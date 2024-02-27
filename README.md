@@ -1,2 +1,2 @@
 # onecx-shell-ui
-OneCx shell UI
+OneCx Shell UI

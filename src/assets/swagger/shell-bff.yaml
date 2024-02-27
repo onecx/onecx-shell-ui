@@ -1,0 +1,157 @@
+---
+openapi: 3.0.3
+info:
+  title: Generated API
+  version: '1.0'
+
+paths:
+  /routes:
+    get:
+      operationId: getRoutesByUrl
+      tags:
+        - Routes
+      parameters:
+        - name: 'url'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRoutesByUrlResponse'
+        400:
+          description: 'Bad request'
+        404:
+          description: 'Not Found'
+        500:
+          description: 'Internal Server Error'
+  /components:
+    get:
+      operationId: getComponentsByUrl
+      tags:
+        - Components
+      parameters:
+        - name: 'url'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetComponentsByUrlResponse'
+        400:
+          description: 'Bad request'
+        404:
+          description: 'Not Found'
+        500:
+          description: 'Internal Server Error'
+
+  
+components:
+  schemas:
+    GetRoutesByUrlResponse:
+      type: object
+      required:
+        - 'routes'
+      properties:
+        routes:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/AngularRoute'
+              - $ref: '#/components/schemas/WebComponentRoute'
+
+    Route:
+      type: object
+      required:
+        - 'url'
+        - 'remoteEntry'
+        - 'type'
+        - 'exposedModule'
+        - 'remoteBaseUrl'
+        - 'displayName'
+        - 'appVersion'
+      properties:
+        url:
+          type: string
+        remoteEntry:
+          type: string
+        remoteBaseUrl:
+          type: string
+        displayName:
+          type: string
+        appVersion:
+          type: string
+        type:
+          type: string
+          enum:
+            - WebComponent
+            - Angular
+        exposedModule:
+          type: string
+        pathMatch:
+          type: string
+
+    AngularRoute:
+      allOf:
+        - $ref: '#/components/schemas/Route'
+      type: object
+        
+    WebComponentRoute:
+      allOf:
+        - $ref: '#/components/schemas/Route'
+      type: object
+      required:
+        - 'remoteName'
+      properties:
+        remoteName:
+          type: string
+    
+    GetComponentsByUrlResponse:
+      type: object
+      required:
+        - 'slotComponents'
+      properties:
+        slotComponents:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/ComponentArray'
+              type: string
+     
+    ComponentArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Component'
+
+    Component:
+      type: object
+      required:
+        - 'url'
+        - 'remoteEntry'
+        - 'exposedModule'
+        - 'remoteBaseUrl'
+        - 'displayName'
+        - 'appVersion'
+      properties:
+        url:
+          type: string
+        remoteEntry:
+          type: string
+        remoteBaseUrl:
+          type: string
+        displayName:
+          type: string
+        appVersion:
+          type: string
+        exposedModule:
+          type: string
+        pathMatch:
+          type: string

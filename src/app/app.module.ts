@@ -1,6 +1,6 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { RoutesService } from './shared/services/routes.service';
@@ -53,6 +53,18 @@ export function slotInitializer(slotService: ShellSlotService) {
   return () => slotService.init();
 }
 
+export function configurationServiceInitializer(configurationService: ConfigurationService) {
+  return () => configurationService.init();
+}
+
+export function dummyPortalInitializer(appStateService: AppStateService) {
+  return () => appStateService.currentPortal$.publish({
+    portalName: 'dummy',
+    microfrontendRegistrations: [],
+    baseUrl: ''
+  });
+}
+
 export function apiConfigProvider(
   configService: ConfigurationService,
   appStateService: AppStateService
@@ -97,6 +109,18 @@ export function apiConfigProvider(
       provide: APP_INITIALIZER,
       useFactory: slotInitializer,
       deps: [SLOT_SERVICE],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: configurationServiceInitializer,
+      deps: [ConfigurationService],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: dummyPortalInitializer,// TODO remove
+      deps: [AppStateService],
       multi: true,
     },
     {

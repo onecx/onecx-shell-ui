@@ -3,11 +3,8 @@ import { Injectable, Type } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
-  ReplaySubject,
   from,
   map,
-  mergeMap,
-  of,
   retry,
 } from 'rxjs';
 import { SlotService } from '@onecx/shell-core';
@@ -39,7 +36,12 @@ export class ShellSlotService implements SlotService {
   }
 
   getComponentsForSlot(slotName: string): Observable<Type<unknown>[]> {
-    return this.slots$.pipe(mergeMap((slots) => slots[slotName] ?? of([])));
+    return from(this.loadComponent({
+      remoteEntry:
+      'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
+    exposedModule: 'MenuComponent',
+    }).then((c) => ([c])))
+    // return this.slots$.pipe(mergeMap((slots) => slots[slotName] ?? of([])));
   }
 
   private async loadComponent(component: {

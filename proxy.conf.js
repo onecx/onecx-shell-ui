@@ -23,8 +23,8 @@ const bypassFn = function (req, res) {
             url: '/admin/portal-mgmt/menu',
             remoteEntry:
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
-            type: 'ANGULAR',
-            exposedModule: './MenuModule',
+            type: 'Angular',
+            exposedModule: 'MenuModule',
             remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
             displayName: 'Menu Management',
             appVersion: '',
@@ -43,7 +43,6 @@ const bypassFn = function (req, res) {
         slotComponents: {
           menu: [
             {
-              url: '/admin/portal-mgmt/menu',
               remoteEntry:
                 'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
               exposedModule: 'MenuComponent',

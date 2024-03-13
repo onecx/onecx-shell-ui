@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import {
+  AngularRouteTypeEnum,
   GetRoutesByUrlResponseRoutesInner,
   RoutesBffService,
   WebComponentRoute,
@@ -39,7 +40,7 @@ export class RoutesService {
       // DEFAULT_CATCH_ALL_ROUTE,
     ]);
     console.log(
-      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.remoteBaseUrl} -> ${JSON.stringify(lr.exposedModule)}`).join('\t\n')}`
+      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.remoteBaseUrl} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
     )
     return Promise.resolve();
   }
@@ -80,7 +81,6 @@ export class RoutesService {
       mountPath: r.url,
       shellName: 'portal',
       remoteBaseUrl: r.remoteBaseUrl,
-      //remote: `${r.remoteBaseUrl}#${r.exposedModule}=${r.remoteName}`,
       version: r.appVersion,
       displayName: r.displayName,
     }
@@ -98,18 +98,18 @@ export class RoutesService {
   private toLoadRemoteEntryOptions(
     r: GetRoutesByUrlResponseRoutesInner
   ): LoadRemoteModuleOptions {
-    if (r.type == 'Angular') {
+    if (r.type === AngularRouteTypeEnum.Angular) {
       return {
         type: 'module',
         remoteEntry: r.remoteEntry,
-        exposedModule: r.exposedModule,
+        exposedModule: './' + r.exposedModule,
       };
     }
     return {
         type: 'script',
         remoteName: (r as WebComponentRoute).remoteName,
         remoteEntry: r.remoteEntry,
-        exposedModule: r.exposedModule,
+        exposedModule: './' + r.exposedModule,
       };
   }
 

@@ -1,1 +1,100 @@
 /* You can add global styles to this file, and also import other style files */
+@import '../node_modules/primeng/resources/primeng.min.css';
+@import '../node_modules/primeflex/primeflex.scss';
+@import '../node_modules/primeicons/primeicons.css';
+
+@import '@onecx/portal-layout-styles/src/styles/shell/shell.scss';
+@import '@onecx/portal-layout-styles/src/styles/primeng/theme-light.scss';
+@import '../node_modules/@onecx/portal-integration-angular/assets/output.css';
+
+.splash {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0, 123, 180);
+  color: white;
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+onecx-root:empty + .splash {
+  //   transition: all 0.5s;
+  display: flex;
+  opacity: 1;
+  //   animation: fadeIn 1.5s forwards;
+}
+
+.splash-welcome {
+  padding: 10px;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.splash-loader {
+  animation: rotator 1.4s linear infinite;
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+.splash-path {
+  stroke-dasharray: 187;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+}
+
+@keyframes colors {
+  0% {
+    stroke: #4285f4;
+  }
+
+  25% {
+    stroke: #de3e35;
+  }
+
+  50% {
+    stroke: #f7c223;
+  }
+
+  75% {
+    stroke: #1b9a59;
+  }
+
+  100% {
+    stroke: #4285f4;
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 187;
+  }
+
+  50% {
+    stroke-dashoffset: 46.75;
+    transform: rotate(135deg);
+  }
+
+  100% {
+    stroke-dashoffset: 187;
+    transform: rotate(450deg);
+  }
+}

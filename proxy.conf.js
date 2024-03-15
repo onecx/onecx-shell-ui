@@ -16,7 +16,7 @@ const bypassFn = function (req, res) {
     res.setHeader('Access-Control-Allow-Headers', '*');
     return res.send('');
   } else {
-    if (req.url.startsWith('/shell-bff/routes')) {
+    if (req.url.startsWith('/shell-bff/workspaceConfig')) {
       const routesResponseMock = {
         routes: [
           {
@@ -30,7 +30,9 @@ const bypassFn = function (req, res) {
             appVersion: '',
           },
         ],
-        remoteName: 'MenuModule',
+        theme: {
+          name: 'theme name',
+        },
       };
       res.end(
         JSON.stringify({
@@ -51,6 +53,18 @@ const bypassFn = function (req, res) {
               appVersion: '',
             },
           ],
+        },
+      };
+      res.end(
+        JSON.stringify({
+          slotComponents: componentsResponse.slotComponents,
+        })
+      );
+    } else if (req.url.startsWith('/shell-bff/userProfile')) {
+      const componentsResponse = {
+        userProfile: {
+          userId: 'userId',
+          person: {},
         },
       };
       res.end(

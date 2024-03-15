@@ -24,6 +24,7 @@ import {
 } from '@onecx/portal-integration-angular';
 import { Configuration } from './shared/generated';
 import { ShellCoreModule } from '@onecx/shell-core'
+import { AppInitializerService } from './shared/services/app-initializer.service';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -45,8 +46,8 @@ export function createTranslateLoader(
   );
 }
 
-export function routesInitializer(routesService: RoutesService) {
-  return () => routesService.init();
+export function appInitializer(appInitializerService: AppInitializerService) {
+  return () => appInitializerService.init();
 }
 
 export function slotInitializer(slotService: ShellSlotService) {
@@ -101,8 +102,8 @@ export function apiConfigProvider(
   providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: routesInitializer,
-      deps: [RoutesService],
+      useFactory: appInitializer,
+      deps: [AppInitializerService],
       multi: true,
     },
     {

@@ -1,3 +1,4 @@
 serviceSuffix: BffService
 stringEnums: true
 providedIn: 'any'
+enumPropertyNaming: 'original'

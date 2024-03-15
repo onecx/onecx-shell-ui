@@ -9,24 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { WebComponentRoute } from './webComponentRoute';
+import { AngularRoute } from './angularRoute';
 import { PathMatch } from './pathMatch';
 
 
-export interface AngularRoute { 
-    url: string;
-    basePath: string;
-    remoteEntryUrl: string;
-    appId: string;
-    productName: string;
-    bffUrl: string;
-    type: AngularRouteTypeEnum;
-    exposedModule: string;
-    pathMatch: PathMatch;
-}
-export enum AngularRouteTypeEnum {
-    WebComponent = 'WebComponent',
-    Angular = 'Angular'
-};
-
-
+/**
+ * @type GetWorkspaceConfigResponseRoutesInner
+ * @export
+ */
+export type GetWorkspaceConfigResponseRoutesInner = AngularRoute | WebComponentRoute;
 

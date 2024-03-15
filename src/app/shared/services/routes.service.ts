@@ -2,17 +2,16 @@ import { Injectable } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import {
   AngularRouteTypeEnum,
-  GetRoutesByUrlResponseRoutesInner,
-  RoutesBffService,
+  GetWorkspaceConfigResponseRoutesInner,
   WebComponentRoute,
 } from '../generated';
-import { firstValueFrom, retry } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import {
   LoadRemoteModuleOptions,
   loadRemoteModule,
 } from '@angular-architects/module-federation';
 import { AppStateService, CONFIG_KEY, ConfigurationService, PortalMessageService } from '@onecx/portal-integration-angular';
+import { GetRoutesByUrlResponseRoutesInner } from '../generated/model/getRoutesByUrlResponseRoutesInner';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {}; //{ path: '**', component: ErrorPageComponent }
 
@@ -20,18 +19,12 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {}; //{ path: '**', component: Err
 export class RoutesService {
   constructor(
     private router: Router,
-    private routesBffService: RoutesBffService,
     private appStateService: AppStateService,
     private portalMessageService: PortalMessageService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
   ) {}
 
-  async init(): Promise<unknown> {
-    const getRoutesByUrlResponse = await firstValueFrom(
-      this.routesBffService.getRoutesByUrl(window.location.href).pipe(retry(1))
-    );
-    const routes = getRoutesByUrlResponse.routes;
-
+  async init(routes: GetWorkspaceConfigResponseRoutesInner[]): Promise<unknown> {
     this.router.resetConfig([
       ...appRoutes,
       ...routes
@@ -40,7 +33,7 @@ export class RoutesService {
       // DEFAULT_CATCH_ALL_ROUTE,
     ]);
     console.log(
-      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.remoteBaseUrl} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
+      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.remoteEntryUrl} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
     )
     return Promise.resolve();
   }
@@ -50,7 +43,7 @@ export class RoutesService {
       path: this.toRouteUrl(r.url),
       data: {
         module: r.exposedModule,
-        breadcrumb: r.displayName,
+        breadcrumb: r.productName,
       },
       pathMatch: r.pathMatch ?? r.url.endsWith('$') ? 'full' : 'prefix',
       loadChildren: async () => await this.loadChildren(r),
@@ -80,9 +73,8 @@ export class RoutesService {
       baseHref: r.url,
       mountPath: r.url,
       shellName: 'portal',
-      remoteBaseUrl: r.remoteBaseUrl,
-      version: r.appVersion,
-      displayName: r.displayName,
+      remoteBaseUrl: r.basePath,
+      displayName: r.productName,
     }
     this.appStateService.currentMfe$.publish(mfeInfo)
   }
@@ -101,14 +93,14 @@ export class RoutesService {
     if (r.type === AngularRouteTypeEnum.Angular) {
       return {
         type: 'module',
-        remoteEntry: r.remoteEntry,
+        remoteEntry: r.remoteEntryUrl,
         exposedModule: './' + r.exposedModule,
       };
     }
     return {
         type: 'script',
-        remoteName: (r as WebComponentRoute).remoteName,
-        remoteEntry: r.remoteEntry,
+        remoteName: (r as WebComponentRoute).productName,
+        remoteEntry: r.remoteEntryUrl,
         exposedModule: './' + r.exposedModule,
       };
   }

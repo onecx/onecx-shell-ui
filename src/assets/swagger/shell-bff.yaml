@@ -5,30 +5,72 @@ info:
   version: '1.0'
 
 paths:
-  /routes:
+  /workspaceConfig:
     get:
-      operationId: getRoutesByUrl
       tags:
-        - Routes
+        - "WorkspaceConfig"
       parameters:
         - name: 'url'
           in: 'query'
           required: true
           schema:
             type: 'string'
+      operationId: getWorkspaceConfig
       responses:
-        200:
-          description: 'OK'
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetRoutesByUrlResponse'
-        400:
-          description: 'Bad request'
-        404:
+                $ref: '#/components/schemas/GetWorkspaceConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
           description: 'Not Found'
-        500:
-          description: 'Internal Server Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+
+  /userProfile:
+    get:
+      tags:
+        - "user"
+      parameters:
+        - name: 'url'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserProfileResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+
   /components:
     get:
       operationId: getComponentsByUrl
@@ -57,10 +99,12 @@ paths:
   
 components:
   schemas:
-    GetRoutesByUrlResponse:
+    GetWorkspaceConfigResponse:
       type: object
       required:
         - 'routes'
+        - 'theme'
+        - 'workspace'
       properties:
         routes:
           type: array
@@ -68,27 +112,55 @@ components:
             oneOf:
               - $ref: '#/components/schemas/AngularRoute'
               - $ref: '#/components/schemas/WebComponentRoute'
+        theme:
+          $ref: '#/components/schemas/Theme'
+        workspace:
+          $ref: '#/components/schemas/Workspace'
+          
+    Workspace:
+      type: object
+      properties:
+        portalName:
+          type: string
+        baseUrl:
+          type: string
+          
+    Theme:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
 
     Route:
       type: object
       required:
         - 'url'
-        - 'remoteEntry'
+        - 'basePath'
+        - 'remoteEntryUrl'
         - 'type'
         - 'exposedModule'
-        - 'remoteBaseUrl'
-        - 'displayName'
-        - 'appVersion'
+        - 'appId'
+        - 'productName'
+        - 'bffUrl'
+        - 'pathMatch'
       properties:
         url:
           type: string
-        remoteEntry:
+        basePath:
           type: string
-        remoteBaseUrl:
+        remoteEntryUrl:
           type: string
-        displayName:
+        appId:
           type: string
-        appVersion:
+        productName:
+          type: string
+        bffUrl:
           type: string
         type:
           type: string
@@ -98,21 +170,146 @@ components:
         exposedModule:
           type: string
         pathMatch:
-          type: string
-
+          $ref: '#/components/schemas/PathMatch'
+          
+    PathMatch:
+      type: string
+      enum: ['full', 'prefix']
+          
     AngularRoute:
+      type: object
       allOf:
         - $ref: '#/components/schemas/Route'
-      type: object
         
     WebComponentRoute:
+      type: object
       allOf:
         - $ref: '#/components/schemas/Route'
+      required:
+        - 'productName'
+      properties:
+        productName:
+          type: string
+          
+    GetUserProfileResponse:
       type: object
       required:
-        - 'remoteName'
+        - 'userProfile'
       properties:
-        remoteName:
+        userProfile:
+          $ref: '#/components/schemas/UserProfile'
+          
+    UserProfile:
+      type: object
+      required:
+        - 'userId'
+        - 'person'
+      properties:
+        userId:
+          type: string
+        person:
+          $ref: '#/components/schemas/UserPerson'
+        layoutAndThemeSettings:
+          $ref: '#/components/schemas/LayoutAndThemeSettings'
+        localeAndTimeSettings:
+          $ref: '#/components/schemas/LocaleAndTimeSettings'
+          
+    UserPerson:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName: 
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        address:
+          $ref: '#/components/schemas/UserPersonAddress'
+        phone:
+          $ref: '#/components/schemas/UserPersonPhone'
+          
+    UserPersonAddress:
+      type: object
+      properties:
+        street:
+          type: string
+        streetNo:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+    
+    UserPersonPhone:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/PhoneType'
+        number:
+          type: string
+          
+    PhoneType:
+      type: string
+      enum: ['MOBILE', 'LANDLINE']
+    
+    LayoutAndThemeSettings:
+      type: object
+      properties:
+        colorScheme:
+          $ref: '#/components/schemas/ColorScheme'
+        menuMode:
+          $ref: '#/components/schemas/MenuMode'
+          
+    ColorScheme:
+      type: string
+      enum: ['AUTO', 'LIGHT', 'DARK']
+      
+    MenuMode:
+      type: string
+      enum: ['HORIZONTAL', 'STATIC', 'OVERLAY', 'SLIM', 'SLIMPLUS']
+              
+    LocaleAndTimeSettings:
+      type: object
+      properties:
+        locale:
+          type: string
+        timeZone:
+          type: string
+    
+    ProblemDetailResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        detail:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailParam'
+        invalidParams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailInvalidParam'
+
+    ProblemDetailParam:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    ProblemDetailInvalidParam:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
           type: string
     
     GetComponentsByUrlResponse:
@@ -124,7 +321,6 @@ components:
             type: object
             additionalProperties:
               $ref: '#/components/schemas/ComponentArray'
-              type: string
      
     ComponentArray:
       type: array

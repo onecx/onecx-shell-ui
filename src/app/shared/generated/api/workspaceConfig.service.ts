@@ -19,7 +19,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { GetComponentsByUrlResponse } from '../model/getComponentsByUrlResponse';
+import { GetWorkspaceConfigResponse } from '../model/getWorkspaceConfigResponse';
+// @ts-ignore
+import { ProblemDetailResponse } from '../model/problemDetailResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -30,7 +32,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'any'
 })
-export class ComponentsBffService {
+export class WorkspaceConfigBffService {
 
     protected basePath = 'http://localhost';
     public defaultHeaders = new HttpHeaders();
@@ -96,12 +98,12 @@ export class ComponentsBffService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getComponentsByUrl(url: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetComponentsByUrlResponse>;
-    public getComponentsByUrl(url: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetComponentsByUrlResponse>>;
-    public getComponentsByUrl(url: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetComponentsByUrlResponse>>;
-    public getComponentsByUrl(url: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+    public getWorkspaceConfig(url: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetWorkspaceConfigResponse>;
+    public getWorkspaceConfig(url: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetWorkspaceConfigResponse>>;
+    public getWorkspaceConfig(url: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetWorkspaceConfigResponse>>;
+    public getWorkspaceConfig(url: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         if (url === null || url === undefined) {
-            throw new Error('Required parameter url was null or undefined when calling getComponentsByUrl.');
+            throw new Error('Required parameter url was null or undefined when calling getWorkspaceConfig.');
         }
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
@@ -141,8 +143,8 @@ export class ComponentsBffService {
             }
         }
 
-        let localVarPath = `/components`;
-        return this.httpClient.request<GetComponentsByUrlResponse>('get', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/workspaceConfig`;
+        return this.httpClient.request<GetWorkspaceConfigResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,

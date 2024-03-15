@@ -9,18 +9,19 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { PathMatch } from './pathMatch';
 
 
 export interface WebComponentRoute { 
-    remoteName: string;
+    productName: string;
     url: string;
-    remoteEntry: string;
-    remoteBaseUrl: string;
-    displayName: string;
-    appVersion: string;
+    basePath: string;
+    remoteEntryUrl: string;
+    appId: string;
+    bffUrl: string;
     type: WebComponentRouteTypeEnum;
     exposedModule: string;
-    pathMatch?: string;
+    pathMatch: PathMatch;
 }
 export enum WebComponentRouteTypeEnum {
     WebComponent = 'WebComponent',

@@ -9,13 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { AccountSettings } from './accountSettings';
-import { UserPerson } from './userPerson';
+import { LayoutAndThemeSettings } from './layoutAndThemeSettings';
+import { LocaleAndTimeSettings } from './localeAndTimeSettings';
 
 
-export interface UserProfile { 
-    userId: string;
-    person: UserPerson;
-    accountSettings?: AccountSettings;
+export interface AccountSettings { 
+    layoutAndThemeSettings?: LayoutAndThemeSettings;
+    localeAndTimeSettings?: LocaleAndTimeSettings;
 }
 

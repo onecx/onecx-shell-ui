@@ -96,7 +96,6 @@ paths:
         500:
           description: 'Internal Server Error'
 
-  
 components:
   schemas:
     GetWorkspaceConfigResponse:
@@ -116,6 +115,10 @@ components:
           $ref: '#/components/schemas/Theme'
         workspace:
           $ref: '#/components/schemas/Workspace'
+        remoteComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
           
     Workspace:
       type: object
@@ -209,10 +212,8 @@ components:
           type: string
         person:
           $ref: '#/components/schemas/UserPerson'
-        layoutAndThemeSettings:
-          $ref: '#/components/schemas/LayoutAndThemeSettings'
-        localeAndTimeSettings:
-          $ref: '#/components/schemas/LocaleAndTimeSettings'
+        accountSettings:
+          $ref: '#/components/schemas/AccountSettings'
           
     UserPerson:
       type: object
@@ -255,6 +256,14 @@ components:
     PhoneType:
       type: string
       enum: ['MOBILE', 'LANDLINE']
+
+    AccountSettings:
+      type: object
+      properties:
+        layoutAndThemeSettings:
+          $ref: '#/components/schemas/LayoutAndThemeSettings'
+        localeAndTimeSettings:
+          $ref: '#/components/schemas/LocaleAndTimeSettings'
     
     LayoutAndThemeSettings:
       type: object

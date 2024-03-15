@@ -11,6 +11,7 @@
  */
 import { GetWorkspaceConfigResponseRoutesInner } from './getWorkspaceConfigResponseRoutesInner';
 import { Theme } from './theme';
+import { Route } from './route';
 import { Workspace } from './workspace';
 
 
@@ -18,5 +19,6 @@ export interface GetWorkspaceConfigResponse {
     routes: Array<GetWorkspaceConfigResponseRoutesInner>;
     theme: Theme;
     workspace: Workspace;
+    remoteComponents?: Array<Route>;
 }
 

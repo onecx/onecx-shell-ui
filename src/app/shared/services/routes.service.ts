@@ -33,7 +33,7 @@ export class RoutesService {
       // DEFAULT_CATCH_ALL_ROUTE,
     ]);
     console.log(
-      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.remoteEntryUrl} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
+      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.basePath} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
     )
     return Promise.resolve();
   }
@@ -53,9 +53,10 @@ export class RoutesService {
 
   private async loadChildren(r: GetRoutesByUrlResponseRoutesInner) {
     await this.appStateService.globalLoading$.publish(true)
-    console.log(`➡ Load remote module ${r.exposedModule}`);
+    console.log(`➡ Load remote module ${r.exposedModule}`, r);
     try {
       try {
+        console.log('R ', r)
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         console.log(`Load remote module ${r.exposedModule} finished`);
         this.updateMfeInfo(r)

@@ -9,6 +9,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/accountSettings.ts
 model/angularRoute.ts
 model/colorScheme.ts
 model/component.ts

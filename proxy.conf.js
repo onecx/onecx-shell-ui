@@ -21,25 +21,67 @@ const bypassFn = function (req, res) {
         routes: [
           {
             url: '/admin/portal-mgmt/menu',
-            remoteEntry:
+            remoteEntryUrl:
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
             type: 'Angular',
             exposedModule: 'MenuModule',
-            remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
+            basePath: 'http://localhost:4400/core/portal-mgmt/',
             displayName: 'Menu Management',
-            appVersion: '',
           },
         ],
         theme: {
-          name: 'theme name',
+          name: 'CapGemini',
+          properties: {
+            font: {
+              'font-family': null,
+              'font-size': null,
+            },
+            topbar: {
+              'topbar-bg-color': ' rgb(18, 171, 219)',
+              'topbar-item-text-color': ' #ffffff',
+              'topbar-text-color': ' #ffffff',
+              'topbar-left-bg-color': ' #ececec',
+              'topbar-item-text-hover-bg-color': ' rgba(255, 255, 255, 0.12)',
+              'topbar-menu-button-bg-color': ' rgb(255, 0, 68)',
+              'logo-color': ' rgb(18, 171, 219)',
+            },
+            general: {
+              'primary-color': ' rgb(18, 171, 219)',
+              'secondary-color': ' #ee4400',
+              'text-color': ' rgba(0, 0, 0, 0.87)',
+              'text-secondary-color': ' rgba(0, 0, 0, 0.6)',
+              'body-bg-color': ' #f7f7f7',
+              'content-bg-color': ' #ffffff',
+              'content-alt-bg-colorr': '',
+              'overlay-content-bg-color': ' #ffffff',
+              'hover-bg-color': ' rgba(0, 0, 0, 0.04)',
+              'solid-surface-text-color': ' #ffffff',
+              'divider-color': ' #e4e4e4',
+              'button-hover-bg': null,
+              'danger-button-bg': null,
+              'info-message-bg': null,
+              'success-message-bg': null,
+              'warning-message-bg': null,
+              'error-message-bg': null,
+            },
+            sidebar: {
+              'menu-text-color': ' #657380',
+              'menu-bg-color': ' #fdfeff',
+              'menu-item-text-color': ' #515c66',
+              'menu-item-hover-bg-color': ' rgba(0, 0, 0, 0.04)',
+              'menu-active-item-text-color': null,
+              'menu-active-item-bg-color': null,
+              'inline-menu-border-color': ' #e4e4e4',
+            },
+          },
         },
+        remoteComponents: [
+          {
+
+          }
+        ]
       };
-      res.end(
-        JSON.stringify({
-          routes: routesResponseMock.routes,
-          remoteName: routesResponseMock.remoteName,
-        })
-      );
+      res.end(JSON.stringify(routesResponseMock));
     } else if (req.url.startsWith('/shell-bff/components')) {
       const componentsResponse = {
         slotComponents: {
@@ -61,17 +103,33 @@ const bypassFn = function (req, res) {
         })
       );
     } else if (req.url.startsWith('/shell-bff/userProfile')) {
-      const componentsResponse = {
+      const profileResponse = {
         userProfile: {
           userId: 'userId',
           person: {},
+          accountSettings: {
+            version: null,
+            creationDate: '2023-07-17T09:17:50.723706Z',
+            creationUser: null,
+            modificationDate: '2024-02-15T08:45:57.281799Z',
+            modificationUser: null,
+            id: '4092c9fa-2fbf-4500-a74a-665fc6959684',
+            privacySettings: {
+              hideMyProfile: true,
+            },
+            localeAndTimeSettings: {
+              locale: 'en',
+              timezone: 'Asia/Riyadh',
+            },
+            notificationSettings: null,
+            layoutAndThemeSettings: {
+              menuMode: 'SLIM',
+              colorScheme: 'LIGHT',
+            },
+          },
         },
       };
-      res.end(
-        JSON.stringify({
-          slotComponents: componentsResponse.slotComponents,
-        })
-      );
+      res.end(JSON.stringify(profileResponse));
     } else {
       return null;
     }

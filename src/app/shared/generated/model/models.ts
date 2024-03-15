@@ -1,3 +1,4 @@
+export * from './accountSettings';
 export * from './angularRoute';
 export * from './colorScheme';
 export * from './component';

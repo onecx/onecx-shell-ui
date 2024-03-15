@@ -1,5 +1,6 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -21,10 +22,17 @@ import {
   AppStateService,
   ConfigurationService,
   PortalApiConfiguration,
+  PortalCoreModule,
+  ThemeService,
+  UserService,
 } from '@onecx/portal-integration-angular';
-import { Configuration } from './shared/generated';
-import { ShellCoreModule } from '@onecx/shell-core'
-import { AppInitializerService } from './shared/services/app-initializer.service';
+import {
+  Configuration,
+  UserBffService,
+  WorkspaceConfigBffService,
+} from './shared/generated';
+import { ShellCoreModule } from '@onecx/shell-core';
+import { firstValueFrom } from 'rxjs';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -46,24 +54,45 @@ export function createTranslateLoader(
   );
 }
 
-export function appInitializer(appInitializerService: AppInitializerService) {
-  return () => appInitializerService.init();
+export function appInitializer(
+  workspaceConfigBffService: WorkspaceConfigBffService,
+  userProfileBffService: UserBffService,
+  routesService: RoutesService,
+  themeService: ThemeService,
+  userService: UserService
+) {
+  return async () => {
+    const getWorkspaceConfigResponse = await firstValueFrom(
+      workspaceConfigBffService.getWorkspaceConfig(window.location.href)
+    );
+
+    const getUserProfileResponse = await firstValueFrom(
+      userProfileBffService.getUserProfile(window.location.href)
+    );
+
+    routesService.init(getWorkspaceConfigResponse.routes);
+    await themeService.apply(getWorkspaceConfigResponse.theme);
+    await userService.profile$.publish(getUserProfileResponse.userProfile);
+  };
 }
 
 export function slotInitializer(slotService: ShellSlotService) {
   return () => slotService.init();
 }
 
-export function configurationServiceInitializer(configurationService: ConfigurationService) {
+export function configurationServiceInitializer(
+  configurationService: ConfigurationService
+) {
   return () => configurationService.init();
 }
 
 export function dummyPortalInitializer(appStateService: AppStateService) {
-  return () => appStateService.currentPortal$.publish({
-    portalName: 'dummy',
-    microfrontendRegistrations: [],
-    baseUrl: ''
-  });
+  return () =>
+    appStateService.currentPortal$.publish({
+      portalName: 'dummy',
+      microfrontendRegistrations: [],
+      baseUrl: '',
+    });
 }
 
 export function apiConfigProvider(
@@ -97,13 +126,21 @@ export function apiConfigProvider(
         useClass: PortalMissingTranslationHandler,
       },
     }),
-    ShellCoreModule
+    ShellCoreModule,
+    PortalCoreModule.forRoot('shell', true),
+    BrowserAnimationsModule,
   ],
   providers: [
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
-      deps: [AppInitializerService],
+      deps: [
+        WorkspaceConfigBffService,
+        UserBffService,
+        RoutesService,
+        ThemeService,
+        UserService
+      ],
       multi: true,
     },
     {
@@ -120,7 +157,7 @@ export function apiConfigProvider(
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: dummyPortalInitializer,// TODO remove
+      useFactory: dummyPortalInitializer, // TODO remove
       deps: [AppStateService],
       multi: true,
     },

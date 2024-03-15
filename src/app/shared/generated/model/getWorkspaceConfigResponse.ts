@@ -9,9 +9,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { RemoteComponent } from './remoteComponent';
+import { RemoteComponentMapping } from './remoteComponentMapping';
 import { GetWorkspaceConfigResponseRoutesInner } from './getWorkspaceConfigResponseRoutesInner';
 import { Theme } from './theme';
-import { Route } from './route';
 import { Workspace } from './workspace';
 
 
@@ -19,6 +20,7 @@ export interface GetWorkspaceConfigResponse {
     routes: Array<GetWorkspaceConfigResponseRoutesInner>;
     theme: Theme;
     workspace: Workspace;
-    remoteComponents?: Array<Route>;
+    remoteComponents: Array<RemoteComponent>;
+    shellRemoteComponents: Array<RemoteComponentMapping>;
 }
 

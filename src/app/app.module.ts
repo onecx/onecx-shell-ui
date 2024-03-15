@@ -161,9 +161,10 @@ export function apiConfigProvider(
       deps: [AppStateService],
       multi: true,
     },
+    ShellSlotService,
     {
       provide: SLOT_SERVICE,
-      useClass: ShellSlotService,
+      useExisting: ShellSlotService,
     },
     {
       provide: Configuration,

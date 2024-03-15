@@ -104,6 +104,8 @@ components:
         - 'routes'
         - 'theme'
         - 'workspace'
+        - 'remoteComponents'
+        - 'shellRemoteComponents'
       properties:
         routes:
           type: array
@@ -118,7 +120,11 @@ components:
         remoteComponents:
           type: array
           items:
-            $ref: '#/components/schemas/Route'
+            $ref: '#/components/schemas/RemoteComponent'
+        shellRemoteComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteComponentMapping'
           
     Workspace:
       type: object
@@ -192,6 +198,46 @@ components:
         - 'productName'
       properties:
         productName:
+          type: string
+
+    RemoteComponent:
+      type: object
+      required:
+        - 'name'
+        - 'url'
+        - 'basePath'
+        - 'remoteEntryUrl'
+        - 'exposedModule'
+        - 'appId'
+        - 'productName'
+        - 'bffUrl'
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        basePath:
+          type: string
+        remoteEntryUrl:
+          type: string
+        appId:
+          type: string
+        productName:
+          type: string
+        bffUrl:
+          type: string
+        exposedModule:
+          type: string
+
+    RemoteComponentMapping:
+      type: object
+      required:
+        - 'slotName'
+        - 'remoteComponent'
+      properties:
+        slotName:
+          type: string
+        remoteComponent:
           type: string
           
     GetUserProfileResponse:

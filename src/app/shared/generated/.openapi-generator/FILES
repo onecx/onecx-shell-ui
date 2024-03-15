@@ -26,6 +26,8 @@ model/phoneType.ts
 model/problemDetailInvalidParam.ts
 model/problemDetailParam.ts
 model/problemDetailResponse.ts
+model/remoteComponent.ts
+model/remoteComponentMapping.ts
 model/route.ts
 model/theme.ts
 model/userPerson.ts

@@ -14,6 +14,8 @@ export * from './phoneType';
 export * from './problemDetailInvalidParam';
 export * from './problemDetailParam';
 export * from './problemDetailResponse';
+export * from './remoteComponent';
+export * from './remoteComponentMapping';
 export * from './route';
 export * from './theme';
 export * from './userPerson';

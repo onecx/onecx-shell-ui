@@ -2,10 +2,15 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import { BehaviorSubject, Observable, from, map, retry, of } from 'rxjs';
 import { SlotService } from '@onecx/shell-core';
-import { ComponentsBffService } from '../generated';
+import { RemoteComponentsTopic } from '@onecx/integration-interface';
+import { ComponentsBffService, RemoteComponentMapping } from '../generated';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
+  
+  remoteComponents = new RemoteComponentsTopic();
+  remoteComponentMappings: RemoteComponentMapping[] | undefined
+
   private slots$ = new BehaviorSubject<
     Record<string, Observable<Type<unknown>[]>>
   >({});

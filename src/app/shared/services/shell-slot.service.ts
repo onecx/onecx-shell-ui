@@ -14,7 +14,11 @@ export class ShellSlotService implements SlotService {
     // not needed in this implementation
   }
 
-  getComponentsForSlot(slotName: string): Observable<Type<unknown>[]> {
+  getComponentsForSlot(
+    slotName: string
+  ): Observable<
+    { componentType: Type<unknown>; remoteComponent: RemoteComponent }[]
+  > {
     return this.remoteComponents.pipe(
       map((rcs) =>
         (
@@ -27,7 +31,16 @@ export class ShellSlotService implements SlotService {
           .map((rc) => rc as RemoteComponent)
       ),
       mergeMap((rcs: RemoteComponent[]) =>
-        from(Promise.all(rcs.map((rc) => this.loadComponent(rc))))
+        from(
+          Promise.all(
+            rcs.map((rc) =>
+              this.loadComponent(rc).then((c) => ({
+                componentType: c,
+                remoteComponent: rc,
+              }))
+            )
+          )
+        )
       )
     );
   }

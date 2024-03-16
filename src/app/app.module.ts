@@ -59,7 +59,8 @@ export function appInitializer(
   userProfileBffService: UserBffService,
   routesService: RoutesService,
   themeService: ThemeService,
-  userService: UserService
+  userService: UserService,
+  shellSlotService: ShellSlotService
 ) {
   return async () => {
     const getWorkspaceConfigResponse = await firstValueFrom(
@@ -73,6 +74,9 @@ export function appInitializer(
     routesService.init(getWorkspaceConfigResponse.routes);
     await themeService.apply(getWorkspaceConfigResponse.theme);
     await userService.profile$.publish(getUserProfileResponse.userProfile);
+
+    shellSlotService.remoteComponentMappings = getWorkspaceConfigResponse.shellRemoteComponents;
+    await shellSlotService.remoteComponents.publish(getWorkspaceConfigResponse.remoteComponents); //TODO: create Service in angular-integration-interface
   };
 }
 
@@ -139,7 +143,8 @@ export function apiConfigProvider(
         UserBffService,
         RoutesService,
         ThemeService,
-        UserService
+        UserService,
+        ShellSlotService
       ],
       multi: true,
     },

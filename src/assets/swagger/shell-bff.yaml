@@ -214,8 +214,6 @@ components:
       properties:
         name:
           type: string
-        url:
-          type: string
         basePath:
           type: string
         remoteEntryUrl:

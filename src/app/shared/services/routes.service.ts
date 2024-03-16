@@ -53,10 +53,9 @@ export class RoutesService {
 
   private async loadChildren(r: GetRoutesByUrlResponseRoutesInner) {
     await this.appStateService.globalLoading$.publish(true)
-    console.log(`➡ Load remote module ${r.exposedModule}`, r);
+    console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
-        console.log('R ', r)
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         console.log(`Load remote module ${r.exposedModule} finished`);
         this.updateMfeInfo(r)

@@ -77,9 +77,21 @@ const bypassFn = function (req, res) {
         },
         remoteComponents: [
           {
-
+            name: 'PortalMenu',
+            basePath: 'http://localhost:4400/core/portal-mgmt/',
+            remoteEntryUrl:
+              'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
+            appId: 'appId',
+            productName: 'PortalMgmt',
+            bffUrl: 'http://localhost:4400/core/portal-mgmt/api/',
+            exposedModule: 'MenuComponent',
+            remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
           }
-        ]
+        ],
+        shellRemoteComponents:[{
+          slotName: 'menu',
+          remoteComponent: 'PortalMenu'
+        }]
       };
       res.end(JSON.stringify(routesResponseMock));
     } else if (req.url.startsWith('/shell-bff/components')) {

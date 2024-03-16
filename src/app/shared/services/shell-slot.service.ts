@@ -4,6 +4,7 @@ import { RemoteComponentsTopic } from '@onecx/integration-interface';
 import { SlotService } from '@onecx/angular-remote-components';
 import { Observable, from, map, mergeMap } from 'rxjs';
 import { RemoteComponent, RemoteComponentMapping } from '../generated';
+import { RemoteComponentInfo } from '@onecx/angular-remote-components'
 
 @Injectable()
 export class ShellSlotService implements SlotService {
@@ -11,14 +12,12 @@ export class ShellSlotService implements SlotService {
   remoteComponentMappings: RemoteComponentMapping[] | undefined;
 
   async init(): Promise<void> {
-    // not needed in this implementation
+    return Promise.resolve()
   }
 
   getComponentsForSlot(
     slotName: string
-  ): Observable<
-    { componentType: Type<unknown>; remoteComponent: RemoteComponent }[]
-  > {
+  ): Observable<{ componentType: Type<unknown>; remoteComponent: RemoteComponentInfo }[]> {
     return this.remoteComponents.pipe(
       map((rcs) =>
         (

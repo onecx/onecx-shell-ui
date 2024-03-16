@@ -1,52 +1,17 @@
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
-import {
-  BehaviorSubject,
-  Observable,
-  from,
-  map,
-  retry,
-  of,
-  mergeMap,
-} from 'rxjs';
-import { SlotService } from '@onecx/shell-core';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
-import {
-  ComponentsBffService,
-  RemoteComponent,
-  RemoteComponentMapping,
-} from '../generated';
+import { SlotService } from '@onecx/shell-core';
+import { Observable, from, map, mergeMap } from 'rxjs';
+import { RemoteComponent, RemoteComponentMapping } from '../generated';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
   remoteComponents = new RemoteComponentsTopic();
   remoteComponentMappings: RemoteComponentMapping[] | undefined;
 
-  private slots$ = new BehaviorSubject<
-    Record<string, Observable<Type<unknown>[]>>
-  >({});
-
-  constructor(private componentService: ComponentsBffService) {}
-
   async init(): Promise<void> {
-    // this.componentService
-    //   .getComponentsByUrl(window.location.href)
-    //   .pipe(
-    //     retry(1),
-    //     map(({ slotComponents }) => {
-    //       return Object.keys(slotComponents).reduce((acc, slotName) => {
-    //         const observable = from(
-    //           Promise.all(
-    //             slotComponents[slotName].map((component) => {
-    //               return this.loadComponent(component);
-    //             })
-    //           )
-    //         );
-    //         return { ...acc, [slotName]: observable };
-    //       }, {} as Record<string, Observable<Type<unknown>[]>>);
-    //     })
-    //   )
-    //   .subscribe(this.slots$);
+    // not needed in this implementation
   }
 
   getComponentsForSlot(slotName: string): Observable<Type<unknown>[]> {

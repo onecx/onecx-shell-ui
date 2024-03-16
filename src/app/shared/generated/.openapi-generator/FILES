@@ -2,7 +2,6 @@
 README.md
 api.module.ts
 api/api.ts
-api/components.service.ts
 api/user.service.ts
 api/workspaceConfig.service.ts
 configuration.ts
@@ -12,8 +11,6 @@ index.ts
 model/accountSettings.ts
 model/angularRoute.ts
 model/colorScheme.ts
-model/component.ts
-model/getComponentsByUrlResponse.ts
 model/getUserProfileResponse.ts
 model/getWorkspaceConfigResponse.ts
 model/getWorkspaceConfigResponseRoutesInner.ts

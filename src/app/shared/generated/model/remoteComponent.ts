@@ -13,7 +13,6 @@
 
 export interface RemoteComponent { 
     name: string;
-    url: string;
     basePath: string;
     remoteEntryUrl: string;
     appId: string;

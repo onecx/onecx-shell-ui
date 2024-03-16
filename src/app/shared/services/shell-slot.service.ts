@@ -1,7 +1,7 @@
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
-import { SlotService } from '@onecx/shell-core';
+import { SlotService } from '@onecx/angular-remote-components';
 import { Observable, from, map, mergeMap } from 'rxjs';
 import { RemoteComponent, RemoteComponentMapping } from '../generated';
 

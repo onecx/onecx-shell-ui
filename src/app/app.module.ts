@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { RoutesService } from './shared/services/routes.service';
-import { SLOT_SERVICE } from '@onecx/shell-core';
+import { SLOT_SERVICE } from '@onecx/angular-remote-components';
 import { ShellSlotService } from './shared/services/shell-slot.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {
@@ -33,6 +33,7 @@ import {
 } from './shared/generated';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
+import { AngularRemoteComponentModule } from '@onecx/angular-remote-components'
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -131,6 +132,7 @@ export function apiConfigProvider(
       },
     }),
     ShellCoreModule,
+    AngularRemoteComponentModule,
     PortalCoreModule.forRoot('shell', true),
     BrowserAnimationsModule,
   ],

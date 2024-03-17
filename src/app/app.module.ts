@@ -131,9 +131,9 @@ export function apiConfigProvider(
         useClass: PortalMissingTranslationHandler,
       },
     }),
+    PortalCoreModule.forRoot('shell', true),
     ShellCoreModule,
     AngularRemoteComponentModule,
-    PortalCoreModule.forRoot('shell', true),
     BrowserAnimationsModule,
   ],
   providers: [

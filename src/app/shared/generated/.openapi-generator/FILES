@@ -11,6 +11,7 @@ index.ts
 model/accountSettings.ts
 model/angularRoute.ts
 model/colorScheme.ts
+model/getPermissionsResponse.ts
 model/getUserProfileResponse.ts
 model/getWorkspaceConfigResponse.ts
 model/getWorkspaceConfigResponseRoutesInner.ts

@@ -1,6 +1,7 @@
 export * from './accountSettings';
 export * from './angularRoute';
 export * from './colorScheme';
+export * from './getPermissionsResponse';
 export * from './getUserProfileResponse';
 export * from './getWorkspaceConfigResponse';
 export * from './getWorkspaceConfigResponseRoutesInner';

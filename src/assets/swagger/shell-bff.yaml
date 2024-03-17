@@ -71,6 +71,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
 
+  /permissions:
+    get:
+      tags:
+        - "user"
+      parameters:
+        - name: 'appId'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+        - name: 'productName'
+          in: 'query'
+          required: true
+          schema:
+            type: 'string'
+      operationId: getPermissions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPermissionsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+
 components:
   schemas:
     GetWorkspaceConfigResponse:
@@ -307,6 +345,16 @@ components:
           type: string
         timeZone:
           type: string
+
+    GetPermissionsResponse:
+      type: object
+      required:
+        - permissions
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
     
     ProblemDetailResponse:
       type: object

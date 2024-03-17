@@ -25,8 +25,8 @@ const bypassFn = function (req, res) {
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
             type: 'Angular',
             exposedModule: 'MenuModule',
-            basePath: 'http://localhost:4400/core/portal-mgmt/',
-            displayName: 'Menu Management',
+            baseUrl: 'http://localhost:4400/core/portal-mgmt/',
+            productName: 'Menu Management',
           },
         ],
         theme: {

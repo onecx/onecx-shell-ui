@@ -44,8 +44,8 @@ export class ShellSlotService implements SlotService {
           .filter((remoteComponent) => !!remoteComponent)
           .map((remoteComponent) => remoteComponent as RemoteComponent)
       ),
-      mergeMap((remoteComponents: RemoteComponent[]) => {
-        return zip(
+      mergeMap((remoteComponents: RemoteComponent[]) =>
+        zip(
           remoteComponents.map((remoteComponent) =>
             this.userService
               .getPermissions(
@@ -56,8 +56,8 @@ export class ShellSlotService implements SlotService {
                 map(({ permissions }) => ({ remoteComponent, permissions }))
               )
           )
-        );
-      }),
+        )
+      ),
       mergeMap((infos) =>
         from(
           Promise.all(

@@ -14,7 +14,7 @@ import { PathMatch } from './pathMatch';
 
 export interface AngularRoute { 
     url: string;
-    basePath: string;
+    baseUrl: string;
     remoteEntryUrl: string;
     appId: string;
     productName: string;

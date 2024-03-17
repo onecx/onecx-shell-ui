@@ -163,7 +163,7 @@ components:
       type: object
       required:
         - 'url'
-        - 'basePath'
+        - 'baseUrl'
         - 'remoteEntryUrl'
         - 'type'
         - 'exposedModule'
@@ -174,7 +174,7 @@ components:
       properties:
         url:
           type: string
-        basePath:
+        baseUrl:
           type: string
         remoteEntryUrl:
           type: string
@@ -218,7 +218,7 @@ components:
       required:
         - 'name'
         - 'url'
-        - 'basePath'
+        - 'baseUrl'
         - 'remoteEntryUrl'
         - 'exposedModule'
         - 'appId'
@@ -227,7 +227,7 @@ components:
       properties:
         name:
           type: string
-        basePath:
+        baseUrl:
           type: string
         remoteEntryUrl:
           type: string

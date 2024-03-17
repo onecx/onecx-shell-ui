@@ -33,7 +33,7 @@ export class RoutesService {
       // DEFAULT_CATCH_ALL_ROUTE,
     ]);
     console.log(
-      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.basePath} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
+      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.baseUrl} -> ${JSON.stringify(lr.url)}`).join('\t\n')}`
     )
     return Promise.resolve();
   }
@@ -73,7 +73,7 @@ export class RoutesService {
       baseHref: r.url,
       mountPath: r.url,
       shellName: 'portal',
-      remoteBaseUrl: r.basePath,
+      remoteBaseUrl: r.baseUrl,
       displayName: r.productName,
     }
     this.appStateService.currentMfe$.publish(mfeInfo)

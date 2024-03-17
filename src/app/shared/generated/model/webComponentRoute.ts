@@ -15,7 +15,7 @@ import { PathMatch } from './pathMatch';
 export interface WebComponentRoute { 
     productName: string;
     url: string;
-    basePath: string;
+    baseUrl: string;
     remoteEntryUrl: string;
     appId: string;
     bffUrl: string;

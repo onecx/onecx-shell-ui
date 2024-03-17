@@ -14,7 +14,7 @@ import { PathMatch } from './pathMatch';
 
 export interface Route { 
     url: string;
-    basePath: string;
+    baseUrl: string;
     remoteEntryUrl: string;
     appId: string;
     productName: string;

@@ -21,37 +21,51 @@ export class ShellSlotService implements SlotService {
     return Promise.resolve();
   }
 
-  getComponentsForSlot(
-    slotName: string
-  ): Observable<
-    { componentType: Type<unknown>; remoteComponent: RemoteComponentInfo, permissions: string[] }[]
+  getComponentsForSlot(slotName: string): Observable<
+    {
+      componentType: Type<unknown>;
+      remoteComponent: RemoteComponentInfo;
+      permissions: string[];
+    }[]
   > {
     return this.remoteComponents.pipe(
-      map((rcs) =>
+      map((remoteComponents) =>
         (
           this.remoteComponentMappings?.filter(
-            (rcm) => rcm.slotName === slotName
+            (remoteComponentMappings) =>
+              remoteComponentMappings.slotName === slotName
           ) ?? []
         )
-          .map((rcm) => rcs.find((rc) => rc.name === rcm.remoteComponent))
-          .filter((rc) => !!rc)
-          .map((rc) => rc as RemoteComponent)
+          .map((remoteComponentMappings) =>
+            remoteComponents.find(
+              (rc) => rc.name === remoteComponentMappings.remoteComponent
+            )
+          )
+          .filter((remoteComponent) => !!remoteComponent)
+          .map((remoteComponent) => remoteComponent as RemoteComponent)
       ),
-      mergeMap((rcs: RemoteComponent[]) => {
-        return zip(rcs.map((rc) =>
-          this.userService
-            .getPermissions(rc.appId, rc.productName)
-            .pipe(map(({permissions}) => ({rc, permissions})))
-        ));
+      mergeMap((remoteComponents: RemoteComponent[]) => {
+        return zip(
+          remoteComponents.map((remoteComponent) =>
+            this.userService
+              .getPermissions(
+                remoteComponent.appId,
+                remoteComponent.productName
+              )
+              .pipe(
+                map(({ permissions }) => ({ remoteComponent, permissions }))
+              )
+          )
+        );
       }),
       mergeMap((infos) =>
         from(
           Promise.all(
-            infos.map(({rc, permissions}) =>
-              this.loadComponent(rc).then((c) => ({
-                componentType: c,
-                remoteComponent: rc,
-                permissions
+            infos.map(({ remoteComponent, permissions }) =>
+              this.loadComponent(remoteComponent).then((componentType) => ({
+                componentType,
+                remoteComponent,
+                permissions,
               }))
             )
           )

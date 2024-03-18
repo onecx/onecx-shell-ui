@@ -31,6 +31,7 @@ const bypassFn = function (req, res) {
         ],
         theme: {
           name: 'CapGemini',
+          favicon: 'favicon',
           properties: {
             font: {
               'font-family': null,

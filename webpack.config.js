@@ -65,28 +65,32 @@ const {
 const webpackConfig = {
   ...withModuleFederationPlugin({
     shared: share({
-      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true, eager: true },
+      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true, eager: true, singleton: true },
       '@angular/forms': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true
+        eager: true,
+        singleton: true
       },
       '@angular/common': {
         requiredVersion: 'auto',
         includeSecondaries: {
           skip: ['@angular/common/http/testing'],
         },
-        eager: true
+        eager: true,
+        singleton: true
       },
       '@angular/common/http': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true
+        eager: true,
+        singleton: true
       },
       '@angular/router': {
         requiredVersion: 'auto',
         includeSecondaries: true,
         eager: true,
+        singleton: true
       },
       rxjs: { requiredVersion: 'auto', includeSecondaries: true, eager: true },
       '@ngx-translate/core': {

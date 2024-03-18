@@ -25,7 +25,7 @@ import {
   PortalCoreModule,
   ThemeService,
   UserService,
-  // AUTH_SERVICE,
+  AUTH_SERVICE,
 } from '@onecx/portal-integration-angular';
 import {
   Configuration,
@@ -132,8 +132,8 @@ export function apiConfigProvider(
         useClass: PortalMissingTranslationHandler,
       },
     }),
-    PortalCoreModule.forRoot('shell', true),
     ShellCoreModule,
+    PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentModule,
     BrowserAnimationsModule,
   ],
@@ -179,9 +179,9 @@ export function apiConfigProvider(
       useFactory: apiConfigProvider,
       deps: [ConfigurationService, AppStateService],
     },
-    // {
-    //   provide: AUTH_SERVICE, useValue: AUTH_SERVICE
-    // }
+    {
+      provide: AUTH_SERVICE, useValue: AUTH_SERVICE
+    }
   ],
   bootstrap: [AppComponent],
 })

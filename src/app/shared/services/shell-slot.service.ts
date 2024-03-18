@@ -48,10 +48,10 @@ export class ShellSlotService implements SlotService {
         zip(
           remoteComponents.map((remoteComponent) =>
             this.userService
-              .getPermissions(
-                remoteComponent.appId,
-                remoteComponent.productName
-              )
+              .getPermissions({
+                appId: remoteComponent.appId,
+                productName: remoteComponent.productName,
+              })
               .pipe(
                 map(({ permissions }) => ({ remoteComponent, permissions }))
               )

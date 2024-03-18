@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import {
-  AngularRouteTypeEnum,
   GetWorkspaceConfigResponseRoutesInner,
   WebComponentRoute,
 } from '../generated';
@@ -90,7 +89,7 @@ export class RoutesService {
   private toLoadRemoteEntryOptions(
     r: GetRoutesByUrlResponseRoutesInner
   ): LoadRemoteModuleOptions {
-    if (r.type === AngularRouteTypeEnum.Angular) {
+    if (r.technology === 'Angular') {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,

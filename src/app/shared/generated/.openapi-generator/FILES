@@ -11,8 +11,10 @@ index.ts
 model/accountSettings.ts
 model/angularRoute.ts
 model/colorScheme.ts
+model/getPermissionsRequest.ts
 model/getPermissionsResponse.ts
 model/getUserProfileResponse.ts
+model/getWorkspaceConfigRequest.ts
 model/getWorkspaceConfigResponse.ts
 model/getWorkspaceConfigResponseRoutesInner.ts
 model/layoutAndThemeSettings.ts
@@ -27,6 +29,7 @@ model/problemDetailResponse.ts
 model/remoteComponent.ts
 model/remoteComponentMapping.ts
 model/route.ts
+model/technologies.ts
 model/theme.ts
 model/userPerson.ts
 model/userPersonAddress.ts

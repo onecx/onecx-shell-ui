@@ -11,8 +11,8 @@
  */
 
 
-export interface RemoteComponentMapping { 
-    slotName: string;
-    remoteComponent: string;
+export enum Technologies {
+    Angular = 'Angular',
+    WebComponent = 'WebComponent'
 }
 

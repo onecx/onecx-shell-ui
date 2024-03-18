@@ -23,7 +23,7 @@ const bypassFn = function (req, res) {
             url: '/admin/portal-mgmt/menu',
             remoteEntryUrl:
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
-            type: 'Angular',
+            technology: 'Angular',
             exposedModule: 'MenuModule',
             baseUrl: 'http://localhost:4400/core/portal-mgmt/',
             productName: 'Menu Management',
@@ -78,7 +78,7 @@ const bypassFn = function (req, res) {
         remoteComponents: [
           {
             name: 'PortalMenu',
-            basePath: 'http://localhost:4400/core/portal-mgmt/',
+            baseUrl: 'http://localhost:4400/core/portal-mgmt/',
             remoteEntryUrl:
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
             appId: 'appId',
@@ -86,12 +86,14 @@ const bypassFn = function (req, res) {
             bffUrl: 'http://localhost:4400/core/portal-mgmt/api/',
             exposedModule: 'MenuComponent',
             remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
-          }
+          },
         ],
-        shellRemoteComponents:[{
-          slotName: 'menu',
-          remoteComponent: 'PortalMenu'
-        }]
+        shellRemoteComponents: [
+          {
+            slotName: 'menu',
+            remoteComponent: 'PortalMenu',
+          },
+        ],
       };
       res.end(JSON.stringify(routesResponseMock));
     } else if (req.url.startsWith('/shell-bff/components')) {
@@ -142,6 +144,11 @@ const bypassFn = function (req, res) {
         },
       };
       res.end(JSON.stringify(profileResponse));
+    } else if (req.url.startsWith('/shell-bff/permissions')) {
+      const permissionsResponse = {
+        permissions: [],
+      };
+      res.end(JSON.stringify(permissionsResponse));
     } else {
       return null;
     }

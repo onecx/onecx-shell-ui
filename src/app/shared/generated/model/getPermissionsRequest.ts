@@ -11,8 +11,8 @@
  */
 
 
-export interface RemoteComponentMapping { 
-    slotName: string;
-    remoteComponent: string;
+export interface GetPermissionsRequest { 
+    appId: string;
+    productName: string;
 }
 

@@ -25,6 +25,7 @@ import {
   PortalCoreModule,
   ThemeService,
   UserService,
+  // AUTH_SERVICE,
 } from '@onecx/portal-integration-angular';
 import {
   Configuration,
@@ -65,11 +66,11 @@ export function appInitializer(
 ) {
   return async () => {
     const getWorkspaceConfigResponse = await firstValueFrom(
-      workspaceConfigBffService.getWorkspaceConfig(window.location.href)
+      workspaceConfigBffService.getWorkspaceConfig({basePath: window.location.href})
     );
 
     const getUserProfileResponse = await firstValueFrom(
-      userProfileBffService.getUserProfile(window.location.href)
+      userProfileBffService.getUserProfile()
     );
 
     routesService.init(getWorkspaceConfigResponse.routes);
@@ -178,6 +179,9 @@ export function apiConfigProvider(
       useFactory: apiConfigProvider,
       deps: [ConfigurationService, AppStateService],
     },
+    // {
+    //   provide: AUTH_SERVICE, useValue: AUTH_SERVICE
+    // }
   ],
   bootstrap: [AppComponent],
 })

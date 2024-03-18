@@ -1,20 +1,23 @@
 ---
 openapi: 3.0.3
 info:
-  title: Generated API
-  version: '1.0'
+  title: onecx-shell-bff
+  description: OneCx shell Bff
+  version: "1.0"
+servers:
+  - url: http://onecx-shell-bff:8080/
 
 paths:
   /workspaceConfig:
-    get:
+    post:
       tags:
         - "WorkspaceConfig"
-      parameters:
-        - name: 'url'
-          in: 'query'
-          required: true
-          schema:
-            type: 'string'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetWorkspaceConfigRequest'
       operationId: getWorkspaceConfig
       responses:
         '200':
@@ -31,23 +34,11 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: 'Not Found'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetailResponse'
 
   /userProfile:
     get:
       tags:
         - "user"
-      parameters:
-        - name: 'url'
-          in: 'query'
-          required: true
-          schema:
-            type: 'string'
       operationId: getUserProfile
       responses:
         '200':
@@ -64,29 +55,18 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: 'Not Found'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetailResponse'
 
   /permissions:
-    get:
+    post:
       tags:
         - "user"
-      parameters:
-        - name: 'appId'
-          in: 'query'
-          required: true
-          schema:
-            type: 'string'
-        - name: 'productName'
-          in: 'query'
-          required: true
-          schema:
-            type: 'string'
       operationId: getPermissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPermissionsRequest'
       responses:
         '200':
           description: OK
@@ -102,12 +82,6 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: 'Not Found'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetailResponse'
 
 components:
   schemas:
@@ -123,7 +97,7 @@ components:
         routes:
           type: array
           items:
-            oneOf:
+            anyOf:
               - $ref: '#/components/schemas/AngularRoute'
               - $ref: '#/components/schemas/WebComponentRoute'
         theme:
@@ -138,6 +112,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RemoteComponentMapping'
+
+    GetWorkspaceConfigRequest:
+      type: object
+      required:
+        - basePath
+      properties:
+        basePath:
+          type: string
+
+    GetPermissionsRequest:
+      type: object
+      required:
+        - appId
+        - productName
+      properties:
+        appId:
+          type: string
+        productName:
+          type: string
           
     Workspace:
       type: object
@@ -151,6 +144,8 @@ components:
       type: object
       properties:
         name:
+          type: string
+        favicon: # TODO
           type: string
         properties:
           type: object
@@ -184,16 +179,17 @@ components:
           type: string
         bffUrl:
           type: string
-        type:
-          type: string
-          enum:
-            - WebComponent
-            - Angular
+        technology:
+          $ref: '#/components/schemas/Technologies'
         exposedModule:
           type: string
         pathMatch:
           $ref: '#/components/schemas/PathMatch'
           
+    Technologies:
+      type: string
+      enum: ['Angular', 'WebComponent']
+
     PathMatch:
       type: string
       enum: ['full', 'prefix']
@@ -208,9 +204,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/Route'
       required:
-        - 'productName'
+        - 'remoteName'
       properties:
-        productName:
+        remoteName:
           type: string
 
     RemoteComponent:

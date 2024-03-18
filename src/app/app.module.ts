@@ -34,7 +34,7 @@ import {
 } from './shared/generated';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
-import { AngularRemoteComponentModule } from '@onecx/angular-remote-components'
+import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -134,7 +134,7 @@ export function apiConfigProvider(
     }),
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
-    AngularRemoteComponentModule,
+    AngularRemoteComponentsModule,
     BrowserAnimationsModule,
   ],
   providers: [

@@ -138,8 +138,8 @@ const bypassFn = function (req, res) {
             },
             notificationSettings: null,
             layoutAndThemeSettings: {
-              menuMode: 'SLIM',
-              colorScheme: 'LIGHT',
+              menuMode: 'HORIZONTAL',
+              colorScheme: 'DARK',
             },
           },
         },

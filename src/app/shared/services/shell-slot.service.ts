@@ -47,6 +47,7 @@ export class ShellSlotService implements SlotService {
       mergeMap((remoteComponents: RemoteComponent[]) =>
         zip(
           remoteComponents.map((remoteComponent) =>
+          // TODO add permissions cache service
             this.userService
               .getPermissions({
                 appId: remoteComponent.appId,
@@ -86,8 +87,12 @@ export class ShellSlotService implements SlotService {
       });
       return m[component.exposedModule];
     } catch (e) {
-      //TODO: verbessern
-      console.log(e);
+      console.log(
+        'Failed to load remote module ',
+        e,
+        component.remoteEntryUrl,
+        component.exposedModule
+      );
       throw e;
     }
   }

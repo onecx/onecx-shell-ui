@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { RoutesService } from './shared/services/routes.service';
@@ -21,20 +21,20 @@ import {
   CachingTranslateLoader,
   AppStateService,
   ConfigurationService,
-  PortalApiConfiguration,
   PortalCoreModule,
   ThemeService,
   UserService,
   AUTH_SERVICE,
 } from '@onecx/portal-integration-angular';
 import {
-  Configuration,
+  BASE_PATH,
   UserBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
+import { ErrorPageComponent } from './shared/components/error-page.component';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -101,20 +101,8 @@ export function dummyPortalInitializer(appStateService: AppStateService) {
     });
 }
 
-export function apiConfigProvider(
-  configService: ConfigurationService,
-  appStateService: AppStateService
-) {
-  return new PortalApiConfiguration(
-    Configuration,
-    'shell-bff',
-    configService,
-    appStateService
-  );
-}
-
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, ErrorPageComponent],
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes),
@@ -136,6 +124,7 @@ export function apiConfigProvider(
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
     BrowserAnimationsModule,
+    RouterModule
   ],
   providers: [
     {
@@ -175,12 +164,10 @@ export function apiConfigProvider(
       useExisting: ShellSlotService,
     },
     {
-      provide: Configuration,
-      useFactory: apiConfigProvider,
-      deps: [ConfigurationService, AppStateService],
+      provide: AUTH_SERVICE, useValue: AUTH_SERVICE
     },
     {
-      provide: AUTH_SERVICE, useValue: AUTH_SERVICE
+      provide: BASE_PATH, useValue: './shell-bff'
     }
   ],
   bootstrap: [AppComponent],

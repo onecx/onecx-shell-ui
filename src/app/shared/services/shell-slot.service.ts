@@ -2,20 +2,26 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
 import { SlotService } from '@onecx/angular-remote-components';
-import { Observable, from, map, mergeMap, zip } from 'rxjs';
+import { Observable, from, map, mergeMap, zip, firstValueFrom } from 'rxjs';
 import {
   RemoteComponent,
   RemoteComponentMapping,
   UserBffService,
 } from '../generated';
 import { RemoteComponentInfo } from '@onecx/angular-remote-components';
+import { PermissionsTopic } from '@onecx/integration-interface';
+import { PermissionsCacheService } from '@onecx/shell-core';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
   remoteComponents = new RemoteComponentsTopic();
   remoteComponentMappings: RemoteComponentMapping[] | undefined;
+  private permissionsTopic$ = new PermissionsTopic();
 
-  constructor(private userService: UserBffService) {}
+  constructor(
+    private userService: UserBffService,
+    private permissionsCacheService: PermissionsCacheService
+  ) {}
 
   async init(): Promise<void> {
     return Promise.resolve();
@@ -47,15 +53,16 @@ export class ShellSlotService implements SlotService {
       mergeMap((remoteComponents: RemoteComponent[]) =>
         zip(
           remoteComponents.map((remoteComponent) =>
-          // TODO add permissions cache service
-            this.userService
-              .getPermissions({
-                appId: remoteComponent.appId,
-                productName: remoteComponent.productName,
-              })
-              .pipe(
-                map(({ permissions }) => ({ remoteComponent, permissions }))
+            this.permissionsCacheService
+              .getPermissions(
+                remoteComponent.appId,
+                remoteComponent.productName,
+                (appId, productName) =>
+                  this.userService
+                    .getPermissions({ appId, productName })
+                    .pipe(map(({ permissions }) => permissions))
               )
+              .pipe(map((permissions) => ({ remoteComponent, permissions })))
           )
         )
       ),

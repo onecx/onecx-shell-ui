@@ -32,6 +32,7 @@ const bypassFn = function (req, res) {
         theme: {
           name: 'CapGemini',
           favicon: 'favicon',
+          themeId: 'themeId',
           properties: {
             font: {
               'font-family': null,
@@ -76,6 +77,11 @@ const bypassFn = function (req, res) {
             },
           },
         },
+        workspace: {
+          portalName: 'Workspace Name',
+          workspaceId: 'Workspace Id',
+          baseUrl: 'Workspace baseUrl',
+        },
         remoteComponents: [
           {
             name: 'PortalMenu',
@@ -84,7 +90,6 @@ const bypassFn = function (req, res) {
               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
             appId: 'appId',
             productName: 'PortalMgmt',
-            bffUrl: 'http://localhost:4400/core/portal-mgmt/api/',
             exposedModule: 'MenuComponent',
             remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
           },
@@ -138,7 +143,7 @@ const bypassFn = function (req, res) {
             },
             notificationSettings: null,
             layoutAndThemeSettings: {
-              menuMode: 'HORIZONTAL',
+              menuMode: 'SLIM',
               colorScheme: 'DARK',
             },
           },
@@ -147,7 +152,7 @@ const bypassFn = function (req, res) {
       res.end(JSON.stringify(profileResponse));
     } else if (req.url.startsWith('/shell-bff/permissions')) {
       const permissionsResponse = {
-        permissions: [],
+        permissions: ['abc#123', 'MENU#DRAG_DROP', 'PROFILE#VIEW'],
       };
       res.end(JSON.stringify(permissionsResponse));
     } else {

@@ -20,7 +20,6 @@ export interface WebComponentRoute {
     remoteEntryUrl: string;
     appId: string;
     productName: string;
-    bffUrl: string;
     technology?: Technologies;
     exposedModule: string;
     pathMatch: PathMatch;

@@ -137,6 +137,8 @@ components:
       properties:
         portalName:
           type: string
+        workspaceId:
+          type: string
         baseUrl:
           type: string
           
@@ -145,7 +147,9 @@ components:
       properties:
         name:
           type: string
-        favicon: # TODO
+        favicon:
+          type: string
+        themeId:
           type: string
         properties:
           type: object
@@ -164,7 +168,6 @@ components:
         - 'exposedModule'
         - 'appId'
         - 'productName'
-        - 'bffUrl'
         - 'pathMatch'
       properties:
         url:
@@ -176,8 +179,6 @@ components:
         appId:
           type: string
         productName:
-          type: string
-        bffUrl:
           type: string
         technology:
           $ref: '#/components/schemas/Technologies'
@@ -219,7 +220,6 @@ components:
         - 'exposedModule'
         - 'appId'
         - 'productName'
-        - 'bffUrl'
       properties:
         name:
           type: string
@@ -230,8 +230,6 @@ components:
         appId:
           type: string
         productName:
-          type: string
-        bffUrl:
           type: string
         exposedModule:
           type: string

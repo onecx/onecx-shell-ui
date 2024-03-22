@@ -79,6 +79,8 @@ export function appInitializer(
 
     shellSlotService.remoteComponentMappings = getWorkspaceConfigResponse.shellRemoteComponents;
     await shellSlotService.remoteComponents.publish(getWorkspaceConfigResponse.remoteComponents); //TODO: create Service in angular-integration-interface
+
+    
   };
 }
 

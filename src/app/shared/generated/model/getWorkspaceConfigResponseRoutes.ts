@@ -9,9 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { WebComponentRoute } from './webComponentRoute';
+import { AngularRoute } from './angularRoute';
 
 
-export interface GetWorkspaceConfigRequest { 
-    baseUrl: string;
+export interface GetWorkspaceConfigResponseRoutes { 
+    angularRoutes?: Array<AngularRoute>;
+    webComponentRoutes?: Array<WebComponentRoute>;
 }
 

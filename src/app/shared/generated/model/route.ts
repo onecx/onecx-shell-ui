@@ -22,6 +22,7 @@ export interface Route {
     technology?: Technologies;
     exposedModule: string;
     pathMatch: PathMatch;
+    remoteName?: string;
 }
 
 

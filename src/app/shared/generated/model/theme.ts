@@ -12,8 +12,14 @@
 
 
 export interface Theme { 
-    name?: string;
-    favicon?: string;
+    name: string;
+    cssFile?: string;
+    description?: string;
+    assetsUrl?: string;
+    logoUrl?: string;
+    faviconUrl?: string;
+    previewImageUrl?: string;
+    assetsUpdateDate?: string;
     properties?: { [key: string]: { [key: string]: string; }; };
 }
 

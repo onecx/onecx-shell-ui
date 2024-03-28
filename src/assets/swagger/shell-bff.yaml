@@ -10,6 +10,10 @@ servers:
 paths:
   /workspaceConfig:
     post:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
       tags:
         - "WorkspaceConfig"
       requestBody:
@@ -35,10 +39,43 @@ paths:
         '404':
           description: 'Not Found'
 
+  /workspaceConfig/themes/{name}/favicon:
+    get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - "WorkspaceConfig"
+      description: Load favicon by theme name
+      operationId: getThemeFaviconByName
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            image/*:
+              schema:
+                minimum: 1
+                maximum: 110000
+                type: string
+                format: binary
+        404:
+          description: Not found
+
   /userProfile:
     get:
+      x-onecx:
+        permissions:
+          userProfile:
+            - read
       tags:
-        - "user"
+        - userProfile
       operationId: getUserProfile
       responses:
         '200':
@@ -58,8 +95,12 @@ paths:
 
   /permissions:
     post:
+      x-onecx:
+        permissions:
+          permission:
+            - read
       tags:
-        - "user"
+        - permission
       operationId: getPermissions
       requestBody:
         required: true
@@ -97,9 +138,7 @@ components:
         routes:
           type: array
           items:
-            anyOf:
-              - $ref: '#/components/schemas/AngularRoute'
-              - $ref: '#/components/schemas/WebComponentRoute'
+            $ref: '#/components/schemas/Route'
         theme:
           $ref: '#/components/schemas/Theme'
         workspace:
@@ -116,9 +155,9 @@ components:
     GetWorkspaceConfigRequest:
       type: object
       required:
-        - basePath
+        - baseUrl
       properties:
-        basePath:
+        baseUrl:
           type: string
 
     GetPermissionsRequest:
@@ -131,25 +170,39 @@ components:
           type: string
         productName:
           type: string
-          
+
     Workspace:
       type: object
-      properties:
-        portalName:
-          type: string
-        workspaceId:
-          type: string
-        baseUrl:
-          type: string
-          
-    Theme:
-      type: object
+      required:
+        - name
+        - baseUrl
       properties:
         name:
           type: string
-        favicon:
+        baseUrl:
           type: string
-        themeId:
+
+    Theme:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 2
+          type: string
+        cssFile:
+          type: string
+        description:
+          type: string
+        assetsUrl:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        previewImageUrl:
+          type: string
+        assetsUpdateDate:
           type: string
         properties:
           type: object
@@ -186,7 +239,9 @@ components:
           type: string
         pathMatch:
           $ref: '#/components/schemas/PathMatch'
-          
+        remoteName:
+          type: string
+
     Technologies:
       type: string
       enum: ['Angular', 'WebComponent']
@@ -194,21 +249,6 @@ components:
     PathMatch:
       type: string
       enum: ['full', 'prefix']
-          
-    AngularRoute:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/Route'
-        
-    WebComponentRoute:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/Route'
-      required:
-        - 'remoteName'
-      properties:
-        remoteName:
-          type: string
 
     RemoteComponent:
       type: object
@@ -244,7 +284,7 @@ components:
           type: string
         remoteComponent:
           type: string
-          
+
     GetUserProfileResponse:
       type: object
       required:
@@ -252,7 +292,7 @@ components:
       properties:
         userProfile:
           $ref: '#/components/schemas/UserProfile'
-          
+
     UserProfile:
       type: object
       required:
@@ -265,13 +305,13 @@ components:
           $ref: '#/components/schemas/UserPerson'
         accountSettings:
           $ref: '#/components/schemas/AccountSettings'
-          
+
     UserPerson:
       type: object
       properties:
         firstName:
           type: string
-        lastName: 
+        lastName:
           type: string
         displayName:
           type: string
@@ -281,7 +321,7 @@ components:
           $ref: '#/components/schemas/UserPersonAddress'
         phone:
           $ref: '#/components/schemas/UserPersonPhone'
-          
+
     UserPersonAddress:
       type: object
       properties:
@@ -295,7 +335,7 @@ components:
           type: string
         country:
           type: string
-    
+
     UserPersonPhone:
       type: object
       properties:
@@ -303,7 +343,7 @@ components:
           $ref: '#/components/schemas/PhoneType'
         number:
           type: string
-          
+
     PhoneType:
       type: string
       enum: ['MOBILE', 'LANDLINE']
@@ -315,7 +355,7 @@ components:
           $ref: '#/components/schemas/LayoutAndThemeSettings'
         localeAndTimeSettings:
           $ref: '#/components/schemas/LocaleAndTimeSettings'
-    
+
     LayoutAndThemeSettings:
       type: object
       properties:
@@ -323,21 +363,21 @@ components:
           $ref: '#/components/schemas/ColorScheme'
         menuMode:
           $ref: '#/components/schemas/MenuMode'
-          
+
     ColorScheme:
       type: string
       enum: ['AUTO', 'LIGHT', 'DARK']
-      
+
     MenuMode:
       type: string
       enum: ['HORIZONTAL', 'STATIC', 'OVERLAY', 'SLIM', 'SLIMPLUS']
-              
+
     LocaleAndTimeSettings:
       type: object
       properties:
         locale:
           type: string
-        timeZone:
+        timezone:
           type: string
 
     GetPermissionsResponse:
@@ -349,7 +389,7 @@ components:
           type: array
           items:
             type: string
-    
+
     ProblemDetailResponse:
       type: object
       properties:

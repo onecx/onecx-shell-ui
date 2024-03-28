@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Route, Router } from '@angular/router';
-import {
-  GetWorkspaceConfigResponseRoutesInner,
-  UserBffService,
-  WebComponentRoute,
-} from '../generated';
+import { PathMatch, PermissionBffService } from '../generated';
 import { appRoutes } from 'src/app/app.routes';
 import {
   LoadRemoteModuleOptions,
@@ -16,11 +12,14 @@ import {
   ConfigurationService,
   PortalMessageService,
 } from '@onecx/portal-integration-angular';
-import { GetRoutesByUrlResponseRoutesInner } from '../generated/model/getRoutesByUrlResponseRoutesInner';
+import { Route as BffGeneratedRoute } from '../generated/model/route';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { PermissionsCacheService } from '@onecx/shell-core';
 import { firstValueFrom, map } from 'rxjs';
-import { PermissionsTopic } from '@onecx/integration-interface'
+import { PermissionsTopic } from '@onecx/integration-interface';
+import { HomeComponent } from '../components/home/home.component';
+import { WebComponentRoute } from '../generated/model/webComponentRoute';
+import { Location } from '@angular/common';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -29,7 +28,7 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 
 @Injectable({ providedIn: 'root' })
 export class RoutesService {
-  private permissionsTopic$ = new PermissionsTopic()
+  private permissionsTopic$ = new PermissionsTopic();
 
   constructor(
     private router: Router,
@@ -37,57 +36,70 @@ export class RoutesService {
     private portalMessageService: PortalMessageService,
     private configurationService: ConfigurationService,
     private permissionsCacheService: PermissionsCacheService,
-    private userService: UserBffService
+    private permissionsService: PermissionBffService
   ) {}
 
-  async init(
-    routes: GetWorkspaceConfigResponseRoutesInner[]
-  ): Promise<unknown> {
+  async init(routes: BffGeneratedRoute[]): Promise<unknown> {
+    // const genreatedRoutes = routes.map((r) => this.convertToRoute(r));
+    const workspaceBaseUrl =
+      this.appStateService.currentWorkspace$.getValue()?.baseUrl;
+    const genreatedRoutes = routes.map((r) =>
+      this.convertToRoute(r, workspaceBaseUrl ?? '')
+    );
+    if (this.containsRouteForWorkspace(routes)) {
+      console.log(`Adding fallback route for base url ${workspaceBaseUrl}`);
+      genreatedRoutes.push(this.createFallbackRoute());
+    }
     this.router.resetConfig([
       ...appRoutes,
-      ...routes
-        .map((r) => this.convertToRoute(r))
-        .sort((a, b) => (b.path || '')?.length - (a.path || '')?.length),
+      ...genreatedRoutes.sort(
+        (a, b) => (b.path || '')?.length - (a.path || '')?.length
+      ),
       DEFAULT_CATCH_ALL_ROUTE,
     ]);
     console.log(
       `🧭 Adding App routes: \n${routes
-        .map((lr) => `${lr.baseUrl} -> ${JSON.stringify(lr.url)}`)
+        .map((lr) => `${lr.url} -> ${JSON.stringify(workspaceBaseUrl + lr.baseUrl)}`)
         .join('\t\n')}`
     );
     return Promise.resolve();
   }
 
-  private convertToRoute(r: GetRoutesByUrlResponseRoutesInner): Route {
+  // private convertToRoute(r: BffGeneratedRoute): Route {
+  private convertToRoute(
+    r: BffGeneratedRoute,
+    workspaceBaseUrl: string
+  ): Route {
+    const joinedBaseUrl = Location.joinWithSlash(workspaceBaseUrl, r.baseUrl);
     return {
-      path: this.toRouteUrl(r.url),
+      path: this.toRouteUrl(joinedBaseUrl),
       data: {
         module: r.exposedModule,
         breadcrumb: r.productName,
       },
-      pathMatch: r.pathMatch ?? r.url.endsWith('$') ? 'full' : 'prefix',
-      loadChildren: async () => await this.loadChildren(r),
-      canActivateChild: [() => this.updateMfeInfo(r)],
+      pathMatch: r.pathMatch ?? joinedBaseUrl.endsWith('$') ? 'full' : 'prefix',
+      loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
+      canActivateChild: [() => this.updateMfeInfo(r, joinedBaseUrl)],
     };
   }
 
-  private async loadChildren(r: GetRoutesByUrlResponseRoutesInner) {
+  private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
     await this.appStateService.globalLoading$.publish(true);
     console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
-        await this.updateMfeInfo(r);
+        await this.updateMfeInfo(r, joinedBaseUrl);
         const permissions = await firstValueFrom(
           this.permissionsCacheService.getPermissions(
             r.appId,
             r.productName,
             (appId, productName) =>
-              this.userService
+              this.permissionsService
                 .getPermissions({ appId, productName })
                 .pipe(map(({ permissions }) => permissions))
           )
         );
-        await this.permissionsTopic$.publish(permissions)
+        await this.permissionsTopic$.publish(permissions);
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         console.log(`Load remote module ${r.exposedModule} finished`);
         return m[r.exposedModule];
@@ -99,15 +111,15 @@ export class RoutesService {
     }
   }
 
-  private async updateMfeInfo(r: GetRoutesByUrlResponseRoutesInner) {
+  private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
     const mfeInfo = {
-      baseHref: r.url,
-      mountPath: r.url,
+      baseHref: joinedBaseUrl,
+      mountPath: joinedBaseUrl,
       shellName: 'portal',
-      remoteBaseUrl: r.baseUrl,
+      remoteBaseUrl: r.url,
       displayName: r.productName,
       appId: r.appId,
-      productName: r.productName
+      productName: r.productName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
@@ -121,7 +133,7 @@ export class RoutesService {
   }
 
   private toLoadRemoteEntryOptions(
-    r: GetRoutesByUrlResponseRoutesInner
+    r: BffGeneratedRoute
   ): LoadRemoteModuleOptions {
     if (r.technology === 'Angular') {
       return {
@@ -159,5 +171,27 @@ export class RoutesService {
       url = url.substring(0, url.length - 1);
     }
     return url;
+  }
+
+  private containsRouteForWorkspace(routes: BffGeneratedRoute[]): boolean {
+    return (
+      routes.find(
+        (r) =>
+          r.url ===
+          this.toRouteUrl(
+            this.appStateService.currentWorkspace$.getValue()?.baseUrl
+          )
+      ) === undefined
+    );
+  }
+
+  private createFallbackRoute(): Route {
+    return {
+      path: this.toRouteUrl(
+        this.appStateService.currentWorkspace$.getValue()?.baseUrl
+      )!,
+      component: HomeComponent,
+      pathMatch: PathMatch.full,
+    };
   }
 }

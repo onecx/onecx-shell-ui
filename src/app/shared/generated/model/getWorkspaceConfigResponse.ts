@@ -11,13 +11,13 @@
  */
 import { RemoteComponent } from './remoteComponent';
 import { RemoteComponentMapping } from './remoteComponentMapping';
-import { GetWorkspaceConfigResponseRoutesInner } from './getWorkspaceConfigResponseRoutesInner';
 import { Theme } from './theme';
+import { Route } from './route';
 import { Workspace } from './workspace';
 
 
 export interface GetWorkspaceConfigResponse { 
-    routes: Array<GetWorkspaceConfigResponseRoutesInner>;
+    routes: Array<Route>;
     theme: Theme;
     workspace: Workspace;
     remoteComponents: Array<RemoteComponent>;

@@ -12,7 +12,7 @@
 
 
 export interface Workspace { 
-    portalName?: string;
-    baseUrl?: string;
+    name: string;
+    baseUrl: string;
 }
 

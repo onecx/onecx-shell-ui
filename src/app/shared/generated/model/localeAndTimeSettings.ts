@@ -13,6 +13,6 @@
 
 export interface LocaleAndTimeSettings { 
     locale?: string;
-    timeZone?: string;
+    timezone?: string;
 }
 

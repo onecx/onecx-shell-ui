@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { RoutesService } from './shared/services/routes.service';
@@ -24,17 +24,21 @@ import {
   PortalCoreModule,
   ThemeService,
   UserService,
-  AUTH_SERVICE,
+  APP_CONFIG,
 } from '@onecx/portal-integration-angular';
 import {
   BASE_PATH,
-  UserBffService,
+  PermissionBffService,
+  UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
-import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
+import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components';
 import { ErrorPageComponent } from './shared/components/error-page.component';
+import { HomeComponent } from './shared/components/home/home.component';
+import { KeycloakAuthModule } from '@onecx/keycloak-auth';
+import { environment } from 'src/environments/environment';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -58,29 +62,39 @@ export function createTranslateLoader(
 
 export function appInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
-  userProfileBffService: UserBffService,
+  userProfileBffService: UserProfileBffService,
   routesService: RoutesService,
   themeService: ThemeService,
   userService: UserService,
-  shellSlotService: ShellSlotService
+  shellSlotService: ShellSlotService,
+  appStateService: AppStateService
 ) {
+  const workspaceBaseUrl = '/' + window.location.href.split('/')[3];
   return async () => {
     const getWorkspaceConfigResponse = await firstValueFrom(
-      workspaceConfigBffService.getWorkspaceConfig({basePath: window.location.href})
+      workspaceConfigBffService.getWorkspaceConfig({
+        baseUrl: workspaceBaseUrl,
+      })
     );
 
     const getUserProfileResponse = await firstValueFrom(
       userProfileBffService.getUserProfile()
     );
 
+    await appStateService.currentWorkspace$.publish({
+      baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
+      portalName: getWorkspaceConfigResponse.workspace.name,
+      microfrontendRegistrations: [],
+    });
     routesService.init(getWorkspaceConfigResponse.routes);
     await themeService.apply(getWorkspaceConfigResponse.theme);
     await userService.profile$.publish(getUserProfileResponse.userProfile);
 
-    shellSlotService.remoteComponentMappings = getWorkspaceConfigResponse.shellRemoteComponents;
-    await shellSlotService.remoteComponents.publish(getWorkspaceConfigResponse.remoteComponents); //TODO: create Service in angular-integration-interface
-
-    
+    shellSlotService.remoteComponentMappings =
+      getWorkspaceConfigResponse.shellRemoteComponents;
+    await shellSlotService.remoteComponents.publish(
+      getWorkspaceConfigResponse.remoteComponents
+    ); //TODO: create Service in angular-integration-interface
   };
 }
 
@@ -94,17 +108,8 @@ export function configurationServiceInitializer(
   return () => configurationService.init();
 }
 
-export function dummyPortalInitializer(appStateService: AppStateService) {
-  return () =>
-    appStateService.currentPortal$.publish({
-      portalName: 'dummy',
-      microfrontendRegistrations: [],
-      baseUrl: '',
-    });
-}
-
 @NgModule({
-  declarations: [AppComponent, ErrorPageComponent],
+  declarations: [AppComponent, ErrorPageComponent, HomeComponent],
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes),
@@ -126,19 +131,22 @@ export function dummyPortalInitializer(appStateService: AppStateService) {
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
     BrowserAnimationsModule,
-    RouterModule
+    RouterModule,
+    KeycloakAuthModule,
   ],
   providers: [
+    { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
       deps: [
         WorkspaceConfigBffService,
-        UserBffService,
+        UserProfileBffService,
         RoutesService,
         ThemeService,
         UserService,
-        ShellSlotService
+        ShellSlotService,
+        AppStateService
       ],
       multi: true,
     },
@@ -154,23 +162,15 @@ export function dummyPortalInitializer(appStateService: AppStateService) {
       deps: [ConfigurationService],
       multi: true,
     },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: dummyPortalInitializer, // TODO remove
-      deps: [AppStateService],
-      multi: true,
-    },
     ShellSlotService,
     {
       provide: SLOT_SERVICE,
       useExisting: ShellSlotService,
     },
     {
-      provide: AUTH_SERVICE, useValue: AUTH_SERVICE
+      provide: BASE_PATH,
+      useValue: './shell-bff',
     },
-    {
-      provide: BASE_PATH, useValue: './shell-bff'
-    }
   ],
   bootstrap: [AppComponent],
 })

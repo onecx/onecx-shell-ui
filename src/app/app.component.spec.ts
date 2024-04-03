@@ -5,5 +5,7 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({}).compileComponents();
   });
 
-  it('should ', () => {});
+  it('should ', () => {
+    // do nothing for now...
+  });
 });

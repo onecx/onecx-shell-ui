@@ -6,11 +6,12 @@ import { RouterModule } from '@angular/router';
 import {
   MissingTranslationHandler,
   TranslateLoader,
-  TranslateModule,
+  TranslateModule
 } from '@ngx-translate/core';
+import { RemoteComponentsService } from '@onecx/angular-integration-interface';
 import {
   AngularRemoteComponentsModule,
-  SLOT_SERVICE,
+  SLOT_SERVICE
 } from '@onecx/angular-remote-components';
 import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
@@ -24,11 +25,11 @@ import {
   ThemeService,
   TranslateCombinedLoader,
   TranslationCacheService,
-  UserService,
+  UserService
 } from '@onecx/portal-integration-angular';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { ErrorPageComponent } from './shared/components/error-page.component';
@@ -36,11 +37,10 @@ import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
   UserProfileBffService,
-  WorkspaceConfigBffService,
+  WorkspaceConfigBffService
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
-import { RemoteComponentsService } from '@onecx/angular-integration-interface';
 
 export function createTranslateLoader(
   http: HttpClient,

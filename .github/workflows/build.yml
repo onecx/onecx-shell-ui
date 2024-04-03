@@ -1,0 +1,15 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+      - 'fix/[0-9]+.[0-9]+.x'
+
+jobs:
+  build:
+    uses: onecx/ci-angular/.github/workflows/build.yml@v1
+    secrets: inherit
+    with:
+      helmEventTargetRepository: onecx/onecx-user-profile

@@ -1,0 +1,12 @@
+name: Sonar Pull Request
+
+on:
+  workflow_run:
+    workflows: ["Build Pull Request"]
+    types:
+      - completed
+
+jobs:
+  pr:
+    uses: onecx/ci-angular/.github/workflows/angular-pr-sonar.yml@v1
+    secrets: inherit

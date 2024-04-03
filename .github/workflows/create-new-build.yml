@@ -1,0 +1,9 @@
+name: Create new build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: onecx/ci-common/.github/workflows/create-new-build.yml@v1
+    secrets: inherit

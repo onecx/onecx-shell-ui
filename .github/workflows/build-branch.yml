@@ -1,0 +1,15 @@
+name: Build Feature Branch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+      - '!main'
+      - '!fix/[0-9]+.[0-9]+.x'
+
+jobs:
+  branch:
+    uses: onecx/ci-angular/.github/workflows/build-branch.yml@v1
+    secrets: inherit
+    

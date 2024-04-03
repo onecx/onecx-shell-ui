@@ -59,6 +59,5 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "shell",
-  "nxCloudAccessToken": "NzFjY2NlNjItZGM4My00MDdjLTg2NWQtM2M3NGFjNWFlOWNifHJlYWQtd3JpdGU="
+  "defaultProject": "shell"
 }

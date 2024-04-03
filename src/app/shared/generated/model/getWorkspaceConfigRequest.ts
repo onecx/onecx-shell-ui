@@ -12,6 +12,6 @@
 
 
 export interface GetWorkspaceConfigRequest { 
-    baseUrl: string;
+    url: string;
 }
 

@@ -72,12 +72,11 @@ export function appInitializer(
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService
 ) {
-  const workspaceBaseUrl = '/' + window.location.href.split('/')[3];
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
     const getWorkspaceConfigResponse = await firstValueFrom(
       workspaceConfigBffService.getWorkspaceConfig({
-        baseUrl: workspaceBaseUrl,
+        url: window.location.href,
       })
     );
 
@@ -160,7 +159,7 @@ export function configurationServiceInitializer(
         UserService,
         ShellSlotService,
         AppStateService,
-        RemoteComponentsService
+        RemoteComponentsService,
       ],
       multi: true,
     },

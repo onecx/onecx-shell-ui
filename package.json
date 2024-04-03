@@ -7,6 +7,7 @@
     "build": "nx build",
     "test": "nx test",
     "lint": "nx lint",
+    "test:ci": "nx test",
     "apigen": "openapi-generator-cli generate -i src/assets/swagger/shell-bff.yaml -c apigen.yaml -o src/app/shared/generated -g typescript-angular --type-mappings AnyType=object,set=Array"
   },
   "private": true,

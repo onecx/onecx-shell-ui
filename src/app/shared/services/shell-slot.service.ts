@@ -13,7 +13,7 @@ import { PermissionsCacheService } from '@onecx/shell-core';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
-  remoteComponents = new RemoteComponentsTopic();
+  remoteComponents$ = new RemoteComponentsTopic();
   remoteComponentMappings: RemoteComponentMapping[] | undefined;
 
   constructor(
@@ -32,7 +32,7 @@ export class ShellSlotService implements SlotService {
       permissions: string[];
     }[]
   > {
-    return this.remoteComponents.pipe(
+    return this.remoteComponents$.pipe(
       map((remoteComponents) =>
         (
           this.remoteComponentMappings?.filter(

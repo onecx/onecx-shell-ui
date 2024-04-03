@@ -1,44 +1,46 @@
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
-import { appRoutes } from './app.routes';
-import { RoutesService } from './shared/services/routes.service';
-import { SLOT_SERVICE } from '@onecx/angular-remote-components';
-import { ShellSlotService } from './shared/services/shell-slot.service';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {
   MissingTranslationHandler,
   TranslateLoader,
   TranslateModule,
 } from '@ngx-translate/core';
 import {
-  DEFAULT_LANG,
-  TranslationCacheService,
-  PortalMissingTranslationHandler,
-  TranslateCombinedLoader,
-  CachingTranslateLoader,
+  AngularRemoteComponentsModule,
+  SLOT_SERVICE,
+} from '@onecx/angular-remote-components';
+import { KeycloakAuthModule } from '@onecx/keycloak-auth';
+import {
   AppStateService,
-  ConfigurationService,
-  PortalCoreModule,
-  ThemeService,
-  UserService,
   APP_CONFIG,
+  CachingTranslateLoader,
+  ConfigurationService,
+  DEFAULT_LANG,
+  PortalCoreModule,
+  PortalMissingTranslationHandler,
+  ThemeService,
+  TranslateCombinedLoader,
+  TranslationCacheService,
+  UserService,
 } from '@onecx/portal-integration-angular';
+import { ShellCoreModule } from '@onecx/shell-core';
+import { firstValueFrom } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { AppComponent } from './app.component';
+import { appRoutes } from './app.routes';
+import { ErrorPageComponent } from './shared/components/error-page.component';
+import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
-  PermissionBffService,
   UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
-import { ShellCoreModule } from '@onecx/shell-core';
-import { firstValueFrom } from 'rxjs';
-import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components';
-import { ErrorPageComponent } from './shared/components/error-page.component';
-import { HomeComponent } from './shared/components/home/home.component';
-import { KeycloakAuthModule } from '@onecx/keycloak-auth';
-import { environment } from 'src/environments/environment';
+import { RoutesService } from './shared/services/routes.service';
+import { ShellSlotService } from './shared/services/shell-slot.service';
+import { RemoteComponentsService } from '@onecx/angular-integration-interface';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -67,7 +69,8 @@ export function appInitializer(
   themeService: ThemeService,
   userService: UserService,
   shellSlotService: ShellSlotService,
-  appStateService: AppStateService
+  appStateService: AppStateService,
+  remoteComponentsService: RemoteComponentsService
 ) {
   const workspaceBaseUrl = '/' + window.location.href.split('/')[3];
   return async () => {
@@ -87,12 +90,21 @@ export function appInitializer(
       microfrontendRegistrations: [],
     });
     routesService.init(getWorkspaceConfigResponse.routes);
-    await themeService.apply(getWorkspaceConfigResponse.theme);
+
+    const parsedProperties = JSON.parse(
+      getWorkspaceConfigResponse.theme.properties
+    ) as Record<string, Record<string, string>>;
+    const themeWithParsedProperties = {
+      ...getWorkspaceConfigResponse.theme,
+      properties: parsedProperties,
+    };
+    await themeService.apply(themeWithParsedProperties);
+
     await userService.profile$.publish(getUserProfileResponse.userProfile);
 
     shellSlotService.remoteComponentMappings =
       getWorkspaceConfigResponse.shellRemoteComponents;
-    await shellSlotService.remoteComponents.publish(
+    await remoteComponentsService.remoteComponents$.publish(
       getWorkspaceConfigResponse.remoteComponents
     ); //TODO: create Service in angular-integration-interface
   };
@@ -146,7 +158,8 @@ export function configurationServiceInitializer(
         ThemeService,
         UserService,
         ShellSlotService,
-        AppStateService
+        AppStateService,
+        RemoteComponentsService
       ],
       multi: true,
     },

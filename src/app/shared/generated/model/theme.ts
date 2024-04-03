@@ -20,6 +20,6 @@ export interface Theme {
     faviconUrl?: string;
     previewImageUrl?: string;
     assetsUpdateDate?: string;
-    properties?: { [key: string]: { [key: string]: string; }; };
+    properties: string;
 }
 

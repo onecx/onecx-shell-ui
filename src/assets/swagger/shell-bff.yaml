@@ -185,6 +185,7 @@ components:
     Theme:
       required:
       - name
+      - properties
       type: object
       properties:
         name:
@@ -205,11 +206,7 @@ components:
         assetsUpdateDate:
           type: string
         properties:
-          type: object
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: string
+          type: string
 
     Route:
       type: object

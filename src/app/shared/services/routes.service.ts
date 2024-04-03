@@ -40,13 +40,12 @@ export class RoutesService {
   ) {}
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
-    // const genreatedRoutes = routes.map((r) => this.convertToRoute(r));
     const workspaceBaseUrl =
       this.appStateService.currentWorkspace$.getValue()?.baseUrl;
     const genreatedRoutes = routes.map((r) =>
       this.convertToRoute(r, workspaceBaseUrl ?? '')
     );
-    if (this.containsRouteForWorkspace(routes)) {
+    if (!this.containsRouteForWorkspace(routes)) {
       console.log(`Adding fallback route for base url ${workspaceBaseUrl}`);
       genreatedRoutes.push(this.createFallbackRoute());
     }
@@ -65,7 +64,6 @@ export class RoutesService {
     return Promise.resolve();
   }
 
-  // private convertToRoute(r: BffGeneratedRoute): Route {
   private convertToRoute(
     r: BffGeneratedRoute,
     workspaceBaseUrl: string
@@ -77,7 +75,7 @@ export class RoutesService {
         module: r.exposedModule,
         breadcrumb: r.productName,
       },
-      pathMatch: r.pathMatch ?? joinedBaseUrl.endsWith('$') ? 'full' : 'prefix',
+      pathMatch: r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
       canActivateChild: [() => this.updateMfeInfo(r, joinedBaseUrl)],
     };

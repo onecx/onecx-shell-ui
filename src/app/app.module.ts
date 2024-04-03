@@ -74,6 +74,7 @@ export function appInitializer(
 ) {
   const workspaceBaseUrl = '/' + window.location.href.split('/')[3];
   return async () => {
+    await appStateService.isAuthenticated$.isInitialized;
     const getWorkspaceConfigResponse = await firstValueFrom(
       workspaceConfigBffService.getWorkspaceConfig({
         baseUrl: workspaceBaseUrl,

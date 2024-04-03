@@ -1,0 +1,420 @@
+---
+openapi: 3.0.3
+info:
+  title: onecx-shell-bff
+  description: OneCx shell Bff
+  version: "1.0"
+servers:
+  - url: http://onecx-shell-bff:8080/
+
+paths:
+  /workspaceConfig:
+    post:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - "WorkspaceConfig"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetWorkspaceConfigRequest'
+      operationId: getWorkspaceConfig
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkspaceConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
+
+  /workspaceConfig/themes/{name}/favicon:
+    get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - "WorkspaceConfig"
+      description: Load favicon by theme name
+      operationId: getThemeFaviconByName
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            image/*:
+              schema:
+                minimum: 1
+                maximum: 110000
+                type: string
+                format: binary
+        404:
+          description: Not found
+
+  /userProfile:
+    get:
+      x-onecx:
+        permissions:
+          userProfile:
+            - read
+      tags:
+        - userProfile
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserProfileResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
+
+  /permissions:
+    post:
+      x-onecx:
+        permissions:
+          permission:
+            - read
+      tags:
+        - permission
+      operationId: getPermissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPermissionsRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPermissionsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
+
+components:
+  schemas:
+    GetWorkspaceConfigResponse:
+      type: object
+      required:
+        - 'routes'
+        - 'theme'
+        - 'workspace'
+        - 'remoteComponents'
+        - 'shellRemoteComponents'
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        theme:
+          $ref: '#/components/schemas/Theme'
+        workspace:
+          $ref: '#/components/schemas/Workspace'
+        remoteComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteComponent'
+        shellRemoteComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteComponentMapping'
+
+    GetWorkspaceConfigRequest:
+      type: object
+      required:
+        - baseUrl
+      properties:
+        baseUrl:
+          type: string
+
+    GetPermissionsRequest:
+      type: object
+      required:
+        - appId
+        - productName
+      properties:
+        appId:
+          type: string
+        productName:
+          type: string
+
+    Workspace:
+      type: object
+      required:
+        - name
+        - baseUrl
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+
+    Theme:
+      required:
+      - name
+      - properties
+      type: object
+      properties:
+        name:
+          minLength: 2
+          type: string
+        cssFile:
+          type: string
+        description:
+          type: string
+        assetsUrl:
+          type: string
+        logoUrl:
+          type: string
+        faviconUrl:
+          type: string
+        previewImageUrl:
+          type: string
+        assetsUpdateDate:
+          type: string
+        properties:
+          type: string
+
+    Route:
+      type: object
+      required:
+        - 'url'
+        - 'baseUrl'
+        - 'remoteEntryUrl'
+        - 'type'
+        - 'exposedModule'
+        - 'appId'
+        - 'productName'
+        - 'pathMatch'
+      properties:
+        url:
+          type: string
+        baseUrl:
+          type: string
+        remoteEntryUrl:
+          type: string
+        appId:
+          type: string
+        productName:
+          type: string
+        technology:
+          $ref: '#/components/schemas/Technologies'
+        exposedModule:
+          type: string
+        pathMatch:
+          $ref: '#/components/schemas/PathMatch'
+        remoteName:
+          type: string
+
+    Technologies:
+      type: string
+      enum: ['Angular', 'WebComponent']
+
+    PathMatch:
+      type: string
+      enum: ['full', 'prefix']
+
+    RemoteComponent:
+      type: object
+      required:
+        - 'name'
+        - 'url'
+        - 'baseUrl'
+        - 'remoteEntryUrl'
+        - 'exposedModule'
+        - 'appId'
+        - 'productName'
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+        remoteEntryUrl:
+          type: string
+        appId:
+          type: string
+        productName:
+          type: string
+        exposedModule:
+          type: string
+
+    RemoteComponentMapping:
+      type: object
+      required:
+        - 'slotName'
+        - 'remoteComponent'
+      properties:
+        slotName:
+          type: string
+        remoteComponent:
+          type: string
+
+    GetUserProfileResponse:
+      type: object
+      required:
+        - 'userProfile'
+      properties:
+        userProfile:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      required:
+        - 'userId'
+        - 'person'
+      properties:
+        userId:
+          type: string
+        person:
+          $ref: '#/components/schemas/UserPerson'
+        accountSettings:
+          $ref: '#/components/schemas/AccountSettings'
+
+    UserPerson:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        address:
+          $ref: '#/components/schemas/UserPersonAddress'
+        phone:
+          $ref: '#/components/schemas/UserPersonPhone'
+
+    UserPersonAddress:
+      type: object
+      properties:
+        street:
+          type: string
+        streetNo:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    UserPersonPhone:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/PhoneType'
+        number:
+          type: string
+
+    PhoneType:
+      type: string
+      enum: ['MOBILE', 'LANDLINE']
+
+    AccountSettings:
+      type: object
+      properties:
+        layoutAndThemeSettings:
+          $ref: '#/components/schemas/LayoutAndThemeSettings'
+        localeAndTimeSettings:
+          $ref: '#/components/schemas/LocaleAndTimeSettings'
+
+    LayoutAndThemeSettings:
+      type: object
+      properties:
+        colorScheme:
+          $ref: '#/components/schemas/ColorScheme'
+        menuMode:
+          $ref: '#/components/schemas/MenuMode'
+
+    ColorScheme:
+      type: string
+      enum: ['AUTO', 'LIGHT', 'DARK']
+
+    MenuMode:
+      type: string
+      enum: ['HORIZONTAL', 'STATIC', 'OVERLAY', 'SLIM', 'SLIMPLUS']
+
+    LocaleAndTimeSettings:
+      type: object
+      properties:
+        locale:
+          type: string
+        timezone:
+          type: string
+
+    GetPermissionsResponse:
+      type: object
+      required:
+        - permissions
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+
+    ProblemDetailResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        detail:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailParam'
+        invalidParams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailInvalidParam'
+
+    ProblemDetailParam:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    ProblemDetailInvalidParam:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string

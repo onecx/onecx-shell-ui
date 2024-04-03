@@ -1,0 +1,18 @@
+app:
+  name: ui
+  image:
+    repository: 'onecx/onecx-shell-ui'
+  routing:
+    enabled: true
+    path: /newShell/
+  
+  operator:    
+    # Keycloak
+    keycloak:
+      client:
+        enabled: true
+        spec:
+          kcConfig:
+            clientId: "onecx-shell-ui"
+
+# PIPE Config

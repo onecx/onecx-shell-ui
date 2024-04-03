@@ -1,0 +1,17 @@
+apiVersion: v2
+name: onecx-shell-ui
+version: 0.0.0
+description: OneCX Shell UI.
+home: https://github.com/onecx/onecx-shell-ui
+keywords:
+  - shell
+sources:
+  - https://github.com/onecx/onecx-shell-ui
+maintainers:
+  - name: OneCX Developer Team
+    email: tkit_dev@1000kit.org
+dependencies:
+  - name: helm-angular-app
+    version: ^0
+    repository: oci://ghcr.io/onecx/charts
+    alias: app

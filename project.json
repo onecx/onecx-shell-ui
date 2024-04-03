@@ -12,7 +12,7 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/shell",
+        "outputPath": "dist/shell-ui",
         "index": "./src/index.html",
         "main": "./src/main.ts",
         "polyfills": [

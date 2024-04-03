@@ -1,6 +1,20 @@
 {
   "root": true,
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": [
+    ".angular/**",
+    ".husky/**",
+    ".github/**",
+    ".scannerwork/**",
+    "reports/**",
+    "dist/**",
+    "helm/**",
+    "node_modules/**",
+    "src/app/shared/generated/**",
+    "src/app/api/*",
+    "src/app/model/*",
+    "src/**/*.ico",
+    "src/**/*.svg"
+  ],
   "plugins": ["@nx"],
   "overrides": [
     {

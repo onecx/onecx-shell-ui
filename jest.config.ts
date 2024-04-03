@@ -23,4 +23,7 @@ export default {
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/*(*.)@(spec|test).[jt]s?(x)',
   ],
+  moduleNameMapper: {
+    '^d3-(.*)$': `d3-$1/dist/d3-$1`,
+  },
 };

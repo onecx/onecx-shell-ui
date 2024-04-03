@@ -58,7 +58,10 @@ export class RoutesService {
     ]);
     console.log(
       `🧭 Adding App routes: \n${routes
-        .map((lr) => `${lr.url} -> ${JSON.stringify(workspaceBaseUrl + lr.baseUrl)}`)
+        .map(
+          (lr) =>
+            `${lr.url} -> ${JSON.stringify(workspaceBaseUrl + lr.baseUrl)}`
+        )
         .join('\t\n')}`
     );
     return Promise.resolve();
@@ -75,7 +78,8 @@ export class RoutesService {
         module: r.exposedModule,
         breadcrumb: r.productName,
       },
-      pathMatch: r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
+      pathMatch:
+        r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
       canActivateChild: [() => this.updateMfeInfo(r, joinedBaseUrl)],
     };
@@ -187,7 +191,7 @@ export class RoutesService {
     return {
       path: this.toRouteUrl(
         this.appStateService.currentWorkspace$.getValue()?.baseUrl
-      )!,
+      ),
       component: HomeComponent,
       pathMatch: PathMatch.full,
     };

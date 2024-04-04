@@ -155,9 +155,9 @@ components:
     GetWorkspaceConfigRequest:
       type: object
       required:
-        - baseUrl
+        - url
       properties:
-        baseUrl:
+        url:
           type: string
 
     GetPermissionsRequest:

@@ -141,14 +141,18 @@ export class RoutesService {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
-        exposedModule: './' + r.exposedModule,
+        exposedModule: r.exposedModule.startsWith('./')
+          ? r.exposedModule
+          : './' + r.exposedModule,
       };
     }
     return {
       type: 'script',
       remoteName: (r as WebComponentRoute).productName,
       remoteEntry: r.remoteEntryUrl,
-      exposedModule: './' + r.exposedModule,
+      exposedModule: r.exposedModule.startsWith('./')
+        ? r.exposedModule
+        : './' + r.exposedModule,
     };
   }
 

@@ -103,8 +103,11 @@ export class RoutesService {
         );
         await this.permissionsTopic$.publish(permissions);
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
-        console.log(`Load remote module ${r.exposedModule} finished`);
-        return m[r.exposedModule];
+        const exposedModule = r.exposedModule.startsWith('./')
+          ? r.exposedModule.slice(2)
+          : r.exposedModule;
+        console.log(`Load remote module ${exposedModule} finished`);
+        return m[exposedModule];
       } catch (err) {
         return this.onRemoteLoadError(err);
       }
@@ -137,22 +140,21 @@ export class RoutesService {
   private toLoadRemoteEntryOptions(
     r: BffGeneratedRoute
   ): LoadRemoteModuleOptions {
+    const exposedModule = r.exposedModule.startsWith('./')
+      ? r.exposedModule.slice(2)
+      : r.exposedModule;
     if (r.technology === 'Angular') {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
-        exposedModule: r.exposedModule.startsWith('./')
-          ? r.exposedModule
-          : './' + r.exposedModule,
+        exposedModule: './' + exposedModule,
       };
     }
     return {
       type: 'script',
       remoteName: (r as WebComponentRoute).productName,
       remoteEntry: r.remoteEntryUrl,
-      exposedModule: r.exposedModule.startsWith('./')
-        ? r.exposedModule
-        : './' + r.exposedModule,
+      exposedModule: './' + exposedModule,
     };
   }
 

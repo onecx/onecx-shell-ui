@@ -85,14 +85,15 @@ export class ShellSlotService implements SlotService {
     exposedModule: string;
   }): Promise<Type<unknown>> {
     try {
+      const exposedModule = component.exposedModule.startsWith('./')
+        ? component.exposedModule.slice(2)
+        : component.exposedModule;
       const m = await loadRemoteModule({
         type: 'module',
         remoteEntry: component.remoteEntryUrl,
-        exposedModule: component.exposedModule.startsWith('./')
-          ? component.exposedModule
-          : './' + component.exposedModule,
+        exposedModule: './' + exposedModule,
       });
-      return m[component.exposedModule];
+      return m[exposedModule];
     } catch (e) {
       console.log(
         'Failed to load remote module ',

@@ -68,20 +68,30 @@ const bypassFn = function (req, res) {
   //       },
   //       remoteComponents: [
   //         {
-  //           name: 'PortalMenu',
-  //           baseUrl: 'http://localhost:4400/core/portal-mgmt/',
+  //           name: 'UserAvatarMenu',
+  //           baseUrl: 'http://localhost:4201/',
   //           remoteEntryUrl:
-  //             'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
+  //             'http://localhost:4201/remoteEntry.js',
   //           appId: 'appId',
-  //           productName: 'PortalMgmt',
-  //           exposedModule: 'MenuComponent',
-  //           remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
+  //           productName: 'OneCXWorkspace',
+  //           exposedModule: 'OneCXUserAvatarMenuComponent',
+  //           remoteBaseUrl: 'http://localhost:4201/',
+  //         },
+  //         {
+  //           name: 'ShowHelp',
+  //           baseUrl: 'http://localhost:4211/',
+  //           remoteEntryUrl:
+  //             'http://localhost:4211/remoteEntry.js',
+  //           appId: 'appId',
+  //           productName: 'OneCXHelp',
+  //           exposedModule: 'OneCXShowHelpComponent',
+  //           remoteBaseUrl: 'http://localhost:4211/',
   //         },
   //       ],
   //       shellRemoteComponents: [
   //         {
-  //           slotName: 'menu',
-  //           remoteComponent: 'PortalMenu',
+  //           slotName: 'headerRight',
+  //           remoteComponent: 'UserAvatarMenu',
   //         },
   //       ],
   //     };
@@ -92,10 +102,10 @@ const bypassFn = function (req, res) {
   //         menu: [
   //           {
   //             remoteEntry:
-  //               'http://localhost:4400/core/portal-mgmt/remoteEntry.js',
-  //             exposedModule: 'MenuComponent',
-  //             remoteBaseUrl: 'http://localhost:4400/core/portal-mgmt/',
-  //             displayName: 'Menu Management',
+  //               'http://localhost:4201/remoteEntry.js',
+  //             exposedModule: 'OneCXUserAvatarMenuComponent',
+  //             remoteBaseUrl: 'http://localhost:4201/',
+  //             displayName: 'User Avatar Menu',
   //             appVersion: '',
   //           },
   //         ],
@@ -111,6 +121,8 @@ const bypassFn = function (req, res) {
   //       userProfile: {
   //         userId: 'userId',
   //         person: {},
+  //         avatar: {
+  //         },
   //         accountSettings: {
   //           version: null,
   //           creationDate: '2023-07-17T09:17:50.723706Z',

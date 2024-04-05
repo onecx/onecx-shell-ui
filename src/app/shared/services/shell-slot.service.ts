@@ -88,7 +88,9 @@ export class ShellSlotService implements SlotService {
       const m = await loadRemoteModule({
         type: 'module',
         remoteEntry: component.remoteEntryUrl,
-        exposedModule: './' + component.exposedModule,
+        exposedModule: component.exposedModule.startsWith('./')
+          ? component.exposedModule
+          : './' + component.exposedModule,
       });
       return m[component.exposedModule];
     } catch (e) {

@@ -24,6 +24,7 @@
     "@ngx-translate/core": "^14.0.0",
     "@nx/angular": "17.3.1",
     "@onecx/accelerator": "^4.14.3",
+    "@onecx/angular-accelerator": "^4.14.3",
     "@onecx/angular-integration-interface": "^4.14.3",
     "@onecx/angular-remote-components": "^4.14.3",
     "@onecx/integration-interface": "^4.14.3",

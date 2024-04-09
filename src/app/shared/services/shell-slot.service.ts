@@ -96,9 +96,9 @@ export class ShellSlotService implements SlotService {
     } catch (e) {
       console.log(
         'Failed to load remote module ',
-        e,
+        component.exposedModule,
         component.remoteEntryUrl,
-        component.exposedModule
+        e
       );
       return undefined
     }

@@ -52,6 +52,11 @@ const webpackConfig = {
         includeSecondaries: true,
         eager: true,
       },
+      '@onecx/angular-accelerator': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+        eager: true,
+      },
       '@onecx/angular-integration-interface': {
         requiredVersion: 'auto',
         includeSecondaries: true,

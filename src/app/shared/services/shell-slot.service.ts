@@ -1,14 +1,17 @@
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
+import {
+  RemoteComponentInfo,
+  SlotService
+} from '@onecx/angular-remote-components';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
-import { Observable, from, map, mergeMap, zip } from 'rxjs';
+import { PermissionsCacheService } from '@onecx/shell-core';
+import { from, map, mergeMap, Observable, shareReplay, zip } from 'rxjs';
 import {
   PermissionBffService,
   RemoteComponent,
-  RemoteComponentMapping,
+  RemoteComponentMapping
 } from '../generated';
-import { RemoteComponentInfo, SlotService } from '@onecx/angular-remote-components';
-import { PermissionsCacheService } from '@onecx/shell-core';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
@@ -75,7 +78,8 @@ export class ShellSlotService implements SlotService {
             )
           )
         )
-      )
+      ),
+      shareReplay()
     );
   }
 
@@ -100,7 +104,7 @@ export class ShellSlotService implements SlotService {
         component.remoteEntryUrl,
         e
       );
-      return undefined
+      return undefined;
     }
   }
 }

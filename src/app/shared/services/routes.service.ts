@@ -42,16 +42,16 @@ export class RoutesService {
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
     const workspaceBaseUrl =
       this.appStateService.currentWorkspace$.getValue()?.baseUrl;
-    const genreatedRoutes = routes.map((r) =>
+    const generatedRoutes = routes.map((r) =>
       this.convertToRoute(r, workspaceBaseUrl ?? '')
     );
     if (!this.containsRouteForWorkspace(routes)) {
       console.log(`Adding fallback route for base url ${workspaceBaseUrl}`);
-      genreatedRoutes.push(this.createFallbackRoute());
+      generatedRoutes.push(this.createFallbackRoute());
     }
     this.router.resetConfig([
       ...appRoutes,
-      ...genreatedRoutes.sort(
+      ...generatedRoutes.sort(
         (a, b) => (b.path || '')?.length - (a.path || '')?.length
       ),
       DEFAULT_CATCH_ALL_ROUTE,

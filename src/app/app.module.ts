@@ -106,7 +106,7 @@ export function appInitializer(
       getWorkspaceConfigResponse.shellRemoteComponents;
     await remoteComponentsService.remoteComponents$.publish(
       getWorkspaceConfigResponse.remoteComponents
-    ); //TODO: create Service in angular-integration-interface
+    );
   };
 }
 

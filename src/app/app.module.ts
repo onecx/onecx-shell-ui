@@ -13,7 +13,7 @@ import {
   AngularRemoteComponentsModule,
   SLOT_SERVICE
 } from '@onecx/angular-remote-components';
-import { KeycloakAuthModule } from '@onecx/keycloak-auth';
+import { AngularAuth } from '@onecx/angular-auth';
 import {
   AppStateService,
   APP_CONFIG,
@@ -144,7 +144,7 @@ export function configurationServiceInitializer(
     AngularRemoteComponentsModule,
     BrowserAnimationsModule,
     RouterModule,
-    KeycloakAuthModule,
+    AngularAuthModule,
   ],
   providers: [
     { provide: APP_CONFIG, useValue: environment },

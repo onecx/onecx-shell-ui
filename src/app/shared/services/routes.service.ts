@@ -81,7 +81,7 @@ export class RoutesService {
       pathMatch:
         r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
-      canActivateChild: [() => this.updateMfeInfo(r, joinedBaseUrl)],
+      canActivateChild: [() => this.updateAppState(r, joinedBaseUrl)],
     };
   }
 
@@ -90,18 +90,7 @@ export class RoutesService {
     console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
-        await this.updateMfeInfo(r, joinedBaseUrl);
-        const permissions = await firstValueFrom(
-          this.permissionsCacheService.getPermissions(
-            r.appId,
-            r.productName,
-            (appId, productName) =>
-              this.permissionsService
-                .getPermissions({ appId, productName })
-                .pipe(map(({ permissions }) => permissions))
-          )
-        );
-        await this.permissionsTopic$.publish(permissions);
+        await this.updateAppState(r, joinedBaseUrl);
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
@@ -116,6 +105,16 @@ export class RoutesService {
     }
   }
 
+  private async updateAppState(
+    r: BffGeneratedRoute,
+    joinedBaseUrl: string
+  ): Promise<boolean> {
+    return Promise.all([
+      this.updateMfeInfo(r, joinedBaseUrl),
+      this.updatePermissions(r),
+    ]).then(() => true);
+  }
+
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
     const mfeInfo = {
       baseHref: joinedBaseUrl,
@@ -127,6 +126,20 @@ export class RoutesService {
       productName: r.productName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
+  }
+
+  private async updatePermissions(r: BffGeneratedRoute) {
+    const permissions = await firstValueFrom(
+      this.permissionsCacheService.getPermissions(
+        r.appId,
+        r.productName,
+        (appId, productName) =>
+          this.permissionsService
+            .getPermissions({ appId, productName })
+            .pipe(map(({ permissions }) => permissions))
+      )
+    );
+    await this.permissionsTopic$.publish(permissions);
   }
 
   private onRemoteLoadError(err: unknown) {

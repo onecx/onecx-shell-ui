@@ -29,6 +29,7 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 @Injectable({ providedIn: 'root' })
 export class RoutesService {
   private permissionsTopic$ = new PermissionsTopic();
+  private isFirstLoad = true;
 
   constructor(
     private router: Router,
@@ -109,10 +110,29 @@ export class RoutesService {
     r: BffGeneratedRoute,
     joinedBaseUrl: string
   ): Promise<boolean> {
-    return Promise.all([
-      this.updateMfeInfo(r, joinedBaseUrl),
-      this.updatePermissions(r),
-    ]).then(() => true);
+    const currentGlobalLoading = await firstValueFrom(
+      this.appStateService.globalLoading$.asObservable()
+    );
+    const currentMfeInfo = !this.isFirstLoad
+      ? await firstValueFrom(this.appStateService.currentMfe$.asObservable())
+      : undefined;
+
+    if (this.isFirstLoad || currentMfeInfo?.remoteBaseUrl !== r.url) {
+      this.isFirstLoad = false;
+      if (!currentGlobalLoading) {
+        await this.appStateService.globalLoading$.publish(true);
+      }
+      
+      await Promise.all([
+        this.updateMfeInfo(r, joinedBaseUrl),
+        this.updatePermissions(r),
+      ]);
+
+      if (!currentGlobalLoading) {
+        await this.appStateService.globalLoading$.publish(false);
+      }
+    }
+    return true;
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {

@@ -45,7 +45,7 @@ const webpackConfig = {
       '@ngx-translate/core': {
         singleton: true,
         requiredVersion: 'auto',
-        eager: true
+        eager: true,
       },
       '@onecx/accelerator': {
         requiredVersion: 'auto',

@@ -88,6 +88,7 @@ export class RoutesService {
 
   private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
     await this.appStateService.globalLoading$.publish(true);
+    console.log('LOAD CHILDREN GLOBAL LOADING TRUE');
     console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
@@ -102,7 +103,8 @@ export class RoutesService {
         return this.onRemoteLoadError(err);
       }
     } finally {
-      this.appStateService.globalLoading$.publish(false);
+      await this.appStateService.globalLoading$.publish(false);
+      console.log('LOAD CHILDREN GLOBAL LOADING FALSE');
     }
   }
 
@@ -121,8 +123,9 @@ export class RoutesService {
       this.isFirstLoad = false;
       if (!currentGlobalLoading) {
         await this.appStateService.globalLoading$.publish(true);
+        console.log('UPDATE APPSTATE GLOBAL LOADING TRUE');
       }
-      
+
       await Promise.all([
         this.updateMfeInfo(r, joinedBaseUrl),
         this.updatePermissions(r),
@@ -130,6 +133,7 @@ export class RoutesService {
 
       if (!currentGlobalLoading) {
         await this.appStateService.globalLoading$.publish(false);
+        console.log('UPDATE APPSTATE GLOBAL LOADING FALSE');
       }
     }
     return true;

@@ -92,6 +92,7 @@ const webpackConfig = {
     sharedMappings: ['@onecx/portal-integration-angular'],
   }),
 };
+
 const plugins = webpackConfig.plugins.filter(
   (plugin) => !(plugin instanceof ModifyEntryPlugin)
 );

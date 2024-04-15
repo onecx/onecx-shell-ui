@@ -1,29 +1,30 @@
-import { Injectable } from '@angular/core';
-import { Route, Router } from '@angular/router';
-import { PathMatch, PermissionBffService } from '../generated';
-import { appRoutes } from 'src/app/app.routes';
 import {
   LoadRemoteModuleOptions,
   loadRemoteModule,
 } from '@angular-architects/module-federation';
+import { Location } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { Route, Router } from '@angular/router';
+import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   AppStateService,
   CONFIG_KEY,
   ConfigurationService,
   PortalMessageService,
 } from '@onecx/portal-integration-angular';
-import { Route as BffGeneratedRoute } from '../generated/model/route';
-import { ErrorPageComponent } from '../components/error-page.component';
 import { PermissionsCacheService } from '@onecx/shell-core';
 import { firstValueFrom, map } from 'rxjs';
-import { PermissionsTopic } from '@onecx/integration-interface';
+import { appRoutes } from 'src/app/app.routes';
+import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
+import { PathMatch, PermissionBffService } from '../generated';
+import { Route as BffGeneratedRoute } from '../generated/model/route';
 import { WebComponentRoute } from '../generated/model/webComponentRoute';
-import { Location } from '@angular/common';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
   component: ErrorPageComponent,
+  title: 'Error'
 };
 
 @Injectable({ providedIn: 'root' })
@@ -83,6 +84,7 @@ export class RoutesService {
         r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
       canActivateChild: [() => this.updateAppState(r, joinedBaseUrl)],
+      title: r.productName // TODO displayName
     };
   }
 
@@ -145,7 +147,7 @@ export class RoutesService {
       mountPath: joinedBaseUrl,
       shellName: 'portal',
       remoteBaseUrl: r.url,
-      displayName: r.productName,
+      displayName: r.productName, // TODO in yaml anlegen displayName
       appId: r.appId,
       productName: r.productName,
     };

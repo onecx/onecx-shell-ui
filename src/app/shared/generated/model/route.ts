@@ -23,6 +23,7 @@ export interface Route {
     exposedModule: string;
     pathMatch: PathMatch;
     remoteName?: string;
+    displayName: string;
 }
 
 

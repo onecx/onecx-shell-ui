@@ -2,7 +2,6 @@ import {
   LoadRemoteModuleOptions,
   loadRemoteModule,
 } from '@angular-architects/module-federation';
-import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import { PermissionsTopic } from '@onecx/integration-interface';
@@ -24,7 +23,7 @@ import { WebComponentRoute } from '../generated/model/webComponentRoute';
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
   component: ErrorPageComponent,
-  title: 'Error'
+  title: 'Error',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -44,9 +43,7 @@ export class RoutesService {
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
     const workspaceBaseUrl =
       this.appStateService.currentWorkspace$.getValue()?.baseUrl;
-    const generatedRoutes = routes.map((r) =>
-      this.convertToRoute(r, workspaceBaseUrl ?? '')
-    );
+    const generatedRoutes = routes.map((r) => this.convertToRoute(r));
     if (!this.containsRouteForWorkspace(routes)) {
       console.log(`Adding fallback route for base url ${workspaceBaseUrl}`);
       generatedRoutes.push(this.createFallbackRoute());
@@ -60,31 +57,23 @@ export class RoutesService {
     ]);
     console.log(
       `🧭 Adding App routes: \n${routes
-        .map(
-          (lr) =>
-            `${lr.url} -> ${JSON.stringify(workspaceBaseUrl + lr.baseUrl)}`
-        )
+        .map((lr) => `${lr.url} -> ${JSON.stringify(lr.baseUrl)}`)
         .join('\t\n')}`
     );
     return Promise.resolve();
   }
 
-  private convertToRoute(
-    r: BffGeneratedRoute,
-    workspaceBaseUrl: string
-  ): Route {
-    const joinedBaseUrl = Location.joinWithSlash(workspaceBaseUrl, r.baseUrl);
+  private convertToRoute(r: BffGeneratedRoute): Route {
     return {
-      path: this.toRouteUrl(joinedBaseUrl),
+      path: this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
         breadcrumb: r.productName,
       },
-      pathMatch:
-        r.pathMatch ?? (joinedBaseUrl.endsWith('$') ? 'full' : 'prefix'),
-      loadChildren: async () => await this.loadChildren(r, joinedBaseUrl),
-      canActivateChild: [() => this.updateAppState(r, joinedBaseUrl)],
-      title: r.productName // TODO displayName
+      pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
+      loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+      canActivateChild: [() => this.updateAppState(r, r.baseUrl)],
+      title: r.displayName,
     };
   }
 
@@ -147,7 +136,7 @@ export class RoutesService {
       mountPath: joinedBaseUrl,
       shellName: 'portal',
       remoteBaseUrl: r.url,
-      displayName: r.productName, // TODO in yaml anlegen displayName
+      displayName: r.displayName,
       appId: r.appId,
       productName: r.productName,
     };

@@ -6,17 +6,18 @@ import { RouterModule } from '@angular/router';
 import {
   MissingTranslationHandler,
   TranslateLoader,
-  TranslateModule
+  TranslateModule,
 } from '@ngx-translate/core';
+import { getLocation } from '@onecx/accelerator';
 import { RemoteComponentsService } from '@onecx/angular-integration-interface';
 import {
   AngularRemoteComponentsModule,
-  SLOT_SERVICE
+  SLOT_SERVICE,
 } from '@onecx/angular-remote-components';
 import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
-  AppStateService,
   APP_CONFIG,
+  AppStateService,
   CachingTranslateLoader,
   ConfigurationService,
   DEFAULT_LANG,
@@ -25,7 +26,7 @@ import {
   ThemeService,
   TranslateCombinedLoader,
   TranslationCacheService,
-  UserService
+  UserService,
 } from '@onecx/portal-integration-angular';
 import { ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
@@ -37,7 +38,7 @@ import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
   UserProfileBffService,
-  WorkspaceConfigBffService
+  WorkspaceConfigBffService,
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
@@ -76,7 +77,7 @@ export function appInitializer(
     await appStateService.isAuthenticated$.isInitialized;
     const getWorkspaceConfigResponse = await firstValueFrom(
       workspaceConfigBffService.getWorkspaceConfig({
-        url: window.location.href,
+        url: getLocation().applicationPath,
       })
     );
 

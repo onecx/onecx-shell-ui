@@ -3,7 +3,7 @@ import {
   loadRemoteModule,
 } from '@angular-architects/module-federation';
 import { Injectable } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { NavigationEnd, Route, Router } from '@angular/router';
 import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   AppStateService,
@@ -11,8 +11,11 @@ import {
   ConfigurationService,
   PortalMessageService,
 } from '@onecx/portal-integration-angular';
-import { PermissionsCacheService } from '@onecx/shell-core';
-import { firstValueFrom, map } from 'rxjs';
+import {
+  PermissionsCacheService,
+  ShowContentProvider,
+} from '@onecx/shell-core';
+import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
@@ -27,9 +30,10 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 };
 
 @Injectable({ providedIn: 'root' })
-export class RoutesService {
+export class RoutesService implements ShowContentProvider {
   private permissionsTopic$ = new PermissionsTopic();
   private isFirstLoad = true;
+  showContent$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private router: Router,
@@ -38,7 +42,14 @@ export class RoutesService {
     private configurationService: ConfigurationService,
     private permissionsCacheService: PermissionsCacheService,
     private permissionsService: PermissionBffService
-  ) {}
+  ) {
+    router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        map(() => true)
+      )
+      .subscribe(this.showContent$);
+  }
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
     const workspaceBaseUrl =
@@ -78,8 +89,8 @@ export class RoutesService {
   }
 
   private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
+    this.showContent$.next(false);
     await this.appStateService.globalLoading$.publish(true);
-    console.log('LOAD CHILDREN GLOBAL LOADING TRUE');
     console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
@@ -88,14 +99,13 @@ export class RoutesService {
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
           : r.exposedModule;
-        console.log(`Load remote module ${exposedModule} finished`);
+        console.log(`Load remote module ${exposedModule} finished.`);
         return m[exposedModule];
       } catch (err) {
         return this.onRemoteLoadError(err);
       }
     } finally {
       await this.appStateService.globalLoading$.publish(false);
-      console.log('LOAD CHILDREN GLOBAL LOADING FALSE');
     }
   }
 
@@ -113,8 +123,8 @@ export class RoutesService {
     if (this.isFirstLoad || currentMfeInfo?.remoteBaseUrl !== r.url) {
       this.isFirstLoad = false;
       if (!currentGlobalLoading) {
+        this.showContent$.next(false);
         await this.appStateService.globalLoading$.publish(true);
-        console.log('UPDATE APPSTATE GLOBAL LOADING TRUE');
       }
 
       await Promise.all([
@@ -124,7 +134,6 @@ export class RoutesService {
 
       if (!currentGlobalLoading) {
         await this.appStateService.globalLoading$.publish(false);
-        console.log('UPDATE APPSTATE GLOBAL LOADING FALSE');
       }
     }
     return true;
@@ -162,6 +171,9 @@ export class RoutesService {
     this.portalMessageService.error({
       summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
     });
+    this.router.navigate([
+      this.appStateService.currentWorkspace$.getValue()?.baseUrl,
+    ]);
     throw err;
   }
 
@@ -213,11 +225,11 @@ export class RoutesService {
     return (
       routes.find(
         (r) =>
-          r.url ===
+          r.baseUrl ===
           this.toRouteUrl(
             this.appStateService.currentWorkspace$.getValue()?.baseUrl
           )
-      ) === undefined
+      ) !== undefined
     );
   }
 

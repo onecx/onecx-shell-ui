@@ -28,7 +28,7 @@ import {
   TranslationCacheService,
   UserService,
 } from '@onecx/portal-integration-angular';
-import { ShellCoreModule } from '@onecx/shell-core';
+import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
@@ -184,6 +184,10 @@ export function configurationServiceInitializer(
     {
       provide: BASE_PATH,
       useValue: './shell-bff',
+    },
+    {
+      provide: SHOW_CONTENT_PROVIDER,
+      useExisting: RoutesService,
     },
   ],
   bootstrap: [AppComponent],

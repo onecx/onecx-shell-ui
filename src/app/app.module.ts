@@ -29,7 +29,7 @@ import {
   UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -76,13 +76,17 @@ export function appInitializer(
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
     const getWorkspaceConfigResponse = await firstValueFrom(
-      workspaceConfigBffService.getWorkspaceConfig({
-        url: getLocation().applicationPath,
-      })
+      workspaceConfigBffService
+        .getWorkspaceConfig({
+          url: getLocation().applicationPath,
+        })
+        .pipe(retry({ delay: 500, count: 3 }))
     );
 
     const getUserProfileResponse = await firstValueFrom(
-      userProfileBffService.getUserProfile()
+      userProfileBffService
+        .getUserProfile()
+        .pipe(retry({ delay: 500, count: 3 }))
     );
 
     await appStateService.currentWorkspace$.publish({

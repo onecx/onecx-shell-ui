@@ -99,7 +99,7 @@ export class RoutesService implements ShowContentProvider {
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
           : r.exposedModule;
-        console.log(`Load remote module ${exposedModule} finished`);
+        console.log(`Load remote module ${exposedModule} finished.`);
         return m[exposedModule];
       } catch (err) {
         return this.onRemoteLoadError(err);

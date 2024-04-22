@@ -23,10 +23,10 @@ app:
         horizontal:
           name: "horizontalMenu"
           description: "Shell horizontal menu"
-        headerRight:
+        header-right:
           name: "headerRight"
           description: "Shell header right"
-        subHeader:
+        sub-header:
           name: "subHeader"
           description: "Shell sub header menu"
           

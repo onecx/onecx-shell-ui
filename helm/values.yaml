@@ -14,5 +14,20 @@ app:
         spec:
           kcConfig:
             clientId: "onecx-shell-ui"
-
+    slot:
+      enabled: true
+      specs:
+        menu: 
+          name: "menu"
+          description: "Shell main menu"
+        horizontal:
+          name: "horizontalMenu"
+          description: "Shell horizontal menu"
+        headerRight:
+          name: "headerRight"
+          description: "Shell header right"
+        subHeader:
+          name: "subHeader"
+          description: "Shell sub header menu"
+          
 # PIPE Config

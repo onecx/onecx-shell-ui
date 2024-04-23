@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "~15.2.7",
     "@angular/router": "~15.2.7",
     "@ngx-translate/core": "^14.0.0",
-    "@nx/angular": "17.3.1",
+    "@nx/angular": "18.3.3",
     "@onecx/accelerator": "^4.18.0",
     "@onecx/angular-accelerator": "^4.18.0",
     "@onecx/angular-integration-interface": "^4.18.0",

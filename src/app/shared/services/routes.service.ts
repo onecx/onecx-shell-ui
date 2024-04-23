@@ -52,12 +52,10 @@ export class RoutesService implements ShowContentProvider {
   }
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
-    const workspaceBaseUrl =
-      this.appStateService.currentWorkspace$.getValue()?.baseUrl;
     const generatedRoutes = routes.map((r) => this.convertToRoute(r));
-    if (!this.containsRouteForWorkspace(routes)) {
-      console.log(`Adding fallback route for base url ${workspaceBaseUrl}`);
-      generatedRoutes.push(this.createFallbackRoute());
+    if (! await this.containsRouteForWorkspace(routes)) {
+      console.log(`Adding fallback route`);
+      generatedRoutes.push(await this.createFallbackRoute());
     }
     this.router.resetConfig([
       ...appRoutes,
@@ -102,7 +100,7 @@ export class RoutesService implements ShowContentProvider {
         console.log(`Load remote module ${exposedModule} finished.`);
         return m[exposedModule];
       } catch (err) {
-        return this.onRemoteLoadError(err);
+        return await this.onRemoteLoadError(err);
       }
     } finally {
       await this.appStateService.globalLoading$.publish(false);
@@ -166,13 +164,13 @@ export class RoutesService implements ShowContentProvider {
     await this.permissionsTopic$.publish(permissions);
   }
 
-  private onRemoteLoadError(err: unknown) {
+  private async onRemoteLoadError(err: unknown) {
     console.log(`Failed to load remote module: ${err}`);
     this.portalMessageService.error({
       summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
     });
     this.router.navigate([
-      this.appStateService.currentWorkspace$.getValue()?.baseUrl,
+      (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl,
     ]);
     throw err;
   }
@@ -221,22 +219,23 @@ export class RoutesService implements ShowContentProvider {
     return url;
   }
 
-  private containsRouteForWorkspace(routes: BffGeneratedRoute[]): boolean {
+  private async containsRouteForWorkspace(routes: BffGeneratedRoute[]): Promise<boolean> {
+    const baseUrl = (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl
     return (
       routes.find(
         (r) =>
           r.baseUrl ===
           this.toRouteUrl(
-            this.appStateService.currentWorkspace$.getValue()?.baseUrl
+            baseUrl
           )
       ) !== undefined
     );
   }
 
-  private createFallbackRoute(): Route {
+  private async createFallbackRoute(): Promise<Route> {
     return {
       path: this.toRouteUrl(
-        this.appStateService.currentWorkspace$.getValue()?.baseUrl
+        (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl,
       ),
       component: HomeComponent,
       pathMatch: PathMatch.full,

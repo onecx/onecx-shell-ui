@@ -2,15 +2,16 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import {
   RemoteComponentInfo,
-  SlotService
+  SlotComponentConfiguration,
+  SlotService,
 } from '@onecx/angular-remote-components';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
 import { PermissionsCacheService } from '@onecx/shell-core';
-import { from, map, mergeMap, Observable, shareReplay, zip } from 'rxjs';
+import { firstValueFrom, from, map, mergeMap, Observable, shareReplay, zip } from 'rxjs';
 import {
   PermissionBffService,
   RemoteComponent,
-  RemoteComponentMapping
+  RemoteComponentMapping,
 } from '../generated';
 
 @Injectable()
@@ -27,13 +28,9 @@ export class ShellSlotService implements SlotService {
     return Promise.resolve();
   }
 
-  getComponentsForSlot(slotName: string): Observable<
-    {
-      componentType: Type<unknown> | undefined;
-      remoteComponent: RemoteComponentInfo;
-      permissions: string[];
-    }[]
-  > {
+  getComponentsForSlot(
+    slotName: string
+  ): Observable<SlotComponentConfiguration[]> {
     return this.remoteComponents$.pipe(
       map((remoteComponents) =>
         (
@@ -50,35 +47,21 @@ export class ShellSlotService implements SlotService {
           .filter((remoteComponent) => !!remoteComponent)
           .map((remoteComponent) => remoteComponent as RemoteComponent)
       ),
-      mergeMap((remoteComponents: RemoteComponent[]) =>
-        zip(
-          remoteComponents.map((remoteComponent) =>
-            this.permissionsCacheService
-              .getPermissions(
-                remoteComponent.appId,
-                remoteComponent.productName,
-                (appId, productName) =>
-                  this.permissionsService
-                    .getPermissions({ appId, productName })
-                    .pipe(map(({ permissions }) => permissions))
-              )
-              .pipe(map((permissions) => ({ remoteComponent, permissions })))
-          )
-        )
-      ),
-      mergeMap((infos) =>
-        from(
-          Promise.all(
-            infos.map(({ remoteComponent, permissions }) =>
-              this.loadComponent(remoteComponent).then((componentType) => ({
-                componentType,
-                remoteComponent,
-                permissions,
-              }))
-            )
-          )
-        )
-      ),
+      map((infos) =>
+      infos.map((remoteComponent ) => ({
+        componentType: this.loadComponent(remoteComponent),
+        remoteComponent,
+        permissions: firstValueFrom(this.permissionsCacheService
+            .getPermissions(
+              remoteComponent.appId,
+              remoteComponent.productName,
+              (appId, productName) =>
+                this.permissionsService
+                  .getPermissions({ appId, productName })
+                  .pipe(map(({ permissions }) => permissions))
+            )),
+      }))
+    ),
       shareReplay()
     );
   }

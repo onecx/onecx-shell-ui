@@ -92,9 +92,10 @@ export function appInitializer(
     await appStateService.currentWorkspace$.publish({
       baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
       portalName: getWorkspaceConfigResponse.workspace.name,
+      workspaceName: getWorkspaceConfigResponse.workspace.name,
       microfrontendRegistrations: [],
     });
-    routesService.init(getWorkspaceConfigResponse.routes);
+    await routesService.init(getWorkspaceConfigResponse.routes);
 
     const parsedProperties = JSON.parse(
       getWorkspaceConfigResponse.theme.properties

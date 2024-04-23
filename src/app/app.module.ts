@@ -29,7 +29,7 @@ import {
   UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { firstValueFrom, retry } from 'rxjs';
+import { firstValueFrom, retry, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -84,9 +84,12 @@ export function appInitializer(
     );
 
     const getUserProfileResponse = await firstValueFrom(
-      userProfileBffService
-        .getUserProfile()
-        .pipe(retry({ delay: 500, count: 3 }))
+      userProfileBffService.getUserProfile().pipe(
+        retry({ delay: 500, count: 3 }),
+        tap((response) =>
+          console.log('ORGANIZATION : ', response.userProfile.organization)
+        )
+      )
     );
 
     await appStateService.currentWorkspace$.publish({

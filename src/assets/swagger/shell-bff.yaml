@@ -310,6 +310,8 @@ components:
       properties:
         userId:
           type: string
+        organization:
+          type: string
         person:
           $ref: '#/components/schemas/UserPerson'
         accountSettings:

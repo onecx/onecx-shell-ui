@@ -1,13 +1,12 @@
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import {
-  RemoteComponentInfo,
   SlotComponentConfiguration,
-  SlotService,
+  SlotService
 } from '@onecx/angular-remote-components';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
 import { PermissionsCacheService } from '@onecx/shell-core';
-import { firstValueFrom, from, map, mergeMap, Observable, shareReplay, zip } from 'rxjs';
+import { Observable, firstValueFrom, map, shareReplay } from 'rxjs';
 import {
   PermissionBffService,
   RemoteComponent,

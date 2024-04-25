@@ -37,6 +37,7 @@ import { ErrorPageComponent } from './shared/components/error-page.component';
 import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
+  GetWorkspaceConfigResponse,
   UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
@@ -63,12 +64,22 @@ export function createTranslateLoader(
   );
 }
 
+function publishCurrentWorkspace(
+  appStateService: AppStateService,
+  getWorkspaceConfigResponse: GetWorkspaceConfigResponse
+) {
+  return appStateService.currentWorkspace$.publish({
+    baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
+    portalName: getWorkspaceConfigResponse.workspace.name,
+    workspaceName: getWorkspaceConfigResponse.workspace.name,
+    microfrontendRegistrations: [],
+  });
+}
+
 export function appInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
-  userProfileBffService: UserProfileBffService,
   routesService: RoutesService,
   themeService: ThemeService,
-  userService: UserService,
   shellSlotService: ShellSlotService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService
@@ -83,6 +94,35 @@ export function appInitializer(
         .pipe(retry({ delay: 500, count: 3 }))
     );
 
+    const parsedProperties = JSON.parse(
+      getWorkspaceConfigResponse.theme.properties
+    ) as Record<string, Record<string, string>>;
+    const themeWithParsedProperties = {
+      ...getWorkspaceConfigResponse.theme,
+      properties: parsedProperties,
+    };
+
+    shellSlotService.remoteComponentMappings =
+      getWorkspaceConfigResponse.shellRemoteComponents;
+
+    await Promise.all([
+      publishCurrentWorkspace(appStateService, getWorkspaceConfigResponse),
+      routesService.init(getWorkspaceConfigResponse.routes),
+      themeService.apply(themeWithParsedProperties),
+      remoteComponentsService.remoteComponents$.publish(
+        getWorkspaceConfigResponse.remoteComponents
+      ),
+    ]);
+  };
+}
+
+export function userProfileInitializer(
+  userProfileBffService: UserProfileBffService,
+  userService: UserService,
+  appStateService: AppStateService
+) {
+  return async () => {
+    await appStateService.isAuthenticated$.isInitialized;
     const getUserProfileResponse = await firstValueFrom(
       userProfileBffService
         .getUserProfile()
@@ -93,31 +133,8 @@ export function appInitializer(
       'ORGANIZATION : ',
       getUserProfileResponse.userProfile.organization
     );
-
-    await appStateService.currentWorkspace$.publish({
-      baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
-      portalName: getWorkspaceConfigResponse.workspace.name,
-      workspaceName: getWorkspaceConfigResponse.workspace.name,
-      microfrontendRegistrations: [],
-    });
-    await routesService.init(getWorkspaceConfigResponse.routes);
-
-    const parsedProperties = JSON.parse(
-      getWorkspaceConfigResponse.theme.properties
-    ) as Record<string, Record<string, string>>;
-    const themeWithParsedProperties = {
-      ...getWorkspaceConfigResponse.theme,
-      properties: parsedProperties,
-    };
-    await themeService.apply(themeWithParsedProperties);
-
+    
     await userService.profile$.publish(getUserProfileResponse.userProfile);
-
-    shellSlotService.remoteComponentMappings =
-      getWorkspaceConfigResponse.shellRemoteComponents;
-    await remoteComponentsService.remoteComponents$.publish(
-      getWorkspaceConfigResponse.remoteComponents
-    );
   };
 }
 
@@ -164,14 +181,18 @@ export function configurationServiceInitializer(
       useFactory: appInitializer,
       deps: [
         WorkspaceConfigBffService,
-        UserProfileBffService,
         RoutesService,
         ThemeService,
-        UserService,
         ShellSlotService,
         AppStateService,
         RemoteComponentsService,
       ],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: userProfileInitializer,
+      deps: [UserProfileBffService, UserService, AppStateService],
       multi: true,
     },
     {

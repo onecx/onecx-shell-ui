@@ -76,7 +76,7 @@ function publishCurrentWorkspace(
   });
 }
 
-export function appInitializer(
+export function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
   themeService: ThemeService,
@@ -178,7 +178,7 @@ export function configurationServiceInitializer(
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,
-      useFactory: appInitializer,
+      useFactory: workspaceConfigInitializer,
       deps: [
         WorkspaceConfigBffService,
         RoutesService,

@@ -89,6 +89,11 @@ export function appInitializer(
         .pipe(retry({ delay: 500, count: 3 }))
     );
 
+    console.log(
+      'ORGANIZATION : ',
+      getUserProfileResponse.userProfile.organization
+    );
+
     await appStateService.currentWorkspace$.publish({
       baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
       portalName: getWorkspaceConfigResponse.workspace.name,

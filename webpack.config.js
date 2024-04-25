@@ -87,6 +87,11 @@ const webpackConfig = {
         includeSecondaries: true,
         eager: true,
       },
+      'primeng': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+        eager: true,
+      }
     }),
 
     sharedMappings: ['@onecx/portal-integration-angular'],

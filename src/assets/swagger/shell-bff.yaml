@@ -8,6 +8,32 @@ servers:
   - url: http://onecx-shell-bff:8080/
 
 paths:
+  /workspaceConfig/load:
+    post:
+      tags:
+        - "WorkspaceConfig"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadWorkspaceConfigRequest'
+      operationId: loadWorkspaceConfig
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadWorkspaceConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        '404':
+          description: 'Not Found'
   /workspaceConfig:
     post:
       tags:
@@ -135,6 +161,50 @@ paths:
 
 components:
   schemas:
+    LoadWorkspaceConfigRequest:
+      type: object
+      required:
+        - path
+      properties:
+        path:
+          type: string
+    LoadWorkspaceConfigResponse:
+      type: object
+      required:
+        - 'routes'
+        - 'theme'
+        - 'workspace'
+        - 'components'
+        - 'slots'
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        theme:
+          $ref: '#/components/schemas/Theme'
+        workspace:
+          $ref: '#/components/schemas/Workspace'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteComponent'
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+    Slot:
+      type: object
+      required:
+        - 'name'
+        - 'components'
+      properties:
+        name:
+          type: string
+        components:
+          type: array
+          items:
+            type: string
     GetWorkspaceConfigResponse:
       type: object
       required:

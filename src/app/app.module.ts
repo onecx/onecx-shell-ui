@@ -37,9 +37,9 @@ import { ErrorPageComponent } from './shared/components/error-page.component';
 import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
-  GetWorkspaceConfigResponse,
+  LoadWorkspaceConfigResponse,
   UserProfileBffService,
-  WorkspaceConfigBffService,
+  WorkspaceConfigBffService
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
@@ -66,12 +66,12 @@ export function createTranslateLoader(
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
-  getWorkspaceConfigResponse: GetWorkspaceConfigResponse
+  loadWorkspaceConfigResponse: LoadWorkspaceConfigResponse
 ) {
   return appStateService.currentWorkspace$.publish({
-    baseUrl: getWorkspaceConfigResponse.workspace.baseUrl,
-    portalName: getWorkspaceConfigResponse.workspace.name,
-    workspaceName: getWorkspaceConfigResponse.workspace.name,
+    baseUrl: loadWorkspaceConfigResponse.workspace.baseUrl,
+    portalName: loadWorkspaceConfigResponse.workspace.name,
+    workspaceName: loadWorkspaceConfigResponse.workspace.name,
     microfrontendRegistrations: [],
   });
 }
@@ -86,31 +86,30 @@ export function workspaceConfigInitializer(
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
-    const getWorkspaceConfigResponse = await firstValueFrom(
+    const loadWorkspaceConfigResponse = await firstValueFrom(
       workspaceConfigBffService
-        .getWorkspaceConfig({
-          url: getLocation().applicationPath,
+        .loadWorkspaceConfig({
+          path: getLocation().applicationPath,
         })
         .pipe(retry({ delay: 500, count: 3 }))
     );
 
     const parsedProperties = JSON.parse(
-      getWorkspaceConfigResponse.theme.properties
+      loadWorkspaceConfigResponse.theme.properties
     ) as Record<string, Record<string, string>>;
     const themeWithParsedProperties = {
-      ...getWorkspaceConfigResponse.theme,
+      ...loadWorkspaceConfigResponse.theme,
       properties: parsedProperties,
     };
 
-    shellSlotService.remoteComponentMappings =
-      getWorkspaceConfigResponse.shellRemoteComponents;
+    shellSlotService.slotMappings = loadWorkspaceConfigResponse.slots;
 
     await Promise.all([
-      publishCurrentWorkspace(appStateService, getWorkspaceConfigResponse),
-      routesService.init(getWorkspaceConfigResponse.routes),
+      publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+      routesService.init(loadWorkspaceConfigResponse.routes),
       themeService.apply(themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish(
-        getWorkspaceConfigResponse.remoteComponents
+        loadWorkspaceConfigResponse.components
       ),
     ]);
   };
@@ -133,7 +132,7 @@ export function userProfileInitializer(
       'ORGANIZATION : ',
       getUserProfileResponse.userProfile.organization
     );
-    
+
     await userService.profile$.publish(getUserProfileResponse.userProfile);
   };
 }

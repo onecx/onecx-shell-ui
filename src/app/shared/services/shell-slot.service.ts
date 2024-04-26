@@ -2,21 +2,17 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Injectable, Type } from '@angular/core';
 import {
   SlotComponentConfiguration,
-  SlotService
+  SlotService,
 } from '@onecx/angular-remote-components';
 import { RemoteComponentsTopic } from '@onecx/integration-interface';
 import { PermissionsCacheService } from '@onecx/shell-core';
 import { Observable, firstValueFrom, map, shareReplay } from 'rxjs';
-import {
-  PermissionBffService,
-  RemoteComponent,
-  RemoteComponentMapping,
-} from '../generated';
+import { PermissionBffService, RemoteComponent, Slot } from '../generated';
 
 @Injectable()
 export class ShellSlotService implements SlotService {
   remoteComponents$ = new RemoteComponentsTopic();
-  remoteComponentMappings: RemoteComponentMapping[] | undefined;
+  slotMappings: Slot[] | undefined;
 
   constructor(
     private permissionsService: PermissionBffService,
@@ -33,34 +29,35 @@ export class ShellSlotService implements SlotService {
     return this.remoteComponents$.pipe(
       map((remoteComponents) =>
         (
-          this.remoteComponentMappings?.filter(
-            (remoteComponentMappings) =>
-              remoteComponentMappings.slotName === slotName
-          ) ?? []
+          this.slotMappings?.find(
+            (slotMapping) => slotMapping.name === slotName
+          )?.components ?? []
         )
-          .map((remoteComponentMappings) =>
-            remoteComponents.find(
-              (rc) => rc.name === remoteComponentMappings.remoteComponent
-            )
+          .map((remoteComponentName) =>
+            remoteComponents.find((rc) => rc.name === remoteComponentName)
           )
-          .filter((remoteComponent) => !!remoteComponent)
-          .map((remoteComponent) => remoteComponent as RemoteComponent)
+          .filter(
+            (remoteComponent): remoteComponent is RemoteComponent =>
+              !!remoteComponent
+          )
+          .map((remoteComponent) => remoteComponent)
       ),
       map((infos) =>
-      infos.map((remoteComponent ) => ({
-        componentType: this.loadComponent(remoteComponent),
-        remoteComponent,
-        permissions: firstValueFrom(this.permissionsCacheService
-            .getPermissions(
+        infos.map((remoteComponent) => ({
+          componentType: this.loadComponent(remoteComponent),
+          remoteComponent,
+          permissions: firstValueFrom(
+            this.permissionsCacheService.getPermissions(
               remoteComponent.appId,
               remoteComponent.productName,
               (appId, productName) =>
                 this.permissionsService
                   .getPermissions({ appId, productName })
                   .pipe(map(({ permissions }) => permissions))
-            )),
-      }))
-    ),
+            )
+          ),
+        }))
+      ),
       shareReplay()
     );
   }

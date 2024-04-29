@@ -33,7 +33,7 @@ import {
   UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { Observable, catchError, firstValueFrom, of, retry, tap } from 'rxjs';
+import { Observable, catchError, firstValueFrom, of, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';

@@ -114,9 +114,6 @@ export function workspaceConfigInitializer(
           path: getLocation().applicationPath,
         })
         .pipe(
-          tap((val) => {
-            console.log(val);
-          }),
           retry({ delay: 500, count: 3 }),
           catchError((error) => {
             return initializationErrorHandler(error, router);
@@ -157,9 +154,6 @@ export function userProfileInitializer(
     await appStateService.isAuthenticated$.isInitialized;
     const getUserProfileResponse = await firstValueFrom(
       userProfileBffService.getUserProfile().pipe(
-        tap((val) => {
-          console.log(val);
-        }),
         retry({ delay: 500, count: 3 }),
         catchError((error) => {
           return initializationErrorHandler(error, router);
@@ -210,7 +204,7 @@ function initializationErrorHandler(
   };
 
   router.navigate(['shell-initialization-error-page', params]);
-  return of(null);
+  return of(undefined);
 }
 
 export function slotInitializer(slotService: ShellSlotService) {

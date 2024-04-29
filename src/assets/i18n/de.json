@@ -1,8 +1,14 @@
 {
     "ERROR_PAGE_H1": "Oops, das konnte nicht gefunden werden.",
+    "INITIALIZATION_ERROR_PAGE_H1": "Bei der Initialisierung der Shell ist ein Fehler aufgetreten, bitte wenden Sie sich an den Administrator",
     "PAGE_NOT_FOUND": "Seite nicht gefunden.",
     "TO_HOME_PAGE": "Gehe zu der Startseite.",
     "MESSAGE": {
         "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnte nicht geladen werden."
-    }
+    },
+    "INITIALIZATION_ERROR_PAGE_MESSAGE": "Fehlermeldung:",
+    "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
+    "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Fehlercode:",
+    "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Ungültige Parameter:",
+    "INITIALIZATION_ERROR_PAGE_PARAMS": "Params:"
 }

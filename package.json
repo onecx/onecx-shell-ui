@@ -10,7 +10,6 @@
     "openapiYaml": "src/assets/api/openapi-bff.yaml",
     "openapiOutput": "src/app/shared/generated"
   },
-  "nx": {},
   "scripts": {
     "build": "nx build",
     "clean": "npm cache clean --force && npm run clean-angular",
@@ -26,7 +25,6 @@
     "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format",
     "apigen-old": "openapi-generator-cli generate -i src/assets/swagger/shell-bff.yaml -c apigen.yaml -o src/app/shared/generated -g typescript-angular --type-mappings AnyType=object,set=Array"
   },
-  "private": true,
   "dependencies": {
     "@angular-architects/module-federation": "^15.0.0",
     "@angular/animations": "~15.2.7",
@@ -37,24 +35,26 @@
     "@angular/platform-browser": "~15.2.7",
     "@angular/platform-browser-dynamic": "~15.2.7",
     "@angular/router": "~15.2.7",
+    "@ngx-translate/core": "^14.0.0",
     "@nx/angular": "17.3.1",
-    "@onecx/accelerator": "^4.14.0",
-    "@onecx/angular-integration-interface": "^4.14.0",
-    "@onecx/angular-remote-components": "^4.14.0",
-    "@onecx/integration-interface": "^4.14.0",
-    "@onecx/keycloak-auth": "^4.14.0",
-    "@onecx/portal-integration-angular": "^4.14.0",
-    "@onecx/portal-layout-styles": "^4.14.0",
-    "@onecx/shell-core": "^4.14.0",
+    "@onecx/accelerator": "^4.18.0",
+    "@onecx/angular-accelerator": "^4.18.0",
+    "@onecx/angular-integration-interface": "^4.18.0",
+    "@onecx/angular-remote-components": "^4.18.0",
+    "@onecx/integration-interface": "^4.18.0",
+    "@onecx/keycloak-auth": "^4.18.0",
+    "@onecx/portal-integration-angular": "^4.18.0",
+    "@onecx/portal-layout-styles": "^4.18.0",
+    "@onecx/shell-core": "^4.18.0",
     "@openapitools/openapi-generator-cli": "^2.9.0",
     "keycloak-angular": "^13.1.0",
     "keycloak-js": "^18.0.1",
-    "ngx-timeago": "^2.0.0",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
+    "primeng": "15.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.12.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~15.2.6",

@@ -11,7 +11,6 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
-    "start": "nx serve",
     "build": "nx build",
     "clean": "npm cache clean --force && npm run clean-angular",
     "clean-angular": "ng cache clean",

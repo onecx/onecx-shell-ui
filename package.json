@@ -1,16 +1,29 @@
 {
   "name": "onecx-shell-ui",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "start": "nx serve",
-    "build": "nx build",
-    "test": "nx test",
-    "lint": "nx lint",
-    "test:ci": "nx test --coverage --testResultsProcessor=jest-sonar-reporter",
-    "apigen": "openapi-generator-cli generate -i src/assets/swagger/shell-bff.yaml -c apigen.yaml -o src/app/shared/generated -g typescript-angular --type-mappings AnyType=object,set=Array"
-  },
   "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "contributors": [
+    "OneCX Development Team <onecx-development-team@onecx.org>"
+  ],
+  "config": {
+    "openapiYaml": "src/assets/api/openapi-bff.yaml",
+    "openapiOutput": "src/app/shared/generated"
+  },
+  "scripts": {
+    "build": "nx build",
+    "clean": "npm cache clean --force && npm run clean-angular",
+    "clean-angular": "ng cache clean",
+    "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
+    "lint": "nx lint",
+    "format": "ng lint --fix",
+    "test": "nx test",
+    "test:ci": "nx test --coverage --testResultsProcessor=jest-sonar-reporter",
+    "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
+    "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
+    "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
+    "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
+  },
   "dependencies": {
     "@angular-architects/module-federation": "^15.0.0",
     "@angular/animations": "~15.2.7",

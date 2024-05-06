@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: onecx-shell-bff
   description: OneCx shell Bff
-  version: "1.0"
+  version: '1.0'
 servers:
   - url: http://onecx-shell-bff:8080/
 
@@ -11,7 +11,7 @@ paths:
   /workspaceConfig/load:
     post:
       tags:
-        - "WorkspaceConfig"
+        - 'WorkspaceConfig'
       requestBody:
         required: true
         content:
@@ -37,7 +37,7 @@ paths:
   /workspaceConfig/themes/{name}/favicon:
     get:
       tags:
-        - "WorkspaceConfig"
+        - 'WorkspaceConfig'
       description: Load favicon by theme name
       operationId: getThemeFaviconByName
       parameters:
@@ -62,7 +62,7 @@ paths:
   /workspaceConfig/themes/{name}/logo:
     get:
       tags:
-        - "WorkspaceConfig"
+        - 'WorkspaceConfig'
       description: Load logo by theme name
       operationId: getThemeLogoByName
       parameters:
@@ -200,8 +200,8 @@ components:
           type: string
     Theme:
       required:
-      - name
-      - properties
+        - name
+        - properties
       type: object
       properties:
         name:

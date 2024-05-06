@@ -10,6 +10,7 @@ docker-compose up -d postgresdb traefik keycloak-app pgadmin
 - shell bff
 - permission svc
 - product svc
+- tenant svc
 - theme svc
 - user-profile svc
 - workspace svc

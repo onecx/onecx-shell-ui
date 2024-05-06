@@ -4,13 +4,13 @@ import {
 } from '@angular-architects/module-federation';
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Route, Router } from '@angular/router';
-import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   AppStateService,
   CONFIG_KEY,
   ConfigurationService,
   PortalMessageService,
-} from '@onecx/portal-integration-angular';
+} from '@onecx/angular-integration-interface';
+import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   PermissionsCacheService,
   ShowContentProvider,

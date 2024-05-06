@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
-import { AppStateService, Portal } from '@onecx/portal-integration-angular'
+import { AppStateService } from '@onecx/angular-integration-interface'
+import { Workspace } from '@onecx/integration-interface'
 
 @Component({
   template: `<div class="p-4">
@@ -7,12 +8,12 @@ import { AppStateService, Portal } from '@onecx/portal-integration-angular'
       <div>{{ "PAGE_NOT_FOUND" | translate }}</div>
     </div>
     <div class="p-4">
-      <button pButton [routerLink]="[portal?.baseUrl]" routerLinkActive="router-link-active">{{ "TO_HOME_PAGE" | translate }} </button>
+      <button pButton [routerLink]="[workspace?.baseUrl]" routerLinkActive="router-link-active">{{ "TO_HOME_PAGE" | translate }} </button>
     </div> `,
 })
 export class ErrorPageComponent {
-  portal: Portal | undefined
+  workspace: Workspace | undefined
   constructor(private appStateService: AppStateService) {
-    this.portal = this.appStateService.currentWorkspace$.getValue()
+    this.workspace = this.appStateService.currentWorkspace$.getValue()
   }
 }

@@ -9,24 +9,28 @@ import {
   TranslateModule,
 } from '@ngx-translate/core';
 import { getLocation } from '@onecx/accelerator';
-import { RemoteComponentsService } from '@onecx/angular-integration-interface';
+import {
+  AngularAcceleratorMissingTranslationHandler,
+  CachingTranslateLoader,
+  TranslateCombinedLoader,
+  TranslationCacheService,
+} from '@onecx/angular-accelerator';
+import {
+  APP_CONFIG,
+  AppStateService,
+  ConfigurationService,
+  RemoteComponentsService,
+  ThemeService,
+  UserService,
+} from '@onecx/angular-integration-interface';
 import {
   AngularRemoteComponentsModule,
   SLOT_SERVICE,
 } from '@onecx/angular-remote-components';
 import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
-  APP_CONFIG,
-  AppStateService,
-  CachingTranslateLoader,
-  ConfigurationService,
   DEFAULT_LANG,
   PortalCoreModule,
-  PortalMissingTranslationHandler,
-  ThemeService,
-  TranslateCombinedLoader,
-  TranslationCacheService,
-  UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
 import { catchError, firstValueFrom, retry } from 'rxjs';
@@ -35,6 +39,7 @@ import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { ErrorPageComponent } from './shared/components/error-page.component';
 import { HomeComponent } from './shared/components/home/home.component';
+import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
@@ -43,7 +48,6 @@ import {
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
 import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
 
 export function createTranslateLoader(
@@ -184,7 +188,7 @@ export function configurationServiceInitializer(
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
-        useClass: PortalMissingTranslationHandler,
+        useClass: AngularAcceleratorMissingTranslationHandler,
       },
     }),
     ShellCoreModule,

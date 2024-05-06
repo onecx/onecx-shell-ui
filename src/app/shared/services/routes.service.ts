@@ -4,13 +4,13 @@ import {
 } from '@angular-architects/module-federation';
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Route, Router } from '@angular/router';
-import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   AppStateService,
   CONFIG_KEY,
   ConfigurationService,
   PortalMessageService,
-} from '@onecx/portal-integration-angular';
+} from '@onecx/angular-integration-interface';
+import { PermissionsTopic } from '@onecx/integration-interface';
 import {
   PermissionsCacheService,
   ShowContentProvider,
@@ -21,7 +21,6 @@ import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
 import { PathMatch, PermissionBffService } from '../generated';
 import { Route as BffGeneratedRoute } from '../generated/model/route';
-import { WebComponentRoute } from '../generated/model/webComponentRoute';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -53,7 +52,7 @@ export class RoutesService implements ShowContentProvider {
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
     const generatedRoutes = routes.map((r) => this.convertToRoute(r));
-    if (! await this.containsRouteForWorkspace(routes)) {
+    if (!(await this.containsRouteForWorkspace(routes))) {
       console.log(`Adding fallback route`);
       generatedRoutes.push(await this.createFallbackRoute());
     }
@@ -170,7 +169,11 @@ export class RoutesService implements ShowContentProvider {
       summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
     });
     this.router.navigate([
-      (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl,
+      (
+        await firstValueFrom(
+          this.appStateService.currentWorkspace$.asObservable()
+        )
+      ).baseUrl,
     ]);
     throw err;
   }
@@ -190,7 +193,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       type: 'script',
-      remoteName: (r as WebComponentRoute).productName,
+      remoteName: r.productName,
       remoteEntry: r.remoteEntryUrl,
       exposedModule: './' + exposedModule,
     };
@@ -219,23 +222,27 @@ export class RoutesService implements ShowContentProvider {
     return url;
   }
 
-  private async containsRouteForWorkspace(routes: BffGeneratedRoute[]): Promise<boolean> {
-    const baseUrl = (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl
+  private async containsRouteForWorkspace(
+    routes: BffGeneratedRoute[]
+  ): Promise<boolean> {
+    const baseUrl = (
+      await firstValueFrom(
+        this.appStateService.currentWorkspace$.asObservable()
+      )
+    ).baseUrl;
     return (
-      routes.find(
-        (r) =>
-          r.baseUrl ===
-          this.toRouteUrl(
-            baseUrl
-          )
-      ) !== undefined
+      routes.find((r) => r.baseUrl === this.toRouteUrl(baseUrl)) !== undefined
     );
   }
 
   private async createFallbackRoute(): Promise<Route> {
     return {
       path: this.toRouteUrl(
-        (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl,
+        (
+          await firstValueFrom(
+            this.appStateService.currentWorkspace$.asObservable()
+          )
+        ).baseUrl
       ),
       component: HomeComponent,
       pathMatch: PathMatch.full,

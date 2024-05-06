@@ -25,10 +25,6 @@ import { CustomHttpParameterCodec } from '../encoder';
 import { Observable } from 'rxjs';
 
 // @ts-ignore
-import { GetWorkspaceConfigRequest } from '../model/getWorkspaceConfigRequest';
-// @ts-ignore
-import { GetWorkspaceConfigResponse } from '../model/getWorkspaceConfigResponse';
-// @ts-ignore
 import { LoadWorkspaceConfigRequest } from '../model/loadWorkspaceConfigRequest';
 // @ts-ignore
 import { LoadWorkspaceConfigResponse } from '../model/loadWorkspaceConfigResponse';
@@ -285,107 +281,6 @@ export class WorkspaceConfigBffService {
       {
         context: localVarHttpContext,
         responseType: 'blob',
-        withCredentials: this.configuration.withCredentials,
-        headers: localVarHeaders,
-        observe: observe,
-        reportProgress: reportProgress,
-      }
-    );
-  }
-
-  /**
-   * @param getWorkspaceConfigRequest
-   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-   * @param reportProgress flag to report request and response progress.
-   */
-  public getWorkspaceConfig(
-    getWorkspaceConfigRequest: GetWorkspaceConfigRequest,
-    observe?: 'body',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext }
-  ): Observable<GetWorkspaceConfigResponse>;
-  public getWorkspaceConfig(
-    getWorkspaceConfigRequest: GetWorkspaceConfigRequest,
-    observe?: 'response',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext }
-  ): Observable<HttpResponse<GetWorkspaceConfigResponse>>;
-  public getWorkspaceConfig(
-    getWorkspaceConfigRequest: GetWorkspaceConfigRequest,
-    observe?: 'events',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext }
-  ): Observable<HttpEvent<GetWorkspaceConfigResponse>>;
-  public getWorkspaceConfig(
-    getWorkspaceConfigRequest: GetWorkspaceConfigRequest,
-    observe: any = 'body',
-    reportProgress: boolean = false,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext }
-  ): Observable<any> {
-    if (
-      getWorkspaceConfigRequest === null ||
-      getWorkspaceConfigRequest === undefined
-    ) {
-      throw new Error(
-        'Required parameter getWorkspaceConfigRequest was null or undefined when calling getWorkspaceConfig.'
-      );
-    }
-
-    let localVarHeaders = this.defaultHeaders;
-
-    let localVarHttpHeaderAcceptSelected: string | undefined =
-      options && options.httpHeaderAccept;
-    if (localVarHttpHeaderAcceptSelected === undefined) {
-      // to determine the Accept header
-      const httpHeaderAccepts: string[] = ['application/json'];
-      localVarHttpHeaderAcceptSelected =
-        this.configuration.selectHeaderAccept(httpHeaderAccepts);
-    }
-    if (localVarHttpHeaderAcceptSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set(
-        'Accept',
-        localVarHttpHeaderAcceptSelected
-      );
-    }
-
-    let localVarHttpContext: HttpContext | undefined =
-      options && options.context;
-    if (localVarHttpContext === undefined) {
-      localVarHttpContext = new HttpContext();
-    }
-
-    // to determine the Content-Type header
-    const consumes: string[] = ['application/json'];
-    const httpContentTypeSelected: string | undefined =
-      this.configuration.selectHeaderContentType(consumes);
-    if (httpContentTypeSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set(
-        'Content-Type',
-        httpContentTypeSelected
-      );
-    }
-
-    let responseType_: 'text' | 'json' | 'blob' = 'json';
-    if (localVarHttpHeaderAcceptSelected) {
-      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-        responseType_ = 'text';
-      } else if (
-        this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)
-      ) {
-        responseType_ = 'json';
-      } else {
-        responseType_ = 'blob';
-      }
-    }
-
-    let localVarPath = `/workspaceConfig`;
-    return this.httpClient.request<GetWorkspaceConfigResponse>(
-      'post',
-      `${this.configuration.basePath}${localVarPath}`,
-      {
-        context: localVarHttpContext,
-        body: getWorkspaceConfigRequest,
-        responseType: <any>responseType_,
         withCredentials: this.configuration.withCredentials,
         headers: localVarHeaders,
         observe: observe,

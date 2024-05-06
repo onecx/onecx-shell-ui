@@ -7,7 +7,7 @@
         "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnte nicht geladen werden."
     },
     "INITIALIZATION_ERROR_PAGE_MESSAGE": "Fehlermeldung:",
-    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Gewünschte URL:",
+    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Aufgerufene URL:",
     "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
     "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Fehlercode:",
     "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Ungültige Parameter:",

@@ -85,7 +85,6 @@
       "options": {
         "hmr": false,
         "port": 4300,
-        "publicHost": "http://localhost:4300",
         "proxyConfig": "proxy.conf.js"
       }
     },

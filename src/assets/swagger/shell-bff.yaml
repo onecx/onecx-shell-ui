@@ -34,33 +34,6 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: 'Not Found'
-  /workspaceConfig:
-    post:
-      tags:
-        - "WorkspaceConfig"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GetWorkspaceConfigRequest'
-      operationId: getWorkspaceConfig
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetWorkspaceConfigResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetailResponse'
-        '404':
-          description: 'Not Found'
-
   /workspaceConfig/themes/{name}/favicon:
     get:
       tags:
@@ -205,40 +178,6 @@ components:
           type: array
           items:
             type: string
-    GetWorkspaceConfigResponse:
-      type: object
-      required:
-        - 'routes'
-        - 'theme'
-        - 'workspace'
-        - 'remoteComponents'
-        - 'shellRemoteComponents'
-      properties:
-        routes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Route'
-        theme:
-          $ref: '#/components/schemas/Theme'
-        workspace:
-          $ref: '#/components/schemas/Workspace'
-        remoteComponents:
-          type: array
-          items:
-            $ref: '#/components/schemas/RemoteComponent'
-        shellRemoteComponents:
-          type: array
-          items:
-            $ref: '#/components/schemas/RemoteComponentMapping'
-
-    GetWorkspaceConfigRequest:
-      type: object
-      required:
-        - url
-      properties:
-        url:
-          type: string
-
     GetPermissionsRequest:
       type: object
       required:
@@ -249,7 +188,6 @@ components:
           type: string
         productName:
           type: string
-
     Workspace:
       type: object
       required:
@@ -260,7 +198,6 @@ components:
           type: string
         baseUrl:
           type: string
-
     Theme:
       required:
       - name
@@ -286,7 +223,6 @@ components:
           type: string
         properties:
           type: string
-
     Route:
       type: object
       required:
@@ -320,15 +256,12 @@ components:
           type: string
         displayName:
           type: string
-
     Technologies:
       type: string
       enum: ['Angular', 'WebComponent']
-
     PathMatch:
       type: string
       enum: ['full', 'prefix']
-
     RemoteComponent:
       type: object
       required:
@@ -352,18 +285,6 @@ components:
           type: string
         exposedModule:
           type: string
-
-    RemoteComponentMapping:
-      type: object
-      required:
-        - 'slotName'
-        - 'remoteComponent'
-      properties:
-        slotName:
-          type: string
-        remoteComponent:
-          type: string
-
     GetUserProfileResponse:
       type: object
       required:
@@ -371,7 +292,6 @@ components:
       properties:
         userProfile:
           $ref: '#/components/schemas/UserProfile'
-
     UserProfile:
       type: object
       required:
@@ -386,7 +306,6 @@ components:
           $ref: '#/components/schemas/UserPerson'
         accountSettings:
           $ref: '#/components/schemas/AccountSettings'
-
     UserPerson:
       type: object
       properties:
@@ -402,7 +321,6 @@ components:
           $ref: '#/components/schemas/UserPersonAddress'
         phone:
           $ref: '#/components/schemas/UserPersonPhone'
-
     UserPersonAddress:
       type: object
       properties:
@@ -416,7 +334,6 @@ components:
           type: string
         country:
           type: string
-
     UserPersonPhone:
       type: object
       properties:
@@ -424,11 +341,9 @@ components:
           $ref: '#/components/schemas/PhoneType'
         number:
           type: string
-
     PhoneType:
       type: string
       enum: ['MOBILE', 'LANDLINE']
-
     AccountSettings:
       type: object
       properties:
@@ -436,7 +351,6 @@ components:
           $ref: '#/components/schemas/LayoutAndThemeSettings'
         localeAndTimeSettings:
           $ref: '#/components/schemas/LocaleAndTimeSettings'
-
     LayoutAndThemeSettings:
       type: object
       properties:
@@ -444,15 +358,12 @@ components:
           $ref: '#/components/schemas/ColorScheme'
         menuMode:
           $ref: '#/components/schemas/MenuMode'
-
     ColorScheme:
       type: string
       enum: ['AUTO', 'LIGHT', 'DARK']
-
     MenuMode:
       type: string
       enum: ['HORIZONTAL', 'STATIC', 'OVERLAY', 'SLIM', 'SLIMPLUS']
-
     LocaleAndTimeSettings:
       type: object
       properties:
@@ -460,7 +371,6 @@ components:
           type: string
         timezone:
           type: string
-
     GetPermissionsResponse:
       type: object
       required:
@@ -470,7 +380,6 @@ components:
           type: array
           items:
             type: string
-
     ProblemDetailResponse:
       type: object
       properties:
@@ -486,7 +395,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProblemDetailInvalidParam'
-
     ProblemDetailParam:
       type: object
       properties:
@@ -494,7 +402,6 @@ components:
           type: string
         value:
           type: string
-
     ProblemDetailInvalidParam:
       type: object
       properties:

@@ -1,8 +1,15 @@
 {
     "ERROR_PAGE_H1": "Oops of new shell ui, we could not find that.",
+    "INITIALIZATION_ERROR_PAGE_H1": "Something was wrong with portal initialization on page startup. Please contact administrator with the following information:",
     "PAGE_NOT_FOUND": "Page not found in new shell.",
     "TO_HOME_PAGE": "Go to home page.",
     "MESSAGE": {
         "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
-    }
+    },
+    "INITIALIZATION_ERROR_PAGE_MESSAGE": "Error message:",
+    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Requested URL:",
+    "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
+    "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Error code:",
+    "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Invalid params:",
+    "INITIALIZATION_ERROR_PAGE_PARAMS": "Params:"
 }

@@ -1,8 +1,15 @@
 {
     "ERROR_PAGE_H1": "Oops, das konnte nicht gefunden werden.",
+    "INITIALIZATION_ERROR_PAGE_H1": "Bei der Portal-Initialisierung beim Start der Seite ist etwas schief gelaufen. Bitte kontaktieren Sie den Administrator mit den folgenden Informationen:",
     "PAGE_NOT_FOUND": "Seite nicht gefunden.",
     "TO_HOME_PAGE": "Gehe zu der Startseite.",
     "MESSAGE": {
         "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnte nicht geladen werden."
-    }
+    },
+    "INITIALIZATION_ERROR_PAGE_MESSAGE": "Fehlermeldung:",
+    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Aufgerufene URL:",
+    "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
+    "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Fehlercode:",
+    "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Ungültige Parameter:",
+    "INITIALIZATION_ERROR_PAGE_PARAMS": "Params:"
 }

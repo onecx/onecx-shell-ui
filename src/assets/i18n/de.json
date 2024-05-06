@@ -1,6 +1,6 @@
 {
     "ERROR_PAGE_H1": "Oops, das konnte nicht gefunden werden.",
-    "INITIALIZATION_ERROR_PAGE_H1": "Bei der Initialisierung der Shell ist ein Fehler aufgetreten, bitte wenden Sie sich an den Administrator",
+    "INITIALIZATION_ERROR_PAGE_H1": "Bei der Shell-Initialisierung beim Start der Seite ist etwas schief gelaufen. Bitte kontaktieren Sie den Administrator mit den folgenden Informationen:",
     "PAGE_NOT_FOUND": "Seite nicht gefunden.",
     "TO_HOME_PAGE": "Gehe zu der Startseite.",
     "MESSAGE": {

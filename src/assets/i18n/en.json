@@ -1,6 +1,6 @@
 {
     "ERROR_PAGE_H1": "Oops of new shell ui, we could not find that.",
-    "INITIALIZATION_ERROR_PAGE_H1": "Something was wrong with shell initialization, please contact administrator",
+    "INITIALIZATION_ERROR_PAGE_H1": "Something was wrong with shell initialization on page startup. Please contact administrator with the following information:",
     "PAGE_NOT_FOUND": "Page not found in new shell.",
     "TO_HOME_PAGE": "Go to home page.",
     "MESSAGE": {

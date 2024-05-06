@@ -33,7 +33,7 @@ import {
   UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { Observable, catchError, firstValueFrom, of, retry } from 'rxjs';
+import { catchError, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -42,13 +42,13 @@ import { HomeComponent } from './shared/components/home/home.component';
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  ProblemDetailResponse,
   UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page.component';
+import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
+import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -80,21 +80,6 @@ function publishCurrentWorkspace(
     workspaceName: loadWorkspaceConfigResponse.workspace.name,
     microfrontendRegistrations: [],
   });
-}
-
-type InitializationErrorDetails = ProblemDetailResponse;
-
-interface InitializationError {
-  message: string;
-  details?: InitializationErrorDetails;
-}
-
-export interface SerializedInitializationError {
-  message: string;
-  detail?: string;
-  errorCode?: string;
-  params?: string;
-  invalidParams?: string;
 }
 
 export function workspaceConfigInitializer(
@@ -170,41 +155,6 @@ export function userProfileInitializer(
       await userService.profile$.publish(getUserProfileResponse.userProfile);
     }
   };
-}
-
-function initializationErrorHandler(
-  error: any,
-  router: Router
-): Observable<any> {
-  console.error(error);
-  const initError: InitializationError = {
-    message: '',
-  };
-  if (error instanceof ErrorEvent) {
-    initError.message = error.error.message;
-  } else if (error instanceof HttpErrorResponse) {
-    initError.details = error.error;
-    initError.message = error.message;
-  }
-
-  const params: SerializedInitializationError = {
-    message: initError.message,
-    detail: initError.details?.detail ?? '',
-    errorCode: initError.details?.errorCode ?? '',
-    invalidParams: initError.details?.invalidParams
-      ? `[${initError.details.invalidParams.map(
-          (invalidParam) => `${invalidParam.name}: ${invalidParam.message}`
-        )}]`
-      : '',
-    params: initError.details?.params
-      ? `[${initError.details.params.map(
-          (param) => `${param.key}: ${param.value}`
-        )}]`
-      : '',
-  };
-
-  router.navigate(['shell-initialization-error-page', params]);
-  return of(undefined);
 }
 
 export function slotInitializer(slotService: ShellSlotService) {

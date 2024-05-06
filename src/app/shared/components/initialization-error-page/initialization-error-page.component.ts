@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SerializedInitializationError } from 'src/app/app.module';
+import { SerializedInitializationError } from '../../utils/initialization-error-handler.utils';
 
 @Component({
   template: `<div class="p-4">

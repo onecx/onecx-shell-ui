@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page.component';
+import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
 
 export const appRoutes: Route[] = [
   {

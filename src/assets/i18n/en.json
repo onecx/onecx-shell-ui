@@ -7,6 +7,7 @@
         "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
     },
     "INITIALIZATION_ERROR_PAGE_MESSAGE": "Error message:",
+    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Requested URL:",
     "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
     "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Error code:",
     "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Invalid params:",

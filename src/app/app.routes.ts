@@ -3,7 +3,7 @@ import { InitializationErrorPageComponent } from './shared/components/initializa
 
 export const appRoutes: Route[] = [
   {
-    path: 'shell-initialization-error-page',
+    path: 'portal-initialization-error-page',
     data: {
       message: '',
     },

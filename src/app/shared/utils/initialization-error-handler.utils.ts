@@ -12,6 +12,7 @@ interface InitializationError {
 
 export interface SerializedInitializationError {
   message: string;
+  requestedUrl: string;
   detail?: string;
   errorCode?: string;
   params?: string;
@@ -35,6 +36,7 @@ export function initializationErrorHandler(
 
   const params: SerializedInitializationError = {
     message: initError.message,
+    requestedUrl: window.location.href,
     detail: initError.details?.detail ?? '',
     errorCode: initError.details?.errorCode ?? '',
     invalidParams: initError.details?.invalidParams
@@ -49,6 +51,6 @@ export function initializationErrorHandler(
       : '',
   };
 
-  router.navigate(['shell-initialization-error-page', params]);
+  router.navigate(['portal-initialization-error-page', params]);
   return of(undefined);
 }

@@ -11,6 +11,12 @@ import { SerializedInitializationError } from '../../utils/initialization-error-
         {{ error.message }}
       </p>
     </div>
+    <div *ngIf="error.requestedUrl">
+      <p>
+        {{ 'INITIALIZATION_ERROR_PAGE_REQUESTED_URL' | translate }}
+        {{ error.requestedUrl }}
+      </p>
+    </div>
     <div *ngIf="error.detail">
       <p>
         {{ 'INITIALIZATION_ERROR_PAGE_DETAILS' | translate }}
@@ -42,6 +48,7 @@ export class InitializationErrorPageComponent {
   constructor(private route: ActivatedRoute) {
     this.error = {
       message: this.route.snapshot.paramMap.get('message') ?? '',
+      requestedUrl: this.route.snapshot.paramMap.get('requestedUrl') ?? '',
       detail: this.route.snapshot.paramMap.get('detail') ?? '',
       errorCode: this.route.snapshot.paramMap.get('errorCode') ?? '',
       params: this.route.snapshot.paramMap.get('params') ?? '',

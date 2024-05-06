@@ -2,7 +2,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import {
   MissingTranslationHandler,
   TranslateLoader,
@@ -29,7 +29,7 @@ import {
   UserService,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { firstValueFrom, retry } from 'rxjs';
+import { catchError, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -39,10 +39,12 @@ import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   UserProfileBffService,
-  WorkspaceConfigBffService
+  WorkspaceConfigBffService,
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { ShellSlotService } from './shared/services/shell-slot.service';
+import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
+import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -82,7 +84,8 @@ export function workspaceConfigInitializer(
   themeService: ThemeService,
   shellSlotService: ShellSlotService,
   appStateService: AppStateService,
-  remoteComponentsService: RemoteComponentsService
+  remoteComponentsService: RemoteComponentsService,
+  router: Router
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
@@ -91,49 +94,62 @@ export function workspaceConfigInitializer(
         .loadWorkspaceConfig({
           path: getLocation().applicationPath,
         })
-        .pipe(retry({ delay: 500, count: 3 }))
+        .pipe(
+          retry({ delay: 500, count: 3 }),
+          catchError((error) => {
+            return initializationErrorHandler(error, router);
+          })
+        )
     );
 
-    const parsedProperties = JSON.parse(
-      loadWorkspaceConfigResponse.theme.properties
-    ) as Record<string, Record<string, string>>;
-    const themeWithParsedProperties = {
-      ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties,
-    };
+    if (loadWorkspaceConfigResponse) {
+      const parsedProperties = JSON.parse(
+        loadWorkspaceConfigResponse.theme.properties
+      ) as Record<string, Record<string, string>>;
+      const themeWithParsedProperties = {
+        ...loadWorkspaceConfigResponse.theme,
+        properties: parsedProperties,
+      };
 
-    shellSlotService.slotMappings = loadWorkspaceConfigResponse.slots;
+      shellSlotService.slotMappings = loadWorkspaceConfigResponse.slots;
 
-    await Promise.all([
-      publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-      routesService.init(loadWorkspaceConfigResponse.routes),
-      themeService.apply(themeWithParsedProperties),
-      remoteComponentsService.remoteComponents$.publish(
-        loadWorkspaceConfigResponse.components
-      ),
-    ]);
+      await Promise.all([
+        publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+        routesService.init(loadWorkspaceConfigResponse.routes),
+        themeService.apply(themeWithParsedProperties),
+        remoteComponentsService.remoteComponents$.publish(
+          loadWorkspaceConfigResponse.components
+        ),
+      ]);
+    }
   };
 }
 
 export function userProfileInitializer(
   userProfileBffService: UserProfileBffService,
   userService: UserService,
-  appStateService: AppStateService
+  appStateService: AppStateService,
+  router: Router
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
     const getUserProfileResponse = await firstValueFrom(
-      userProfileBffService
-        .getUserProfile()
-        .pipe(retry({ delay: 500, count: 3 }))
+      userProfileBffService.getUserProfile().pipe(
+        retry({ delay: 500, count: 3 }),
+        catchError((error) => {
+          return initializationErrorHandler(error, router);
+        })
+      )
     );
 
-    console.log(
-      'ORGANIZATION : ',
-      getUserProfileResponse.userProfile.organization
-    );
+    if (getUserProfileResponse) {
+      console.log(
+        'ORGANIZATION : ',
+        getUserProfileResponse.userProfile.organization
+      );
 
-    await userService.profile$.publish(getUserProfileResponse.userProfile);
+      await userService.profile$.publish(getUserProfileResponse.userProfile);
+    }
   };
 }
 
@@ -148,7 +164,12 @@ export function configurationServiceInitializer(
 }
 
 @NgModule({
-  declarations: [AppComponent, ErrorPageComponent, HomeComponent],
+  declarations: [
+    AppComponent,
+    ErrorPageComponent,
+    HomeComponent,
+    InitializationErrorPageComponent,
+  ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes),
@@ -185,13 +206,14 @@ export function configurationServiceInitializer(
         ShellSlotService,
         AppStateService,
         RemoteComponentsService,
+        Router,
       ],
       multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: userProfileInitializer,
-      deps: [UserProfileBffService, UserService, AppStateService],
+      deps: [UserProfileBffService, UserService, AppStateService, Router],
       multi: true,
     },
     {

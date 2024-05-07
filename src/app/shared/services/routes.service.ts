@@ -11,10 +11,8 @@ import {
   PortalMessageService,
 } from '@onecx/angular-integration-interface';
 import { PermissionsTopic } from '@onecx/integration-interface';
-import {
-  PermissionsCacheService,
-  ShowContentProvider,
-} from '@onecx/shell-core';
+import { ShowContentProvider } from '@onecx/shell-core';
+import { PermissionsCacheService } from '@onecx/angular-remote-components';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import { ErrorPageComponent } from '../components/error-page.component';

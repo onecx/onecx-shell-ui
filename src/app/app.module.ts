@@ -26,6 +26,7 @@ import {
 import {
   AngularRemoteComponentsModule,
   SLOT_SERVICE,
+  SlotService,
 } from '@onecx/angular-remote-components';
 import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
@@ -47,7 +48,6 @@ import {
   WorkspaceConfigBffService,
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
-import { ShellSlotService } from './shared/services/shell-slot.service';
 import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
 
 export function createTranslateLoader(
@@ -86,7 +86,6 @@ export function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
   themeService: ThemeService,
-  shellSlotService: ShellSlotService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
   router: Router
@@ -115,15 +114,14 @@ export function workspaceConfigInitializer(
         properties: parsedProperties,
       };
 
-      shellSlotService.slotMappings = loadWorkspaceConfigResponse.slots;
-
       await Promise.all([
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
         routesService.init(loadWorkspaceConfigResponse.routes),
         themeService.apply(themeWithParsedProperties),
-        remoteComponentsService.remoteComponents$.publish(
-          loadWorkspaceConfigResponse.components
-        ),
+        remoteComponentsService.remoteComponents$.publish({
+          components: loadWorkspaceConfigResponse.components,
+          slots: loadWorkspaceConfigResponse.slots,
+        }),
       ]);
     }
   };
@@ -157,7 +155,7 @@ export function userProfileInitializer(
   };
 }
 
-export function slotInitializer(slotService: ShellSlotService) {
+export function slotInitializer(slotService: SlotService) {
   return () => slotService.init();
 }
 
@@ -207,7 +205,6 @@ export function configurationServiceInitializer(
         WorkspaceConfigBffService,
         RoutesService,
         ThemeService,
-        ShellSlotService,
         AppStateService,
         RemoteComponentsService,
         Router,
@@ -232,10 +229,10 @@ export function configurationServiceInitializer(
       deps: [ConfigurationService],
       multi: true,
     },
-    ShellSlotService,
+    SlotService,
     {
       provide: SLOT_SERVICE,
-      useExisting: ShellSlotService,
+      useExisting: SlotService,
     },
     {
       provide: BASE_PATH,

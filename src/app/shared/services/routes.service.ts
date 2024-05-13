@@ -149,7 +149,7 @@ export class RoutesService implements ShowContentProvider {
       appId: r.appId,
       productName: r.productName,
     });
-    const perms = await firstValueFrom(
+    await firstValueFrom(
       this.permissionsTopic$.pipe(
         filter(
           (message) =>
@@ -161,7 +161,6 @@ export class RoutesService implements ShowContentProvider {
         map((message) => message.permissions ?? [])
       )
     );
-    console.log(perms);
   }
 
   private async onRemoteLoadError(err: unknown) {

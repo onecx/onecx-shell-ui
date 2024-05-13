@@ -49,6 +49,7 @@ import {
 } from './shared/generated';
 import { RoutesService } from './shared/services/routes.service';
 import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
+import { PermissionProxyService } from './shared/services/permission-proxy.service';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -159,6 +160,12 @@ export function slotInitializer(slotService: SlotService) {
   return () => slotService.init();
 }
 
+export function permissionProxyInitializer(
+  permissionProxyService: PermissionProxyService
+) {
+  return () => permissionProxyService.init();
+}
+
 export function configurationServiceInitializer(
   configurationService: ConfigurationService
 ) {
@@ -200,6 +207,12 @@ export function configurationServiceInitializer(
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,
+      useFactory: permissionProxyInitializer,
+      deps: [PermissionProxyService],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
       deps: [
         WorkspaceConfigBffService,
@@ -229,7 +242,6 @@ export function configurationServiceInitializer(
       deps: [ConfigurationService],
       multi: true,
     },
-    SlotService,
     {
       provide: SLOT_SERVICE,
       useExisting: SlotService,

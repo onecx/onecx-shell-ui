@@ -11,12 +11,15 @@ import {
   PortalMessageService,
 } from '@onecx/angular-integration-interface';
 import { PermissionsTopic } from '@onecx/integration-interface';
-import { ShowContentProvider } from '@onecx/shell-core';
+import {
+  PermissionsCacheService,
+  ShowContentProvider,
+} from '@onecx/shell-core';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch } from '../generated';
+import { PathMatch, PermissionBffService } from '../generated';
 import { Route as BffGeneratedRoute } from '../generated/model/route';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
@@ -35,7 +38,9 @@ export class RoutesService implements ShowContentProvider {
     private router: Router,
     private appStateService: AppStateService,
     private portalMessageService: PortalMessageService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private permissionsCacheService: PermissionsCacheService,
+    private permissionsService: PermissionBffService
   ) {
     router.events
       .pipe(
@@ -145,22 +150,17 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updatePermissions(r: BffGeneratedRoute) {
-    await this.permissionsTopic$.publish({
-      appId: r.appId,
-      productName: r.productName,
-    });
-    await firstValueFrom(
-      this.permissionsTopic$.pipe(
-        filter(
-          (message) =>
-            message.appId === r.appId &&
-            message.productName === r.productName &&
-            Array.isArray(message.permissions) &&
-            message.permissions.length > 0
-        ),
-        map((message) => message.permissions ?? [])
+    const permissions = await firstValueFrom(
+      this.permissionsCacheService.getPermissions(
+        r.appId,
+        r.productName,
+        (appId, productName) =>
+          this.permissionsService
+            .getPermissions({ appId, productName })
+            .pipe(map(({ permissions }) => permissions))
       )
     );
+    await this.permissionsTopic$.publish(permissions);
   }
 
   private async onRemoteLoadError(err: unknown) {

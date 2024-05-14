@@ -8,7 +8,7 @@ servers:
   - url: http://onecx-shell-bff:8080/
 
 paths:
-  /workspaceConfig/load:
+  /workspaceConfig:
     post:
       tags:
         - 'WorkspaceConfig'

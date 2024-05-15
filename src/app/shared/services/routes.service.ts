@@ -152,13 +152,11 @@ export class RoutesService implements ShowContentProvider {
       link.id = 'ocx_app_styles';
       link.rel = 'stylesheet';
       link.media = 'all';
-      link.onload = "this.media='all'";
       document.head.appendChild(link);
     }
-    link.href =
-      link.href === Location.joinWithSlash(r.url, 'styles.css')
-        ? link.href
-        : Location.joinWithSlash(r.url, 'styles.css');
+    if (link.href !== Location.joinWithSlash(r.url, 'styles.css')) {
+      link.href = Location.joinWithSlash(r.url, 'styles.css');
+    }
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {

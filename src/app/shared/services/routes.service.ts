@@ -2,6 +2,7 @@ import {
   LoadRemoteModuleOptions,
   loadRemoteModule,
 } from '@angular-architects/module-federation';
+import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Route, Router } from '@angular/router';
 import {
@@ -80,7 +81,7 @@ export class RoutesService implements ShowContentProvider {
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),
-      canActivateChild: [() => this.updateAppState(r, r.baseUrl)],
+      canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
       title: r.displayName,
     };
   }
@@ -91,7 +92,7 @@ export class RoutesService implements ShowContentProvider {
     console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
-        await this.updateAppState(r, joinedBaseUrl);
+        await this.updateAppEnvironment(r, joinedBaseUrl);
         const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
@@ -104,6 +105,14 @@ export class RoutesService implements ShowContentProvider {
     } finally {
       await this.appStateService.globalLoading$.publish(false);
     }
+  }
+
+  private async updateAppEnvironment(
+    r: BffGeneratedRoute,
+    joinedBaseUrl: string
+  ): Promise<boolean> {
+    this.updateAppStyles(r);
+    return this.updateAppState(r, joinedBaseUrl);
   }
 
   private async updateAppState(
@@ -134,6 +143,20 @@ export class RoutesService implements ShowContentProvider {
       }
     }
     return true;
+  }
+
+  private async updateAppStyles(r: BffGeneratedRoute) {
+    let link = document.getElementById('ocx_app_styles') as any;
+    if (!link) {
+      link = document.createElement('link');
+      link.id = 'ocx_app_styles';
+      link.rel = 'stylesheet';
+      link.media = 'all';
+      document.head.appendChild(link);
+    }
+    if (link.href !== Location.joinWithSlash(r.url, 'styles.css')) {
+      link.href = Location.joinWithSlash(r.url, 'styles.css');
+    }
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {

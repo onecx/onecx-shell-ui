@@ -15,12 +15,7 @@ export class PermissionProxyService {
 
   async init(): Promise<unknown> {
     this.permissionsTopic$
-      .pipe(
-        filter(
-          (message) =>
-            message.permissions === undefined || message.permissions.length == 0
-        )
-      )
+      .pipe(filter((message) => message.permissions === undefined))
       .subscribe(async (message) => {
         const permissions = {
           appId: message.appId,

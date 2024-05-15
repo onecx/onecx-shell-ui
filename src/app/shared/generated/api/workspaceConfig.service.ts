@@ -374,7 +374,7 @@ export class WorkspaceConfigBffService {
       }
     }
 
-    let localVarPath = `/workspaceConfig/load`;
+    let localVarPath = `/workspaceConfig`;
     return this.httpClient.request<LoadWorkspaceConfigResponse>(
       'post',
       `${this.configuration.basePath}${localVarPath}`,

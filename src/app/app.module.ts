@@ -1,5 +1,5 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router, RouterModule } from '@angular/router';
@@ -108,35 +108,47 @@ export function workspaceConfigInitializer(
     );
 
     if (loadWorkspaceConfigResponse) {
-      loadWorkspaceConfigResponse.routes.push({
-        url: 'http://localhost:5025/',
-        baseUrl: '/admin/test',
-        remoteEntryUrl:
-          'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
-        appId: 'onecx-workspace-ui',
-        productName: 'angular1',
-        technology: 'WebComponent',
-        exposedModule: './web-components',
-        pathMatch: 'prefix',
-        remoteName: 'angular1-element',
-        displayName: 'OneCX Workspace',
-        endpoints: [],
+      // loadWorkspaceConfigResponse.routes.push({
+      //   url: 'http://localhost:5025/',
+      //   baseUrl: '/admin/test',
+      //   remoteEntryUrl:
+      //     'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
+      //   appId: 'onecx-workspace-ui',
+      //   productName: 'angular1',
+      //   technology: 'WebComponent',
+      //   exposedModule: './web-components',
+      //   pathMatch: 'prefix',
+      //   remoteName: 'angular1-element',
+      //   displayName: 'OneCX Workspace',
+      //   endpoints: [],
+      // });
+        loadWorkspaceConfigResponse.routes.push(        {
+          "url": "http://localhost:4200/",
+          "baseUrl": "/admin/test",
+          "remoteEntryUrl": "http://localhost:4200/remoteEntry.js",
+          "appId": "onecxAnnouncementUi",
+          "productName": "onecxAnnouncementUi",
+          "technology": "WebComponent",
+          "exposedModule": "./ocxAnnouncementApp",
+          "pathMatch": "prefix",
+          "remoteName": "ocx-announcement-app",
+          "displayName": "OneCX Announcement",
+          "endpoints": []
       });
-      loadWorkspaceConfigResponse.components.push({
-        name: 'test',
-        baseUrl: 'http://localhost:5023/',
-        remoteEntryUrl:
-          'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
-        appId: 'onecx-help-ui',
-        productName: 'angular1',
-        exposedModule: './web-components',
-        remoteName: 'angular1-element',
-        technology: 'WebComponent',
-      });
+      // loadWorkspaceConfigResponse.components.push({
+      //     "name": "test",
+      //     "baseUrl": "http://localhost:4201/",
+      //     "remoteEntryUrl": "http://localhost:4201/remoteEntry.js",
+      //     "appId": "onecx-announcement-ui",
+      //     "productName": "onecx-announcement",
+      //     "exposedModule": "./ocx-announcement-banner",
+      //     "remoteName": "ocx-announcement-banner",
+      //     "technology": "WebComponent"
+      // });
       loadWorkspaceConfigResponse.slots
-        .find((s: Slot) => s.name === 'menu')
+        .find((s: Slot) => s.name === 'subHeader')
         ?.components.push('test');
-
+      loadWorkspaceConfigResponse.slots = [];
       const parsedProperties = JSON.parse(
         loadWorkspaceConfigResponse.theme.properties
       ) as Record<string, Record<string, string>>;
@@ -202,6 +214,12 @@ export function configurationServiceInitializer(
   return () => configurationService.init();
 }
 
+class MyErrorHandler implements ErrorHandler {
+  handleError(error: any) {
+    // do something with the exception
+  }
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -229,11 +247,11 @@ export function configurationServiceInitializer(
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
-    BrowserAnimationsModule,
     RouterModule,
     KeycloakAuthModule,
   ],
   providers: [
+    {provide: ErrorHandler, useClass: MyErrorHandler},
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

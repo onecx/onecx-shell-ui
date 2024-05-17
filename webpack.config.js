@@ -41,6 +41,10 @@ const webpackConfig = {
         requiredVersion: 'auto',
         eager: true,
       },
+      '@angular-architects/module-federation-tools': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+      },
       '@onecx/accelerator': {
         requiredVersion: 'auto',
         includeSecondaries: true,

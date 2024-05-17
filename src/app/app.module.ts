@@ -38,18 +38,19 @@ import { catchError, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
-import { ErrorPageComponent } from './shared/components/error-page.component';
-import { HomeComponent } from './shared/components/home/home.component';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
+import { ErrorPageComponent } from './shell/components/error-page.component';
+import { HomeComponent } from './shell/components/home/home.component';
+import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component';
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
+  Slot,
   UserProfileBffService,
   WorkspaceConfigBffService,
-} from './shared/generated';
-import { RoutesService } from './shared/services/routes.service';
-import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
-import { PermissionProxyService } from './shared/services/permission-proxy.service';
+} from './shell/generated';
+import { RoutesService } from './shell/services/routes.service';
+import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils';
+import { PermissionProxyService } from './shell/services/permission-proxy.service';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -107,6 +108,35 @@ export function workspaceConfigInitializer(
     );
 
     if (loadWorkspaceConfigResponse) {
+      loadWorkspaceConfigResponse.routes.push({
+        url: 'http://localhost:5025/',
+        baseUrl: '/admin/test',
+        remoteEntryUrl:
+          'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
+        appId: 'onecx-workspace-ui',
+        productName: 'angular1',
+        technology: 'WebComponent',
+        exposedModule: './web-components',
+        pathMatch: 'prefix',
+        remoteName: 'angular1-element',
+        displayName: 'OneCX Workspace',
+        endpoints: [],
+      });
+      loadWorkspaceConfigResponse.components.push({
+        name: 'test',
+        baseUrl: 'http://localhost:5023/',
+        remoteEntryUrl:
+          'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
+        appId: 'onecx-help-ui',
+        productName: 'angular1',
+        exposedModule: './web-components',
+        remoteName: 'angular1-element',
+        technology: 'WebComponent',
+      });
+      loadWorkspaceConfigResponse.slots
+        .find((s: Slot) => s.name === 'menu')
+        ?.components.push('test');
+
       const parsedProperties = JSON.parse(
         loadWorkspaceConfigResponse.theme.properties
       ) as Record<string, Record<string, string>>;

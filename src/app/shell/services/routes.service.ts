@@ -20,8 +20,9 @@ import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch, PermissionBffService } from '../generated';
+import { PathMatch, PermissionBffService, Technologies } from '../generated';
 import { Route as BffGeneratedRoute } from '../generated/model/route';
+import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -98,7 +99,11 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        return m[exposedModule];
+        if (r.technology === Technologies.Angular) {
+          return m[exposedModule];
+        } else {
+          return WebcomponentLoaderModule;
+        }
       } catch (err) {
         return await this.onRemoteLoadError(err);
       }
@@ -168,6 +173,7 @@ export class RoutesService implements ShowContentProvider {
       displayName: r.displayName,
       appId: r.appId,
       productName: r.productName,
+      remoteName: r.remoteName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }

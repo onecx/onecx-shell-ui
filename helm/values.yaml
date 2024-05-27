@@ -5,29 +5,31 @@ app:
   routing:
     enabled: true
     path: /newShell/
-  
-  operator:    
+
+  operator:
     # Keycloak
     keycloak:
       client:
         enabled: true
         spec:
           kcConfig:
-            clientId: "onecx-shell-ui"
+            clientId: 'onecx-shell-ui'
     slot:
       enabled: true
       specs:
-        menu: 
-          name: "menu"
-          description: "Shell main menu"
+        menu:
+          name: 'menu'
+          description: 'Shell main menu'
         horizontal:
-          name: "horizontalMenu"
-          description: "Shell horizontal menu"
+          name: 'horizontalMenu'
+          description: 'Shell horizontal menu'
         header-right:
-          name: "headerRight"
-          description: "Shell header right"
+          name: 'headerRight'
+          description: 'Shell header right'
         sub-header:
-          name: "subHeader"
-          description: "Shell sub header menu"
-          
+          name: 'subHeader'
+          description: 'Shell sub header menu'
+        footer:
+          name: 'footer'
+          description: 'Shell footer'
 # PIPE Config

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PermissionsRpcTopic } from '@onecx/integration-interface';
 import { PermissionsCacheService } from '@onecx/shell-core';
-import { filter, firstValueFrom, map } from 'rxjs';
+import { filter, map, mergeMap } from 'rxjs';
 import { PermissionBffService } from '../generated';
 
 @Injectable({ providedIn: 'root' })
@@ -15,13 +15,11 @@ export class PermissionProxyService {
 
   async init(): Promise<unknown> {
     this.permissionsTopic$
-      .pipe(filter((message) => message.permissions === undefined))
-      .subscribe(async (message) => {
-        const permissions = {
-          appId: message.appId,
-          productName: message.productName,
-          permissions: await firstValueFrom(
-            this.permissionsCacheService.getPermissions(
+      .pipe(
+        filter((message) => message.permissions === undefined),
+        mergeMap((message) =>
+          this.permissionsCacheService
+            .getPermissions(
               message.appId,
               message.productName,
               (appId, productName) =>
@@ -29,9 +27,16 @@ export class PermissionProxyService {
                   .getPermissions({ appId, productName })
                   .pipe(map(({ permissions }) => permissions))
             )
-          ),
+            .pipe(map((permissions) => ({ message, permissions })))
+        )
+      )
+      .subscribe(({ message, permissions }) => {
+        const answer = {
+          appId: message.appId,
+          productName: message.productName,
+          permissions: permissions,
         };
-        this.permissionsTopic$.publish(permissions);
+        this.permissionsTopic$.publish(answer);
       });
     return Promise.resolve();
   }

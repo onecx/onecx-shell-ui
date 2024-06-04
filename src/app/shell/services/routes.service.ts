@@ -18,10 +18,14 @@ import {
 } from '@onecx/shell-core';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
+import {
+  PathMatch,
+  PermissionBffService,
+  Technologies,
+} from 'src/app/shared/generated';
+import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch, PermissionBffService, Technologies } from '../generated';
-import { Route as BffGeneratedRoute } from '../generated/model/route';
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
@@ -174,6 +178,7 @@ export class RoutesService implements ShowContentProvider {
       appId: r.appId,
       productName: r.productName,
       remoteName: r.remoteName,
+      elementName: r.elementName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
@@ -213,7 +218,10 @@ export class RoutesService implements ShowContentProvider {
     const exposedModule = r.exposedModule.startsWith('./')
       ? r.exposedModule.slice(2)
       : r.exposedModule;
-    if (r.technology === 'Angular') {
+    if (
+      r.technology === Technologies.Angular ||
+      r.technology === Technologies.WebComponentModule
+    ) {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
@@ -222,7 +230,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       type: 'script',
-      remoteName: r.productName,
+      remoteName: r.remoteName ?? '',
       remoteEntry: r.remoteEntryUrl,
       exposedModule: './' + exposedModule,
     };

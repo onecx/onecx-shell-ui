@@ -20,14 +20,12 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
     
     const currentMfe = await firstValueFrom(this.appStateService.currentMfe$.asObservable());
 
-    if (!currentMfe.remoteName)
+    if (!currentMfe.elementName)
       throw new Error(
-        'The remote of the current MFE is not set correctly.\n' +
-          'The remoteName should be supplied after the "=" sign.\n' +
-          'Example: { "remote":"http://host:port/basePath/my-react-app/#./Module=my-react-app" }'
+        'elementName is missing in the configuration'
       );
 
-    const element = document.createElement(currentMfe.remoteName);
+    const element = document.createElement(currentMfe.elementName);
     this.wrapper?.nativeElement.appendChild(element);
   }
 }

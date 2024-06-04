@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-export enum Technologies {
-  Angular = 'Angular',
-  WebComponent = 'WebComponent',
+export interface UIEndpoint {
+  path?: string;
+  name?: string;
 }

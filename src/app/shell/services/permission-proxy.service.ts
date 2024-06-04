@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PermissionsRpcTopic } from '@onecx/integration-interface';
 import { PermissionsCacheService } from '@onecx/shell-core';
 import { filter, firstValueFrom, map } from 'rxjs';
-import { PermissionBffService } from '../generated';
+import { PermissionBffService } from 'src/app/shared/generated';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionProxyService {

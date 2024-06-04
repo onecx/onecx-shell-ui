@@ -10,11 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface RemoteComponent {
-  name: string;
-  baseUrl: string;
-  remoteEntryUrl: string;
-  appId: string;
-  productName: string;
-  exposedModule: string;
+export enum Technologies {
+  Angular = 'Angular',
+  WebComponent = 'WebComponent',
+  WebComponentScript = 'WebComponentScript',
+  WebComponentModule = 'WebComponentModule',
 }

@@ -9,18 +9,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { PathMatch } from './pathMatch';
 import { Technologies } from './technologies';
 
-export interface Route {
-  url: string;
+export interface RemoteComponent {
+  name: string;
   baseUrl: string;
   remoteEntryUrl: string;
   appId: string;
   productName: string;
-  technology?: Technologies;
   exposedModule: string;
-  pathMatch: PathMatch;
   remoteName?: string;
-  displayName: string;
+  elementName?: string;
+  technology?: Technologies;
 }

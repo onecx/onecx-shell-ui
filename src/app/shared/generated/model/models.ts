@@ -18,6 +18,7 @@ export * from './route';
 export * from './slot';
 export * from './technologies';
 export * from './theme';
+export * from './uIEndpoint';
 export * from './userPerson';
 export * from './userPersonAddress';
 export * from './userPersonPhone';

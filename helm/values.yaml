@@ -32,4 +32,7 @@ app:
         onecx-shell-footer:
           name: 'onecx-shell-footer'
           description: 'Shell footer'
+        onecx-user-profile-change-password:
+          name: 'onecx-userProfile-changePassword'
+          description: 'User profile password change'
 # PIPE Config

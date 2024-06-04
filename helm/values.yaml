@@ -17,19 +17,19 @@ app:
     slot:
       enabled: true
       specs:
-        ocx-shell-vertical-menu:
-          name: 'ocxShellVerticalMenu'
+        onecx-shell-vertical-menu:
+          name: 'onecx-shell-verticalMenu'
           description: 'Shell vertical menu'
-        ocx-shell-horizontal:
-          name: 'ocxShellHorizontalMenu'
+        onecx-shell-horizontal-menu:
+          name: 'onecx-shell-horizontalMenu'
           description: 'Shell horizontal menu'
-        ocx-shell-header-right:
-          name: 'ocxShellHeaderRight'
+        onecx-shell-header-right:
+          name: 'onecx-shell-headerRight'
           description: 'Shell header right'
-        ocx-shell-sub-header:
-          name: 'ocxShellSubHeader'
+        onecx-shell-sub-header:
+          name: 'onecx-shell-subHeader'
           description: 'Shell sub header menu'
-        ocx-shell-footer:
-          name: 'ocxShellFooter'
+        onecx-shell-footer:
+          name: 'onecx-shell-footer'
           description: 'Shell footer'
 # PIPE Config

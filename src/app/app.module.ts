@@ -1,6 +1,7 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router, RouterModule } from '@angular/router';
 import {
   MissingTranslationHandler,
@@ -200,6 +201,7 @@ export function configurationServiceInitializer(
     AngularRemoteComponentsModule,
     RouterModule,
     KeycloakAuthModule,
+    BrowserAnimationsModule
   ],
   providers: [
     { provide: APP_CONFIG, useValue: environment },

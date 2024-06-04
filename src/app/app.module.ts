@@ -1,5 +1,5 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -27,7 +27,6 @@ import {
   SLOT_SERVICE,
   SlotService,
 } from '@onecx/angular-remote-components';
-import { Slot } from '@onecx/integration-interface';
 import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
   DEFAULT_LANG,
@@ -107,99 +106,6 @@ export function workspaceConfigInitializer(
     );
 
     if (loadWorkspaceConfigResponse) {
-
-      loadWorkspaceConfigResponse.components.push({
-        name: 'test',
-        baseUrl: 'http://localhost:5023/',
-        remoteEntryUrl:
-          'http://localhost:4201/remoteEntry.js',
-        appId: 'onecx-help-ui',
-        productName: 'mfe1-ng16',
-        exposedModule: './standalone-component-as-web-component',
-        remoteName: 'mfe1-ng16',
-        technology: 'WebComponentModule',
-        elementName: 'my-mfe-element'
-      });
-      
-      loadWorkspaceConfigResponse.slots
-        .find((s: Slot) => s.name === 'menu')
-        ?.components.push('test');
-
-      loadWorkspaceConfigResponse.routes.push({
-        url: 'http://localhost:5025/',
-        baseUrl: '/admin/test',
-        remoteEntryUrl:
-          'http://localhost:4201/remoteEntry.js',
-        appId: 'onecx-workspace-ui',
-        productName: 'mfe1-ng16',
-        technology: 'WebComponentModule',
-        exposedModule: './standalone-component-as-web-component',
-        pathMatch: 'prefix',
-        remoteName: 'mfe1-ng16',
-        displayName: 'OneCX Workspace',
-        endpoints: [],
-        elementName: 'my-mfe-element'
-      });
-
-      // loadWorkspaceConfigResponse.components.push({
-      //   name: 'test',
-      //   baseUrl: 'http://localhost:5023/',
-      //   remoteEntryUrl:
-      //     'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
-      //   appId: 'onecx-help-ui',
-      //   productName: 'angular1',
-      //   exposedModule: './web-components',
-      //   remoteName: 'angular1',
-      //   technology: 'WebComponentScript',
-      //   elementName: 'angular1-element'
-      // });
-      
-      // loadWorkspaceConfigResponse.slots
-      //   .find((s: Slot) => s.name === 'menu')
-      //   ?.components.push('test');
-
-      // loadWorkspaceConfigResponse.routes.push({
-      //   url: 'http://localhost:5025/',
-      //   baseUrl: '/admin/test',
-      //   remoteEntryUrl:
-      //     'https://nice-grass-018f7d910.azurestaticapps.net/remoteEntry.js',
-      //   appId: 'onecx-workspace-ui',
-      //   productName: 'angular1',
-      //   technology: 'WebComponentScript',
-      //   exposedModule: './web-components',
-      //   pathMatch: 'prefix',
-      //   remoteName: 'angular1',
-      //   displayName: 'OneCX Workspace',
-      //   endpoints: [],
-      //   elementName: 'angular1-element'
-      // });
-      // loadWorkspaceConfigResponse.routes.push({
-      //   url: 'http://localhost:4200/',
-      //   baseUrl: '/admin/test',
-      //   remoteEntryUrl: 'http://localhost:4200/remoteEntry.js',
-      //   appId: 'onecxAnnouncementUi',
-      //   productName: 'onecxAnnouncementUi',
-      //   technology: 'WebComponent',
-      //   exposedModule: './ocxAnnouncementApp',
-      //   pathMatch: 'prefix',
-      //   remoteName: 'ocx-announcement-app',
-      //   displayName: 'OneCX Announcement',
-      //   endpoints: [],
-      // });
-      // loadWorkspaceConfigResponse.components.push({
-      //     "name": "test",
-      //     "baseUrl": "http://localhost:4201/",
-      //     "remoteEntryUrl": "http://localhost:4201/remoteEntry.js",
-      //     "appId": "onecx-announcement-ui",
-      //     "productName": "onecx-announcement",
-      //     "exposedModule": "./ocx-announcement-banner",
-      //     "remoteName": "ocx-announcement-banner",
-      //     "technology": "WebComponent"
-      // });
-      // loadWorkspaceConfigResponse.slots
-      //   .find((s: Slot) => s.name === 'subHeader')
-      //   ?.components.push('test');
-      // loadWorkspaceConfigResponse.slots = [];
       const parsedProperties = JSON.parse(
         loadWorkspaceConfigResponse.theme.properties
       ) as Record<string, Record<string, string>>;
@@ -265,12 +171,6 @@ export function configurationServiceInitializer(
   return () => configurationService.init();
 }
 
-class MyErrorHandler implements ErrorHandler {
-  handleError(error: any) {
-    // do something with the exception
-  }
-}
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -302,7 +202,6 @@ class MyErrorHandler implements ErrorHandler {
     KeycloakAuthModule,
   ],
   providers: [
-    { provide: ErrorHandler, useClass: MyErrorHandler },
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

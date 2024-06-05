@@ -201,7 +201,7 @@ export function configurationServiceInitializer(
     AngularRemoteComponentsModule,
     RouterModule,
     KeycloakAuthModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     { provide: APP_CONFIG, useValue: environment },

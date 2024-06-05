@@ -13,11 +13,13 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
         eager: true,
+        singleton: true,
       },
       '@angular/forms': {
         requiredVersion: 'auto',
         includeSecondaries: true,
         eager: true,
+        singleton: true,
       },
       '@angular/common': {
         requiredVersion: 'auto',
@@ -25,16 +27,19 @@ const webpackConfig = {
           skip: ['@angular/common/http/testing'],
         },
         eager: true,
+        singleton: true,
       },
       '@angular/common/http': {
         requiredVersion: 'auto',
         includeSecondaries: true,
         eager: true,
+        singleton: true,
       },
       '@angular/router': {
         requiredVersion: 'auto',
         includeSecondaries: true,
         eager: true,
+        singleton: true,
       },
       rxjs: { requiredVersion: 'auto', includeSecondaries: true, eager: true },
       '@ngx-translate/core': {
@@ -77,10 +82,10 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
-      'primeng': {
+      primeng: {
         requiredVersion: 'auto',
         includeSecondaries: true,
-      }
+      },
     }),
 
     sharedMappings: ['@onecx/portal-integration-angular'],

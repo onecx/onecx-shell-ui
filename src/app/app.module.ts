@@ -15,6 +15,7 @@ import {
   TranslateCombinedLoader,
   TranslationCacheService,
 } from '@onecx/angular-accelerator';
+import { AngularAuthModule } from '@onecx/angular-auth';
 import {
   APP_CONFIG,
   AppStateService,
@@ -201,7 +202,7 @@ export function configurationServiceInitializer(
     AngularRemoteComponentsModule,
     BrowserAnimationsModule,
     RouterModule,
-    KeycloakAuthModule,
+    AngularAuthModule,
   ],
   providers: [
     { provide: APP_CONFIG, useValue: environment },

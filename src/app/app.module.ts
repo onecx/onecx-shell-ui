@@ -29,7 +29,6 @@ import {
   SLOT_SERVICE,
   SlotService,
 } from '@onecx/angular-remote-components';
-import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
   DEFAULT_LANG,
   PortalCoreModule,

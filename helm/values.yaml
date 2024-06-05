@@ -17,19 +17,19 @@ app:
     slot:
       enabled: true
       specs:
-        menu:
-          name: 'menu'
-          description: 'Shell main menu'
-        horizontal:
-          name: 'horizontalMenu'
+        onecx-shell-vertical-menu:
+          name: 'onecx-shell-verticalMenu'
+          description: 'Shell vertical menu'
+        onecx-shell-horizontal-menu:
+          name: 'onecx-shell-horizontalMenu'
           description: 'Shell horizontal menu'
-        header-right:
-          name: 'headerRight'
+        onecx-shell-header-right:
+          name: 'onecx-shell-headerRight'
           description: 'Shell header right'
-        sub-header:
-          name: 'subHeader'
+        onecx-shell-sub-header:
+          name: 'onecx-shell-subHeader'
           description: 'Shell sub header menu'
-        footer:
-          name: 'footer'
+        onecx-shell-footer:
+          name: 'onecx-shell-footer'
           description: 'Shell footer'
 # PIPE Config

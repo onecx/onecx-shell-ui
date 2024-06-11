@@ -103,7 +103,10 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        if (r.technology === Technologies.Angular) {
+        if (
+          r.technology === Technologies.Angular &&
+          r.appId !== 'hello-world-ui'
+        ) {
           return m[exposedModule];
         } else {
           return WebcomponentLoaderModule;

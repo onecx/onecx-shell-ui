@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone, inject } from '@angular/core';
 
 @Component({
   selector: 'ocx-shell-root',
@@ -7,4 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'shell';
+  constructor() {
+    (globalThis as any).ngZone = inject(NgZone);
+  }
 }

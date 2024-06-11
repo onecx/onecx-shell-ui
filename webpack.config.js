@@ -35,6 +35,12 @@ const webpackConfig = {
         eager: true,
         singleton: true,
       },
+      '@angular/elements': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+        eager: true,
+        singleton: true,
+      },
       '@angular/router': {
         requiredVersion: 'auto',
         includeSecondaries: true,

@@ -15,6 +15,7 @@ import {
   TranslateCombinedLoader,
   TranslationCacheService,
 } from '@onecx/angular-accelerator';
+import { AngularAuthModule } from '@onecx/angular-auth';
 import {
   APP_CONFIG,
   AppStateService,
@@ -28,7 +29,6 @@ import {
   SLOT_SERVICE,
   SlotService,
 } from '@onecx/angular-remote-components';
-import { KeycloakAuthModule } from '@onecx/keycloak-auth';
 import {
   DEFAULT_LANG,
   PortalCoreModule,
@@ -200,8 +200,8 @@ export function configurationServiceInitializer(
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
     RouterModule,
-    KeycloakAuthModule,
     BrowserAnimationsModule,
+    AngularAuthModule,
   ],
   providers: [
     { provide: APP_CONFIG, useValue: environment },

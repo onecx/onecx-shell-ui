@@ -18,16 +18,16 @@ app:
       enabled: true
       specs:
         onecx-shell-vertical-menu:
-          name: 'onecx-shell-verticalMenu'
+          name: 'onecx-shell-vertical-menu'
           description: 'Shell vertical menu'
         onecx-shell-horizontal-menu:
-          name: 'onecx-shell-horizontalMenu'
+          name: 'onecx-shell-horizontal-menu'
           description: 'Shell horizontal menu'
         onecx-shell-header-right:
-          name: 'onecx-shell-headerRight'
+          name: 'onecx-shell-header-right'
           description: 'Shell header right'
         onecx-shell-sub-header:
-          name: 'onecx-shell-subHeader'
+          name: 'onecx-shell-sub-header'
           description: 'Shell sub header menu'
         onecx-shell-footer:
           name: 'onecx-shell-footer'

@@ -105,7 +105,8 @@ export class RoutesService implements ShowContentProvider {
         console.log(`Load remote module ${exposedModule} finished.`);
         if (
           r.technology === Technologies.Angular &&
-          r.appId !== 'hello-webcomponent-ui'
+          r.appId !== 'hello-webcomponent-ui' &&
+          r.appId !== 'onecx-announcement-ui'
         ) {
           return m[exposedModule];
         } else {

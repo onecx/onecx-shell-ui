@@ -26,6 +26,11 @@ import {
 import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
+import {
+  WebComponentWrapper,
+  WebComponentWrapperOptions,
+  startsWith,
+} from '@angular-architects/module-federation-tools';
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
@@ -78,6 +83,79 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {
+    if (r.appId === 'hello-webcomponent-ui') {
+      return {
+        matcher: startsWith('admin/hello/path'),
+        component: WebComponentWrapper,
+        data: {
+          type: 'module',
+          remoteEntry: r.remoteEntryUrl,
+          remoteName: r.remoteName,
+          exposedModule: r.exposedModule,
+          elementName: r.elementName,
+        } as WebComponentWrapperOptions,
+        loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+        canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+        title: r.displayName,
+      };
+    } else if (r.appId === 'onecx-announcement-ui') {
+      return {
+        matcher: startsWith('admin/announcement'),
+        component: WebComponentWrapper,
+        data: {
+          type: 'module',
+          remoteEntry: r.remoteEntryUrl,
+          remoteName: r.remoteName,
+          exposedModule: r.exposedModule,
+          elementName: r.elementName,
+        } as WebComponentWrapperOptions,
+        loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+        canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+        title: r.displayName,
+      };
+      // if (r.appId === 'hello-webcomponent-ui') {
+      //   return {
+      //     matcher: startsWith('admin/hello/path'),
+      //     data: {
+      //       module: r.exposedModule,
+      //       breadcrumb: r.productName,
+      //     },
+      //     // pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
+      //     // loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+      //     loadComponent: async () => await this.loadChildren(r, r.baseUrl),
+      //     canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+      //     title: r.displayName,
+      //   };
+      // } else if (r.appId === 'onecx-announcement-ui') {
+      //   return {
+      //     matcher: startsWith('admin/announcement'),
+      //     data: {
+      //       module: r.exposedModule,
+      //       breadcrumb: r.productName,
+      //     },
+      //     // pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
+      //     // loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+      //     loadComponent: async () => await this.loadChildren(r, r.baseUrl),
+      //     canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+      //     title: r.displayName,
+      //   };
+      // } else {
+      // if (
+      //   r.appId === 'hello-webcomponent-ui' ||
+      //   r.appId === 'onecx-announcement-ui'
+      // ) {
+      //   return {
+      //     path: this.toRouteUrl(r.baseUrl),
+      //     data: {
+      //       module: r.exposedModule,
+      //       breadcrumb: r.productName,
+      //     },
+      //     pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
+      //     loadComponent: async () => await this.loadComponent(r, r.baseUrl),
+      //     canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+      //     title: r.displayName,
+      //   };
+    }
     return {
       path: this.toRouteUrl(r.baseUrl),
       data: {
@@ -89,7 +167,31 @@ export class RoutesService implements ShowContentProvider {
       canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
       title: r.displayName,
     };
+    // }
   }
+
+  // private async loadComponent(r: BffGeneratedRoute, joinedBaseUrl: string) {
+  //   this.showContent$.next(false);
+  //   await this.appStateService.globalLoading$.publish(true);
+  //   console.log(`➡ Load remote module ${r.exposedModule}`);
+  //   try {
+  //     try {
+  //       await this.updateAppEnvironment(r, joinedBaseUrl);
+  //       await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
+  //       const exposedModule = r.exposedModule.startsWith('./')
+  //         ? r.exposedModule.slice(2)
+  //         : r.exposedModule;
+  //       console.log(`Load remote module ${exposedModule} finished.`);
+  //       return import(
+  //         '../web-component-loader/webcomponent-loader.component'
+  //       ).then((x) => x.WebcomponentLoaderComponent) as any;
+  //     } catch (err) {
+  //       return await this.onRemoteLoadError(err);
+  //     }
+  //   } finally {
+  //     await this.appStateService.globalLoading$.publish(false);
+  //   }
+  // }
 
   private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
     this.showContent$.next(false);
@@ -98,18 +200,19 @@ export class RoutesService implements ShowContentProvider {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl);
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
           : r.exposedModule;
-        console.log(`Load remote module ${exposedModule} finished.`);
         if (
           r.technology === Technologies.Angular &&
           r.appId !== 'hello-webcomponent-ui' &&
           r.appId !== 'onecx-announcement-ui'
         ) {
+          const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
+          console.log(`Load remote module ${exposedModule} finished.`);
           return m[exposedModule];
         } else {
+          console.log(`Load remote module ${exposedModule} finished.`);
           return WebcomponentLoaderModule;
         }
       } catch (err) {

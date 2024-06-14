@@ -6,7 +6,7 @@ COPY nginx/locations.conf $DIR_LOCATION/locations.conf
 COPY dist/onecx-shell-ui/ $DIR_HTML
 
 # Optional extend list of application environments
-ENV CONFIG_ENV_LIST BFF_URL,APP_BASE_HREF,CORS_ENABLED,APP_VERSION,APP_ID,PRODUCT_NAME,TKIT_PORTAL_URL,EXTENSIONS_BFF_URL,AUTH_SERVICE,AUTH_SERVICE_CUSTOM_URL,AUTH_SERVICE_CUSTOM_MODULE_NAME
+#ENV CONFIG_ENV_LIST BFF_URL,APP_BASE_HREF
 
 # Application environments default values
 ENV BFF_URL http://onecx-shell-bff:8080/

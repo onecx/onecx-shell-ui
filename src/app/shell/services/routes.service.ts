@@ -18,10 +18,15 @@ import {
 } from '@onecx/shell-core';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
+import {
+  PathMatch,
+  PermissionBffService,
+  Technologies,
+} from 'src/app/shared/generated';
+import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch, PermissionBffService } from '../generated';
-import { Route as BffGeneratedRoute } from '../generated/model/route';
+import { startsWith } from '@angular-architects/module-federation-tools';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -73,6 +78,21 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {
+    if (
+      r.technology !== Technologies.Angular ||
+      r.appId === 'hello-webcomponent-ui' ||
+      r.appId === 'onecx-announcement-ui'
+    ) {
+      const prefix = this.toRouteUrl(r.baseUrl);
+      return {
+        matcher: prefix ? startsWith(prefix) : undefined, // not sure
+        pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
+        loadComponent: async () =>
+          await this.loadRemote('webcomponent', r, r.baseUrl),
+        canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
+        title: r.displayName,
+      };
+    }
     return {
       path: this.toRouteUrl(r.baseUrl),
       data: {
@@ -80,27 +100,37 @@ export class RoutesService implements ShowContentProvider {
         breadcrumb: r.productName,
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
-      loadChildren: async () => await this.loadChildren(r, r.baseUrl),
+      loadChildren: async () => await this.loadRemote('module', r, r.baseUrl),
       canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
       title: r.displayName,
     };
   }
 
-  private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
+  private async loadRemote(
+    type: 'webcomponent' | 'module',
+    r: BffGeneratedRoute,
+    joinedBaseUrl: string
+  ) {
     this.showContent$.next(false);
     await this.appStateService.globalLoading$.publish(true);
-    console.log(`➡ Load remote module ${r.exposedModule}`);
+    console.log(`➡ Load webcomponent remote module ${r.exposedModule}`);
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl);
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
           : r.exposedModule;
-        console.log(`Load remote module ${exposedModule} finished.`);
-        return m[exposedModule];
+        console.log(
+          `Load webcomponent remote module ${exposedModule} finished.`
+        );
+        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
+        return type === 'module'
+          ? m[exposedModule]
+          : import(
+              '../web-component-loader/webcomponent-loader.component'
+            ).then((m) => m.WebcomponentLoaderComponent);
       } catch (err) {
-        return await this.onRemoteLoadError(err);
+        await this.onRemoteLoadError(err);
       }
     } finally {
       await this.appStateService.globalLoading$.publish(false);
@@ -168,6 +198,8 @@ export class RoutesService implements ShowContentProvider {
       displayName: r.displayName,
       appId: r.appId,
       productName: r.productName,
+      remoteName: r.remoteName,
+      elementName: r.elementName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
@@ -207,7 +239,10 @@ export class RoutesService implements ShowContentProvider {
     const exposedModule = r.exposedModule.startsWith('./')
       ? r.exposedModule.slice(2)
       : r.exposedModule;
-    if (r.technology === 'Angular') {
+    if (
+      r.technology === Technologies.Angular ||
+      r.technology === Technologies.WebComponentModule
+    ) {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
@@ -216,7 +251,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       type: 'script',
-      remoteName: r.productName,
+      remoteName: r.remoteName ?? '',
       remoteEntry: r.remoteEntryUrl,
       exposedModule: './' + exposedModule,
     };

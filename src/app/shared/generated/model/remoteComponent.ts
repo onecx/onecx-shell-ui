@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Technologies } from './technologies';
 
 export interface RemoteComponent {
   name: string;
@@ -17,4 +18,7 @@ export interface RemoteComponent {
   appId: string;
   productName: string;
   exposedModule: string;
+  remoteName?: string;
+  elementName?: string;
+  technology?: Technologies;
 }

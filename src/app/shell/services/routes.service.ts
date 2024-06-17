@@ -3,7 +3,7 @@ import {
   loadRemoteModule,
 } from '@angular-architects/module-federation';
 import { Location } from '@angular/common';
-import { Injectable, Type } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NavigationEnd, Route, Router } from '@angular/router';
 import {
   AppStateService,
@@ -26,12 +26,7 @@ import {
 import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import {
-  WebComponentWrapper,
-  WebComponentWrapperOptions,
-  startsWith,
-} from '@angular-architects/module-federation-tools';
-import { WebcomponentLoaderComponent } from '../web-component-loader/webcomponent-loader.component';
+import { startsWith } from '@angular-architects/module-federation-tools';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -83,19 +78,14 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {
-    // if web component then loadComponent
-    if (r.appId === 'hello-webcomponent-ui') {
+    if (
+      r.technology !== Technologies.Angular ||
+      r.appId === 'hello-webcomponent-ui' ||
+      r.appId === 'onecx-announcement-ui'
+    ) {
+      const prefix = this.toRouteUrl(r.baseUrl);
       return {
-        matcher: startsWith('admin/hello/path'),
-        pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
-        loadComponent: async () =>
-          await this.loadRemote('webcomponent', r, r.baseUrl),
-        canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
-        title: r.displayName,
-      };
-    } else if (r.appId === 'onecx-announcement-ui') {
-      return {
-        matcher: startsWith('admin/announcement'),
+        matcher: prefix ? startsWith(prefix) : undefined, // not sure
         pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
         loadComponent: async () =>
           await this.loadRemote('webcomponent', r, r.baseUrl),

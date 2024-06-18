@@ -7,7 +7,4 @@ import { Component, NgZone, inject } from '@angular/core';
 })
 export class AppComponent {
   title = 'shell';
-  constructor() {
-    (globalThis as any).ngZone = inject(NgZone);
-  }
 }

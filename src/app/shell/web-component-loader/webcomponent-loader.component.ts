@@ -9,7 +9,6 @@ import { firstValueFrom } from 'rxjs';
 
 @Component({
   template: '<div #wrapper></div>',
-  standalone: true,
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })

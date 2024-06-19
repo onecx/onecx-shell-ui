@@ -26,7 +26,7 @@ import {
 import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { startsWith } from '@angular-architects/module-federation-tools';
+import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -78,21 +78,6 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {
-    if (
-      r.technology !== Technologies.Angular ||
-      r.appId === 'hello-webcomponent-ui' ||
-      r.appId === 'onecx-announcement-ui'
-    ) {
-      const prefix = this.toRouteUrl(r.baseUrl);
-      return {
-        matcher: prefix ? startsWith(prefix) : undefined, // not sure
-        pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
-        loadComponent: async () =>
-          await this.loadRemote('webcomponent', r, r.baseUrl),
-        canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
-        title: r.displayName,
-      };
-    }
     return {
       path: this.toRouteUrl(r.baseUrl),
       data: {
@@ -100,37 +85,35 @@ export class RoutesService implements ShowContentProvider {
         breadcrumb: r.productName,
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
-      loadChildren: async () => await this.loadRemote('module', r, r.baseUrl),
+      loadChildren: async () => await this.loadChildren(r, r.baseUrl),
       canActivateChild: [() => this.updateAppEnvironment(r, r.baseUrl)],
       title: r.displayName,
     };
   }
 
-  private async loadRemote(
-    type: 'webcomponent' | 'module',
-    r: BffGeneratedRoute,
-    joinedBaseUrl: string
-  ) {
+  private async loadChildren(r: BffGeneratedRoute, joinedBaseUrl: string) {
     this.showContent$.next(false);
     await this.appStateService.globalLoading$.publish(true);
-    console.log(`➡ Load webcomponent remote module ${r.exposedModule}`);
+    console.log(`➡ Load remote module ${r.exposedModule}`);
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl);
+        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
         const exposedModule = r.exposedModule.startsWith('./')
           ? r.exposedModule.slice(2)
           : r.exposedModule;
-        console.log(
-          `Load webcomponent remote module ${exposedModule} finished.`
-        );
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r));
-        return type === 'module'
-          ? m[exposedModule]
-          : import(
-              '../web-component-loader/webcomponent-loader.component'
-            ).then((m) => m.WebcomponentLoaderComponent);
+        console.log(`Load remote module ${exposedModule} finished.`);
+        if (
+          r.technology === Technologies.Angular &&
+          r.appId !== 'hello-webcomponent-ui' &&
+          r.appId !== 'onecx-announcement-ui'
+        ) {
+          return m[exposedModule];
+        } else {
+          return WebcomponentLoaderModule;
+        }
       } catch (err) {
-        await this.onRemoteLoadError(err);
+        return await this.onRemoteLoadError(err);
       }
     } finally {
       await this.appStateService.globalLoading$.publish(false);

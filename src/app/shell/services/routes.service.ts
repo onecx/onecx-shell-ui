@@ -82,7 +82,7 @@ export class RoutesService implements ShowContentProvider {
       path: this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
-        breadcrumb: r.productName,
+        mfeInfo: this.routeToMfeInfo(r, r.baseUrl),
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),
@@ -173,7 +173,13 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
-    const mfeInfo = {
+    return await this.appStateService.currentMfe$.publish(
+      this.routeToMfeInfo(r, joinedBaseUrl)
+    );
+  }
+
+  private routeToMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
+    return {
       baseHref: joinedBaseUrl,
       mountPath: joinedBaseUrl,
       shellName: 'portal',
@@ -184,7 +190,6 @@ export class RoutesService implements ShowContentProvider {
       remoteName: r.remoteName,
       elementName: r.elementName,
     };
-    return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
 
   private async updatePermissions(r: BffGeneratedRoute) {

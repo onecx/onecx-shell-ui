@@ -82,7 +82,7 @@ export class RoutesService implements ShowContentProvider {
       path: this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
-        mfeInfo: this.routeToMfeInfo(r, r.baseUrl),
+        breadcrumb: r.productName,
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),
@@ -103,9 +103,7 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        if (
-          r.technology === Technologies.Angular
-        ) {
+        if (r.technology === Technologies.Angular) {
           return m[exposedModule];
         } else {
           return WebcomponentLoaderModule;
@@ -171,13 +169,7 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
-    return await this.appStateService.currentMfe$.publish(
-      this.routeToMfeInfo(r, joinedBaseUrl)
-    );
-  }
-
-  private routeToMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
-    return {
+    const mfeInfo = {
       baseHref: joinedBaseUrl,
       mountPath: joinedBaseUrl,
       shellName: 'portal',
@@ -188,6 +180,7 @@ export class RoutesService implements ShowContentProvider {
       remoteName: r.remoteName,
       elementName: r.elementName,
     };
+    return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
 
   private async updatePermissions(r: BffGeneratedRoute) {

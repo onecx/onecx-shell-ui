@@ -18,10 +18,15 @@ import {
 } from '@onecx/shell-core';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
+import {
+  PathMatch,
+  PermissionBffService,
+  Technologies,
+} from 'src/app/shared/generated';
+import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch, PermissionBffService } from '../generated';
-import { Route as BffGeneratedRoute } from '../generated/model/route';
+import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -98,7 +103,11 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        return m[exposedModule];
+        if (r.technology === Technologies.Angular) {
+          return m[exposedModule];
+        } else {
+          return WebcomponentLoaderModule;
+        }
       } catch (err) {
         return await this.onRemoteLoadError(err);
       }
@@ -168,6 +177,8 @@ export class RoutesService implements ShowContentProvider {
       displayName: r.displayName,
       appId: r.appId,
       productName: r.productName,
+      remoteName: r.remoteName,
+      elementName: r.elementName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
@@ -207,7 +218,10 @@ export class RoutesService implements ShowContentProvider {
     const exposedModule = r.exposedModule.startsWith('./')
       ? r.exposedModule.slice(2)
       : r.exposedModule;
-    if (r.technology === 'Angular') {
+    if (
+      r.technology === Technologies.Angular ||
+      r.technology === Technologies.WebComponentModule
+    ) {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
@@ -216,7 +230,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       type: 'script',
-      remoteName: r.productName,
+      remoteName: r.remoteName ?? '',
       remoteEntry: r.remoteEntryUrl,
       exposedModule: './' + exposedModule,
     };

@@ -38,18 +38,18 @@ import { catchError, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
-import { ErrorPageComponent } from './shared/components/error-page.component';
-import { HomeComponent } from './shared/components/home/home.component';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
-import { RoutesService } from './shared/services/routes.service';
-import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
-import { PermissionProxyService } from './shared/services/permission-proxy.service';
+import { ErrorPageComponent } from './shell/components/error-page.component';
+import { HomeComponent } from './shell/components/home/home.component';
+import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component';
+import { PermissionProxyService } from './shell/services/permission-proxy.service';
+import { RoutesService } from './shell/services/routes.service';
+import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -199,8 +199,8 @@ export function configurationServiceInitializer(
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
-    BrowserAnimationsModule,
     RouterModule,
+    BrowserAnimationsModule,
     AngularAuthModule,
   ],
   providers: [

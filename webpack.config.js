@@ -43,9 +43,12 @@ const webpackConfig = {
       },
       rxjs: { requiredVersion: 'auto', includeSecondaries: true, eager: true },
       '@ngx-translate/core': {
-        singleton: true,
         requiredVersion: 'auto',
         eager: true,
+      },
+      '@angular-architects/module-federation-tools': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
       },
       '@onecx/accelerator': {
         requiredVersion: 'auto',
@@ -79,10 +82,10 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
-      'primeng': {
+      primeng: {
         requiredVersion: 'auto',
         includeSecondaries: true,
-      }
+      },
     }),
 
     sharedMappings: ['@onecx/portal-integration-angular'],

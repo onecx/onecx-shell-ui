@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { ProblemDetailResponse } from '../generated';
+import { ProblemDetailResponse } from 'src/app/shared/generated';
 
 type InitializationErrorDetails = ProblemDetailResponse;
 

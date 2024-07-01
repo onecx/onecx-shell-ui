@@ -31,6 +31,7 @@ model/route.ts
 model/slot.ts
 model/technologies.ts
 model/theme.ts
+model/uIEndpoint.ts
 model/userPerson.ts
 model/userPersonAddress.ts
 model/userPersonPhone.ts

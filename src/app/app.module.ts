@@ -172,6 +172,20 @@ export function configurationServiceInitializer(
   return () => configurationService.init();
 }
 
+export function urlChangeListenerInitializer(router: Router) {
+  return () => {
+    let lastUrl = location.href;
+    new MutationObserver(() => {
+      const url = location.href;
+      if (url !== lastUrl) {
+        lastUrl = url;
+        const routerUrl = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}`
+        router.navigateByUrl(routerUrl)
+      }
+    }).observe(document, { subtree: true, childList: true });
+  };
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -210,6 +224,12 @@ export function configurationServiceInitializer(
       useFactory: permissionProxyInitializer,
       deps: [PermissionProxyService],
       multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: urlChangeListenerInitializer,
+      deps: [Router],
+      multi: true
     },
     {
       provide: APP_INITIALIZER,

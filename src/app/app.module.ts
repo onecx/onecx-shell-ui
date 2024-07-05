@@ -34,7 +34,7 @@ import {
   PortalCoreModule,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { catchError, firstValueFrom, retry } from 'rxjs';
+import { catchError, filter, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
@@ -50,6 +50,7 @@ import { InitializationErrorPageComponent } from './shell/components/initializat
 import { PermissionProxyService } from './shell/services/permission-proxy.service';
 import { RoutesService } from './shell/services/routes.service';
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils';
+import { EventsPublisher, EventsTopic } from '@onecx/integration-interface';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -171,18 +172,36 @@ export function configurationServiceInitializer(
 ) {
   return () => configurationService.init();
 }
+let pushState = window.history.pushState;
+window.history.pushState = (data: any, unused: string, url?: string) => {
+  pushState.bind(window.history)(data, unused, url);
+  new EventsPublisher().publish({
+    type: 'navigated',
+    payload: {
+      url
+    },
+  });
+};
 
+let replaceState = window.history.replaceState;
+window.history.replaceState = (data: any, unused: string, url?: string) => {
+  replaceState.bind(window.history)(data, unused, url);
+  new EventsPublisher().publish({
+    type: 'navigated',
+    payload: {
+      url
+    },
+  });
+};
 export function urlChangeListenerInitializer(router: Router) {
   return () => {
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-      const url = location.href;
-      if (url !== lastUrl) {
-        lastUrl = url;
-        const routerUrl = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}`
-        router.navigateByUrl(routerUrl)
-      }
-    }).observe(document, { subtree: true, childList: true });
+    const observer = new EventsTopic();
+    observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
+      const routerUrl = `${location.pathname.substring(
+        getLocation().deploymentPath.length
+      )}${location.search}`;
+      router.navigateByUrl(routerUrl);
+    });
   };
 }
 

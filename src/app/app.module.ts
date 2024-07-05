@@ -172,7 +172,7 @@ export function configurationServiceInitializer(
 ) {
   return () => configurationService.init();
 }
-let pushState = window.history.pushState;
+const pushState = window.history.pushState;
 window.history.pushState = (data: any, unused: string, url?: string) => {
   pushState.bind(window.history)(data, unused, url);
   new EventsPublisher().publish({
@@ -183,7 +183,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
   });
 };
 
-let replaceState = window.history.replaceState;
+const replaceState = window.history.replaceState;
 window.history.replaceState = (data: any, unused: string, url?: string) => {
   replaceState.bind(window.history)(data, unused, url);
   new EventsPublisher().publish({

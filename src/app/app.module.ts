@@ -178,7 +178,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
-      url
+      url,
     },
   });
 };
@@ -189,18 +189,23 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
-      url
+      url,
     },
   });
 };
+
 export function urlChangeListenerInitializer(router: Router) {
   return () => {
+    let lastUrl = '';
     const observer = new EventsTopic();
     observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length
       )}${location.search}`;
-      router.navigateByUrl(routerUrl);
+      if (routerUrl !== lastUrl) {
+        lastUrl = routerUrl;
+        router.navigateByUrl(routerUrl);
+      }
     });
   };
 }
@@ -248,7 +253,7 @@ export function urlChangeListenerInitializer(router: Router) {
       provide: APP_INITIALIZER,
       useFactory: urlChangeListenerInitializer,
       deps: [Router],
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,

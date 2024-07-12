@@ -7,13 +7,6 @@ app:
     path: /newShell/
 
   operator:
-    # Keycloak
-    keycloak:
-      client:
-        enabled: true
-        spec:
-          kcConfig:
-            clientId: 'onecx-shell-ui'
     slot:
       enabled: true
       specs:

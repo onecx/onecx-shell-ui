@@ -80,6 +80,7 @@ function publishCurrentWorkspace(
     baseUrl: loadWorkspaceConfigResponse.workspace.baseUrl,
     portalName: loadWorkspaceConfigResponse.workspace.name,
     workspaceName: loadWorkspaceConfigResponse.workspace.name,
+    routes: loadWorkspaceConfigResponse.routes,
     microfrontendRegistrations: [],
   });
 }
@@ -194,8 +195,14 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   });
 };
 
-export function urlChangeListenerInitializer(router: Router) {
-  return () => {
+export function urlChangeListenerInitializer(
+  router: Router,
+  appStateService: AppStateService,
+  routesService: RoutesService
+) {
+  return async () => {
+    await appStateService.isAuthenticated$.isInitialized;
+    await routesService.isInitialized;
     let lastUrl = '';
     const observer = new EventsTopic();
     observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
@@ -252,7 +259,7 @@ export function urlChangeListenerInitializer(router: Router) {
     {
       provide: APP_INITIALIZER,
       useFactory: urlChangeListenerInitializer,
-      deps: [Router],
+      deps: [Router, AppStateService, RoutesService],
       multi: true,
     },
     {

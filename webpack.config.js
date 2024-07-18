@@ -57,11 +57,19 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
+      '@onecx/angular-auth': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+      },
       '@onecx/angular-integration-interface': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
       '@onecx/angular-remote-components': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+      },
+      '@onecx/angular-webcomponents': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
@@ -77,10 +85,11 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
-      '@onecx/shell-core': {
+      '@onecx/portal-layout-styles': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
+      '@onecx/shell-core': { requiredVersion: 'auto', includeSecondaries: true },
       primeng: {
         requiredVersion: 'auto',
         includeSecondaries: true,

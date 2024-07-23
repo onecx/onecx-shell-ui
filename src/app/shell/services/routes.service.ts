@@ -44,13 +44,7 @@ export class RoutesService implements ShowContentProvider {
   private permissionsTopic$ = new PermissionsTopic();
   private isFirstLoad = true;
   private isHomePageLoaded = false;
-  private resolveIsInitialized:
-    | ((value: void | PromiseLike<void>) => void)
-    | undefined;
   showContent$ = new BehaviorSubject<boolean>(true);
-  isInitialized = new Promise<void>(
-    (resolve) => (this.resolveIsInitialized = resolve)
-  );
 
   constructor(
     private router: Router,
@@ -88,7 +82,6 @@ export class RoutesService implements ShowContentProvider {
         .map((lr) => `${lr.url} -> ${JSON.stringify(lr.baseUrl)}`)
         .join('\t\n')}`
     );
-    this.resolveIsInitialized ? this.resolveIsInitialized() : undefined;
     return Promise.resolve();
   }
 

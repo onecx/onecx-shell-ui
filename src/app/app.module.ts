@@ -120,7 +120,9 @@ export function workspaceConfigInitializer(
 
       await Promise.all([
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-        routesService.init(loadWorkspaceConfigResponse.routes),
+        routesService
+          .init(loadWorkspaceConfigResponse.routes)
+          .then(urlChangeListenerInitializer(router, appStateService)),
         themeService.apply(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
@@ -198,12 +200,10 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
 
 export function urlChangeListenerInitializer(
   router: Router,
-  appStateService: AppStateService,
-  routesService: RoutesService
+  appStateService: AppStateService
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
-    await routesService.isInitialized;
     let lastUrl = '';
     let isFirstRoute = true;
     const observer = new EventsTopic();
@@ -260,12 +260,6 @@ export function urlChangeListenerInitializer(
       provide: APP_INITIALIZER,
       useFactory: permissionProxyInitializer,
       deps: [PermissionProxyService],
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: urlChangeListenerInitializer,
-      deps: [Router, AppStateService, RoutesService],
       multi: true,
     },
     {

@@ -21,7 +21,7 @@ import {
   PermissionsCacheService,
   ShowContentProvider,
 } from '@onecx/shell-core';
-import { BehaviorSubject, filter, firstValueFrom, map, tap } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
 import {
   PathMatch,
@@ -62,10 +62,8 @@ export class RoutesService implements ShowContentProvider {
   ) {
     router.events
       .pipe(
-        tap((e) => console.log(e)),
         filter(
-          (e): e is NavigationEnd =>
-            e instanceof NavigationEnd || e instanceof NavigationSkipped
+          (e) => e instanceof NavigationEnd || e instanceof NavigationSkipped
         ),
         map(() => true)
       )

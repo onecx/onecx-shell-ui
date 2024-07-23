@@ -346,7 +346,7 @@ export class RoutesService implements ShowContentProvider {
       pathMatch: PathMatch.full,
     };
 
-    if (currentWorkspace.homePage === undefined) {
+    if (!currentWorkspace.homePage) {
       return {
         ...route,
         component: HomeComponent,

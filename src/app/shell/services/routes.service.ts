@@ -236,7 +236,7 @@ export class RoutesService implements ShowContentProvider {
     if (fallBackRoute?.redirectTo && this.isHomePageLoaded) {
       const homePageUrl = await this.getHomePageUrl();
       const homeRoute = this.router.config.find((r) => r.path === homePageUrl);
-      if (homeRoute && homeRoute.canActivateChild) {
+      if (homeRoute?.canActivateChild) {
         for (const canActivateCallback of homeRoute.canActivateChild)
           await canActivateCallback();
       }

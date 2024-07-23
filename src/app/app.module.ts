@@ -122,7 +122,7 @@ export function workspaceConfigInitializer(
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
         routesService
           .init(loadWorkspaceConfigResponse.routes)
-          .then(await urlChangeListenerInitializer(router, appStateService)),
+          .then(urlChangeListenerInitializer(router, appStateService)),
         themeService.apply(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,

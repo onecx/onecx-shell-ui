@@ -13,4 +13,5 @@
 export interface Workspace {
   name: string;
   baseUrl: string;
+  homePage?: string;
 }

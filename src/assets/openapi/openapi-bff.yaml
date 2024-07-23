@@ -198,6 +198,8 @@ components:
           type: string
         baseUrl:
           type: string
+        homePage:
+          type: string
     Theme:
       required:
         - name

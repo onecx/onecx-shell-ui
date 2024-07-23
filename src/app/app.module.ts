@@ -81,6 +81,7 @@ function publishCurrentWorkspace(
     portalName: loadWorkspaceConfigResponse.workspace.name,
     workspaceName: loadWorkspaceConfigResponse.workspace.name,
     routes: loadWorkspaceConfigResponse.routes,
+    homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
   });
 }
@@ -204,6 +205,7 @@ export function urlChangeListenerInitializer(
     await appStateService.isAuthenticated$.isInitialized;
     await routesService.isInitialized;
     let lastUrl = '';
+    let isFirstRoute = true;
     const observer = new EventsTopic();
     observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
       const routerUrl = `${location.pathname.substring(
@@ -211,7 +213,11 @@ export function urlChangeListenerInitializer(
       )}${location.search}`;
       if (routerUrl !== lastUrl) {
         lastUrl = routerUrl;
-        router.navigateByUrl(routerUrl);
+        if (!isFirstRoute) {
+          router.navigateByUrl(routerUrl);
+        } else {
+          isFirstRoute = false;
+        }
       }
     });
   };

@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 import { PathMatch } from './pathMatch';
+import { UIEndpoint } from './uIEndpoint';
 import { Technologies } from './technologies';
 
 export interface Route {
@@ -22,5 +23,7 @@ export interface Route {
   exposedModule: string;
   pathMatch: PathMatch;
   remoteName?: string;
+  elementName?: string;
   displayName: string;
+  endpoints?: Array<UIEndpoint>;
 }

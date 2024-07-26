@@ -1,6 +1,5 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { bootstrapModule } from '@onecx/angular-webcomponents';
 import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
 
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
-  .catch((err) => console.error(err));
+bootstrapModule(AppModule, 'shell', environment.production);

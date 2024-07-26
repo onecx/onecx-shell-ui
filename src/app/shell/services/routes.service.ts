@@ -4,7 +4,12 @@ import {
 } from '@angular-architects/module-federation';
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { NavigationEnd, Route, Router } from '@angular/router';
+import {
+  NavigationEnd,
+  NavigationSkipped,
+  Route,
+  Router,
+} from '@angular/router';
 import {
   AppStateService,
   CONFIG_KEY,
@@ -18,10 +23,15 @@ import {
 } from '@onecx/shell-core';
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs';
 import { appRoutes } from 'src/app/app.routes';
+import {
+  PathMatch,
+  PermissionBffService,
+  Technologies,
+} from 'src/app/shared/generated';
+import { Route as BffGeneratedRoute } from '../../shared/generated';
 import { ErrorPageComponent } from '../components/error-page.component';
 import { HomeComponent } from '../components/home/home.component';
-import { PathMatch, PermissionBffService } from '../generated';
-import { Route as BffGeneratedRoute } from '../generated/model/route';
+import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -33,6 +43,7 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 export class RoutesService implements ShowContentProvider {
   private permissionsTopic$ = new PermissionsTopic();
   private isFirstLoad = true;
+  private isHomePageLoaded = false;
   showContent$ = new BehaviorSubject<boolean>(true);
 
   constructor(
@@ -45,7 +56,9 @@ export class RoutesService implements ShowContentProvider {
   ) {
     router.events
       .pipe(
-        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        filter(
+          (e) => e instanceof NavigationEnd || e instanceof NavigationSkipped
+        ),
         map(() => true)
       )
       .subscribe(this.showContent$);
@@ -98,8 +111,16 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        return m[exposedModule];
+        if (await this.isHomePage(r)) {
+          this.isHomePageLoaded = true;
+        }
+        if (r.technology === Technologies.Angular) {
+          return m[exposedModule];
+        } else {
+          return WebcomponentLoaderModule;
+        }
       } catch (err) {
+        await this.ensureHomePageAvailability(r);
         return await this.onRemoteLoadError(err);
       }
     } finally {
@@ -168,6 +189,8 @@ export class RoutesService implements ShowContentProvider {
       displayName: r.displayName,
       appId: r.appId,
       productName: r.productName,
+      remoteName: r.remoteName,
+      elementName: r.elementName,
     };
     return await this.appStateService.currentMfe$.publish(mfeInfo);
   }
@@ -191,14 +214,67 @@ export class RoutesService implements ShowContentProvider {
     this.portalMessageService.error({
       summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
     });
-    this.router.navigate([
-      (
-        await firstValueFrom(
-          this.appStateService.currentWorkspace$.asObservable()
-        )
-      ).baseUrl,
-    ]);
+
+    const currentBaseUrl = (
+      await firstValueFrom(
+        this.appStateService.currentWorkspace$.asObservable()
+      )
+    ).baseUrl;
+
+    const fallBackRoute = this.router.config.find(
+      (r) => r.path === this.toRouteUrl(currentBaseUrl)
+    );
+    if (fallBackRoute?.redirectTo && this.isHomePageLoaded) {
+      const homePageUrl = await this.getHomePageUrl();
+      const homeRoute = this.router.config.find((r) => r.path === homePageUrl);
+      if (homeRoute?.canActivateChild) {
+        for (const canActivateCallback of homeRoute.canActivateChild)
+          await canActivateCallback();
+      }
+    }
+
+    this.router.navigate([currentBaseUrl]);
     throw err;
+  }
+
+  private async ensureHomePageAvailability(r: BffGeneratedRoute) {
+    if (!(await this.isHomePage(r))) return;
+
+    const baseUrl = (
+      await firstValueFrom(
+        this.appStateService.currentWorkspace$.asObservable()
+      )
+    ).baseUrl;
+
+    const routes = this.router.config;
+    const fallBackRoute = routes.find(
+      (r) => r.path === this.toRouteUrl(baseUrl)
+    );
+    if (fallBackRoute?.redirectTo) {
+      fallBackRoute.redirectTo = undefined;
+      fallBackRoute.component = HomeComponent;
+    }
+    this.router.resetConfig(routes);
+  }
+
+  private async isHomePage(r: BffGeneratedRoute): Promise<boolean> {
+    const homePageUrl = await this.getHomePageUrl();
+    return (
+      homePageUrl !== undefined && this.toRouteUrl(r.baseUrl) === homePageUrl
+    );
+  }
+
+  private async getHomePageUrl(): Promise<string | undefined> {
+    const currentWorkspace = await firstValueFrom(
+      this.appStateService.currentWorkspace$.asObservable()
+    );
+    return (
+      currentWorkspace.homePage &&
+      this.createHomePageUrl(
+        currentWorkspace.baseUrl,
+        currentWorkspace.homePage
+      )
+    );
   }
 
   private toLoadRemoteEntryOptions(
@@ -207,7 +283,10 @@ export class RoutesService implements ShowContentProvider {
     const exposedModule = r.exposedModule.startsWith('./')
       ? r.exposedModule.slice(2)
       : r.exposedModule;
-    if (r.technology === 'Angular') {
+    if (
+      r.technology === Technologies.Angular ||
+      r.technology === Technologies.WebComponentModule
+    ) {
       return {
         type: 'module',
         remoteEntry: r.remoteEntryUrl,
@@ -216,7 +295,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       type: 'script',
-      remoteName: r.productName,
+      remoteName: r.remoteName ?? '',
       remoteEntry: r.remoteEntryUrl,
       exposedModule: './' + exposedModule,
     };
@@ -259,16 +338,30 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async createFallbackRoute(): Promise<Route> {
-    return {
-      path: this.toRouteUrl(
-        (
-          await firstValueFrom(
-            this.appStateService.currentWorkspace$.asObservable()
-          )
-        ).baseUrl
-      ),
-      component: HomeComponent,
+    const currentWorkspace = await firstValueFrom(
+      this.appStateService.currentWorkspace$.asObservable()
+    );
+    const route = {
+      path: this.toRouteUrl(currentWorkspace.baseUrl),
       pathMatch: PathMatch.full,
     };
+
+    if (!currentWorkspace.homePage) {
+      return {
+        ...route,
+        component: HomeComponent,
+      };
+    }
+    return {
+      ...route,
+      redirectTo: this.createHomePageUrl(
+        currentWorkspace.baseUrl,
+        currentWorkspace.homePage
+      ),
+    };
+  }
+
+  private createHomePageUrl(baseUrl: string, homePage: string) {
+    return this.toRouteUrl(Location.joinWithSlash(baseUrl, homePage));
   }
 }

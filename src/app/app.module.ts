@@ -34,22 +34,23 @@ import {
   PortalCoreModule,
 } from '@onecx/portal-integration-angular';
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core';
-import { catchError, firstValueFrom, retry } from 'rxjs';
+import { catchError, filter, firstValueFrom, retry } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
-import { ErrorPageComponent } from './shared/components/error-page.component';
-import { HomeComponent } from './shared/components/home/home.component';
-import { InitializationErrorPageComponent } from './shared/components/initialization-error-page/initialization-error-page.component';
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   UserProfileBffService,
   WorkspaceConfigBffService,
 } from './shared/generated';
-import { RoutesService } from './shared/services/routes.service';
-import { initializationErrorHandler } from './shared/utils/initialization-error-handler.utils';
-import { PermissionProxyService } from './shared/services/permission-proxy.service';
+import { ErrorPageComponent } from './shell/components/error-page.component';
+import { HomeComponent } from './shell/components/home/home.component';
+import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component';
+import { PermissionProxyService } from './shell/services/permission-proxy.service';
+import { RoutesService } from './shell/services/routes.service';
+import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils';
+import { EventsPublisher, EventsTopic } from '@onecx/integration-interface';
 
 export function createTranslateLoader(
   http: HttpClient,
@@ -79,6 +80,8 @@ function publishCurrentWorkspace(
     baseUrl: loadWorkspaceConfigResponse.workspace.baseUrl,
     portalName: loadWorkspaceConfigResponse.workspace.name,
     workspaceName: loadWorkspaceConfigResponse.workspace.name,
+    routes: loadWorkspaceConfigResponse.routes,
+    homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
   });
 }
@@ -117,7 +120,9 @@ export function workspaceConfigInitializer(
 
       await Promise.all([
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-        routesService.init(loadWorkspaceConfigResponse.routes),
+        routesService
+          .init(loadWorkspaceConfigResponse.routes)
+          .then(urlChangeListenerInitializer(router, appStateService)),
         themeService.apply(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
@@ -171,6 +176,52 @@ export function configurationServiceInitializer(
 ) {
   return () => configurationService.init();
 }
+const pushState = window.history.pushState;
+window.history.pushState = (data: any, unused: string, url?: string) => {
+  pushState.bind(window.history)(data, unused, url);
+  new EventsPublisher().publish({
+    type: 'navigated',
+    payload: {
+      url,
+    },
+  });
+};
+
+const replaceState = window.history.replaceState;
+window.history.replaceState = (data: any, unused: string, url?: string) => {
+  replaceState.bind(window.history)(data, unused, url);
+  new EventsPublisher().publish({
+    type: 'navigated',
+    payload: {
+      url,
+    },
+  });
+};
+
+export function urlChangeListenerInitializer(
+  router: Router,
+  appStateService: AppStateService
+) {
+  return async () => {
+    await appStateService.isAuthenticated$.isInitialized;
+    let lastUrl = '';
+    let isFirstRoute = true;
+    const observer = new EventsTopic();
+    observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
+      const routerUrl = `${location.pathname.substring(
+        getLocation().deploymentPath.length
+      )}${location.search}`;
+      if (routerUrl !== lastUrl) {
+        lastUrl = routerUrl;
+        if (!isFirstRoute) {
+          router.navigateByUrl(routerUrl);
+        } else {
+          isFirstRoute = false;
+        }
+      }
+    });
+  };
+}
 
 @NgModule({
   declarations: [
@@ -199,8 +250,8 @@ export function configurationServiceInitializer(
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
-    BrowserAnimationsModule,
     RouterModule,
+    BrowserAnimationsModule,
     AngularAuthModule,
   ],
   providers: [

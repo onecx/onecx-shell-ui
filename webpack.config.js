@@ -12,13 +12,11 @@ const webpackConfig = {
       '@angular/core': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true,
         singleton: true,
       },
       '@angular/forms': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true,
         singleton: true,
       },
       '@angular/common': {
@@ -26,26 +24,30 @@ const webpackConfig = {
         includeSecondaries: {
           skip: ['@angular/common/http/testing'],
         },
-        eager: true,
         singleton: true,
       },
       '@angular/common/http': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true,
+        singleton: true,
+      },
+      '@angular/elements': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
         singleton: true,
       },
       '@angular/router': {
         requiredVersion: 'auto',
         includeSecondaries: true,
-        eager: true,
         singleton: true,
       },
-      rxjs: { requiredVersion: 'auto', includeSecondaries: true, eager: true },
+      rxjs: { requiredVersion: 'auto', includeSecondaries: true },
       '@ngx-translate/core': {
-        singleton: true,
         requiredVersion: 'auto',
-        eager: true,
+      },
+      '@angular-architects/module-federation-tools': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
       },
       '@onecx/accelerator': {
         requiredVersion: 'auto',
@@ -55,11 +57,19 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
+      '@onecx/angular-auth': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+      },
       '@onecx/angular-integration-interface': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
       '@onecx/angular-remote-components': {
+        requiredVersion: 'auto',
+        includeSecondaries: true,
+      },
+      '@onecx/angular-webcomponents': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
@@ -75,14 +85,15 @@ const webpackConfig = {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
-      '@onecx/shell-core': {
+      '@onecx/portal-layout-styles': {
         requiredVersion: 'auto',
         includeSecondaries: true,
       },
-      'primeng': {
+      '@onecx/shell-core': { requiredVersion: 'auto', includeSecondaries: true },
+      primeng: {
         requiredVersion: 'auto',
         includeSecondaries: true,
-      }
+      },
     }),
 
     sharedMappings: ['@onecx/portal-integration-angular'],

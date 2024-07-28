@@ -59,5 +59,6 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "onecx-shell-ui"
+  "defaultProject": "onecx-shell-ui",
+  "useInferencePlugins": false
 }

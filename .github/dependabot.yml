@@ -6,6 +6,21 @@ updates:
       interval: daily
     labels:
       - dependencies
+    groups:
+      angular:
+        applies-to: version-updates
+        patterns:
+        - "@angular*"
+        update-types:
+        - "minor"
+        - "patch"
+      onecx:
+        applies-to: version-updates
+        patterns:
+        - "@onecx*"
+        update-types:
+        - "minor"
+        - "patch"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

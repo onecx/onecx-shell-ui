@@ -72,7 +72,7 @@
     "@angular/language-service": "^18.2.0",
     "@nx/eslint": "19.5.7",
     "@nx/eslint-plugin": "19.5.7",
-    "@nx/jest": "19.5.7",
+    "@nx/jest": "19.6.0",
     "@nx/js": "19.5.7",
     "@nx/workspace": "19.5.7",
     "@schematics/angular": "~18.1.2",

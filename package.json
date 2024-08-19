@@ -75,7 +75,7 @@
     "@nx/jest": "19.6.0",
     "@nx/js": "19.6.0",
     "@nx/workspace": "19.6.0",
-    "@schematics/angular": "~18.1.2",
+    "@schematics/angular": "~18.2.0",
     "@swc-node/register": "1.10.9",
     "@swc/core": "1.7.12",
     "@swc/helpers": "0.5.12",

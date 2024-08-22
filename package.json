@@ -7,7 +7,7 @@
     "OneCX Development Team <onecx-development-team@onecx.org>"
   ],
   "config": {
-    "openapiYaml": "src/assets/openapi/openapi-bff.yaml",
+    "openapiYaml": "src/assets/api/openapi-bff.yaml",
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {

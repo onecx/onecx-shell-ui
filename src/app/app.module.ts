@@ -83,6 +83,7 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
+    displayName: loadWorkspaceConfigResponse.workspace.displayName
   });
 }
 

@@ -206,20 +206,16 @@ export function urlChangeListenerInitializer(
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
     let lastUrl = '';
-    let lastHash = '';
     let isFirstRoute = true;
     const observer = new EventsTopic();
     observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length,
-      )}${location.search}`;
-      if (routerUrl !== lastUrl || location.hash !== lastHash) {
+      )}${location.search}${location.hash}`;
+      if (routerUrl !== lastUrl) {
         lastUrl = routerUrl;
-        lastHash = location.hash;
         if (!isFirstRoute) {
-          router.navigate([routerUrl], {
-            fragment: location.hash.substring(1),
-          });
+          router.navigateByUrl(routerUrl);
         } else {
           isFirstRoute = false;
         }

@@ -92,7 +92,7 @@
     "jsonc-eslint-parser": "^2.4.0",
     "nx": "19.6.4",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.2.3",
+    "ts-jest": "^29.2.5",
     "ts-node": "10.9.2",
     "typescript": "~5.5.4"
   },

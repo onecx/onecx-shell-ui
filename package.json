@@ -70,7 +70,7 @@
     "@angular/cli": "~18.2.2",
     "@angular/compiler-cli": "^18.2.2",
     "@angular/language-service": "^18.2.2",
-    "@nx/eslint": "19.6.4",
+    "@nx/eslint": "19.6.5",
     "@nx/eslint-plugin": "19.6.4",
     "@nx/jest": "19.6.4",
     "@nx/js": "19.6.4",

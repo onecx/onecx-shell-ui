@@ -2,23 +2,28 @@
 openapi: 3.0.3
 info:
   title: onecx-shell-bff
-  description: OneCx shell Bff
-  version: '1.0'
+  description: Backend-For-Frontend (BFF) service for OneCX Shell. This API provides base configuration information for frontends.
+  version: 1.0.0
+  contact:
+    email: tkit_dev@1000kit.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: http://onecx-shell-bff:8080/
-
 paths:
   /workspaceConfig:
     post:
       tags:
         - 'WorkspaceConfig'
+      description: Load all data needed by startup of OneCX UI (components, routes, slots, theme, workspace)
+      operationId: loadWorkspaceConfig
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/LoadWorkspaceConfigRequest'
-      operationId: loadWorkspaceConfig
       responses:
         '200':
           description: OK
@@ -194,6 +199,8 @@ components:
         - name
         - baseUrl
       properties:
+        displayName:
+          type: string
         name:
           type: string
         baseUrl:
@@ -206,6 +213,8 @@ components:
         - properties
       type: object
       properties:
+        displayName:
+          type: string
         name:
           minLength: 2
           type: string

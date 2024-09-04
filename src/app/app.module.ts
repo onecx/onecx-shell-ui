@@ -54,27 +54,27 @@ import { EventsPublisher, EventsTopic } from '@onecx/integration-interface';
 
 export function createTranslateLoader(
   http: HttpClient,
-  translationCacheService: TranslationCacheService
+  translationCacheService: TranslationCacheService,
 ) {
   return new TranslateCombinedLoader(
     new CachingTranslateLoader(
       translationCacheService,
       http,
       `./assets/i18n/`,
-      '.json'
+      '.json',
     ),
     new CachingTranslateLoader(
       translationCacheService,
       http,
       `./onecx-portal-lib/assets/i18n/`,
-      '.json'
-    )
+      '.json',
+    ),
   );
 }
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
-  loadWorkspaceConfigResponse: LoadWorkspaceConfigResponse
+  loadWorkspaceConfigResponse: LoadWorkspaceConfigResponse,
 ) {
   return appStateService.currentWorkspace$.publish({
     baseUrl: loadWorkspaceConfigResponse.workspace.baseUrl,
@@ -83,6 +83,7 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
+    displayName: loadWorkspaceConfigResponse.workspace.displayName,
   });
 }
 
@@ -92,7 +93,7 @@ export function workspaceConfigInitializer(
   themeService: ThemeService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
-  router: Router
+  router: Router,
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
@@ -105,13 +106,13 @@ export function workspaceConfigInitializer(
           retry({ delay: 500, count: 3 }),
           catchError((error) => {
             return initializationErrorHandler(error, router);
-          })
-        )
+          }),
+        ),
     );
 
     if (loadWorkspaceConfigResponse) {
       const parsedProperties = JSON.parse(
-        loadWorkspaceConfigResponse.theme.properties
+        loadWorkspaceConfigResponse.theme.properties,
       ) as Record<string, Record<string, string>>;
       const themeWithParsedProperties = {
         ...loadWorkspaceConfigResponse.theme,
@@ -137,7 +138,7 @@ export function userProfileInitializer(
   userProfileBffService: UserProfileBffService,
   userService: UserService,
   appStateService: AppStateService,
-  router: Router
+  router: Router,
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
@@ -146,14 +147,14 @@ export function userProfileInitializer(
         retry({ delay: 500, count: 3 }),
         catchError((error) => {
           return initializationErrorHandler(error, router);
-        })
-      )
+        }),
+      ),
     );
 
     if (getUserProfileResponse) {
       console.log(
         'ORGANIZATION : ',
-        getUserProfileResponse.userProfile.organization
+        getUserProfileResponse.userProfile.organization,
       );
 
       await userService.profile$.publish(getUserProfileResponse.userProfile);
@@ -166,13 +167,13 @@ export function slotInitializer(slotService: SlotService) {
 }
 
 export function permissionProxyInitializer(
-  permissionProxyService: PermissionProxyService
+  permissionProxyService: PermissionProxyService,
 ) {
   return () => permissionProxyService.init();
 }
 
 export function configurationServiceInitializer(
-  configurationService: ConfigurationService
+  configurationService: ConfigurationService,
 ) {
   return () => configurationService.init();
 }
@@ -200,7 +201,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
 
 export function urlChangeListenerInitializer(
   router: Router,
-  appStateService: AppStateService
+  appStateService: AppStateService,
 ) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized;
@@ -209,8 +210,8 @@ export function urlChangeListenerInitializer(
     const observer = new EventsTopic();
     observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
       const routerUrl = `${location.pathname.substring(
-        getLocation().deploymentPath.length
-      )}${location.search}`;
+        getLocation().deploymentPath.length,
+      )}${location.search}${location.hash}`;
       if (routerUrl !== lastUrl) {
         lastUrl = routerUrl;
         if (!isFirstRoute) {

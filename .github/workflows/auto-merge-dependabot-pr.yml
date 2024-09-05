@@ -12,6 +12,16 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      - name: Auto Approve
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const result = await github.pulls.createReview({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number,
+            event: "APPROVE"
+            })
       - name: Enable auto-merge for Dependabot PRs
         run: gh pr merge --auto --merge "$PR_URL"
         env:

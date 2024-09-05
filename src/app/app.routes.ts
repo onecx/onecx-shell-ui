@@ -1,13 +1,11 @@
-import { Route } from '@angular/router';
-import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component';
+import { Route } from '@angular/router'
+import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
 
 export const appRoutes: Route[] = [
   {
     path: 'portal-initialization-error-page',
-    data: {
-      message: '',
-    },
+    data: { message: '' },
     component: InitializationErrorPageComponent,
-    title: 'Initialization Error',
-  },
-];
+    title: 'Initialization Error'
+  }
+]

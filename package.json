@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "contributors": [
-    "OneCX Development Team <onecx-development-team@onecx.org>"
+    "OneCX Development Team <onecx_dev@1000kit.org>"
   ],
   "config": {
     "openapiYaml": "src/assets/api/openapi-bff.yaml",
@@ -12,11 +12,14 @@
   },
   "scripts": {
     "build": "nx build",
-    "clean": "npm cache clean --force && npm run clean-angular",
-    "clean-angular": "ng cache clean",
+    "check": "nx lint --cache=true && npx prettier -c --cache .",
+    "clean": "npm cache clean --force",
+    "eslint": "eslint --quiet --ext .js,.ts src",
+    "browser": "npx browserslist",
+    "prepare": "husky || true",
     "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
-    "lint": "nx lint",
-    "format": "ng lint --fix",
+    "lint": "nx lint --cache=true",
+    "format": "nx lint --fix",
     "test": "nx test",
     "test:ci": "nx test --coverage --testResultsProcessor=jest-sonar-reporter",
     "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",

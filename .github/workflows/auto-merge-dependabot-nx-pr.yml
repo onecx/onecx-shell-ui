@@ -1,4 +1,4 @@
-name: Auto merge dependabot Angular and Onecx PRs
+name: Auto merge dependabot and NX PRs
 on:
   pull_request_target:
 jobs:

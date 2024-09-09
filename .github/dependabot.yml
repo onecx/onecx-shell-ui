@@ -23,6 +23,7 @@ updates:
         - "patch"
     ignore:
       - dependency-name: "nx*"
+      - dependency-name: "@nx*"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

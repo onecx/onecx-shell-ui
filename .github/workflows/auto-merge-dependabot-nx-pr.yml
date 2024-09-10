@@ -17,7 +17,7 @@ jobs:
         with:
           script: |
             const result = await github.pulls.createReview({
-            owner: context.repo.owner,
+            owner: 'tkit-dev',
             repo: context.repo.repo,
             pull_number: context.issue.number,
             event: "APPROVE"

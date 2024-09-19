@@ -42,6 +42,8 @@ jobs:
         uses: cirrus-actions/rebase@1.8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_COMMITTER_NAME: tkit-dev
+          GIT_COMMITTER_EMAIL: tkit-dev@1000kit.org
       - name: Auto Approve
         uses: actions/github-script@v4
         with:

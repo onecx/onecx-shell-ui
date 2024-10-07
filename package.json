@@ -52,7 +52,7 @@
     "@onecx/portal-integration-angular": "^5.16.0",
     "@onecx/portal-layout-styles": "^5.16.0",
     "@onecx/shell-core": "^5.16.0",
-    "@openapitools/openapi-generator-cli": "^2.13.9",
+    "@openapitools/openapi-generator-cli": "^2.13.13",
     "keycloak-angular": "^16.0.1",
     "keycloak-js": "^25.0.6",
     "primeflex": "^3.3.1",

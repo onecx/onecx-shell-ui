@@ -6,7 +6,6 @@ jobs:
     if: >- 
       github.event.pull_request.user.login == 'dependabot[bot]' &&
       (
-        startsWith(github.head_ref, 'dependabot/npm_and_yarn/angular-') ||
         startsWith(github.head_ref, 'dependabot/npm_and_yarn/onecx-') ||
         startsWith(github.event.pull_request.title, 'chore(deps-dev)')
       )

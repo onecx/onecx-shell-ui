@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
-
+import { PayloadNavigatedEvent } from '@onecx/integration-interface'
 import { getLocation } from '@onecx/accelerator'
 import {
   AngularAcceleratorMissingTranslationHandler,
@@ -163,7 +163,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
       url,
       isFirst: history.length === 0,
       history
-    }
+    } satisfies PayloadNavigatedEvent
   })
   if (!isInitialPageLoad) {
     history.push(url ?? '')
@@ -181,7 +181,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
       url,
       isFirst: history.length === 0,
       history
-    }
+    } satisfies PayloadNavigatedEvent
   })
   if (!isInitialPageLoad) {
     history.push(url ?? '')

@@ -151,15 +151,25 @@ export function permissionProxyInitializer(permissionProxyService: PermissionPro
 export function configurationServiceInitializer(configurationService: ConfigurationService) {
   return () => configurationService.init()
 }
+
+let history: string[] = []
+let isInitialPageLoad = true
 const pushState = window.history.pushState
 window.history.pushState = (data: any, unused: string, url?: string) => {
   pushState.bind(window.history)(data, unused, url)
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
-      url
+      url,
+      isFirst: history.length === 0,
+      history
     }
   })
+  if (!isInitialPageLoad) {
+    history.push(url ?? '')
+    history = history.slice(-100)
+  }
+  isInitialPageLoad = false
 }
 
 const replaceState = window.history.replaceState
@@ -168,9 +178,16 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
-      url
+      url,
+      isFirst: history.length === 0,
+      history
     }
   })
+  if (!isInitialPageLoad) {
+    history.push(url ?? '')
+    history = history.slice(-100)
+  }
+  isInitialPageLoad = false
 }
 
 export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {

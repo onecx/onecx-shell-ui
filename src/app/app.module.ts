@@ -187,8 +187,8 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     if (history.length === 0) {
       history.push(url ?? '')
     } else {
-      let length = history.length - 1
-      history[length] = url ?? ''
+      let lastIndex = history.length - 1
+      history[lastIndex] = url ?? ''
     }
   }
   isInitialPageLoad = false

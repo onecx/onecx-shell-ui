@@ -184,8 +184,12 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     } satisfies PayloadNavigatedEvent
   })
   if (!isInitialPageLoad) {
-    history.push(url ?? '')
-    history = history.slice(-100)
+    if (history.length === 0) {
+      history.push(url ?? '')
+    } else {
+      let length = history.length - 1
+      history[length] = url ?? ''
+    }
   }
   isInitialPageLoad = false
 }

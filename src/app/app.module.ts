@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
-
 import { getLocation } from '@onecx/accelerator'
 import {
   AngularAcceleratorMissingTranslationHandler,
@@ -24,7 +23,8 @@ import {
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
-import { EventsPublisher, EventsTopic } from '@onecx/integration-interface'
+
+import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
 
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import { environment } from 'src/environments/environment'
@@ -163,7 +163,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
       url,
       isFirst: history.length === 0,
       history
-    }
+    } satisfies NavigatedEventPayload
   })
   if (!isInitialPageLoad) {
     history.push(url ?? '')
@@ -181,11 +181,15 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
       url,
       isFirst: history.length === 0,
       history
-    }
+    } satisfies NavigatedEventPayload
   })
   if (!isInitialPageLoad) {
-    history.push(url ?? '')
-    history = history.slice(-100)
+    if (history.length === 0) {
+      history.push(url ?? '')
+    } else {
+      const lastIndex = history.length - 1
+      history[lastIndex] = url ?? ''
+    }
   }
   isInitialPageLoad = false
 }

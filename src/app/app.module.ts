@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { NavigatedEventPayload } from '@onecx/integration-interface'
 import { getLocation } from '@onecx/accelerator'
 import {
   AngularAcceleratorMissingTranslationHandler,
@@ -24,7 +23,8 @@ import {
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
-import { EventsPublisher, EventsTopic } from '@onecx/integration-interface'
+
+import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
 
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import { environment } from 'src/environments/environment'

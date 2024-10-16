@@ -187,7 +187,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     if (history.length === 0) {
       history.push(url ?? '')
     } else {
-      let lastIndex = history.length - 1
+      const lastIndex = history.length - 1
       history[lastIndex] = url ?? ''
     }
   }

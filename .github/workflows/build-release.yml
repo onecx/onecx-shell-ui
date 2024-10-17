@@ -7,3 +7,5 @@ jobs:
   release:
     uses: onecx/ci-angular/.github/workflows/build-release.yml@v1
     secrets: inherit
+    with:
+      helmEventTargetRepository: onecx/onecx-shell

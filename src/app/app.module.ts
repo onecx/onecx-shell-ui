@@ -164,8 +164,9 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
       isFirst
     } satisfies NavigatedEventPayload
   })
+
   if (!isInitialPageLoad) {
-    isFirst = true
+    isFirst = false
   }
   isInitialPageLoad = false
 }
@@ -177,11 +178,12 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     type: 'navigated',
     payload: {
       url,
-      isFirst
+      isFirst: isFirst
     } satisfies NavigatedEventPayload
   })
+
   if (!isInitialPageLoad) {
-    isFirst = true
+    isFirst = false
   }
   isInitialPageLoad = false
 }

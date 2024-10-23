@@ -152,7 +152,7 @@ export function configurationServiceInitializer(configurationService: Configurat
   return () => configurationService.init()
 }
 
-let history: string[] = []
+let isFirst = true
 let isInitialPageLoad = true
 const pushState = window.history.pushState
 window.history.pushState = (data: any, unused: string, url?: string) => {
@@ -161,13 +161,12 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
     type: 'navigated',
     payload: {
       url,
-      isFirst: history.length === 0,
-      history
+      isFirst
     } satisfies NavigatedEventPayload
   })
+
   if (!isInitialPageLoad) {
-    history.push(url ?? '')
-    history = history.slice(-100)
+    isFirst = false
   }
   isInitialPageLoad = false
 }
@@ -179,17 +178,12 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     type: 'navigated',
     payload: {
       url,
-      isFirst: history.length === 0,
-      history
+      isFirst: isFirst
     } satisfies NavigatedEventPayload
   })
+
   if (!isInitialPageLoad) {
-    if (history.length === 0) {
-      history.push(url ?? '')
-    } else {
-      const lastIndex = history.length - 1
-      history[lastIndex] = url ?? ''
-    }
+    isFirst = false
   }
   isInitialPageLoad = false
 }

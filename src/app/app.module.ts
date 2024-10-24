@@ -207,7 +207,9 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       if (routerUrl !== lastUrl) {
         lastUrl = routerUrl
         if (!isFirstRoute) {
-          router.navigateByUrl(routerUrl)
+          router.navigateByUrl(routerUrl, {
+            replaceUrl: true
+          })
         } else {
           isFirstRoute = false
         }

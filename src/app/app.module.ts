@@ -11,7 +11,7 @@ import {
   TranslateCombinedLoader,
   TranslationCacheService
 } from '@onecx/angular-accelerator'
-import { AngularAuthModule } from '@onecx/angular-auth'
+import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
   AppStateService,
@@ -235,9 +235,10 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
     AngularRemoteComponentsModule,
-    AngularAuthModule
   ],
   providers: [
+    provideTokenInterceptor(),
+    provideAuthService(),
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

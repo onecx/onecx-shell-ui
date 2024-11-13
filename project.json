@@ -29,11 +29,10 @@
             "output": "/onecx-angular-accelerator/assets/"
           }
         ],
-        "styles": ["./src/styles.scss"],
+        "styles": ["src/styles.scss"],
         "scripts": [],
-        "customWebpackConfig": {
-          "path": "./webpack.config.js"
-        }
+        "customWebpackConfig": { "path": "./webpack.config.js" },
+        "outputHashing": "all"
       },
       "configurations": {
         "production": {
@@ -49,7 +48,6 @@
               "maximumError": "4kb"
             }
           ],
-          "outputHashing": "all",
           "customWebpackConfig": {
             "path": "./webpack.config.js"
           }

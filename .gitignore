@@ -4,31 +4,30 @@
 dist
 tmp
 out-tsc
+reports
+coverage
 
 # dependencies
 node_modules
 
 # IDEs and editors
+.c9
 .idea
 .project
 .classpath
-.c9
+.history
 .settings
+.vscode
 *.launch
 *.sublime-workspace
-
-# IDE - VSCode
-.vscode
 
 # misc
 .nx
 .angular
 .eslintcache
-.husky/_
 .sass-cache
+.husky/_
 connect.lock
-coverage
-reports
 typings
 *.log
 *.sh
@@ -36,4 +35,3 @@ typings
 # System Files
 .DS_Store
 Thumbs.db
-

@@ -1,7 +1,6 @@
-# Copy of .gitignore AND removed "dist" directory
+# See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-# dist
 tmp
 out-tsc
 reports
@@ -17,14 +16,12 @@ speed-measure-plugin*.json
 .idea
 .project
 .classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode
+.c9
 .history
+.settings
+.vscode
+*.launch
+*.sublime-workspace
 
 # misc
 .nx

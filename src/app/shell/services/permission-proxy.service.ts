@@ -23,7 +23,7 @@ export class PermissionProxyService {
               this.permissionsService.getPermissions({ appId, productName }).pipe(
                 retry({ delay: 500, count: 3 }),
                 catchError(() => {
-                  console.error('Unable to load permissions.')
+                  console.error('Unable to load permissions for ', appId, productName)
                   return of({ permissions: [] })
                 }),
                 map(({ permissions }) => permissions)

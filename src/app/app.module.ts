@@ -22,7 +22,7 @@ import {
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
-import { SHOW_CONTENT_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
+import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
 import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
 
@@ -234,7 +234,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     }),
     ShellCoreModule,
     PortalCoreModule.forRoot('shell', true),
-    AngularRemoteComponentsModule,
+    AngularRemoteComponentsModule
   ],
   providers: [
     provideTokenInterceptor(),
@@ -272,7 +272,8 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     },
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
-    { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService }
+    { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
+    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
   ],
   bootstrap: [AppComponent]
 })

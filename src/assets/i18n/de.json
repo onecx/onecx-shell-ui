@@ -6,6 +6,20 @@
     "MESSAGE": {
         "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnte nicht geladen werden."
     },
+    "WELCOME": {
+        "TITLE": "Hallo"
+    },
+    "NOT_FOUND_PAGE": {
+        "TITLE": "Die Seite konnte nicht gefunden werden.",
+        "DETAILS": "Die Seite, auf die Sie zugreifen wollten, ist im aktuellen Workspace nicht vorhanden.",
+        "BUTTON": "Workspace Startseite"
+    },
+    "ERROR_PAGE": {
+        "TITLE": "Die Seite konnte nicht geladen werden.",
+        "DETAILS": "Versuchen Sie es erneut oder kontaktieren Sie einen Workspace Administrator.",
+        "REQUESTED_PAGE": "Angefragte Seite:",
+        "BUTTON": "Neuladen"
+    },
     "INITIALIZATION_ERROR_PAGE_MESSAGE": "Fehlermeldung:",
     "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Aufgerufene URL:",
     "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",

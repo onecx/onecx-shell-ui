@@ -6,8 +6,10 @@ import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
 import {
+  AlwaysGrantPermissionChecker,
   AngularAcceleratorMissingTranslationHandler,
   CachingTranslateLoader,
+  HAS_PERMISSION_CHECKER,
   TranslateCombinedLoader,
   TranslationCacheService
 } from '@onecx/angular-accelerator'
@@ -35,7 +37,7 @@ import {
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
 
-import { ErrorPageComponent } from './shell/components/error-page.component'
+import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { HomeComponent } from './shell/components/home/home.component'
 import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
@@ -44,6 +46,8 @@ import { initializationErrorHandler } from './shell/utils/initialization-error-h
 
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
+import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
+import { ErrorPageComponent } from './shell/components/error-page.component'
 
 export function createTranslateLoader(http: HttpClient, translationCacheService: TranslationCacheService) {
   return new TranslateCombinedLoader(
@@ -213,7 +217,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
 }
 
 @NgModule({
-  declarations: [AppComponent, ErrorPageComponent, HomeComponent, InitializationErrorPageComponent],
+  declarations: [AppComponent, PageNotFoundComponent, ErrorPageComponent, HomeComponent, WelcomeMessageComponent, InitializationErrorPageComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -239,6 +243,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   providers: [
     provideTokenInterceptor(),
     provideAuthService(),
+    {provide: HAS_PERMISSION_CHECKER, useClass: AlwaysGrantPermissionChecker },
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

@@ -1,19 +1,32 @@
+import { Location } from '@angular/common'
 import { Component } from '@angular/core'
-import { AppStateService } from '@onecx/angular-integration-interface'
-import { Workspace } from '@onecx/integration-interface'
+import { ActivatedRoute } from '@angular/router'
+import { getLocation } from '@onecx/accelerator'
 
 @Component({
-  template: `<div class="p-4">
-      <h1>{{ "ERROR_PAGE_H1" | translate }}</h1>
-      <div>{{ "PAGE_NOT_FOUND" | translate }}</div>
+  template: `
+    <div class="p-4 flex flex-column gap-5">
+      <div>
+        <h1 class="md:text-4xl text-2xl mb-1">{{ 'ERROR_PAGE.TITLE' | translate }}</h1>
+        <p class="md:text-2xl text-lg mb-1">{{ 'ERROR_PAGE.DETAILS' | translate }}</p>
+        <p class="md:text-lg text-sm">{{ 'ERROR_PAGE.REQUESTED_PAGE' | translate }} {{ requestedApplicationPath }}</p>
+      </div>
+      <button pButton (click)="reloadPage()" routerLinkActive="router-link-active" class="w-max">
+        {{ 'ERROR_PAGE.BUTTON' | translate }}
+      </button>
     </div>
-    <div class="p-4">
-      <button pButton [routerLink]="[workspace?.baseUrl]" routerLinkActive="router-link-active">{{ "TO_HOME_PAGE" | translate }} </button>
-    </div> `,
+  `
 })
 export class ErrorPageComponent {
-  workspace: Workspace | undefined
-  constructor(private appStateService: AppStateService) {
-    this.workspace = this.appStateService.currentWorkspace$.getValue()
+  requestedApplicationPath: string
+  constructor(private route: ActivatedRoute) {
+    this.requestedApplicationPath = this.route.snapshot.paramMap.get('requestedApplicationPath') ?? ''
+  }
+
+  reloadPage() {
+    const pageLocation = getLocation()
+    const reloadBaseUrl = Location.joinWithSlash(pageLocation.origin, pageLocation.deploymentPath)
+    const reloadHref = Location.joinWithSlash(reloadBaseUrl, this.requestedApplicationPath)
+    window.location.href = reloadHref
   }
 }

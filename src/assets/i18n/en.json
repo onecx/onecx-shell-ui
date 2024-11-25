@@ -6,6 +6,20 @@
     "MESSAGE": {
         "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
     },
+    "WELCOME": {
+        "TITLE": "Hello"
+    },
+    "NOT_FOUND_PAGE": {
+        "TITLE": "Page not found",
+        "DETAILS": "The page you tried to access does not exist in the current Workspace.",
+        "BUTTON": "Workspace Home"
+    },
+    "ERROR_PAGE": {
+        "TITLE": "Something went wrong",
+        "DETAILS": "The page you tried to access could not be loaded. Please try again or contact a Workspace administrator.",
+        "REQUESTED_PAGE": "Requested page:",
+        "BUTTON": "Reload"
+    },
     "INITIALIZATION_ERROR_PAGE_MESSAGE": "Error message:",
     "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Requested URL:",
     "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",

@@ -1,0 +1,7 @@
+<div id="wc_overview_info_title" class="mb-1 sm:mb-2 md:mb-4 text-xl sm:text-4xl md:text-6xl">
+  {{ 'WELCOME.TITLE' | translate }} {{ (user$ | async)?.person?.firstName }}
+</div>
+<div id="wc_overview_info_date" class="text-sm sm:text-xl md:text-3xl m-0">{{ currentDate | date }}</div>
+<div id="wc_overview_info_workspace" class="text-xs sm:text-sm mt-0 sm:mt-1">
+  Workspace: {{ (workspace$ | async)?.displayName }}
+</div>

@@ -208,7 +208,7 @@ export class RoutesService implements ShowContentProvider {
   private async onRemoteLoadError(err: unknown) {
     console.log(`Failed to load remote module: ${err}`);
     this.portalMessageService.error({
-      summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
+      summaryKey: 'ERROR_MESSAGES.ON_REMOTE_LOAD_ERROR',
     });
 
     const routerParams = {

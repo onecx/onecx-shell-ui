@@ -9,7 +9,7 @@ import { Workspace } from '@onecx/integration-interface'
         <h1 class="md:text-4xl text-2xl mb-1">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
         <p class="md:text-2xl text-lg">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
       </div>
-      <button pButton [routerLink]="[workspace?.baseUrl]" routerLinkActive="router-link-active" class="w-max">
+      <button pButton [routerLink]="[workspace?.baseUrl]" class="w-max">
         {{ 'NOT_FOUND_PAGE.BUTTON' | translate }}
       </button>
     </div>

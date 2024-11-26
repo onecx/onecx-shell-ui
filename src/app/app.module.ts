@@ -6,10 +6,8 @@ import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
 import {
-  AlwaysGrantPermissionChecker,
   AngularAcceleratorMissingTranslationHandler,
   CachingTranslateLoader,
-  HAS_PERMISSION_CHECKER,
   TranslateCombinedLoader,
   TranslationCacheService
 } from '@onecx/angular-accelerator'
@@ -243,7 +241,6 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   providers: [
     provideTokenInterceptor(),
     provideAuthService(),
-    {provide: HAS_PERMISSION_CHECKER, useClass: AlwaysGrantPermissionChecker },
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

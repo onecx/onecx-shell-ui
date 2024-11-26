@@ -60,8 +60,7 @@
           "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
-          "namedChunks": true,
-          "baseHref": "/newShell/"
+          "namedChunks": true
         }
       },
       "defaultConfiguration": "production"

@@ -17,7 +17,7 @@ const onProxyRes = function (proxyRes, req, res) {
 }
 
 const PROXY_CONFIG = {
-  '/newShell/shell-bff': {
+  '/shell-bff': {
     target: 'http://onecx-shell-bff',
     secure: false,
     pathRewrite: {

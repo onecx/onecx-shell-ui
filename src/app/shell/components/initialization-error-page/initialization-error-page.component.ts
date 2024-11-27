@@ -4,40 +4,41 @@ import { SerializedInitializationError } from '../../utils/initialization-error-
 
 @Component({
   template: `<div class="p-4">
-    <h1>{{ 'INITIALIZATION_ERROR_PAGE_H1' | translate }}</h1>
+    <h1 class="md:text-4xl text-2xl mb-1">{{ 'INITIALIZATION_ERROR_PAGE.TITLE' | translate }}</h1>
+    <p class="md:text-2xl text-lg mb-1">{{ 'INITIALIZATION_ERROR_PAGE.SUBTITLE' | translate }}</p>
     <div *ngIf="error.message">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_MESSAGE' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.MESSAGE' | translate }}
         {{ error.message }}
       </p>
     </div>
     <div *ngIf="error.requestedUrl">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_REQUESTED_URL' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.REQUESTED_URL' | translate }}
         {{ error.requestedUrl }}
       </p>
     </div>
     <div *ngIf="error.detail">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_DETAILS' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.DETAILS' | translate }}
         {{ error.detail }}
       </p>
     </div>
     <div *ngIf="error.errorCode">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_ERRORCODE' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.ERRORCODE' | translate }}
         {{ error.errorCode }}
       </p>
     </div>
     <div *ngIf="error.invalidParams">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_INVALID_PARAMS' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.INVALID_PARAMS' | translate }}
         {{ error.invalidParams }}
       </p>
     </div>
     <div *ngIf="error.params">
-      <p>
-        {{ 'INITIALIZATION_ERROR_PAGE_PARAMS' | translate }}
+      <p class="md:text-lg text-sm">
+        {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.PARAMS' | translate }}
         {{ error.params }}
       </p>
     </div>

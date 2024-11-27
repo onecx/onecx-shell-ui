@@ -29,13 +29,14 @@ import {
   Technologies,
 } from 'src/app/shared/generated';
 import { Route as BffGeneratedRoute } from '../../shared/generated';
-import { ErrorPageComponent } from '../components/error-page.component';
+import { PageNotFoundComponent } from '../components/not-found-page.component';
 import { HomeComponent } from '../components/home/home.component';
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module';
+import { getLocation } from '@onecx/accelerator';
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
-  component: ErrorPageComponent,
+  component: PageNotFoundComponent,
   title: 'Error',
 };
 
@@ -43,7 +44,6 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 export class RoutesService implements ShowContentProvider {
   private permissionsTopic$ = new PermissionsTopic();
   private isFirstLoad = true;
-  private isHomePageLoaded = false;
   showContent$ = new BehaviorSubject<boolean>(true);
 
   constructor(
@@ -111,16 +111,12 @@ export class RoutesService implements ShowContentProvider {
           ? r.exposedModule.slice(2)
           : r.exposedModule;
         console.log(`Load remote module ${exposedModule} finished.`);
-        if (await this.isHomePage(r)) {
-          this.isHomePageLoaded = true;
-        }
         if (r.technology === Technologies.Angular) {
           return m[exposedModule];
         } else {
           return WebcomponentLoaderModule;
         }
       } catch (err) {
-        await this.ensureHomePageAvailability(r);
         return await this.onRemoteLoadError(err);
       }
     } finally {
@@ -212,69 +208,15 @@ export class RoutesService implements ShowContentProvider {
   private async onRemoteLoadError(err: unknown) {
     console.log(`Failed to load remote module: ${err}`);
     this.portalMessageService.error({
-      summaryKey: 'MESSAGE.ON_REMOTE_LOAD_ERROR',
+      summaryKey: 'ERROR_MESSAGES.ON_REMOTE_LOAD_ERROR',
     });
 
-    const currentBaseUrl = (
-      await firstValueFrom(
-        this.appStateService.currentWorkspace$.asObservable()
-      )
-    ).baseUrl;
-
-    const fallBackRoute = this.router.config.find(
-      (r) => r.path === this.toRouteUrl(currentBaseUrl)
-    );
-    if (fallBackRoute?.redirectTo && this.isHomePageLoaded) {
-      const homePageUrl = await this.getHomePageUrl();
-      const homeRoute = this.router.config.find((r) => r.path === homePageUrl);
-      if (homeRoute?.canActivateChild) {
-        for (const canActivateCallback of homeRoute.canActivateChild)
-          await canActivateCallback();
-      }
+    const routerParams = {
+      requestedApplicationPath: getLocation().applicationPath
     }
 
-    this.router.navigate([currentBaseUrl]);
+    this.router.navigate(['remote-loading-error-page', routerParams]);
     throw err;
-  }
-
-  private async ensureHomePageAvailability(r: BffGeneratedRoute) {
-    if (!(await this.isHomePage(r))) return;
-
-    const baseUrl = (
-      await firstValueFrom(
-        this.appStateService.currentWorkspace$.asObservable()
-      )
-    ).baseUrl;
-
-    const routes = this.router.config;
-    const fallBackRoute = routes.find(
-      (r) => r.path === this.toRouteUrl(baseUrl)
-    );
-    if (fallBackRoute?.redirectTo) {
-      fallBackRoute.redirectTo = undefined;
-      fallBackRoute.component = HomeComponent;
-    }
-    this.router.resetConfig(routes);
-  }
-
-  private async isHomePage(r: BffGeneratedRoute): Promise<boolean> {
-    const homePageUrl = await this.getHomePageUrl();
-    return (
-      homePageUrl !== undefined && this.toRouteUrl(r.baseUrl) === homePageUrl
-    );
-  }
-
-  private async getHomePageUrl(): Promise<string | undefined> {
-    const currentWorkspace = await firstValueFrom(
-      this.appStateService.currentWorkspace$.asObservable()
-    );
-    return (
-      currentWorkspace.homePage &&
-      this.createHomePageUrl(
-        currentWorkspace.baseUrl,
-        currentWorkspace.homePage
-      )
-    );
   }
 
   private toLoadRemoteEntryOptions(

@@ -1,15 +1,31 @@
 {
-    "ERROR_PAGE_H1": "Oops of new shell ui, we could not find that.",
-    "INITIALIZATION_ERROR_PAGE_H1": "Something was wrong with portal initialization on page startup. Please contact administrator with the following information:",
-    "PAGE_NOT_FOUND": "Page not found in new shell.",
-    "TO_HOME_PAGE": "Go to home page.",
-    "MESSAGE": {
+    "ERROR_MESSAGES": {
         "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
     },
-    "INITIALIZATION_ERROR_PAGE_MESSAGE": "Error message:",
-    "INITIALIZATION_ERROR_PAGE_REQUESTED_URL": "Requested URL:",
-    "INITIALIZATION_ERROR_PAGE_DETAILS": "Details:",
-    "INITIALIZATION_ERROR_PAGE_ERRORCODE": "Error code:",
-    "INITIALIZATION_ERROR_PAGE_INVALID_PARAMS": "Invalid params:",
-    "INITIALIZATION_ERROR_PAGE_PARAMS": "Params:"
+    "WELCOME": {
+        "TITLE": "Hello"
+    },
+    "NOT_FOUND_PAGE": {
+        "TITLE": "Page not found",
+        "DETAILS": "The page you tried to access does not exist in the current Workspace.",
+        "BUTTON": "Workspace Home"
+    },
+    "ERROR_PAGE": {
+        "TITLE": "Something went wrong",
+        "DETAILS": "The page you tried to access could not be loaded. Please try again or contact a Workspace administrator.",
+        "REQUESTED_PAGE": "Requested page:",
+        "BUTTON": "Reload"
+    },
+    "INITIALIZATION_ERROR_PAGE": {
+        "TITLE": "Something went wrong during Workspace initialization.",
+        "SUBTITLE": "Please contact a Workspace administrator with the following information:",
+        "DETAILS": {
+            "MESSAGE": "Error message:",
+            "REQUESTED_URL": "Requested URL:",
+            "DETAILS": "Details:",
+            "ERRORCODE": "Error code:",
+            "INVALID_PARAMS": "Invalid params:",
+            "PARAMS": "Params:"
+        }
+    }
 }

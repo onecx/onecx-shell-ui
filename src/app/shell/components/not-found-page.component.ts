@@ -23,7 +23,7 @@ export class PageNotFoundComponent {
       baseHref: '/',
       mountPath: '',
       remoteBaseUrl: '',
-      shellName: '',
+      shellName: 'portal',
       productName: ''
     })
     this.workspace = this.appStateService.currentWorkspace$.getValue()

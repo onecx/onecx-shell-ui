@@ -18,6 +18,14 @@ import { Workspace } from '@onecx/integration-interface'
 export class PageNotFoundComponent {
   workspace: Workspace | undefined
   constructor(private appStateService: AppStateService) {
+    this.appStateService.currentMfe$.publish({
+      appId: '',
+      baseHref: '/',
+      mountPath: '',
+      remoteBaseUrl: '',
+      shellName: '',
+      productName: ''
+    })
     this.workspace = this.appStateService.currentWorkspace$.getValue()
   }
 }

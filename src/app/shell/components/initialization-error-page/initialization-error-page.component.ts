@@ -5,44 +5,44 @@ import { SerializedInitializationError } from '../../utils/initialization-error-
 @Component({
   template: `<div class="p-4">
     <h1 class="md:text-2xl text-lg mb-1">{{ 'INITIALIZATION_ERROR_PAGE.TITLE' | translate }}</h1>
-    <p class="md:text-lg text-base mb-1">{{ 'INITIALIZATION_ERROR_PAGE.SUBTITLE' | translate }}</p>
-    <div class="flex flex-column row-gap-2">
-      <ng-container *ngIf="error.message">
+    <p class="md:text-lg text-base">{{ 'INITIALIZATION_ERROR_PAGE.SUBTITLE' | translate }}</p>
+    <div class="mt-3 flex flex-column row-gap-2">
+      <div *ngIf="error.message">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.MESSAGE' | translate }}
         </div>
         <i>{{ error.message }}</i>
-      </ng-container>
-      <ng-container *ngIf="error.requestedUrl">
+      </div>
+      <div *ngIf="error.requestedUrl">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.REQUESTED_URL' | translate }}
-          <i>{{ error.requestedUrl }}</i>
         </div>
-      </ng-container>
-      <ng-container *ngIf="error.detail">
+        <i>{{ error.requestedUrl }}</i>
+      </div>
+      <div *ngIf="error.detail">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.DETAILS' | translate }}
-          <i>{{ error.detail }}</i>
         </div>
-      </ng-container>
-      <ng-container *ngIf="error.errorCode">
+        <i>{{ error.detail }}</i>
+      </div>
+      <div *ngIf="error.errorCode">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.ERRORCODE' | translate }}
-          <i>{{ error.errorCode }}</i>
         </div>
-      </ng-container>
-      <ng-container *ngIf="error.invalidParams">
+        <i>{{ error.errorCode }}</i>
+      </div>
+      <div *ngIf="error.invalidParams">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.INVALID_PARAMS' | translate }}
-          <i>{{ error.invalidParams }}</i>
         </div>
-      </ng-container>
-      <ng-container *ngIf="error.params">
+        <i>{{ error.invalidParams }}</i>
+      </div>
+      <div *ngIf="error.params">
         <div class="md:text-base text-sm">
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.PARAMS' | translate }}
-          <i>{{ error.params }}</i>
         </div>
-      </ng-container>
+        <i>{{ error.params }}</i>
+      </div>
     </div>
   </div> `
 })

@@ -7,9 +7,9 @@ import { getLocation } from '@onecx/accelerator'
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>
-        <h1 class="md:text-4xl text-2xl mb-1">{{ 'ERROR_PAGE.TITLE' | translate }}</h1>
-        <p class="md:text-2xl text-lg mb-1">{{ 'ERROR_PAGE.DETAILS' | translate }}</p>
-        <p class="md:text-lg text-sm">{{ 'ERROR_PAGE.REQUESTED_PAGE' | translate }} {{ requestedApplicationPath }}</p>
+        <h1 class="md:text-2xl text-lg">{{ 'ERROR_PAGE.TITLE' | translate }}</h1>
+        <p class="md:text-lg text-base mb-1">{{ 'ERROR_PAGE.DETAILS' | translate }}</p>
+        <p class="md:text-base text-sm">{{ 'ERROR_PAGE.REQUESTED_PAGE' | translate }} {{ requestedApplicationPath }}</p>
       </div>
       <button pButton (click)="reloadPage()" routerLinkActive="router-link-active" class="w-max">
         {{ 'ERROR_PAGE.BUTTON' | translate }}

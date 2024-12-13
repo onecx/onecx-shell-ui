@@ -28,12 +28,14 @@ export function initializationErrorHandler(error: any, router: Router): Observab
   params.set(
     'invalidParams',
     initError.details?.invalidParams
-      ? `[${initError.details.invalidParams.map((invalidParam) => `${invalidParam.name}: ${invalidParam.message}`)}]`
+      ? '['.concat(initError.details.invalidParams.map((p) => `${p.name}: ${p.message}`).join(',')).concat(']')
       : ''
   )
   params.set(
     'params',
-    initError.details?.params ? `[${initError.details.params.map((param) => `${param.key}: ${param.value}`)}]` : ''
+    initError.details?.params
+      ? '['.concat(initError.details.params.map((p) => `${p.key}: ${p.value}`).join(',')).concat(']')
+      : ''
   )
 
   router.navigate(['portal-initialization-error-page'], { fragment: params.toString() })

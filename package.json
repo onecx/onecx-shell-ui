@@ -18,6 +18,7 @@
     "browser": "npx browserslist",
     "prepare": "husky || true",
     "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
+    "start-local": "nx serve --configuration=development --proxy-config=proxy.conf.js  --host 0.0.0.0 --disable-host-check",
     "lint": "nx lint --cache=true",
     "format": "nx lint --fix",
     "test": "nx test",

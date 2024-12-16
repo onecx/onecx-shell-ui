@@ -26,6 +26,23 @@ const PROXY_CONFIG = {
     changeOrigin: true,
     logLevel: 'debug',
     onProxyRes: onProxyRes
+  },
+  '/onecx-shell': {
+    target: 'http://localhost:4300/',
+    secure: false,
+    pathRewrite: {
+      '^.*/onecx-shell': ''
+    },
+    changeOrigin: true,
+    logLevel: 'debug',
+    onProxyRes: onProxyRes
+  },
+  '/mfe': {
+    target: 'http://local-proxy/mfe',
+    secure: false,
+    changeOrigin: true,
+    logLevel: 'debug',
+    onProxyRes: onProxyRes
   }
 }
 

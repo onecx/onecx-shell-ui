@@ -1,31 +1,31 @@
 {
-    "ERROR_MESSAGES": {
-        "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
-    },
-    "WELCOME": {
-        "TITLE": "Hello"
-    },
-    "NOT_FOUND_PAGE": {
-        "TITLE": "Page not found",
-        "DETAILS": "The page you tried to access does not exist in the current Workspace.",
-        "BUTTON": "Workspace Home"
-    },
-    "ERROR_PAGE": {
-        "TITLE": "Something went wrong",
-        "DETAILS": "The page you tried to access could not be loaded. Please try again or contact a Workspace administrator.",
-        "REQUESTED_PAGE": "Requested page:",
-        "BUTTON": "Reload"
-    },
-    "INITIALIZATION_ERROR_PAGE": {
-        "TITLE": "Something went wrong during Workspace initialization.",
-        "SUBTITLE": "Please contact a Workspace administrator with the following information:",
-        "DETAILS": {
-            "MESSAGE": "Error message:",
-            "REQUESTED_URL": "Requested URL:",
-            "DETAILS": "Details:",
-            "ERRORCODE": "Error code:",
-            "INVALID_PARAMS": "Invalid params:",
-            "PARAMS": "Params:"
-        }
+  "ERROR_MESSAGES": {
+    "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
+  },
+  "WELCOME": {
+    "TITLE": "Hello"
+  },
+  "NOT_FOUND_PAGE": {
+    "TITLE": "Page not found",
+    "DETAILS": "The page you tried to access does not exist in the current Workspace.",
+    "BUTTON": "Workspace Home"
+  },
+  "ERROR_PAGE": {
+    "TITLE": "Something went wrong",
+    "DETAILS": "The page you tried to access could not be loaded. Please try again or contact a Workspace administrator.",
+    "REQUESTED_PAGE": "Requested page:",
+    "BUTTON": "Reload"
+  },
+  "INITIALIZATION_ERROR_PAGE": {
+    "TITLE": "Something went wrong during Workspace initialization.",
+    "SUBTITLE": "Please contact a Workspace administrator with the following information:",
+    "DETAILS": {
+      "MESSAGE": "Error message:",
+      "REQUESTED_URL": "Requested URL:",
+      "DETAILS": "Details:",
+      "ERRORCODE": "Error code:",
+      "INVALID_PARAMS": "Invalid params:",
+      "PARAMS": "Params:"
     }
+  }
 }

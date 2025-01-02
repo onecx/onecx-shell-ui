@@ -1,6 +1,6 @@
 {
   "ERROR_MESSAGES": {
-    "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnte nicht geladen werden."
+    "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnten nicht geladen werden."
   },
   "WELCOME": {
     "TITLE": "Hallo"

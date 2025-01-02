@@ -13,7 +13,7 @@
   "scripts": {
     "build": "nx build",
     "check": "nx lint --cache=true && npx prettier -c --cache .",
-    "clean": "npm cache clean --force",
+    "clean": "npm cache clean --force && rm -rf *.log dist reports .nx .angular .eslintcache ./node_modules/.cache/prettier/.prettier-cache",
     "eslint": "eslint --quiet --ext .js,.ts src",
     "browser": "npx browserslist",
     "prepare": "husky || true",
@@ -78,6 +78,8 @@
     "@angular/cli": "~18.2.12",
     "@angular/compiler-cli": "^18.2.12",
     "@angular/language-service": "^18.2.12",
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
     "@nx/eslint": "19.8.2",
     "@nx/eslint-plugin": "19.8.2",
     "@nx/jest": "19.8.2",

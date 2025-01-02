@@ -1,0 +1,10 @@
+# .husky/pre-commit
+
+bash << EOF
+
+echo "[Husky] Running lint check on changed files:"
+nx lint --cache=true
+echo "[Husky] Running prettier check on changed files:"
+npx prettier -c --cache .
+
+EOF

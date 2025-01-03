@@ -6,8 +6,8 @@ import { Workspace } from '@onecx/integration-interface'
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>
-        <h1 class="md:text-2xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
-        <p class="md:text-lg text-base">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
+        <h1 class="md:text-xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
+        <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
       </div>
       <button pButton [routerLink]="[workspace?.baseUrl]" class="w-max">
         {{ 'NOT_FOUND_PAGE.BUTTON' | translate }}

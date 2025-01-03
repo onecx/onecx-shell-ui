@@ -1,4 +1,5 @@
 {
+  "SHELL": "",
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
   },

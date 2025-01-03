@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
       this.translateService.onTranslationChange,
       this.translateService.onDefaultLangChange
     )
-      .pipe(mergeMap(() => this.translateService.get('primeng')))
+      .pipe(mergeMap(() => this.translateService.get('SHELL')))
       .subscribe((res) => this.config.setTranslation(res))
   }
 }

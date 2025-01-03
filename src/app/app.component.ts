@@ -13,9 +13,9 @@ export class AppComponent implements OnInit {
   title = 'shell'
 
   constructor(
-    private translateService: TranslateService,
-    private config: PrimeNGConfig,
-    private userService: UserService
+    private readonly translateService: TranslateService,
+    private readonly config: PrimeNGConfig,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit(): void {

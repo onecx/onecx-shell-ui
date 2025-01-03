@@ -31,7 +31,7 @@ import { getLocation } from '@onecx/accelerator'
 })
 export class ErrorPageComponent {
   requestedApplicationPath: string
-  constructor(private route: ActivatedRoute) {
+  constructor(private readonly route: ActivatedRoute) {
     this.requestedApplicationPath = this.route.snapshot.paramMap.get('requestedApplicationPath') ?? ''
   }
 

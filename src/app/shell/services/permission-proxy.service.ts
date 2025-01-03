@@ -6,11 +6,11 @@ import { PermissionBffService } from 'src/app/shared/generated'
 
 @Injectable({ providedIn: 'root' })
 export class PermissionProxyService {
-  private permissionsTopic$ = new PermissionsRpcTopic()
+  private readonly permissionsTopic$ = new PermissionsRpcTopic()
 
   constructor(
-    private permissionsService: PermissionBffService,
-    private permissionsCacheService: PermissionsCacheService
+    private readonly permissionsService: PermissionBffService,
+    private readonly permissionsCacheService: PermissionsCacheService
   ) {}
 
   async init(): Promise<unknown> {

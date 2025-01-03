@@ -8,6 +8,14 @@
 @import 'node_modules/@onecx/portal-integration-angular/assets/styles.scss';
 @import 'node_modules/@onecx/shell-core/assets/styles.scss';
 
+.layout-content {
+  background-size: 500px !important;
+  background-color: transparent;
+  background-image: url(assets/images/onecx_watermark.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
 .splash {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -22,17 +30,25 @@
   position: fixed;
   top: 0;
   left: 0;
+  .splash-content {
+    padding: 1rem;
+    .splash-loader {
+      animation: rotator 1.4s linear infinite;
+      .splash-path {
+        stroke-dasharray: 187;
+        stroke-dashoffset: 0;
+        transform-origin: center;
+        animation:
+          dash 1.4s ease-in-out infinite,
+          colors 5.6s ease-in-out infinite;
+      }
+    }
+  }
 }
 
 ocx-shell-root:empty + .splash {
-  //   transition: all 0.5s;
   display: flex;
   opacity: 1;
-  //   animation: fadeIn 1.5s forwards;
-}
-
-.splash-welcome {
-  padding: 10px;
 }
 
 @keyframes fadeIn {
@@ -41,44 +57,28 @@ ocx-shell-root:empty + .splash {
   }
 }
 
-.splash-loader {
-  animation: rotator 1.4s linear infinite;
-}
-
 @keyframes rotator {
   0% {
     transform: rotate(0deg);
   }
-
   100% {
     transform: rotate(270deg);
   }
-}
-
-.splash-path {
-  stroke-dasharray: 187;
-  stroke-dashoffset: 0;
-  transform-origin: center;
-  animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
 }
 
 @keyframes colors {
   0% {
     stroke: #4285f4;
   }
-
   25% {
     stroke: #de3e35;
   }
-
   50% {
     stroke: #f7c223;
   }
-
   75% {
     stroke: #1b9a59;
   }
-
   100% {
     stroke: #4285f4;
   }
@@ -88,12 +88,10 @@ ocx-shell-root:empty + .splash {
   0% {
     stroke-dashoffset: 187;
   }
-
   50% {
     stroke-dashoffset: 46.75;
     transform: rotate(135deg);
   }
-
   100% {
     stroke-dashoffset: 187;
     transform: rotate(450deg);

@@ -1,21 +1,21 @@
 import { Component, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
-import { UserService } from '@onecx/angular-integration-interface'
 import { PrimeNGConfig } from 'primeng/api'
 import { merge, mergeMap } from 'rxjs'
 
+import { UserService } from '@onecx/angular-integration-interface'
+
 @Component({
   selector: 'ocx-shell-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
   title = 'shell'
 
   constructor(
-    private translateService: TranslateService,
-    private config: PrimeNGConfig,
-    private userService: UserService
+    private readonly translateService: TranslateService,
+    private readonly config: PrimeNGConfig,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
       this.translateService.onTranslationChange,
       this.translateService.onDefaultLangChange
     )
-      .pipe(mergeMap(() => this.translateService.get('primeng')))
+      .pipe(mergeMap(() => this.translateService.get('SHELL')))
       .subscribe((res) => this.config.setTranslation(res))
   }
 }

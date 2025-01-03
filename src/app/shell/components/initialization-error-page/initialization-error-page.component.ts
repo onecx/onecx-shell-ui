@@ -1,6 +1,15 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { SerializedInitializationError } from '../../utils/initialization-error-handler.utils'
+import { Observable, map } from 'rxjs'
+
+interface InitializationError {
+  message: string
+  requestedUrl: string
+  detail: string | null
+  errorCode: string | null
+  params: string | null
+  invalidParams: string | null
+}
 
 @Component({
   template: `<div class="p-4">
@@ -13,31 +22,31 @@ import { SerializedInitializationError } from '../../utils/initialization-error-
         </div>
         <i>{{ error.message }}</i>
       </div>
-      <div *ngIf="error.requestedUrl" class="md:text-base text-sm">
+      <div *ngIf="error.requestedUrl" id="onecxInitializationErrorRequestedUrl" class="md:text-base text-sm">
         <div>
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.REQUESTED_URL' | translate }}
         </div>
         <i>{{ error.requestedUrl }}</i>
       </div>
-      <div *ngIf="error.detail" class="md:text-base text-sm">
+      <div id="onecxInitializationErrorDetail" *ngIf="error.detail" class="md:text-base text-sm">
         <div>
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.DETAILS' | translate }}
         </div>
         <i>{{ error.detail }}</i>
       </div>
-      <div *ngIf="error.errorCode" class="md:text-base text-sm">
+      <div id="onecxInitializationErrorErrorCode" *ngIf="error.errorCode" class="md:text-base text-sm">
         <div>
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.ERRORCODE' | translate }}
         </div>
         <i>{{ error.errorCode }}</i>
       </div>
-      <div *ngIf="error.invalidParams" class="md:text-base text-sm">
+      <div id="onecxInitializationErrorInvalidParams" *ngIf="error.invalidParams" class="md:text-base text-sm">
         <div>
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.INVALID_PARAMS' | translate }}
         </div>
         <i>{{ error.invalidParams }}</i>
       </div>
-      <div *ngIf="error.params" class="md:text-base text-sm">
+      <div id="onecxInitializationErrorParams" *ngIf="error.params" class="md:text-base text-sm">
         <div>
           {{ 'INITIALIZATION_ERROR_PAGE.DETAILS.PARAMS' | translate }}
         </div>
@@ -47,15 +56,21 @@ import { SerializedInitializationError } from '../../utils/initialization-error-
   </div> `
 })
 export class InitializationErrorPageComponent {
-  error: SerializedInitializationError
+  error$: Observable<InitializationError>
+
   constructor(private route: ActivatedRoute) {
-    this.error = {
-      message: this.route.snapshot.paramMap.get('message') ?? '',
-      requestedUrl: this.route.snapshot.paramMap.get('requestedUrl') ?? '',
-      detail: this.route.snapshot.paramMap.get('detail') ?? '',
-      errorCode: this.route.snapshot.paramMap.get('errorCode') ?? '',
-      params: this.route.snapshot.paramMap.get('params') ?? '',
-      invalidParams: this.route.snapshot.paramMap.get('invalidParams') ?? ''
-    }
+    this.error$ = this.route.fragment.pipe(
+      map((fragment) => {
+        const params = new URLSearchParams(fragment ?? '')
+        return {
+          message: params.get('message') ?? '',
+          requestedUrl: params.get('requestedUrl') ?? '',
+          detail: params.get('detail'),
+          errorCode: params.get('errorCode'),
+          params: params.get('params'),
+          invalidParams: params.get('invalidParams')
+        }
+      })
+    )
   }
 }

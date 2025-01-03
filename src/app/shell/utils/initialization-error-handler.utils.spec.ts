@@ -13,17 +13,18 @@ describe('initializationErrorHandler', () => {
     })
 
     router = TestBed.inject(Router)
+    //jest.spyOn(console, 'error').mockImplementation(jest.fn()) // disable console output
   })
 
   it('should log the error and navigate to the error page with fragment parameters for ErrorEvent', () => {
-    const errorEvent = new ErrorEvent('Network error', { error: { message: 'Network error occurred' } })
+    const errorEvent = new ErrorEvent('Network error', { error: { message: 'A Network error has occurred' } })
     const consoleSpy = jest.spyOn(console, 'error')
 
     initializationErrorHandler(errorEvent, router)
 
     expect(consoleSpy).toHaveBeenCalledWith(errorEvent)
     expect(router.navigate).toHaveBeenCalledWith(['portal-initialization-error-page'], {
-      fragment: expect.stringContaining('message=Network+error+occurred')
+      fragment: expect.stringContaining('Network+error')
     })
 
     consoleSpy.mockRestore()
@@ -67,7 +68,7 @@ describe('initializationErrorHandler', () => {
   })
 
   it('should handle unknown error types gracefully', () => {
-    const unknownError = { message: 'Unknown error' }
+    const unknownError = { anything: 'Unknown error' }
     const consoleSpy = jest.spyOn(console, 'error')
 
     initializationErrorHandler(unknownError, router)

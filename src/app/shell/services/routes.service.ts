@@ -66,7 +66,7 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private sortRoutes(a: BffGeneratedRoute, b: BffGeneratedRoute): number {
-    return (a.baseUrl ?? '').toUpperCase().localeCompare((b.baseUrl ?? '').toUpperCase())
+    return (b.url ?? '').length - (a.url ?? '').length
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {

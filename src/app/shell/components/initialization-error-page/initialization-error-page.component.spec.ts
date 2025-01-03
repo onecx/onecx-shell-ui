@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
 import { TranslateTestingModule } from 'ngx-translate-testing'
+
 import { InitializationErrorPageComponent } from './initialization-error-page.component'
 
 describe('InitializationErrorPageComponent', () => {

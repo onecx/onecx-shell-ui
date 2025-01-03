@@ -9,8 +9,16 @@ import { Workspace } from '@onecx/integration-interface'
         <h1 class="md:text-xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
         <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
       </div>
-      <button pButton [routerLink]="[workspace?.baseUrl]" class="w-max">
-        {{ 'NOT_FOUND_PAGE.BUTTON' | translate }}
+      <button
+        pButton
+        [routerLink]="[workspace?.baseUrl]"
+        class="w-max"
+        [ariaLabel]="'NOT_FOUND_PAGE.ACTION' | translate"
+        [pTooltip]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        {{ 'NOT_FOUND_PAGE.ACTION' | translate }}
       </button>
     </div>
   `

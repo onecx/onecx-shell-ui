@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
-import { UserService } from '@onecx/angular-integration-interface'
 import { PrimeNGConfig } from 'primeng/api'
 import { merge, mergeMap } from 'rxjs'
 
+import { UserService } from '@onecx/angular-integration-interface'
+
 @Component({
   selector: 'ocx-shell-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
   title = 'shell'

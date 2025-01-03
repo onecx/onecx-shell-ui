@@ -1,4 +1,5 @@
 import { Route } from '@angular/router'
+
 import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
 

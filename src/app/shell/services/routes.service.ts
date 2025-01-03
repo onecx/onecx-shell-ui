@@ -15,8 +15,7 @@ import { PermissionsTopic } from '@onecx/integration-interface'
 import { PermissionsCacheService, ShowContentProvider } from '@onecx/shell-core'
 
 import { appRoutes } from 'src/app/app.routes'
-import { Route as BffGeneratedRoute } from 'src/app/shared/generated'
-import { PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
+import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
 
 import { HomeComponent } from '../components/home/home.component'
 import { PageNotFoundComponent } from '../components/not-found-page.component'
@@ -30,7 +29,7 @@ export const DEFAULT_CATCH_ALL_ROUTE: Route = {
 
 @Injectable({ providedIn: 'root' })
 export class RoutesService implements ShowContentProvider {
-  private permissionsTopic$ = new PermissionsTopic()
+  private readonly permissionsTopic$ = new PermissionsTopic()
   private isFirstLoad = true
   showContent$ = new BehaviorSubject<boolean>(true)
 
@@ -56,15 +55,18 @@ export class RoutesService implements ShowContentProvider {
       console.log(`Adding fallback route`)
       generatedRoutes.push(await this.createFallbackRoute())
     }
-    this.router.resetConfig([
-      ...appRoutes,
-      ...generatedRoutes.sort((a, b) => (b.path || '')?.length - (a.path || '')?.length),
-      DEFAULT_CATCH_ALL_ROUTE
-    ])
-    console.log(
-      `🧭 Adding App routes: \n${routes.map((lr) => `${lr.url} -> ${JSON.stringify(lr.baseUrl)}`).join('\t\n')}`
-    )
+    this.router.resetConfig([...appRoutes, ...generatedRoutes.sort(this.sortRoutes), DEFAULT_CATCH_ALL_ROUTE])
+    console.log('🧭 Adding App routes:')
+    console.log(this.listRoutes(routes))
     return Promise.resolve()
+  }
+
+  private listRoutes(routes: BffGeneratedRoute[]): string {
+    return routes.map((lr) => `\t${lr.url} -> ${JSON.stringify(lr.baseUrl)}`).join('\n')
+  }
+
+  private sortRoutes(a: Route, b: Route): number {
+    return (b.path || '')?.length - (a.path || '')?.length
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {

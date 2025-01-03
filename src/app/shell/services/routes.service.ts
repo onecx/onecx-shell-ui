@@ -50,14 +50,14 @@ export class RoutesService implements ShowContentProvider {
   }
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
+    routes.sort(this.sortRoutes)
     const generatedRoutes = routes.map((r) => this.convertToRoute(r))
     if (!(await this.containsRouteForWorkspace(routes))) {
-      console.log(`Adding fallback route`)
+      console.log('🧭 Adding fallback route')
       generatedRoutes.push(await this.createFallbackRoute())
     }
-    this.router.resetConfig([...appRoutes, ...generatedRoutes.sort(this.sortRoutes), DEFAULT_CATCH_ALL_ROUTE])
-    console.log('🧭 Adding App routes:')
-    console.log(this.listRoutes(routes))
+    this.router.resetConfig([...appRoutes, ...generatedRoutes, DEFAULT_CATCH_ALL_ROUTE])
+    console.log('🧭 Adding Workspace routes:\n' + this.listRoutes(routes))
     return Promise.resolve()
   }
 
@@ -65,8 +65,8 @@ export class RoutesService implements ShowContentProvider {
     return routes.map((lr) => `\t${lr.url} -> ${JSON.stringify(lr.baseUrl)}`).join('\n')
   }
 
-  private sortRoutes(a: Route, b: Route): number {
-    return (b.path || '')?.length - (a.path || '')?.length
+  private sortRoutes(a: BffGeneratedRoute, b: BffGeneratedRoute): number {
+    return (a.baseUrl ?? '').toUpperCase().localeCompare((b.baseUrl ?? '').toUpperCase())
   }
 
   private convertToRoute(r: BffGeneratedRoute): Route {

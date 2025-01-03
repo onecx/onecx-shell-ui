@@ -10,7 +10,10 @@
 
 .layout-content {
   background-size: 500px !important;
-  background: transparent url(assets/images/onecx_watermark.png) no-repeat center center;
+  background-color: transparent;
+  background-image: url(assets/images/onecx_watermark.png);
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 
 .splash {

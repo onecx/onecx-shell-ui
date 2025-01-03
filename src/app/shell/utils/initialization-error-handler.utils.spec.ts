@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing'
-import { Router } from '@angular/router'
-import { initializationErrorHandler } from './initialization-error-handler.utils'
 import { HttpErrorResponse } from '@angular/common/http'
+import { Router } from '@angular/router'
+
+import { initializationErrorHandler } from './initialization-error-handler.utils'
 
 describe('initializationErrorHandler', () => {
   let router: Router

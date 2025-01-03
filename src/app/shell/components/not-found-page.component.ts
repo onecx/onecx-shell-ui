@@ -25,7 +25,7 @@ import { Workspace } from '@onecx/integration-interface'
 })
 export class PageNotFoundComponent {
   workspace: Workspace | undefined
-  constructor(private appStateService: AppStateService) {
+  constructor(private readonly appStateService: AppStateService) {
     this.appStateService.currentMfe$.publish({
       appId: '',
       baseHref: '/',

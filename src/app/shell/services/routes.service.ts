@@ -34,12 +34,12 @@ export class RoutesService implements ShowContentProvider {
   showContent$ = new BehaviorSubject<boolean>(true)
 
   constructor(
-    private router: Router,
-    private appStateService: AppStateService,
-    private portalMessageService: PortalMessageService,
-    private configurationService: ConfigurationService,
-    private permissionsCacheService: PermissionsCacheService,
-    private permissionsService: PermissionBffService
+    private readonly router: Router,
+    private readonly appStateService: AppStateService,
+    private readonly portalMessageService: PortalMessageService,
+    private readonly configurationService: ConfigurationService,
+    private readonly permissionsCacheService: PermissionsCacheService,
+    private readonly permissionsService: PermissionBffService
   ) {
     router.events
       .pipe(

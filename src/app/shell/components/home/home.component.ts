@@ -11,7 +11,7 @@ import { Workspace } from '@onecx/integration-interface'
 export class HomeComponent {
   workspace$: Observable<Workspace | undefined>
 
-  constructor(private appStateService: AppStateService) {
+  constructor(private readonly appStateService: AppStateService) {
     this.workspace$ = this.appStateService.currentWorkspace$.pipe(map((currentWorkspace) => currentWorkspace))
   }
 }

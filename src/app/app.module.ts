@@ -7,9 +7,6 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ng
 import { getLocation } from '@onecx/accelerator'
 import {
   AngularAcceleratorMissingTranslationHandler,
-  CachingTranslateLoader,
-  TranslateCombinedLoader,
-  TranslationCacheService
 } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
@@ -21,6 +18,7 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
+import { createTranslateLoader, TRANSLATION_PATH,  } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
@@ -46,13 +44,6 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
-
-export function createTranslateLoader(http: HttpClient, translationCacheService: TranslationCacheService) {
-  return new TranslateCombinedLoader(
-    new CachingTranslateLoader(translationCacheService, http, `./assets/i18n/`, '.json'),
-    new CachingTranslateLoader(translationCacheService, http, `./onecx-portal-lib/assets/i18n/`, '.json')
-  )
-}
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -233,7 +224,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       loader: {
         provide: TranslateLoader,
         useFactory: createTranslateLoader,
-        deps: [HttpClient, TranslationCacheService]
+        deps: [HttpClient]
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
@@ -248,6 +239,11 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     provideTokenInterceptor(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
+    {
+      provide: TRANSLATION_PATH,
+      useValue: './assets/i18n/',
+      multi: true,
+    },
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

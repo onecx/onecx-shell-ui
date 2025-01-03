@@ -58,6 +58,7 @@
     "@onecx/angular-auth": "^5.28.0",
     "@onecx/angular-integration-interface": "^5.28.0",
     "@onecx/angular-remote-components": "^5.28.0",
+    "@onecx/angular-utils": "^5.28.0",
     "@onecx/angular-webcomponents": "^5.28.0",
     "@onecx/integration-interface": "^5.28.0",
     "@onecx/keycloak-auth": "^5.28.0",

@@ -1,5 +1,5 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core'
-import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
@@ -215,12 +215,18 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
 }
 
 @NgModule({
-  declarations: [AppComponent, PageNotFoundComponent, ErrorPageComponent, HomeComponent, WelcomeMessageComponent, InitializationErrorPageComponent],
+  declarations: [
+    AppComponent,
+    PageNotFoundComponent,
+    ErrorPageComponent,
+    HomeComponent,
+    WelcomeMessageComponent,
+    InitializationErrorPageComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(appRoutes),
-    HttpClientModule,
     TranslateModule.forRoot({
       isolate: true,
       defaultLanguage: DEFAULT_LANG,
@@ -240,6 +246,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   ],
   providers: [
     provideTokenInterceptor(),
+    provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
     { provide: APP_CONFIG, useValue: environment },
     {

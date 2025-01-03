@@ -13,7 +13,7 @@
   "scripts": {
     "build": "nx build",
     "check": "nx lint --cache=true && npx prettier -c --cache .",
-    "clean": "npm cache clean --force",
+    "clean": "npm cache clean --force && rm -rf *.log dist reports .nx .angular .eslintcache ./node_modules/.cache/prettier/.prettier-cache",
     "eslint": "eslint --quiet --ext .js,.ts src",
     "browser": "npx browserslist",
     "prepare": "husky || true",
@@ -26,6 +26,11 @@
     "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
     "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "dependencies": {
     "@angular-architects/module-federation": "18.0.6",
@@ -73,6 +78,8 @@
     "@angular/cli": "~18.2.12",
     "@angular/compiler-cli": "^18.2.12",
     "@angular/language-service": "^18.2.12",
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
     "@nx/eslint": "19.8.2",
     "@nx/eslint-plugin": "19.8.2",
     "@nx/jest": "19.8.2",
@@ -86,8 +93,12 @@
     "@types/node": "22.7.5",
     "@typescript-eslint/eslint-plugin": "7.17.0",
     "@typescript-eslint/parser": "7.18.0",
-    "eslint": "~8.57.1",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-deprecation": "^3.0.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.6",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "jest-preset-angular": "14.2.4",

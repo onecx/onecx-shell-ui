@@ -3,32 +3,32 @@
 # compiled output
 dist
 tmp
-out-tsc
+reports
 
 # dependencies
 node_modules
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
 
 # IDEs and editors
 .idea
 .project
 .classpath
-.c9
+.history
 .settings
-*.launch
-*.sublime-workspace
-
-# IDE - VSCode
 .vscode
+*.launch
 
 # misc
 .nx
 .angular
 .eslintcache
-.husky/_
 .sass-cache
+.husky/_
+.gitlab*
 connect.lock
-coverage
-reports
 typings
 *.log
 *.sh
@@ -36,4 +36,3 @@ typings
 # System Files
 .DS_Store
 Thumbs.db
-

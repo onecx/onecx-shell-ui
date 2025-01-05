@@ -17,7 +17,7 @@ interface InitializationError {
 export class InitializationErrorPageComponent {
   error$: Observable<InitializationError>
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private readonly route: ActivatedRoute) {
     this.error$ = this.route.fragment.pipe(
       map((fragment) => {
         const params = new URLSearchParams(fragment ?? '')

@@ -60,11 +60,9 @@ function publishCurrentWorkspace(
 ) {
   return appStateService.currentWorkspace$.publish({
     baseUrl: loadWorkspaceConfigResponse.workspace.baseUrl,
-    portalName: loadWorkspaceConfigResponse.workspace.name,
     workspaceName: loadWorkspaceConfigResponse.workspace.name,
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
-    microfrontendRegistrations: [],
     displayName: loadWorkspaceConfigResponse.workspace.displayName
   })
 }

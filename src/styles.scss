@@ -8,7 +8,12 @@
 @import 'node_modules/@onecx/portal-integration-angular/assets/styles.scss';
 @import 'node_modules/@onecx/shell-core/assets/styles.scss';
 
+body {
+  overflow: hidden;
+}
+
 .layout-content {
+  overflow: auto;
   background-size: 500px !important;
   background-color: transparent;
   background-image: url(assets/images/onecx_watermark.png);

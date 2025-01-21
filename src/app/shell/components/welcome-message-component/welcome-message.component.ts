@@ -9,7 +9,6 @@ import { CurrentWorkspaceTopic, UserProfileTopic } from '@onecx/integration-inte
 })
 export class WelcomeMessageComponent {
   user$: UserProfileTopic
-  currentDate = new Date()
   workspace$: CurrentWorkspaceTopic
 
   constructor(

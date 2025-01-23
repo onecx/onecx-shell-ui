@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
+import { ThemeConfigService } from '@onecx/angular-utils'
 import {
   AngularAcceleratorMissingTranslationHandler,
 } from '@onecx/angular-accelerator'
@@ -64,6 +65,7 @@ export function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
   themeService: ThemeService,
+  themeConfigService: ThemeConfigService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
   router: Router
@@ -98,7 +100,8 @@ export function workspaceConfigInitializer(
         routesService
           .init(loadWorkspaceConfigResponse.routes)
           .then(urlChangeListenerInitializer(router, appStateService)),
-        themeService.apply(themeWithParsedProperties),
+        //themeService.apply(themeWithParsedProperties),
+        themeConfigService.applyThemeVariables(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
           slots: loadWorkspaceConfigResponse.slots
@@ -254,7 +257,15 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     {
       provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
-      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, RemoteComponentsService, Router],
+      deps: [
+        WorkspaceConfigBffService,
+        RoutesService,
+        ThemeService,
+        ThemeConfigService,
+        AppStateService,
+        RemoteComponentsService,
+        Router
+      ],
       multi: true
     },
     {

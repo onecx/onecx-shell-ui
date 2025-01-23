@@ -65,6 +65,7 @@
     "@onecx/portal-integration-angular": "^5.31.0",
     "@onecx/portal-layout-styles": "^5.31.0",
     "@onecx/shell-core": "^5.31.0",
+    "@primeng/themes": "^19.0.5",
     "keycloak-angular": "^16.0.1",
     "keycloak-js": "^25.0.6",
     "primeflex": "^3.3.1",

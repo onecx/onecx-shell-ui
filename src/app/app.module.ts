@@ -6,9 +6,7 @@ import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
 import { ThemeConfigService } from '@onecx/angular-utils'
-import {
-  AngularAcceleratorMissingTranslationHandler,
-} from '@onecx/angular-accelerator'
+import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
@@ -19,7 +17,7 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
-import { createTranslateLoader, TRANSLATION_PATH,  } from '@onecx/angular-utils'
+import { createTranslateLoader, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
@@ -100,7 +98,8 @@ export function workspaceConfigInitializer(
         routesService
           .init(loadWorkspaceConfigResponse.routes)
           .then(urlChangeListenerInitializer(router, appStateService)),
-        //themeService.apply(themeWithParsedProperties),
+        themeService.apply(themeWithParsedProperties),
+        // TODO: Publish a new theme message
         themeConfigService.applyThemeVariables(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
@@ -245,7 +244,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     {
       provide: TRANSLATION_PATH,
       useValue: './assets/i18n/',
-      multi: true,
+      multi: true
     },
     { provide: APP_CONFIG, useValue: environment },
     {

@@ -16,7 +16,7 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
-import { createTranslateLoader, provideThemeConfig, ThemeConfigService, TRANSLATION_PATH } from '@onecx/angular-utils'
+import { createTranslateLoader, provideThemeConfig, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
@@ -62,7 +62,6 @@ export function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
   themeService: ThemeService,
-  themeConfigService: ThemeConfigService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
   router: Router
@@ -254,15 +253,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     {
       provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
-      deps: [
-        WorkspaceConfigBffService,
-        RoutesService,
-        ThemeService,
-        ThemeConfigService,
-        AppStateService,
-        RemoteComponentsService,
-        Router
-      ],
+      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, RemoteComponentsService, Router],
       multi: true
     },
     {

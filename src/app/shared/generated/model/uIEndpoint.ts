@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface UIEndpoint {
-  path?: string;
-  name?: string;
+
+export interface UIEndpoint { 
+    path?: string;
+    name?: string;
 }
+

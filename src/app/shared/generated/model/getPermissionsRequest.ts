@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface GetPermissionsRequest {
-  appId: string;
-  productName: string;
+
+export interface GetPermissionsRequest { 
+    appId: string;
+    productName: string;
 }
+

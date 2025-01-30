@@ -12,9 +12,11 @@
 import { ProblemDetailInvalidParam } from './problemDetailInvalidParam';
 import { ProblemDetailParam } from './problemDetailParam';
 
-export interface ProblemDetailResponse {
-  errorCode?: string;
-  detail?: string;
-  params?: Array<ProblemDetailParam>;
-  invalidParams?: Array<ProblemDetailInvalidParam>;
+
+export interface ProblemDetailResponse { 
+    errorCode?: string;
+    detail?: string;
+    params?: Array<ProblemDetailParam>;
+    invalidParams?: Array<ProblemDetailInvalidParam>;
 }
+

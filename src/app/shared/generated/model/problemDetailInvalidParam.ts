@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface ProblemDetailInvalidParam {
-  name?: string;
-  message?: string;
+
+export interface ProblemDetailInvalidParam { 
+    name?: string;
+    message?: string;
 }
+

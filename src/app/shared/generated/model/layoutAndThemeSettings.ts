@@ -12,7 +12,11 @@
 import { ColorScheme } from './colorScheme';
 import { MenuMode } from './menuMode';
 
-export interface LayoutAndThemeSettings {
-  colorScheme?: ColorScheme;
-  menuMode?: MenuMode;
+
+export interface LayoutAndThemeSettings { 
+    colorScheme?: ColorScheme;
+    menuMode?: MenuMode;
 }
+
+
+

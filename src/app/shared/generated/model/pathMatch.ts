@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
+
 export enum PathMatch {
-  full = 'full',
-  prefix = 'prefix',
+    full = 'full',
+    prefix = 'prefix'
 }
+

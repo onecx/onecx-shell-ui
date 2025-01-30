@@ -15,10 +15,12 @@ import { Theme } from './theme';
 import { Route } from './route';
 import { Workspace } from './workspace';
 
-export interface LoadWorkspaceConfigResponse {
-  routes: Array<Route>;
-  theme: Theme;
-  workspace: Workspace;
-  components: Array<RemoteComponent>;
-  slots: Array<Slot>;
+
+export interface LoadWorkspaceConfigResponse { 
+    routes: Array<Route>;
+    theme: Theme;
+    workspace: Workspace;
+    components: Array<RemoteComponent>;
+    slots: Array<Slot>;
 }
+

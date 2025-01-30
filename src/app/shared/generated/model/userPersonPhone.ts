@@ -11,7 +11,11 @@
  */
 import { PhoneType } from './phoneType';
 
-export interface UserPersonPhone {
-  type?: PhoneType;
-  number?: string;
+
+export interface UserPersonPhone { 
+    type?: PhoneType;
+    number?: string;
 }
+
+
+

@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface ProblemDetailParam {
-  key?: string;
-  value?: string;
+
+export interface ProblemDetailParam { 
+    key?: string;
+    value?: string;
 }
+

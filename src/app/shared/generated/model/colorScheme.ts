@@ -10,8 +10,10 @@
  * Do not edit the class manually.
  */
 
+
 export enum ColorScheme {
-  AUTO = 'AUTO',
-  LIGHT = 'LIGHT',
-  DARK = 'DARK',
+    AUTO = 'AUTO',
+    LIGHT = 'LIGHT',
+    DARK = 'DARK'
 }
+

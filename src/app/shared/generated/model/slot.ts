@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface Slot {
-  name: string;
-  components: Array<string>;
+
+export interface Slot { 
+    name: string;
+    components: Array<string>;
 }
+

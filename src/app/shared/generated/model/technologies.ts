@@ -10,9 +10,11 @@
  * Do not edit the class manually.
  */
 
+
 export enum Technologies {
-  Angular = 'Angular',
-  WebComponent = 'WebComponent',
-  WebComponentScript = 'WebComponentScript',
-  WebComponentModule = 'WebComponentModule',
+    Angular = 'Angular',
+    WebComponent = 'WebComponent',
+    WebComponentScript = 'WebComponentScript',
+    WebComponentModule = 'WebComponentModule'
 }
+

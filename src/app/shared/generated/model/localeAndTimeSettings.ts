@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface LocaleAndTimeSettings {
-  locale?: string;
-  timezone?: string;
+
+export interface LocaleAndTimeSettings { 
+    locale?: string;
+    timezone?: string;
 }
+

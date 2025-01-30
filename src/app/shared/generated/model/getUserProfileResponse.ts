@@ -11,6 +11,8 @@
  */
 import { UserProfile } from './userProfile';
 
-export interface GetUserProfileResponse {
-  userProfile: UserProfile;
+
+export interface GetUserProfileResponse { 
+    userProfile: UserProfile;
 }
+

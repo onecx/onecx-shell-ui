@@ -11,14 +11,19 @@
  */
 import { Technologies } from './technologies';
 
-export interface RemoteComponent {
-  name: string;
-  baseUrl: string;
-  remoteEntryUrl: string;
-  appId: string;
-  productName: string;
-  exposedModule: string;
-  remoteName?: string;
-  elementName?: string;
-  technology?: Technologies;
+
+export interface RemoteComponent { 
+    name: string;
+    baseUrl: string;
+    remoteEntryUrl: string;
+    appId: string;
+    productName: string;
+    productVersion?: string;
+    exposedModule: string;
+    remoteName?: string;
+    elementName?: string;
+    technology?: Technologies;
 }
+
+
+

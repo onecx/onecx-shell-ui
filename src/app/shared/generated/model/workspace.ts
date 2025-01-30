@@ -10,9 +10,11 @@
  * Do not edit the class manually.
  */
 
-export interface Workspace {
-  displayName?: string;
-  name: string;
-  baseUrl: string;
-  homePage?: string;
+
+export interface Workspace { 
+    displayName?: string;
+    name: string;
+    baseUrl: string;
+    homePage?: string;
 }
+

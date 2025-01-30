@@ -14,8 +14,12 @@ servers:
 paths:
   /workspaceConfig:
     post:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
       tags:
-        - 'WorkspaceConfig'
+        - "WorkspaceConfig"
       description: Load all data needed by startup of OneCX UI (components, routes, slots, theme, workspace)
       operationId: loadWorkspaceConfig
       requestBody:
@@ -41,8 +45,12 @@ paths:
           description: 'Not Found'
   /workspaceConfig/themes/{name}/favicon:
     get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
       tags:
-        - 'WorkspaceConfig'
+        - "WorkspaceConfig"
       description: Load favicon by theme name
       operationId: getThemeFaviconByName
       parameters:
@@ -55,7 +63,7 @@ paths:
         200:
           description: OK
           content:
-            image/*:
+            image/x-icon:
               schema:
                 minimum: 1
                 maximum: 110000
@@ -66,8 +74,12 @@ paths:
 
   /workspaceConfig/themes/{name}/logo:
     get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
       tags:
-        - 'WorkspaceConfig'
+        - "WorkspaceConfig"
       description: Load logo by theme name
       operationId: getThemeLogoByName
       parameters:
@@ -91,6 +103,10 @@ paths:
 
   /userProfile:
     get:
+      x-onecx:
+        permissions:
+          userProfile:
+            - read
       tags:
         - userProfile
       operationId: getUserProfile
@@ -112,6 +128,10 @@ paths:
 
   /permissions:
     post:
+      x-onecx:
+        permissions:
+          permission:
+            - read
       tags:
         - permission
       operationId: getPermissions
@@ -209,8 +229,8 @@ components:
           type: string
     Theme:
       required:
-        - name
-        - properties
+      - name
+      - properties
       type: object
       properties:
         displayName:
@@ -282,8 +302,7 @@ components:
           type: string
     Technologies:
       type: string
-      enum:
-        ['Angular', 'WebComponent', 'WebComponentScript', 'WebComponentModule']
+      enum: ['Angular', 'WebComponent', 'WebComponentScript', 'WebComponentModule' ]
     PathMatch:
       type: string
       enum: ['full', 'prefix']
@@ -307,6 +326,8 @@ components:
         appId:
           type: string
         productName:
+          type: string
+        productVersion:
           type: string
         exposedModule:
           type: string

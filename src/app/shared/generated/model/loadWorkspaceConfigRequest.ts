@@ -10,6 +10,8 @@
  * Do not edit the class manually.
  */
 
-export interface LoadWorkspaceConfigRequest {
-  path: string;
+
+export interface LoadWorkspaceConfigRequest { 
+    path: string;
 }
+

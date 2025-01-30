@@ -10,15 +10,17 @@
  * Do not edit the class manually.
  */
 
-export interface Theme {
-  displayName?: string;
-  name: string;
-  cssFile?: string;
-  description?: string;
-  assetsUrl?: string;
-  logoUrl?: string;
-  faviconUrl?: string;
-  previewImageUrl?: string;
-  assetsUpdateDate?: string;
-  properties: string;
+
+export interface Theme { 
+    displayName?: string;
+    name: string;
+    cssFile?: string;
+    description?: string;
+    assetsUrl?: string;
+    logoUrl?: string;
+    faviconUrl?: string;
+    previewImageUrl?: string;
+    assetsUpdateDate?: string;
+    properties: string;
 }
+

@@ -10,10 +10,12 @@
  * Do not edit the class manually.
  */
 
-export interface UserPersonAddress {
-  street?: string;
-  streetNo?: string;
-  city?: string;
-  postalCode?: string;
-  country?: string;
+
+export interface UserPersonAddress { 
+    street?: string;
+    streetNo?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
 }
+

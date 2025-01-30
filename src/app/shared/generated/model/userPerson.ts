@@ -12,11 +12,13 @@
 import { UserPersonPhone } from './userPersonPhone';
 import { UserPersonAddress } from './userPersonAddress';
 
-export interface UserPerson {
-  firstName?: string;
-  lastName?: string;
-  displayName?: string;
-  email?: string;
-  address?: UserPersonAddress;
-  phone?: UserPersonPhone;
+
+export interface UserPerson { 
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    email?: string;
+    address?: UserPersonAddress;
+    phone?: UserPersonPhone;
 }
+

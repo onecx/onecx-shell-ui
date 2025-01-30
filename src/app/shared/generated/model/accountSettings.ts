@@ -12,7 +12,9 @@
 import { LayoutAndThemeSettings } from './layoutAndThemeSettings';
 import { LocaleAndTimeSettings } from './localeAndTimeSettings';
 
-export interface AccountSettings {
-  layoutAndThemeSettings?: LayoutAndThemeSettings;
-  localeAndTimeSettings?: LocaleAndTimeSettings;
+
+export interface AccountSettings { 
+    layoutAndThemeSettings?: LayoutAndThemeSettings;
+    localeAndTimeSettings?: LocaleAndTimeSettings;
 }
+

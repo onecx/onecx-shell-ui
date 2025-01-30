@@ -12,9 +12,11 @@
 import { AccountSettings } from './accountSettings';
 import { UserPerson } from './userPerson';
 
-export interface UserProfile {
-  userId: string;
-  organization?: string;
-  person: UserPerson;
-  accountSettings?: AccountSettings;
+
+export interface UserProfile { 
+    userId: string;
+    organization?: string;
+    person: UserPerson;
+    accountSettings?: AccountSettings;
 }
+

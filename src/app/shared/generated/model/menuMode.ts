@@ -10,10 +10,12 @@
  * Do not edit the class manually.
  */
 
+
 export enum MenuMode {
-  HORIZONTAL = 'HORIZONTAL',
-  STATIC = 'STATIC',
-  OVERLAY = 'OVERLAY',
-  SLIM = 'SLIM',
-  SLIMPLUS = 'SLIMPLUS',
+    HORIZONTAL = 'HORIZONTAL',
+    STATIC = 'STATIC',
+    OVERLAY = 'OVERLAY',
+    SLIM = 'SLIM',
+    SLIMPLUS = 'SLIMPLUS'
 }
+

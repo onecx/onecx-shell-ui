@@ -13,17 +13,21 @@ import { PathMatch } from './pathMatch';
 import { UIEndpoint } from './uIEndpoint';
 import { Technologies } from './technologies';
 
-export interface Route {
-  url: string;
-  baseUrl: string;
-  remoteEntryUrl: string;
-  appId: string;
-  productName: string;
-  technology?: Technologies;
-  exposedModule: string;
-  pathMatch: PathMatch;
-  remoteName?: string;
-  elementName?: string;
-  displayName: string;
-  endpoints?: Array<UIEndpoint>;
+
+export interface Route { 
+    url: string;
+    baseUrl: string;
+    remoteEntryUrl: string;
+    appId: string;
+    productName: string;
+    technology?: Technologies;
+    exposedModule: string;
+    pathMatch: PathMatch;
+    remoteName?: string;
+    elementName?: string;
+    displayName: string;
+    endpoints?: Array<UIEndpoint>;
 }
+
+
+

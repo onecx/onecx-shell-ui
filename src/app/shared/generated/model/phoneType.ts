@@ -10,7 +10,9 @@
  * Do not edit the class manually.
  */
 
+
 export enum PhoneType {
-  MOBILE = 'MOBILE',
-  LANDLINE = 'LANDLINE',
+    MOBILE = 'MOBILE',
+    LANDLINE = 'LANDLINE'
 }
+

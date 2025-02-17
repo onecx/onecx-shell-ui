@@ -3,6 +3,7 @@ import { AppStateService } from '@onecx/angular-integration-interface'
 import { firstValueFrom } from 'rxjs'
 
 @Component({
+  standalone: false,
   template: '<div #wrapper [attr.data-style-id]="styleId"></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {

@@ -6,6 +6,7 @@ import { merge, mergeMap } from 'rxjs'
 import { UserService } from '@onecx/angular-integration-interface'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-root',
   templateUrl: './app.component.html'
 })

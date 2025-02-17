@@ -4,6 +4,7 @@ import { Workspace } from '@onecx/integration-interface'
 import { Observable } from 'rxjs'
 
 @Component({
+  standalone: false,
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>

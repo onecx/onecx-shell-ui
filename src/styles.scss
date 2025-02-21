@@ -14,11 +14,6 @@ body {
 
 .layout-content {
   overflow: auto;
-  background-size: 500px !important;
-  background-color: transparent;
-  background-image: url(assets/images/onecx_watermark.png);
-  background-repeat: no-repeat;
-  background-position: center center;
 }
 
 .splash {
@@ -29,8 +24,8 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgb(0, 123, 180);
-  color: white;
+  background: transparent;
+  color: #555;
   z-index: 999;
   position: fixed;
   top: 0;

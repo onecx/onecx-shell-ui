@@ -1,7 +1,9 @@
 import { Component } from '@angular/core'
+
+import { Observable } from 'rxjs'
+
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
-import { Observable } from 'rxjs'
 
 @Component({
   template: `

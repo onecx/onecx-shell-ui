@@ -82,14 +82,12 @@ export function workspaceConfigInitializer(
         )
     )
 
-    console.log('here')
+    const angular18LoaderEntryPath = `${getLocation().deploymentPath}dummy_loaders/onecx-angular-18-dummy/remoteEntry.js`
     await loadRemoteModule({
       type: 'module',
-      // TODO: Add base path of shell
-      remoteEntry: '/onecx-shell/dummy_loaders/onecx-angular-18-dummy/remoteEntry.js',
+      remoteEntry: angular18LoaderEntryPath,
       exposedModule: './Angular18Loader'
     }).then((): Promise<any> => {
-      const tasks = []
       if (loadWorkspaceConfigResponse) {
         const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
           string,
@@ -100,7 +98,7 @@ export function workspaceConfigInitializer(
           properties: parsedProperties
         }
 
-        tasks.push([
+        return Promise.all([
           publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
           routesService
             .init(loadWorkspaceConfigResponse.routes)
@@ -112,7 +110,8 @@ export function workspaceConfigInitializer(
           })
         ])
       }
-      return Promise.all(tasks)
+      /* eslint-disable  @typescript-eslint/no-empty-function */
+      return Promise.resolve(() => {})
     })
   }
 }

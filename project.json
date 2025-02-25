@@ -6,8 +6,56 @@
   "sourceRoot": "./src",
   "tags": [],
   "targets": {
+    "build-18-dummy": {
+      "executor": "@nx/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/dummy_loaders/onecx-angular-18-dummy",
+        "index": "./dummy_loaders/angular-18/src/index.html",
+        "main": "./dummy_loaders/angular-18/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "./dummy_loaders/angular-18/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [],
+        "styles": [],
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "./dummy_loaders/angular-18/webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "./dummy_loaders/angular-18/webpack.config.js"
+          }
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
       "executor": "@nx/angular:webpack-browser",
+      "dependsOn": ["^build", "build-18-dummy"],
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/onecx-shell-ui",
@@ -28,6 +76,11 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/angular-accelerator/assets/",
             "output": "/onecx-angular-accelerator/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./dist/dummy_loaders/",
+            "output": "./dummy_loaders"
           }
         ],
         "styles": ["./src/styles.scss"],

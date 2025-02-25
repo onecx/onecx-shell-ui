@@ -42,6 +42,7 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
+import { loadRemoteModule } from '@angular-architects/module-federation'
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -81,28 +82,38 @@ export function workspaceConfigInitializer(
         )
     )
 
-    if (loadWorkspaceConfigResponse) {
-      const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-        string,
-        Record<string, string>
-      >
-      const themeWithParsedProperties = {
-        ...loadWorkspaceConfigResponse.theme,
-        properties: parsedProperties
-      }
+    console.log('here')
+    await loadRemoteModule({
+      type: 'module',
+      // TODO: Add base path of shell
+      remoteEntry: '/onecx-shell/dummy_loaders/onecx-angular-18-dummy/remoteEntry.js',
+      exposedModule: './Angular18Loader'
+    }).then((): Promise<any> => {
+      const tasks = []
+      if (loadWorkspaceConfigResponse) {
+        const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
+          string,
+          Record<string, string>
+        >
+        const themeWithParsedProperties = {
+          ...loadWorkspaceConfigResponse.theme,
+          properties: parsedProperties
+        }
 
-      await Promise.all([
-        publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-        routesService
-          .init(loadWorkspaceConfigResponse.routes)
-          .then(urlChangeListenerInitializer(router, appStateService)),
-        themeService.apply(themeWithParsedProperties),
-        remoteComponentsService.remoteComponents$.publish({
-          components: loadWorkspaceConfigResponse.components,
-          slots: loadWorkspaceConfigResponse.slots
-        })
-      ])
-    }
+        tasks.push([
+          publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+          routesService
+            .init(loadWorkspaceConfigResponse.routes)
+            .then(urlChangeListenerInitializer(router, appStateService)),
+          themeService.apply(themeWithParsedProperties),
+          remoteComponentsService.remoteComponents$.publish({
+            components: loadWorkspaceConfigResponse.components,
+            slots: loadWorkspaceConfigResponse.slots
+          })
+        ])
+      }
+      return Promise.all(tasks)
+    })
   }
 }
 
@@ -142,6 +153,17 @@ export function permissionProxyInitializer(permissionProxyService: PermissionPro
 export function configurationServiceInitializer(configurationService: ConfigurationService) {
   return () => configurationService.init()
 }
+
+// export function packageLoadersInitializer() {
+//   return async () => {
+//     await loadRemoteModule({
+//       type: 'module',
+//       // TODO: Add base path of shell
+//       remoteEntry: '/onecx-shell/dummy_loaders/onecx-angular-18-dummy/remoteEntry.js',
+//       exposedModule: './Angular18Loader'
+//     })
+//   }
+// }
 
 let isFirst = true
 let isInitialPageLoad = true

@@ -4,17 +4,16 @@ const { share, withModuleFederationPlugin } = require('@angular-architects/modul
 const webpackConfig = {
   ...withModuleFederationPlugin({
     shared: share({
-      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
+      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular/common': {
         requiredVersion: 'auto',
-        includeSecondaries: { skip: ['@angular/common/http/testing'] },
-        singleton: true
+        includeSecondaries: { skip: ['@angular/common/http/testing'] }
       },
-      '@angular/common/http': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
-      '@angular/elements': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
-      '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
+      '@angular/common/http': { requiredVersion: 'auto', includeSecondaries: true },
+      '@angular/elements': { requiredVersion: 'auto', includeSecondaries: true },
+      '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular/router': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
+      '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular-architects/module-federation-tools': { requiredVersion: 'auto', includeSecondaries: true },
       '@ngx-translate/core': { requiredVersion: 'auto' },
       rxjs: { requiredVersion: 'auto', includeSecondaries: true },

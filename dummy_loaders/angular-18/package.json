@@ -1,0 +1,23 @@
+{
+  "name": "onecx-dummy-loader-angular-18",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "contributors": [
+    "OneCX Development Team <onecx_dev@1000kit.org>"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@angular-architects/module-federation": "18.0.6",
+    "@angular/animations": "^18.2.13",
+    "@angular/common": "^18.2.13",
+    "@angular/compiler": "^18.2.13",
+    "@angular/core": "^18.2.13",
+    "@angular/elements": "^18.2.13",
+    "@angular/forms": "^18.2.13",
+    "@angular/platform-browser": "^18.2.13",
+    "@angular/platform-browser-dynamic": "^18.2.13",
+    "@angular/router": "^18.2.13"
+  },
+  "devDependencies": {}
+}

@@ -5,6 +5,7 @@ import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-home',
   templateUrl: './home.component.html'
 })

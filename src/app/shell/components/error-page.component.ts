@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { getLocation } from '@onecx/accelerator'
 
 @Component({
+  standalone: false,
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>

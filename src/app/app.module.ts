@@ -42,7 +42,6 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
-import { loadRemoteModule } from '@angular-architects/module-federation'
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -82,37 +81,28 @@ export function workspaceConfigInitializer(
         )
     )
 
-    const angular18LoaderEntryPath = `${getLocation().deploymentPath}dummy_loaders/onecx-angular-18-dummy/remoteEntry.js`
-    await loadRemoteModule({
-      type: 'module',
-      remoteEntry: angular18LoaderEntryPath,
-      exposedModule: './Angular18Loader'
-    }).then((): Promise<any> => {
-      if (loadWorkspaceConfigResponse) {
-        const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-          string,
-          Record<string, string>
-        >
-        const themeWithParsedProperties = {
-          ...loadWorkspaceConfigResponse.theme,
-          properties: parsedProperties
-        }
-
-        return Promise.all([
-          publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-          routesService
-            .init(loadWorkspaceConfigResponse.routes)
-            .then(urlChangeListenerInitializer(router, appStateService)),
-          themeService.apply(themeWithParsedProperties),
-          remoteComponentsService.remoteComponents$.publish({
-            components: loadWorkspaceConfigResponse.components,
-            slots: loadWorkspaceConfigResponse.slots
-          })
-        ])
+    if (loadWorkspaceConfigResponse) {
+      const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
+        string,
+        Record<string, string>
+      >
+      const themeWithParsedProperties = {
+        ...loadWorkspaceConfigResponse.theme,
+        properties: parsedProperties
       }
-      /* eslint-disable  @typescript-eslint/no-empty-function */
-      return Promise.resolve(() => {})
-    })
+
+      await Promise.all([
+        publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+        routesService
+          .init(loadWorkspaceConfigResponse.routes)
+          .then(urlChangeListenerInitializer(router, appStateService)),
+        themeService.apply(themeWithParsedProperties),
+        remoteComponentsService.remoteComponents$.publish({
+          components: loadWorkspaceConfigResponse.components,
+          slots: loadWorkspaceConfigResponse.slots
+        })
+      ])
+    }
   }
 }
 

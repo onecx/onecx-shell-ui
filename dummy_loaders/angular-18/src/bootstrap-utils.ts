@@ -12,11 +12,20 @@ import {
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 
+declare global {
+  interface Window {
+    onecxDummy: Record<string, any>
+  }
+}
+
 @NgModule({
   imports: [BrowserModule, RouterModule.forRoot([])]
 })
 export class DummyModule implements DoBootstrap {
-  ngDoBootstrap(): void {}
+  ngDoBootstrap(): void {
+    window['onecxDummy'] ??= {}
+    window['onecxDummy']['angular18'] = true
+  }
 }
 
 export function getWindowState(): any {

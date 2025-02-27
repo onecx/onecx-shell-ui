@@ -4,7 +4,6 @@ import { getLocation } from '@onecx/accelerator'
 declare global {
   interface Window {
     onecxPreloaders: Record<string, any>
-    '@onecx/angular-webcomponents': any
   }
 }
 

@@ -34,6 +34,6 @@ export function ensurePreloaderModuleLoaded(preloader: Preloader) {
       if (window['onecxPreloaders'][preloader.windowKey]) {
         resolve(true)
       }
-    }, 100)
+    }, 50)
   })
 }

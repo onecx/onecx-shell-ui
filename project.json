@@ -6,21 +6,21 @@
   "sourceRoot": "./src",
   "tags": [],
   "targets": {
-    "build-18-dummy": {
+    "build-18-loader": {
       "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/dummy_loaders/onecx-angular-18-dummy",
-        "index": "./dummy_loaders/angular-18/src/index.html",
-        "main": "./dummy_loaders/angular-18/src/main.ts",
+        "outputPath": "dist/pre_loaders/onecx-angular-18-loader",
+        "index": "./pre_loaders/angular-18/src/index.html",
+        "main": "./pre_loaders/angular-18/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "./dummy_loaders/angular-18/tsconfig.app.json",
+        "tsConfig": "./pre_loaders/angular-18/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [],
         "styles": [],
         "scripts": [],
         "customWebpackConfig": {
-          "path": "./dummy_loaders/angular-18/webpack.config.js"
+          "path": "./pre_loaders/angular-18/webpack.config.js"
         }
       },
       "configurations": {
@@ -39,7 +39,7 @@
           ],
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./dummy_loaders/angular-18/webpack.config.js"
+            "path": "./pre_loaders/angular-18/webpack.config.js"
           }
         },
         "development": {
@@ -55,7 +55,7 @@
     },
     "build": {
       "executor": "@nx/angular:webpack-browser",
-      "dependsOn": ["^build", "build-18-dummy"],
+      "dependsOn": ["^build", "build-18-loader"],
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/onecx-shell-ui",
@@ -79,8 +79,8 @@
           },
           {
             "glob": "**/*",
-            "input": "./dist/dummy_loaders/",
-            "output": "./dummy_loaders"
+            "input": "./dist/pre_loaders/",
+            "output": "./pre_loaders"
           }
         ],
         "styles": ["./src/styles.scss"],

@@ -143,17 +143,6 @@ export function configurationServiceInitializer(configurationService: Configurat
   return () => configurationService.init()
 }
 
-// export function packageLoadersInitializer() {
-//   return async () => {
-//     await loadRemoteModule({
-//       type: 'module',
-//       // TODO: Add base path of shell
-//       remoteEntry: '/onecx-shell/dummy_loaders/onecx-angular-18-dummy/remoteEntry.js',
-//       exposedModule: './Angular18Loader'
-//     })
-//   }
-// }
-
 let isFirst = true
 let isInitialPageLoad = true
 const pushState = window.history.pushState

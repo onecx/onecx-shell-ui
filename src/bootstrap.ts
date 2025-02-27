@@ -1,11 +1,11 @@
 import { bootstrapModule } from '@onecx/angular-webcomponents'
 import { AppModule } from './app/app.module'
 import { environment } from './environments/environment'
-import { angular18DummyLoader, ensureDummyModuleLoaded, loadDummyModule } from './app/shell/utils/dummy-loader.utils'
+import { angular18Preloader, ensurePreloaderModuleLoaded, loadPreloaderModule } from './app/shell/utils/preloader.utils'
 
 bootstrapModule(AppModule, 'shell', environment.production).then(() => {
-  window['onecxDummy'] ??= {}
-  const dummyLoaders = [angular18DummyLoader]
+  window['onecxPreloaders'] ??= {}
+  const preloaders = [angular18Preloader]
 
-  return Promise.all([...dummyLoaders.map(loadDummyModule), ...dummyLoaders.map(ensureDummyModuleLoaded)])
+  return Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)])
 })

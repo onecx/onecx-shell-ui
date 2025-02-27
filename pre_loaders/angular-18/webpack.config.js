@@ -49,7 +49,7 @@ const plugins = webpackConfig.plugins.filter((plugin) => !(plugin instanceof Mod
 module.exports = {
   ...webpackConfig,
   plugins,
-  output: { uniqueName: 'onecx-dummy-loader-angular-18', publicPath: 'auto' },
+  output: { uniqueName: 'onecx-angular-18-loader', publicPath: 'auto' },
   experiments: { ...webpackConfig.experiments, topLevelAwait: true },
   optimization: { runtimeChunk: false, splitChunks: false }
 }

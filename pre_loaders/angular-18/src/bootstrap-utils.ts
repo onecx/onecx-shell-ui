@@ -14,17 +14,17 @@ import { RouterModule } from '@angular/router'
 
 declare global {
   interface Window {
-    onecxDummy: Record<string, any>
+    onecxPreloaders: Record<string, any>
   }
 }
 
 @NgModule({
   imports: [BrowserModule, RouterModule.forRoot([])]
 })
-export class DummyModule implements DoBootstrap {
+export class PreloaderModule implements DoBootstrap {
   ngDoBootstrap(): void {
-    window['onecxDummy'] ??= {}
-    window['onecxDummy']['angular18'] = true
+    window['onecxPreloaders'] ??= {}
+    window['onecxPreloaders']['angular-18'] = true
   }
 }
 

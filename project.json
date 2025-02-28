@@ -81,6 +81,11 @@
             "glob": "**/*",
             "input": "./dist/pre_loaders/",
             "output": "./pre_loaders"
+          },
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/portal-layout-styles/src/styles/",
+            "output": "./portal-layout-styles/styles"
           }
         ],
         "styles": ["./src/styles.scss"],

@@ -16,7 +16,13 @@
     "@angular/forms": "^18.2.13",
     "@angular/platform-browser": "^18.2.13",
     "@angular/platform-browser-dynamic": "^18.2.13",
-    "@angular/router": "^18.2.13"
+    "@angular/router": "^18.2.13",
+    "@ngx-translate/core": "^15.0.0",
+    "@onecx/integration-interface": "^5.32.0",
+    "@onecx/accelerator": "^5.32.0",
+    "@onecx/angular-integration-interface": "^5.32.0",
+    "@onecx/angular-remote-components": "^5.32.0",
+    "@onecx/angular-utils": "^5.32.0"
   },
   "devDependencies": {}
 }

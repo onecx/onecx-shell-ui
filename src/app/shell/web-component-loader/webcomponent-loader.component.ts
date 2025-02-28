@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs'
 
 @Component({
   standalone: false,
-  template: '<div #wrapper [attr.data-style-id]="styleId"></div>'
+  template: '<div #wrapper [attr.data-style-id]="styleId" data-style-isolation></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })

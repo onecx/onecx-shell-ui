@@ -37,7 +37,15 @@ const webpackConfig = {
         '@angular/router': {
           requiredVersion: 'auto',
           includeSecondaries: true
-        }
+        },
+        '@ngx-translate/core': { requiredVersion: 'auto' },
+        '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
+        '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },
+        '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
+        '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
+        '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true }
+        // TODO: Enable when new version of webcomponents is merged
+        // '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true }
       },
       './package.json'
     )

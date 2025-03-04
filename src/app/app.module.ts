@@ -42,6 +42,15 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
+import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/legacy-style.utils'
+
+function portalLayoutStylesInitializer(http: HttpClient) {
+  return async () => {
+    const css = await fetchPortalLayoutStyles(http)
+    loadPortalLayoutStyles(css)
+
+  }
+}
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -276,6 +285,12 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       provide: APP_INITIALIZER,
       useFactory: configurationServiceInitializer,
       deps: [ConfigurationService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: portalLayoutStylesInitializer,
+      deps: [HttpClient],
       multi: true
     },
     { provide: SLOT_SERVICE, useExisting: SlotService },

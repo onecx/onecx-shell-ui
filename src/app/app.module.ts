@@ -43,12 +43,12 @@ import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/legacy-style.utils'
+import { bodyChildListenerInitializer } from './shell/utils/body-append-child.utils'
 
 function portalLayoutStylesInitializer(http: HttpClient) {
   return async () => {
     const css = await fetchPortalLayoutStyles(http)
     loadPortalLayoutStyles(css)
-
   }
 }
 
@@ -296,7 +296,13 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
     { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
+    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: bodyChildListenerInitializer,
+      deps: [],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

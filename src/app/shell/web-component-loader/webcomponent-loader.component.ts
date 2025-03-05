@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs'
 
 @Component({
   standalone: false,
-  template: '<div #wrapper data-style-isolation></div>'
+  template: '<div #wrapper></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })
@@ -21,6 +21,7 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
 
     const element = document.createElement(currentMfe.elementName)
     element.dataset['styleId'] = styleId
+    element.dataset['styleIsolation'] = ''
     this.wrapper?.nativeElement.appendChild(element)
   }
 }

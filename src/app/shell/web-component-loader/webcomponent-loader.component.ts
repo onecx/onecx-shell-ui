@@ -3,7 +3,7 @@ import { AppStateService } from '@onecx/angular-integration-interface'
 import { firstValueFrom } from 'rxjs'
 
 @Component({
-  template: '<div #wrapper [attr.data-style-id]="styleId" data-style-isolation></div>'
+  template: '<div #wrapper></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })
@@ -18,9 +18,11 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
 
     if (!currentMfe.elementName) throw new Error('elementName is missing in the configuration')
 
-    this.styleId = `${currentMfe.productName}|${currentMfe.appId}`
+    const styleId = `${currentMfe.productName}|${currentMfe.appId}`
 
     const element = document.createElement(currentMfe.elementName)
+    element.dataset['styleId'] = styleId
+    element.dataset['styleIsolation'] = ''
     this.wrapper?.nativeElement.appendChild(element)
   }
 }

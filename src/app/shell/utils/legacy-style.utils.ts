@@ -25,6 +25,14 @@ function loadPortalLayoutStylesStyles(css: string) {
   `,
     'portalLayoutStylesStyles'
   )
+  createStyleElement(
+    `
+  @scope(body > :not([data-no-portal-layout-styles])) to ([data-style-isolation]) {
+    ${extractStylesFromCss(css)}
+  }
+  `,
+    'dynamicContentPortalLayoutStyles'
+  )
 }
 
 function createStyleElement(content: string, dataAttribute?: string) {

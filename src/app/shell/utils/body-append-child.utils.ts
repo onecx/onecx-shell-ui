@@ -9,7 +9,8 @@ export function bodyChildListenerInitializer() {
     document.body.appendChild = function (newChild: any): any {
       let childToAppend = newChild
       if (newChild.nodeType === Node.ELEMENT_NODE) {
-        childToAppend = wrapWithStyleData(newChild, getParentStyleData(newChild))
+        childToAppend = wrapWithStyleData(newChild, getStyleData(newChild))
+        removeStyleDataRecursive(newChild)
       }
       return originalAppendChild.call(this, childToAppend)
     }
@@ -22,7 +23,30 @@ export function bodyChildListenerInitializer() {
       }
       return originalRemoveChild.call(this, childToRemove)
     }
+    ;(document as any).createElementFromPrimeNg = function (args: any): any {
+      console.log('ARGS', args)
+
+      const el = document.createElement(args['element'])
+      const parent = args['this']?.el?.nativeElement
+      parent && appendStyleData(el, getStyleData(parent))
+      return el
+    }
   }
+}
+
+function wrapWithStyleData(element: HTMLElement, styleData: StyleData) {
+  const dataStyleWrapper = createDataStyleWrapper(styleData)
+
+  dataStyleWrapper.appendChild(element)
+  observeWrapper(dataStyleWrapper)
+  return dataStyleWrapper
+}
+
+function createDataStyleWrapper(styleData: StyleData) {
+  const wrapper = document.createElement('div')
+  appendStyleData(wrapper, styleData)
+
+  return wrapper
 }
 
 function observeWrapper(wrapper: HTMLElement) {
@@ -46,38 +70,40 @@ function findWrapper(element: HTMLElement) {
   return currentNode
 }
 
-function wrapWithStyleData(element: HTMLElement, styleData: StyleData) {
-  const dataStyleWrapper = createDataStyleWrapper(styleData)
+function removeStyleDataRecursive(element: Element) {
+  if ((element as HTMLElement).dataset) {
+    delete (element as HTMLElement).dataset['styleIsolation']
+    delete (element as HTMLElement).dataset['styleId']
+    delete (element as HTMLElement).dataset['noPortalLayoutStyles']
+  }
 
-  dataStyleWrapper.appendChild(element)
-  observeWrapper(dataStyleWrapper)
-  return dataStyleWrapper
+  for (let i = 0; i < element.children.length; i++) {
+    const child = element.children[i]
+    removeStyleDataRecursive(child)
+  }
 }
 
-function createDataStyleWrapper(styleData: StyleData) {
-  const wrapper = document.createElement('div')
-  wrapper.dataset['styleIsolation'] = ''
+function appendStyleData(element: HTMLElement, styleData: StyleData) {
+  element.dataset['styleIsolation'] = ''
 
   if (styleData.styleId) {
-    wrapper.dataset['styleId'] = styleData.styleId
+    element.dataset['styleId'] = styleData.styleId
   }
   if (styleData.noPortalLayoutStyles || styleData.noPortalLayoutStyles === '') {
-    wrapper.dataset['noPortalLayoutStyles'] = styleData.noPortalLayoutStyles
+    element.dataset['noPortalLayoutStyles'] = styleData.noPortalLayoutStyles
   }
-
-  return wrapper
 }
 
-function getParentStyleData(child: HTMLElement): StyleData {
-  const parent = findParentStyleElement(child)
+function getStyleData(element: HTMLElement): StyleData {
+  const styleElement = findStyleElement(element)
 
   return {
-    styleId: parent.dataset['styleId'],
-    noPortalLayoutStyles: parent.dataset['noPortalLayoutStyles']
+    styleId: styleElement.dataset['styleId'],
+    noPortalLayoutStyles: styleElement.dataset['noPortalLayoutStyles']
   }
 }
 
-function findParentStyleElement(startNode: HTMLElement): HTMLElement {
+function findStyleElement(startNode: HTMLElement): HTMLElement {
   let currentNode = startNode
   while (!currentNode.dataset['styleId'] && currentNode.parentElement) {
     currentNode = currentNode.parentElement

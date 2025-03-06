@@ -1,5 +1,6 @@
 const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
+const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
 
 const webpackConfig = {
   ...withModuleFederationPlugin({
@@ -36,8 +37,24 @@ const webpackConfig = {
 }
 
 const plugins = webpackConfig.plugins.filter((plugin) => !(plugin instanceof ModifyEntryPlugin))
+const modifyPrimeNgPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return module.resource && module.resource.includes('primeng')
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(([^)]+)\\)',
+          'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments), element: $1})'
+        )
+      ]
+    }
+  ]
+})
 
 module.exports = {
   ...webpackConfig,
-  plugins
+  plugins: [...plugins, modifyPrimeNgPlugin]
 }

@@ -18,11 +18,21 @@
     "@angular/platform-browser-dynamic": "^18.2.13",
     "@angular/router": "^18.2.13",
     "@ngx-translate/core": "^15.0.0",
-    "@onecx/integration-interface": "^5.32.0",
-    "@onecx/accelerator": "^5.32.0",
-    "@onecx/angular-integration-interface": "^5.32.0",
-    "@onecx/angular-remote-components": "^5.32.0",
-    "@onecx/angular-utils": "^5.32.0"
+    "@onecx/accelerator": "^5.32.1",
+    "@onecx/angular-accelerator": "^5.32.1",
+    "@onecx/angular-auth": "^5.32.1",
+    "@onecx/angular-integration-interface": "^5.32.1",
+    "@onecx/angular-remote-components": "^5.32.1",
+    "@onecx/angular-webcomponents": "^5.32.1",
+    "@onecx/integration-interface": "^5.32.1",
+    "@onecx/keycloak-auth": "^5.32.1",
+    "@onecx/portal-integration-angular": "^5.32.1",
+    "@onecx/portal-layout-styles": "^5.32.1",
+    "@onecx/shell-core": "^5.32.1",
+    "@onecx/angular-utils": "^5.32.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^18.2.13",
+    "@angular/compiler-cli": "^18.2.13"
+  }
 }

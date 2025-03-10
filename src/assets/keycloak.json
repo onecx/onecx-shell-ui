@@ -1,5 +1,0 @@
-{
-  "url": "keycloak-server-url",
-  "realm": "realm-id",
-  "clientId": "client-id"
-}

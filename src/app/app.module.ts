@@ -20,7 +20,7 @@ import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLAT
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
-import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
+import { EventsPublisher, EventsTopic, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import { environment } from 'src/environments/environment'
@@ -105,7 +105,7 @@ export function workspaceConfigInitializer(
         routesService
           .init(loadWorkspaceConfigResponse.routes)
           .then(urlChangeListenerInitializer(router, appStateService)),
-        themeService.apply(themeWithParsedProperties),
+        apply(themeService, themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
           slots: loadWorkspaceConfigResponse.slots
@@ -207,6 +207,18 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
         } else {
           isFirstRoute = false
         }
+      }
+    })
+  }
+}
+
+async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
+  console.log(`🎨 Applying theme: ${theme.name}`)
+  await themeService.currentTheme$.publish(theme)
+  if (theme.properties) {
+    Object.values(theme.properties).forEach((group) => {
+      for (const [key, value] of Object.entries(group)) {
+        document.documentElement.style.setProperty(`--${key}`, value)
       }
     })
   }

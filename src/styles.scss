@@ -12,6 +12,13 @@ body {
   overflow: auto;
 }
 
+// disable default settings of dialogs created by portal dialog service
+.buttonDialogScrollableContent {
+  overflow: unset;
+  max-height: unset !important;
+  margin-bottom: 1rem !important;
+}
+
 .splash {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;

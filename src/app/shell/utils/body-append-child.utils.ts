@@ -62,7 +62,7 @@ function observeWrapper(wrapper: HTMLElement) {
 
 function findWrapper(element: HTMLElement) {
   let currentNode = element
-  while (!(currentNode.dataset['styleIsolation'] === '') && currentNode.parentElement) {
+  while (currentNode.dataset['styleIsolation'] !== '' && currentNode.parentElement) {
     currentNode = currentNode.parentElement
   }
   return currentNode
@@ -75,8 +75,7 @@ function removeStyleDataRecursive(element: Element) {
     delete (element as HTMLElement).dataset['noPortalLayoutStyles']
   }
 
-  for (let i = 0; i < element.children.length; i++) {
-    const child = element.children[i]
+  for (const child of Array.from(element.children)) {
     removeStyleDataRecursive(child)
   }
 }

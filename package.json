@@ -63,7 +63,6 @@
     "@onecx/angular-utils": "^5.32.0",
     "@onecx/angular-webcomponents": "^5.32.0",
     "@onecx/integration-interface": "^5.32.0",
-    "@onecx/keycloak-auth": "^5.32.0",
     "@onecx/portal-integration-angular": "^5.32.0",
     "@onecx/portal-layout-styles": "^5.32.0",
     "@onecx/shell-core": "^5.32.0",
@@ -124,5 +123,10 @@
     "ts-jest": "^29.2.5",
     "ts-node": "10.9.2",
     "typescript": "~5.7.3"
+  },
+  "overrides": {
+    "@openapitools/openapi-generator-cli": {
+      "axios": "^1.8.3"
+    }
   }
 }

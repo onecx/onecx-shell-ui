@@ -1,4 +1,5 @@
-import { PreloaderModule, cachePlatform, getNgZone } from './bootstrap-utils'
+import { PreloaderModule } from './bootstrap-utils'
+import { cachePlatform, getNgZone } from '@onecx/angular-webcomponents'
 
 cachePlatform(true)
   .bootstrapModule(PreloaderModule, {

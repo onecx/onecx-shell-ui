@@ -29,8 +29,9 @@ export function loadPreloaderModule(preloader: Preloader) {
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   return new Promise((resolve) => {
-    setTimeout(() => {
+    const ensureIntevalId = setInterval(() => {
       if (window['onecxPreloaders'][preloader.windowKey]) {
+        clearInterval(ensureIntevalId)
         resolve(true)
       }
     }, 50)

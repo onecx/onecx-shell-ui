@@ -5,9 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
-import {
-  AngularAcceleratorMissingTranslationHandler,
-} from '@onecx/angular-accelerator'
+import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
@@ -18,11 +16,11 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
-import { createTranslateLoader, TRANSLATION_PATH,  } from '@onecx/angular-utils'
+import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
-import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
+import { EventsPublisher, EventsTopic, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import { environment } from 'src/environments/environment'
@@ -44,6 +42,15 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
+import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/legacy-style.utils'
+import { bodyChildListenerInitializer } from './shell/utils/body-append-child.utils'
+
+function portalLayoutStylesInitializer(http: HttpClient) {
+  return async () => {
+    const css = await fetchPortalLayoutStyles(http)
+    loadPortalLayoutStyles(css)
+  }
+}
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -98,7 +105,7 @@ export function workspaceConfigInitializer(
         routesService
           .init(loadWorkspaceConfigResponse.routes)
           .then(urlChangeListenerInitializer(router, appStateService)),
-        themeService.apply(themeWithParsedProperties),
+        apply(themeService, themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
           slots: loadWorkspaceConfigResponse.slots
@@ -205,6 +212,18 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
+async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
+  console.log(`🎨 Applying theme: ${theme.name}`)
+  await themeService.currentTheme$.publish(theme)
+  if (theme.properties) {
+    Object.values(theme.properties).forEach((group) => {
+      for (const [key, value] of Object.entries(group)) {
+        document.documentElement.style.setProperty(`--${key}`, value)
+      }
+    })
+  }
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -236,13 +255,18 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     AngularRemoteComponentsModule
   ],
   providers: [
+    provideThemeConfig(),
     provideTokenInterceptor(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
     {
+      provide: SKIP_STYLE_SCOPING,
+      useValue: true
+    },
+    {
       provide: TRANSLATION_PATH,
       useValue: './assets/i18n/',
-      multi: true,
+      multi: true
     },
     { provide: APP_CONFIG, useValue: environment },
     {
@@ -275,10 +299,22 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       deps: [ConfigurationService],
       multi: true
     },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: portalLayoutStylesInitializer,
+      deps: [HttpClient],
+      multi: true
+    },
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
     { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
+    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: bodyChildListenerInitializer,
+      deps: [],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

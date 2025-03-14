@@ -64,7 +64,7 @@
     "@onecx/angular-webcomponents": "^6.0.0-rc.4",
     "@onecx/integration-interface": "^6.0.0-rc.4",
     "@onecx/portal-integration-angular": "^6.0.0-rc.4",
-    "@onecx/portal-layout-styles": "^6.0.0-rc.4",
+    "@onecx/portal-layout-styles": "^5.33.0",
     "@onecx/shell-core": "^6.0.0-rc.4",
     "@primeng/themes": "^19.0.6",
     "keycloak-js": "^25.0.6",

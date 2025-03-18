@@ -23,9 +23,9 @@ export function bodyChildListenerInitializer() {
       }
       return originalRemoveChild.call(this, childToRemove)
     }
-    ;(document as any).createElementFromPrimeNg = function (args: any): any {
-      const el = document.createElement(args['element'])
-      const parent = args['this']?.el?.nativeElement
+    ;(document as any).createElementFromPrimeNg = function (context: any, tagName: any, options?: any): any {
+      const el = document.createElement(tagName, options)
+      const parent = context['this']?.el?.nativeElement
       parent && appendStyleData(el, getStyleData(parent))
       return el
     }

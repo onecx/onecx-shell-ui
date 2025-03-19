@@ -5,6 +5,7 @@ import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import { createTranslateLoader } from '@onecx/angular-utils'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { HttpClient } from '@angular/common/http'
+import { PortalCoreModule } from '@onecx/portal-integration-angular'
 
 declare global {
   interface Window {
@@ -17,6 +18,7 @@ declare global {
     BrowserModule,
     RouterModule.forRoot([]),
     AngularRemoteComponentsModule,
+    PortalCoreModule.forMicroFrontend(),
     TranslateModule.forRoot({
       extend: true,
       isolate: false,

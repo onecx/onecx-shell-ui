@@ -5,9 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
-import {
-  AngularAcceleratorMissingTranslationHandler,
-} from '@onecx/angular-accelerator'
+import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
@@ -18,13 +16,20 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
-import { createTranslateLoader, TRANSLATION_PATH,  } from '@onecx/angular-utils'
+import { Capability, createTranslateLoader, ShellCapabilityService, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
-import { EventsPublisher, EventsTopic, NavigatedEventPayload } from '@onecx/integration-interface'
+import {
+  CurrentLocationPublisher,
+  EventsPublisher,
+  EventsTopic,
+  NavigatedEventPayload,
+  TopicEventType,
+  CurrentLocationTopicPayload
+} from '@onecx/integration-interface'
 
-import { catchError, filter, firstValueFrom, retry } from 'rxjs'
+import { catchError, filter, firstValueFrom, Observable, retry } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import {
   BASE_PATH,
@@ -149,7 +154,17 @@ let isFirst = true
 let isInitialPageLoad = true
 const pushState = window.history.pushState
 window.history.pushState = (data: any, unused: string, url?: string) => {
+  const isRouterSync = data?.isRouterSync
+  if ('isRouterSync' in data) {
+    delete data.isRouterSync
+  }
   pushState.bind(window.history)(data, unused, url)
+  if (!isRouterSync) {
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: false
+    })
+  }
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
@@ -166,7 +181,17 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
 
 const replaceState = window.history.replaceState
 window.history.replaceState = (data: any, unused: string, url?: string) => {
+  const isRouterSync = data?.isRouterSync
+  if ('isRouterSync' in data) {
+    delete data.isRouterSync
+  }
   replaceState.bind(window.history)(data, unused, url)
+  if (!isRouterSync) {
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: false
+    })
+  }
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
@@ -182,12 +207,21 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
 }
 
 export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
+  const capabilityService = new ShellCapabilityService()
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
     let isFirstRoute = true
-    const observer = new EventsTopic()
-    observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
+    const url = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: true
+    })
+    let observer: Observable<TopicEventType | CurrentLocationTopicPayload> = appStateService.currentLocation$.asObservable()
+    if (!capabilityService.hasCapability(Capability.CURRENT_LOCATION_TOPIC)) {
+      observer = new EventsTopic().pipe(filter((e) => e.type === 'navigated'))
+    }
+    observer.subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length
       )}${location.search}${location.hash}`
@@ -195,7 +229,8 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
         lastUrl = routerUrl
         if (!isFirstRoute) {
           router.navigateByUrl(routerUrl, {
-            replaceUrl: true
+            replaceUrl: true,
+            state: { isRouterSync: true }
           })
         } else {
           isFirstRoute = false

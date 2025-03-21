@@ -70,6 +70,7 @@ export function workspaceConfigInitializer(
   routesService: RoutesService,
   themeService: ThemeService,
   appStateService: AppStateService,
+  capabilityService: ShellCapabilityService,
   remoteComponentsService: RemoteComponentsService,
   router: Router
 ) {
@@ -102,7 +103,7 @@ export function workspaceConfigInitializer(
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
         routesService
           .init(loadWorkspaceConfigResponse.routes)
-          .then(urlChangeListenerInitializer(router, appStateService)),
+          .then(urlChangeListenerInitializer(router, appStateService, capabilityService)),
         themeService.apply(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
@@ -206,8 +207,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
-  const capabilityService = new ShellCapabilityService()
+export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService, capabilityService: ShellCapabilityService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
@@ -289,7 +289,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     {
       provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
-      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, RemoteComponentsService, Router],
+      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, ShellCapabilityService, RemoteComponentsService, Router],
       multi: true
     },
     {

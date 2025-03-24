@@ -39,6 +39,8 @@ const webpackConfig = {
           includeSecondaries: true
         },
         '@ngx-translate/core': { requiredVersion: 'auto' },
+        primeng: { requiredVersion: 'auto', includeSecondaries: true },
+        rxjs: { requiredVersion: 'auto', includeSecondaries: true },
         '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },
         '@onecx/angular-accelerator': { requiredVersion: 'auto', includeSecondaries: true },
         '@onecx/angular-auth': { requiredVersion: 'auto', includeSecondaries: true },

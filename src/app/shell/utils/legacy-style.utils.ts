@@ -1,11 +1,8 @@
 import { HttpClient } from '@angular/common/http'
-import { getLocation } from '@onecx/accelerator'
 import { firstValueFrom } from 'rxjs'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
-  return await firstValueFrom(
-    http.get(`${getLocation().deploymentPath}/assets/portal-layout-styles.css`, { responseType: 'text' })
-  )
+  return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))
 }
 
 export function loadPortalLayoutStyles(css: string) {

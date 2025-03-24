@@ -224,6 +224,20 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
+declare const __webpack_share_scopes__: { default: unknown }
+
+declare global {
+  interface Window {
+    onecxWebpackContainer: any
+  }
+}
+
+export function shareMfContainer() {
+  return async () => {
+    window.onecxWebpackContainer = __webpack_share_scopes__.default
+  }
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -302,7 +316,11 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
     {
       provide: APP_INITIALIZER,
       useFactory: portalLayoutStylesInitializer,
-      deps: [HttpClient],
+      deps: [HttpClient]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: shareMfContainer,
       multi: true
     },
     { provide: SLOT_SERVICE, useExisting: SlotService },

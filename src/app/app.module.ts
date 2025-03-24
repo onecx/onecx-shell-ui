@@ -317,7 +317,8 @@ export function shareMfContainer() {
     {
       provide: APP_INITIALIZER,
       useFactory: portalLayoutStylesInitializer,
-      deps: [AppStateService, HttpClient]
+      deps: [AppStateService, HttpClient],
+      multi: true
     },
     {
       provide: APP_INITIALIZER,

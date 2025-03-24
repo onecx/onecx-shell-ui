@@ -13,7 +13,6 @@
   "scripts": {
     "build": "nx build",
     "postinstall": "npm install --prefix pre_loaders/angular-18",
-    "postbuild": "cp dist/onecx-shell-ui/portal-layout-styles.css dist/onecx-shell-ui/assets/portal-layout-styles.css",
     "check": "nx lint --cache=true && npx prettier -c --cache .",
     "clean": "npm cache clean --force && rm -rf *.log dist reports .nx .angular .eslintcache ./node_modules/.cache/prettier/.prettier-cache",
     "lint": "nx lint --cache=true",

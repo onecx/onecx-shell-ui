@@ -45,8 +45,9 @@ import { ErrorPageComponent } from './shell/components/error-page.component'
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/legacy-style.utils'
 import { bodyChildListenerInitializer } from './shell/utils/body-append-child.utils'
 
-function portalLayoutStylesInitializer(http: HttpClient) {
+function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   return async () => {
+    await appStateService.isAuthenticated$.isInitialized
     const css = await fetchPortalLayoutStyles(http)
     loadPortalLayoutStyles(css)
   }
@@ -302,7 +303,7 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
     {
       provide: APP_INITIALIZER,
       useFactory: portalLayoutStylesInitializer,
-      deps: [HttpClient],
+      deps: [AppStateService, HttpClient],
       multi: true
     },
     { provide: SLOT_SERVICE, useExisting: SlotService },

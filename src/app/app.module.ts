@@ -205,6 +205,21 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
+declare const __webpack_share_scopes__: { default: unknown};
+
+declare global { 
+  interface Window {
+    onecxWebpackContainer: any;
+  }
+}
+
+export function shareMfContainer(){
+  return async ()=>{
+    window.onecxWebpackContainer = __webpack_share_scopes__.default
+  }
+}
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -273,6 +288,11 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       provide: APP_INITIALIZER,
       useFactory: configurationServiceInitializer,
       deps: [ConfigurationService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: shareMfContainer,
       multi: true
     },
     { provide: SLOT_SERVICE, useExisting: SlotService },

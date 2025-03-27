@@ -217,11 +217,11 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       url,
       isFirst: true
     })
-    let observer: Observable<TopicEventType | CurrentLocationTopicPayload> = appStateService.currentLocation$.asObservable()
+    let observable: Observable<TopicEventType | CurrentLocationTopicPayload> = appStateService.currentLocation$.asObservable()
     if (!capabilityService.hasCapability(Capability.CURRENT_LOCATION_TOPIC)) {
-      observer = new EventsTopic().pipe(filter((e) => e.type === 'navigated'))
+      observable = new EventsTopic().pipe(filter((e) => e.type === 'navigated'))
     }
-    observer.subscribe(() => {
+    observable.subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length
       )}${location.search}${location.hash}`

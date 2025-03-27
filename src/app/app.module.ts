@@ -10,13 +10,15 @@ import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth
 import {
   APP_CONFIG,
   AppStateService,
+  Capability,
   ConfigurationService,
   RemoteComponentsService,
+  ShellCapabilityService,
   ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
-import { Capability, createTranslateLoader, ShellCapabilityService, TRANSLATION_PATH } from '@onecx/angular-utils'
+import { createTranslateLoader, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
 
@@ -156,7 +158,7 @@ let isInitialPageLoad = true
 const pushState = window.history.pushState
 window.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
-  if ('isRouterSync' in data) {
+  if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
   pushState.bind(window.history)(data, unused, url)
@@ -183,7 +185,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
 const replaceState = window.history.replaceState
 window.history.replaceState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
-  if ('isRouterSync' in data) {
+  if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
   replaceState.bind(window.history)(data, unused, url)

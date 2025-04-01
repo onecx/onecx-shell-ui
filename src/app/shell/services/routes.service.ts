@@ -150,6 +150,7 @@ export class RoutesService implements ShowContentProvider {
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
     const mfeInfo = {
       baseHref: joinedBaseUrl,
+      version: r.productVersion,
       mountPath: joinedBaseUrl,
       shellName: 'portal',
       remoteBaseUrl: r.url,

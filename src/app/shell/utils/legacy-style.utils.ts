@@ -14,17 +14,30 @@ function loadPortalLayoutStylesVariables(css: string) {
   createStyleElement(extractVariablesFromCss(css), 'portalLayoutStylesVariables')
 }
 function loadPortalLayoutStylesStyles(css: string) {
+  const isScopeSupported = typeof CSSScopeRule !== 'undefined'
   createStyleElement(
-    `
+    isScopeSupported
+      ? `
   @scope([data-style-id]:not([data-no-portal-layout-styles])) to ([data-style-isolation]) {
+    ${extractStylesFromCss(css)}
+  }
+  `
+      : `
+  @supports(@scope([data-style-id]:not([data-no-portal-layout-styles])) to ([data-style-isolation])) {
     ${extractStylesFromCss(css)}
   }
   `,
     'portalLayoutStylesStyles'
   )
   createStyleElement(
-    `
+    isScopeSupported
+      ? `
   @scope(body > :not([data-no-portal-layout-styles])) to ([data-style-isolation]) {
+    ${extractStylesFromCss(css)}
+  }
+  `
+      : `
+  @supports(@scope(body > :not([data-no-portal-layout-styles])) to ([data-style-isolation])) {
     ${extractStylesFromCss(css)}
   }
   `,

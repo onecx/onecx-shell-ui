@@ -264,6 +264,7 @@ components:
         - 'exposedModule'
         - 'appId'
         - 'productName'
+        - 'productVersion'
         - 'pathMatch'
         - 'displayName'
       properties:
@@ -276,6 +277,8 @@ components:
         appId:
           type: string
         productName:
+          type: string
+        productVersion:
           type: string
         technology:
           $ref: '#/components/schemas/Technologies'

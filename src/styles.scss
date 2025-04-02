@@ -104,3 +104,16 @@ ocx-shell-root:empty + .splash {
     transform: rotate(450deg);
   }
 }
+
+.layout-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-content>ng-component {
+  flex-grow: 1;
+}
+
+.webcomponentwrapper {
+  height:100%
+}

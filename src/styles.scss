@@ -14,6 +14,8 @@ body {
 
 .layout-content {
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 // disable default settings of dialogs created by portal dialog service
@@ -103,11 +105,6 @@ ocx-shell-root:empty + .splash {
     stroke-dashoffset: 187;
     transform: rotate(450deg);
   }
-}
-
-.layout-content {
-  display: flex;
-  flex-direction: column;
 }
 
 .layout-content>ng-component {

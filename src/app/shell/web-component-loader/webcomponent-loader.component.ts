@@ -3,7 +3,7 @@ import { AppStateService } from '@onecx/angular-integration-interface'
 import { firstValueFrom } from 'rxjs'
 
 @Component({
-  template: '<div #wrapper></div>'
+  template: '<div class="webcomponentwrapper" #wrapper></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })

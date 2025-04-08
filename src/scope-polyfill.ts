@@ -7,12 +7,12 @@
 import { CssStyleSheetHandler } from './css-style-sheet-updater'
 import { OcxCSSStyleSheet, OcxOwnerNode, ScopeSelectorPresenceMap, SelectorPresenceMap } from './scope-data'
 import {
+  dataStyleIdKey,
   doesContainOnlySupportsRule,
   isScopedStyleSheet,
   mutationListToUniqueNodes,
   nodeToStyleIdSelector,
-  normalize,
-  removeDuplicates
+  normalize
 } from './scope-utils'
 
 // Pop ups are nowhere to be found in legacy apps -> resolved
@@ -67,7 +67,145 @@ export function applyScopePolyfill() {
   }
 }
 
-function updateStyleSheets(mutationList: MutationRecord[]) {
+export function overrideHtmlElementAppendAndClassChanges() {
+  if (typeof CSSScopeRule === 'undefined') {
+    overrideHtmlElementAppend()
+    overrideHtmlElementClassChanges()
+  }
+}
+
+function overrideHtmlElementAppend() {
+  const originalAppend = HTMLElement.prototype.appendChild
+  HTMLElement.prototype.appendChild = function (newChild: any): any {
+    const result = originalAppend.call(this, newChild)
+    console.log('APPEND SHEET ACTION OVERRIDE')
+    updateStyleSheets([
+      {
+        type: 'childList',
+        target: this,
+        addedNodes: createNodeList([newChild]) as NodeList,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: createNodeList([]) as NodeList
+      } as MutationRecord
+    ])
+    return result
+  }
+}
+
+function overrideHtmlElementClassChanges() {
+  const originalClassNameSetter = (HTMLElement.prototype as any).__lookupSetter__('className')
+
+  Object.defineProperty(HTMLElement.prototype, 'className', {
+    set: function (val) {
+      let result
+      if (originalClassNameSetter) {
+        result = originalClassNameSetter.call(this, val)
+      }
+      console.log('CLASS NAME')
+      updateStyleSheetsForClassChange(this)
+      return result
+    }
+  })
+
+  const originalClassListGetter = (HTMLElement.prototype as any).__lookupGetter__('classList')
+
+  Object.defineProperty(HTMLElement.prototype, 'classList', {
+    get: function () {
+      const classList = originalClassListGetter.call(this)
+      ;(classList as any).ocxHtmlElement = this
+      return classList
+    },
+    configurable: true
+  })
+
+  const domTokenListOriginalAdd = DOMTokenList.prototype.add
+
+  DOMTokenList.prototype.add = function (...tokens: string[]) {
+    const result = domTokenListOriginalAdd.call(this, ...tokens)
+    const element = (this as any).ocxHtmlElement
+    console.log('CLASSLIST ADD')
+    if (element) updateStyleSheetsForClassChange(element)
+    return result
+  }
+
+  const domTokenListOriginalRemove = DOMTokenList.prototype.remove
+
+  DOMTokenList.prototype.remove = function (...tokens: string[]) {
+    const result = domTokenListOriginalRemove.call(this, ...tokens)
+    const element = (this as any).ocxHtmlElement
+    console.log('CLASSLIST REMOVE')
+    if (element) updateStyleSheetsForClassChange(element)
+    return result
+  }
+
+  const domTokenListOriginalReplace = DOMTokenList.prototype.replace
+
+  DOMTokenList.prototype.replace = function (token: string, newToken: string) {
+    const result = domTokenListOriginalReplace.call(this, token, newToken)
+    const element = (this as any).ocxHtmlElement
+    console.log('CLASSLIST REPLACE')
+    if (element) updateStyleSheetsForClassChange(element)
+    return result
+  }
+
+  const domTokenListOriginalToggle = DOMTokenList.prototype.toggle
+
+  DOMTokenList.prototype.toggle = function (token: string, force: boolean | undefined) {
+    const result = domTokenListOriginalToggle.call(this, token, force)
+    const element = (this as any).ocxHtmlElement
+    console.log('CLASSLIST TOGGLE')
+    if (element) updateStyleSheetsForClassChange(element)
+    return result
+  }
+}
+
+function updateStyleSheetsForClassChange(element: Node) {
+  updateStyleSheets([
+    {
+      type: 'attributes',
+      target: element,
+      addedNodes: createNodeList([]) as NodeList,
+      attributeName: 'class',
+      attributeNamespace: null,
+      nextSibling: null,
+      oldValue: null,
+      previousSibling: null,
+      removedNodes: createNodeList([]) as NodeList
+    } as MutationRecord
+  ])
+}
+
+export function createNodeList(nodes: Element[]) {
+  return {
+    nodes: nodes,
+    length: nodes.length,
+    item: function (index: number) {
+      return this.nodes[index]
+    },
+    forEach: function (callback: any) {
+      this.nodes.forEach(callback)
+    },
+    [Symbol.iterator]: function () {
+      let index = 0
+      const nodes = this.nodes
+      return {
+        next: function () {
+          if (index < nodes.length) {
+            return { value: nodes[index++], done: false }
+          } else {
+            return { done: true }
+          }
+        }
+      }
+    }
+  }
+}
+
+export function updateStyleSheets(mutationList: MutationRecord[]) {
   const nodesFromMutationList = mutationListToUniqueNodes(mutationList)
   if (nodesFromMutationList.length === 0) return
 
@@ -102,32 +240,37 @@ function isSelectorInChangedList(selector: string, changedStyleIdSelectorList: A
 
 // Find all style id
 function getChangedStyleIdSelectors(mutationList: MutationRecord[]) {
-  const styleIdSelectorsToUpdate = mutationList
-    .map((record) => {
-      if (record.target === document.body) return getChangedStyleIdSelectorForBodyChange(record)
-      let currentNode: HTMLElement | null = record.target as HTMLElement
-      while (currentNode && isChildOfBodyAndHasNoStyleId(currentNode)) {
-        currentNode = currentNode.parentNode as HTMLElement
-      }
-      if (!currentNode || currentNode === document.body.parentNode) return null
+  const set = new Set<string>()
+  for (const mutation of mutationList) {
+    // If mutation was made to the body, we assume that its addition or removal of the wrapper
+    if (mutation.target === document.body) {
+      const styleIdSelector = getChangedStyleIdSelectorForWrapper(mutation)
+      styleIdSelector && set.add(styleIdSelector)
+      continue
+    }
 
-      return nodeToStyleIdSelector(currentNode)
-    })
-    .filter((selector): selector is string => !!selector)
+    let currentNode: HTMLElement | null = mutation.target as HTMLElement
+    while (currentNode && isNotChildOfBodyAndHasNoStyleId(currentNode)) {
+      currentNode = currentNode.parentElement
+    }
+    if (!currentNode) continue
+    const styleIdSelector = nodeToStyleIdSelector(currentNode)
+    styleIdSelector && set.add(styleIdSelector)
+  }
 
-  return removeDuplicates(styleIdSelectorsToUpdate)
+  return Array.from(set)
 }
 
 // Find style id for body change based on added and removed nodes
-function getChangedStyleIdSelectorForBodyChange(record: MutationRecord) {
+function getChangedStyleIdSelectorForWrapper(record: MutationRecord) {
   const node = (record.addedNodes.item(0) ?? record.removedNodes.item(0)) as HTMLElement
   if (!node) return null
 
-  return nodeToStyleIdSelector(node, true)
+  return nodeToStyleIdSelector(node)
 }
 
-function isChildOfBodyAndHasNoStyleId(node: Node) {
-  return node !== document.body.parentNode && !(node as any)?.dataset['styleId']
+function isNotChildOfBodyAndHasNoStyleId(node: Node) {
+  return node.parentElement !== document.body && !(node as any)?.dataset[dataStyleIdKey]
 }
 
 // Create observer for style sheet node updates

@@ -52,8 +52,8 @@ export function isScopedStyleSheet(sheet: CSSStyleSheet): sheet is OcxCSSStyleSh
 export function matchScope(content: string): RegExpMatchArray | null {
   const scopeRegex =
     // eslint-disable-next-line no-useless-escape
-    /@scope\s*\(\s*([^\(\)]+(?:\([^\(\)]+\))*(?::[^\(\)]+(?:\([^\(\)]+\))*)*)\s*\)\s*to\s*\(\s*([^\(\)]+(?:\([^\(\)]+\))*(?::[^\(\)]+(?:\([^\(\)]+\))*)*)\s*\)/
-  return content.match(scopeRegex)
+    /@scope\s*\((.*)(?=\)\s*)\)\s*to\s*\((.*)(?=\)\s*)\)/
+  return scopeRegex.exec(content)
 }
 
 // Split selector into list of subselectors
@@ -111,7 +111,7 @@ export function scopeFromToUniqueId(from: string) {
     return 'dynamic-portal-layout-styles'
   }
 
-  const styleIdMatch = from.match(/\[data-style-id="([^"]+)"/)
+  const styleIdMatch = /\[data-style-id="([^"]+)"/.exec(from)
   return styleIdMatch ? styleIdMatch[1].replace(everythingNotACharacterOrNumberRegex, '-') : ''
 }
 

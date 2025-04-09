@@ -15,7 +15,7 @@ export class CssStyleSheetHandler {
   static changeToScopedSheet(sheetWithSupportsRule: CSSStyleSheet) {
     // Leave information about this being a scoped sheet
     const supportsRule = sheetWithSupportsRule.cssRules[0] as CSSSupportsRule
-    const [match, from, to] = matchScope(supportsRule.conditionText) ?? []
+    const [match, from, to] = matchScope(this.supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
     if (!match) {
       console.warn('Expected to have a scoped sheet for:', sheetWithSupportsRule)
       return
@@ -28,6 +28,10 @@ export class CssStyleSheetHandler {
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxKeyFrames = []
 
     this.moveSupportsRulesToTopLevelAndApplyInitialScope(sheetWithSupportsRule as OcxCSSStyleSheet)
+  }
+
+  private static supportsConditionTextToScopeRuleText(conditionText: string) {
+    return conditionText.slice(1, -1)
   }
 
   private static moveSupportsRulesToTopLevelAndApplyInitialScope(sheet: OcxCSSStyleSheet) {
@@ -136,7 +140,8 @@ export class CssStyleSheetHandler {
 
     let result = ''
     let depth = 0
-    for (let i = 0; i < selectorText.length; i++) {
+    let i = 0
+    while (i < selectorText.length) {
       if (selectorText.slice(i, i + 7) === ':where(') {
         if (i == 0 || [' ', '+', '>', '~'].includes(selectorText[i - 1])) {
           result += '*'
@@ -150,6 +155,7 @@ export class CssStyleSheetHandler {
       } else if (depth === 0) {
         result += selectorText[i]
       }
+      i++
     }
     return result === '' ? '*' : result
   }

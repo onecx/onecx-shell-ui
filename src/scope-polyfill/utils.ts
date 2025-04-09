@@ -16,8 +16,6 @@ export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-
 export const portalLayoutStylesSheetId = `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`
 export const dynamicPortalLayoutStylesSheetId = `body>:not([${dataNoPortalLayoutStylesAttribute}])`
 
-// export const fontFamilyValueRegex = /font-family:\s*([^\;]*)/;
-
 // eslint-disable-next-line no-useless-escape
 export const animationNameValueRegex = /animation-name:\s*([^\;]*)/
 const everythingNotACharacterOrNumberRegex = /[^a-zA-Z0-9-]/g

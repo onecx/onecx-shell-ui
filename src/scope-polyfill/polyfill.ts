@@ -71,7 +71,7 @@ function overrideHtmlElementClassChanges() {
   Object.defineProperty(HTMLElement.prototype, 'classList', {
     get: function () {
       const classList = originalClassListGetter.call(this)
-      ;(classList as any).ocxHtmlElement = this
+      classList.ocxHtmlElement = this
       return classList
     },
     configurable: true

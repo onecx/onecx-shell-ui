@@ -26,8 +26,6 @@ export class CssStyleSheetHandler {
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxTo = normalize(to)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxScopeUniqueId = scopeFromToUniqueId(normalize(from))
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxKeyFrames = []
-    // (sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFontFamilies =
-    //   new Set();
 
     this.moveSupportsRulesToTopLevelAndApplyInitialScope(sheetWithSupportsRule as OcxCSSStyleSheet)
   }
@@ -51,16 +49,11 @@ export class CssStyleSheetHandler {
 
   private static createSheetDefaultRuleText(rule: CSSRule, sheet: OcxCSSStyleSheet) {
     if (rule instanceof CSSLayerBlockRule) {
-      return this.createSheetDefaultLayerRuleText(rule as CSSLayerBlockRule, sheet)
+      return this.createSheetDefaultLayerRuleText(rule, sheet)
     } else if (rule instanceof CSSMediaRule) {
-      return this.createSheetDefaultMediaRuleText(rule as CSSMediaRule, sheet)
+      return this.createSheetDefaultMediaRuleText(rule, sheet)
     } else if (rule instanceof CSSKeyframesRule) {
-      return this.createSheetDefaultKeyframesRuleText(rule as CSSKeyframesRule, sheet)
-      // } else if (rule instanceof CSSFontFaceRule) {
-      //   return this.createSheetDefaultFontFaceRuleText(
-      //     rule as CSSFontFaceRule,
-      //     sheet
-      //   );
+      return this.createSheetDefaultKeyframesRuleText(rule, sheet)
     } else if ((rule as any).selectorText === undefined) {
       // Fallback to all Rules that are not covered
       return rule.cssText
@@ -92,23 +85,6 @@ export class CssStyleSheetHandler {
     return rule.cssText.replace(rule.name, this.applyScopeUniqueId(rule.name, sheet))
   }
 
-  // private static createSheetDefaultFontFaceRuleText(
-  //   rule: CSSFontFaceRule,
-  //   sheet: OcxCSSStyleSheet
-  // ) {
-  //   let fontFamilyValue;
-  //   const fontFaceRuleText = rule.cssText.replace(
-  //     fontFamilyValueRegex,
-  //     (match, p1) => {
-  //       fontFamilyValue = p1;
-  //       return `font-family: ${this.applyScopeUniqueId(p1, sheet)}`;
-  //     }
-  //   );
-
-  //   fontFamilyValue && sheet.ownerNode.ocxFontFamilies.add(fontFamilyValue);
-  //   return fontFaceRuleText;
-  // }
-
   private static createSheetDefaultStyleRuleText(rule: CSSStyleRule & CSSGroupingRule, sheet: OcxCSSStyleSheet) {
     let childrenCss = ''
     for (const styleChildRule of Array.from(rule.cssRules).filter((rule) => rule.cssText)) {
@@ -121,9 +97,7 @@ export class CssStyleSheetHandler {
   private static constructStyleRuleText(rule: CSSStyleRule, childrenCss: string, sheet: OcxCSSStyleSheet) {
     if (childrenCss) {
       let ruleStyleText = rule.style.cssText
-      if (ruleStyleText)
-        // ruleStyleText = this.applyAnimationAndFontChangesToCssText(
-        ruleStyleText = this.applyAnimationChangesToCssText(ruleStyleText, sheet)
+      if (ruleStyleText) ruleStyleText = this.applyAnimationChangesToCssText(ruleStyleText, sheet)
       return `${appendToUniqueSelectors(rule.selectorText, ':where(0)')} {${ruleStyleText}${childrenCss}}`
     }
 
@@ -131,19 +105,8 @@ export class CssStyleSheetHandler {
       rule.selectorText,
       appendToUniqueSelectors(rule.selectorText, ':where(0)')
     )
-    // return this.applyAnimationAndFontChangesToCssText(updatedRuleText, sheet);
     return this.applyAnimationChangesToCssText(updatedRuleText, sheet)
   }
-
-  // private static applyAnimationAndFontChangesToCssText(
-  //   cssText: string,
-  //   sheet: OcxCSSStyleSheet
-  // ) {
-  //   return this.applyAnimationChangesToCssText(
-  //     this.applyFontChangesToCssText(cssText, sheet),
-  //     sheet
-  //   );
-  // }
 
   private static applyAnimationChangesToCssText(cssText: string, sheet: OcxCSSStyleSheet) {
     return cssText.replace(animationNameValueRegex, (match, p1) => {
@@ -155,21 +118,8 @@ export class CssStyleSheetHandler {
     })
   }
 
-  // private static applyFontChangesToCssText(
-  //   cssText: string,
-  //   sheet: OcxCSSStyleSheet
-  // ) {
-  //   return cssText.replace(fontFamilyValueRegex, (match, p1) => {
-  //     let fontFamily = p1;
-  //     if (sheet.ownerNode.ocxFontFamilies.has(p1)) {
-  //       fontFamily = this.applyScopeUniqueId(fontFamily, sheet);
-  //     }
-  //     return `font-family: ${fontFamily}`;
-  //   });
-  // }
-
   private static applyScopeUniqueId(text: string, sheet: OcxCSSStyleSheet) {
-    return `${text}-${(sheet as OcxCSSStyleSheet).ownerNode.ocxScopeUniqueId}`
+    return `${text}-${sheet.ownerNode.ocxScopeUniqueId}`
   }
 
   private static setOcxSelectorText(rule: CSSRule) {
@@ -210,7 +160,7 @@ export class CssStyleSheetHandler {
     const nodesMatchingFromSelector = Array.from(document.querySelectorAll(normalize(sheet.ownerNode.ocxFrom)))
 
     for (const cssRule of Array.from(sheet.cssRules)) {
-      this.updateRule(cssRule as CSSRule, nodesMatchingFromSelector, sheet, mutationData, cachedSelectors)
+      this.updateRule(cssRule, nodesMatchingFromSelector, sheet, mutationData, cachedSelectors)
     }
 
     // Mark sheet as updated by polyfill
@@ -225,9 +175,9 @@ export class CssStyleSheetHandler {
     cachedSelectors: SelectorPresenceMap
   ) {
     if (cssRule instanceof CSSLayerBlockRule) {
-      this.updateLayerRule(cssRule as CSSLayerBlockRule, fromNodes, sheet, mutationData, cachedSelectors)
+      this.updateLayerRule(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
     } else if (cssRule instanceof CSSMediaRule) {
-      this.updateMediaRule(cssRule as CSSMediaRule, fromNodes, sheet, mutationData, cachedSelectors)
+      this.updateMediaRule(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
     } else if (cssRule instanceof CSSStyleRule) {
       this.updateStyleRule(cssRule as CSSStyleRule & CSSGroupingRule, fromNodes, sheet, mutationData, cachedSelectors)
     }
@@ -241,7 +191,7 @@ export class CssStyleSheetHandler {
     cachedSelectors: SelectorPresenceMap
   ) {
     for (const layerChildRule of Array.from(cssRule.cssRules)) {
-      this.updateRule(layerChildRule as CSSRule, fromNodes, sheet, mutationData, cachedSelectors)
+      this.updateRule(layerChildRule, fromNodes, sheet, mutationData, cachedSelectors)
     }
   }
 
@@ -253,7 +203,7 @@ export class CssStyleSheetHandler {
     cachedSelectors: SelectorPresenceMap
   ) {
     for (const mediaChildRule of Array.from(cssRule.cssRules)) {
-      this.updateRule(mediaChildRule as CSSRule, fromNodes, sheet, mutationData, cachedSelectors)
+      this.updateRule(mediaChildRule, fromNodes, sheet, mutationData, cachedSelectors)
     }
   }
 
@@ -274,7 +224,7 @@ export class CssStyleSheetHandler {
     ) {
       this.updateElementsMatchingSelectorsInScope(cssRule, originalSelectorText, fromNodes, sheet)
       for (const child of Array.from(cssRule?.cssRules) ?? []) {
-        this.updateRule(child as CSSRule, fromNodes, sheet, mutationData, cachedSelectors)
+        this.updateRule(child, fromNodes, sheet, mutationData, cachedSelectors)
       }
     }
   }

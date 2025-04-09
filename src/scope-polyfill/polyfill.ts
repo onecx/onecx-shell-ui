@@ -33,7 +33,6 @@ function overrideHtmlElementAppend() {
   const originalAppend = HTMLElement.prototype.appendChild
   HTMLElement.prototype.appendChild = function (newChild: any): any {
     const result = originalAppend.call(this, newChild)
-    console.log('APPEND SHEET ACTION OVERRIDE')
     updateStyleSheets([
       {
         type: 'childList',
@@ -60,7 +59,6 @@ function overrideHtmlElementClassChanges() {
       if (originalClassNameSetter) {
         result = originalClassNameSetter.call(this, val)
       }
-      console.log('CLASS NAME')
       updateStyleSheetsForClassChange(this)
       return result
     }
@@ -82,7 +80,6 @@ function overrideHtmlElementClassChanges() {
   DOMTokenList.prototype.add = function (...tokens: string[]) {
     const result = domTokenListOriginalAdd.call(this, ...tokens)
     const element = (this as any).ocxHtmlElement
-    console.log('CLASSLIST ADD')
     if (element) updateStyleSheetsForClassChange(element)
     return result
   }
@@ -92,7 +89,6 @@ function overrideHtmlElementClassChanges() {
   DOMTokenList.prototype.remove = function (...tokens: string[]) {
     const result = domTokenListOriginalRemove.call(this, ...tokens)
     const element = (this as any).ocxHtmlElement
-    console.log('CLASSLIST REMOVE')
     if (element) updateStyleSheetsForClassChange(element)
     return result
   }
@@ -102,7 +98,6 @@ function overrideHtmlElementClassChanges() {
   DOMTokenList.prototype.replace = function (token: string, newToken: string) {
     const result = domTokenListOriginalReplace.call(this, token, newToken)
     const element = (this as any).ocxHtmlElement
-    console.log('CLASSLIST REPLACE')
     if (element) updateStyleSheetsForClassChange(element)
     return result
   }
@@ -112,7 +107,6 @@ function overrideHtmlElementClassChanges() {
   DOMTokenList.prototype.toggle = function (token: string, force: boolean | undefined) {
     const result = domTokenListOriginalToggle.call(this, token, force)
     const element = (this as any).ocxHtmlElement
-    console.log('CLASSLIST TOGGLE')
     if (element) updateStyleSheetsForClassChange(element)
     return result
   }

@@ -61,7 +61,7 @@ export function splitSelectorToSubSelectors(selectorText: string) {
   const uniqueSelectors = splitSelectorToUniqueSelectors(selectorText)
   const subSelectors: Array<Array<string>> = []
   for (const selector of uniqueSelectors) {
-    const chunks = constructSelectorChunks(selector)
+    const chunks = new SelectorToChunksMapper().map(selector)
     subSelectors.push(chunks)
   }
   return subSelectors
@@ -167,51 +167,118 @@ function splitSelectorToUniqueSelectors(selectorText: string) {
   return selectorText.split(',').map((s) => s.trim())
 }
 
-function constructSelectorChunks(selectorText: string) {
-  let currentSelector = ''
-  const chunks = []
-  let inPseudo = false
-  for (let i = 0; i < selectorText.length; i++) {
-    const letter = selectorText[i]
-    switch (letter) {
-      case '(':
-      case ')':
-        inPseudo = letter === '('
-        currentSelector += letter
-        break
+class SelectorToChunksMapper {
+  currentSelector = ''
+  chunks: string[] = []
+  inPseudo = false
 
-      case '#':
-      case '.':
-        if (!inPseudo && selectorText[i - 1] !== ' ') {
-          currentSelector && chunks.push(currentSelector)
-        }
-        currentSelector += letter
-        break
-      case ' ':
-        if (!inPseudo) {
-          chunks.push(currentSelector)
-        }
-        currentSelector += letter
-        break
+  private reset() {
+    this.currentSelector = ''
+    this.chunks = []
+    this.inPseudo = false
+  }
 
-      case '+':
-      case '>':
-      case '~':
-        currentSelector = selectorText[i - 1] === ' ' ? chunks[chunks.length - 1] + ' ' : currentSelector
-        currentSelector += letter + ' '
-        while (selectorText[++i] == ' ' && i < selectorText.length);
-        i--
-        break
+  private mapOpeningBrace() {
+    this.inPseudo = true
+    this.currentSelector += '('
+  }
 
-      default:
-        currentSelector += letter
+  private mapClosingBrace() {
+    this.currentSelector += ')'
+  }
+
+  private mapHash(previousCharacter: string) {
+    this.mapDotOrHash(previousCharacter, '#')
+  }
+
+  private mapDot(previousCharacter: string) {
+    this.mapDotOrHash(previousCharacter, '.')
+  }
+
+  private mapDotOrHash(previousCharacter: string, character: string) {
+    if (!this.inPseudo && previousCharacter !== ' ') {
+      this.currentSelector && this.chunks.push(this.currentSelector)
     }
+    this.currentSelector += character
   }
-  if (chunks.length === 0 || (chunks.length > 0 && chunks[chunks.length - 1] !== currentSelector)) {
-    chunks.push(currentSelector)
+
+  private mapSpace() {
+    if (!this.inPseudo) {
+      this.chunks.push(this.currentSelector)
+    }
+    this.currentSelector += ' '
   }
-  if (chunks.length > 0 && chunks[0] === '&') chunks.shift()
-  return chunks
+
+  private mapPlus(selectorText: string, iterator: number) {
+    return this.mapPlusArrowRightOrTilde(selectorText, '+', iterator)
+  }
+
+  private mapArrowRight(selectorText: string, iterator: number) {
+    return this.mapPlusArrowRightOrTilde(selectorText, '>', iterator)
+  }
+
+  private mapTilde(selectorText: string, iterator: number) {
+    return this.mapPlusArrowRightOrTilde(selectorText, '~', iterator)
+  }
+
+  private mapPlusArrowRightOrTilde(selectorText: string, character: string, iterator: number) {
+    this.currentSelector =
+      selectorText[iterator - 1] === ' ' ? this.chunks[this.chunks.length - 1] + ' ' : this.currentSelector
+    this.currentSelector += character + ' '
+    while (selectorText[++iterator] == ' ' && iterator < selectorText.length);
+    iterator--
+    return iterator
+  }
+
+  map(selectorText: string) {
+    this.reset()
+
+    let i = 0
+    while (i < selectorText.length) {
+      const letter = selectorText[i]
+      switch (letter) {
+        case '(':
+          this.mapOpeningBrace()
+          break
+        case ')':
+          this.mapClosingBrace()
+          break
+
+        case '#':
+          this.mapHash(selectorText[i - 1])
+          break
+        case '.':
+          this.mapDot(selectorText[i - 1])
+          break
+        case ' ':
+          this.mapSpace()
+          break
+
+        case '+':
+          i = this.mapPlus(selectorText, i)
+          break
+        case '>':
+          i = this.mapArrowRight(selectorText, i)
+          break
+        case '~':
+          i = this.mapTilde(selectorText, i)
+          break
+
+        default:
+          this.currentSelector += letter
+      }
+      i++
+    }
+
+    if (
+      this.chunks.length === 0 ||
+      (this.chunks.length > 0 && this.chunks[this.chunks.length - 1] !== this.currentSelector)
+    ) {
+      this.chunks.push(this.currentSelector)
+    }
+    if (this.chunks.length > 0 && this.chunks[0] === '&') this.chunks.shift()
+    return this.chunks
+  }
 }
 
 function computeRootSelectorForElement(element: Element) {

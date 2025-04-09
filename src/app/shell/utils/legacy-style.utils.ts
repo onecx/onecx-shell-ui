@@ -1,6 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { firstValueFrom } from 'rxjs'
-import { dataNoPortalLayoutStylesAttribute, dataStyleIdAttribute, dataStyleIsolationAttribute } from 'src/scope-utils'
+import {
+  dataNoPortalLayoutStylesAttribute,
+  dataStyleIdAttribute,
+  dataStyleIsolationAttribute
+} from 'src/scope-polyfill/utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
   return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))

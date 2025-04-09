@@ -1,4 +1,4 @@
-import { MutationData, OcxCSSStyleSheet, SelectorPresenceMap } from './scope-data'
+import { MutationData, OcxCSSStyleSheet, SelectorPresenceMap } from './data'
 import {
   animationNameValueRegex,
   appendToUniqueSelectors,
@@ -8,7 +8,7 @@ import {
   normalize,
   scopeFromToUniqueId,
   splitSelectorToSubSelectors
-} from './scope-utils'
+} from './utils'
 
 export class CssStyleSheetHandler {
   //-------------------------Scope sheet creation-------------------------
@@ -20,6 +20,7 @@ export class CssStyleSheetHandler {
       console.warn('Expected to have a scoped sheet for:', sheetWithSupportsRule)
       return
     }
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFrom = normalize(from)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxTo = normalize(to)
@@ -126,7 +127,7 @@ export class CssStyleSheetHandler {
       return `${appendToUniqueSelectors(rule.selectorText, ':where(0)')} {${ruleStyleText}${childrenCss}}`
     }
 
-    let updatedRuleText = rule.cssText.replace(
+    const updatedRuleText = rule.cssText.replace(
       rule.selectorText,
       appendToUniqueSelectors(rule.selectorText, ':where(0)')
     )

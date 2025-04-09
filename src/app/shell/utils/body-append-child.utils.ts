@@ -1,11 +1,11 @@
-import { createNodeList, updateStyleSheets } from 'src/scope-polyfill'
+import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
   dataIntermediateNoPortalLayoutStylesKey,
   dataIntermediateStyleIdKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
   dataStyleIsolationKey
-} from 'src/scope-utils'
+} from 'src/scope-polyfill/utils'
 
 interface StyleData {
   styleId: string | undefined

@@ -1,11 +1,5 @@
-// INFO:
-// 3 types of things can happen
-// new style appears and needs to be transformed -> should be taken care of
-// new elements are on a page that should utilize the scope styles -> should be taken care of
-// existing style has updated values -> should be taken care of
-
 import { CssStyleSheetHandler } from './css-style-sheet-updater'
-import { OcxCSSStyleSheet, OcxOwnerNode, ScopeSelectorPresenceMap, SelectorPresenceMap } from './scope-data'
+import { OcxCSSStyleSheet, OcxOwnerNode, ScopeSelectorPresenceMap, SelectorPresenceMap } from './data'
 import {
   dataStyleIdKey,
   doesContainOnlySupportsRule,
@@ -13,52 +7,13 @@ import {
   mutationListToUniqueNodes,
   nodeToStyleIdSelector,
   normalize
-} from './scope-utils'
-
-// Pop ups are nowhere to be found in legacy apps -> resolved
-// Pop ups seem to not be styled correctly (look for "menu-style-onecx-tenant|onecx-tenant-ui"):
-//Parse information about layers -> RESOLVED
-
-// -- TODO 3.1: Pop ups are not placed correctly in new apps and old apps? (Can be that e.g., keyframes rules are not correctly interpreted) (Are pop ups missplaced in new apps?? -> Help UI seems fine but Tenant UI seems broken)
-
-// Optimize algorithm so re-computation does not happen hat often:
-// -- optimized well enough for migrated apps
-// -- further optimize solution for legacy apps
-
-// STATUS:
-// - children are updated
-// - observer for style nodes working
-// - on every mutation event (rule selection cache)
-// -- create new cache (per scope) of selectors
-// -- for every new selector compute if it requires re-computation
-// -- if there is no selector for a rule that requires re-computation, don't recompute
-
-// FIXES DONE:
-// - target === body
-// - don't look for all attributes?
-
-// FIX:
-// - optimize further
-// - debounce?
-// - inputs not styled
-// - pop ups in incorrect places
-// - media rules not taken
-
-// Possible:
-// - improve subSelector caching (more specific, e.g.,
-//
-// .p-floatlabel
-// .p-floatlabel:has(sth)
-// ...
-//
-// )
-// - caching the elements choosing for DOM computation
+} from './utils'
 
 const scopedSheetNodes = new Set()
 
 export function applyScopePolyfill() {
   if (typeof CSSScopeRule === 'undefined') {
-    let observer = new MutationObserver((mutationList: MutationRecord[]) => updateStyleSheets(mutationList))
+    const observer = new MutationObserver((mutationList: MutationRecord[]) => updateStyleSheets(mutationList))
     observer.observe(document.body, {
       subtree: true,
       childList: true,
@@ -279,7 +234,7 @@ function setupStyleNodeObserver(sheet: OcxCSSStyleSheet) {
   if (sheetNode && !scopedSheetNodes.has(sheetNode)) {
     scopedSheetNodes.add(sheetNode)
     // Create an observer for the new style sheet
-    let sheetObserver = new MutationObserver(() => existingScopedSheetCallback(sheetNode))
+    const sheetObserver = new MutationObserver(() => existingScopedSheetCallback(sheetNode))
     sheetObserver.observe(sheetNode, {
       characterData: true,
       childList: true,
@@ -292,7 +247,7 @@ function executeManualUpdateOfStyleSheet(
   sheet: OcxCSSStyleSheet,
   mutatedElements: Element[],
   selectorCache: SelectorPresenceMap,
-  skipMutationCheck: boolean = false
+  skipMutationCheck = false
 ) {
   CssStyleSheetHandler.updateScopedSheet(
     sheet,

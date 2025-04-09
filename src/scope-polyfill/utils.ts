@@ -1,4 +1,4 @@
-import { OcxCSSStyleSheet } from './scope-data'
+import { OcxCSSStyleSheet } from './data'
 
 export const dataStyleIdKey = 'styleId'
 export const dataStyleIsolationKey = 'styleIsolation'
@@ -10,13 +10,15 @@ export const dataStyleIdAttribute = 'data-style-id'
 export const dataStyleIsolationAttribute = 'data-style-isolation'
 export const dataNoPortalLayoutStylesAttribute = 'data-no-portal-layout-styles'
 export const dataIntermediateStyleIdAttribute = 'data-intermediate-style-id'
-export const dataIntermediateStyleIsolationAttribute = 'data-intermediate-style-ssolation'
+export const dataIntermediateStyleIsolationAttribute = 'data-intermediate-style-isolation'
 export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-no-portal-layout-styles'
 
 export const portalLayoutStylesSheetId = `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`
 export const dynamicPortalLayoutStylesSheetId = `body>:not([${dataNoPortalLayoutStylesAttribute}])`
 
 // export const fontFamilyValueRegex = /font-family:\s*([^\;]*)/;
+
+// eslint-disable-next-line no-useless-escape
 export const animationNameValueRegex = /animation-name:\s*([^\;]*)/
 const everythingNotACharacterOrNumberRegex = /[^a-zA-Z0-9-]/g
 
@@ -51,6 +53,7 @@ export function isScopedStyleSheet(sheet: CSSStyleSheet): sheet is OcxCSSStyleSh
 // Find scope match in a string
 export function matchScope(content: string): RegExpMatchArray | null {
   const scopeRegex =
+    // eslint-disable-next-line no-useless-escape
     /@scope\s*\(\s*([^\(\)]+(?:\([^\(\)]+\))*(?::[^\(\)]+(?:\([^\(\)]+\))*)*)\s*\)\s*to\s*\(\s*([^\(\)]+(?:\([^\(\)]+\))*(?::[^\(\)]+(?:\([^\(\)]+\))*)*)\s*\)/
   return content.match(scopeRegex)
 }
@@ -168,10 +171,10 @@ function splitSelectorToUniqueSelectors(selectorText: string) {
 
 function constructSelectorChunks(selectorText: string) {
   let currentSelector = ''
-  var chunks = []
-  var inPseudo = false
-  for (var i = 0; i < selectorText.length; i++) {
-    var letter = selectorText[i]
+  const chunks = []
+  let inPseudo = false
+  for (let i = 0; i < selectorText.length; i++) {
+    const letter = selectorText[i]
     switch (letter) {
       case '(':
       case ')':

@@ -1,7 +1,7 @@
 import { AfterContentInit, Component, ElementRef, ViewChild } from '@angular/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { firstValueFrom } from 'rxjs'
-import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-utils'
+import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 
 @Component({
   standalone: false,

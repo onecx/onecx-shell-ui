@@ -1,4 +1,4 @@
-import { applyScopePolyfill, overrideHtmlElementAppendAndClassChanges } from './scope-polyfill'
+import { applyScopePolyfill, overrideHtmlElementAppendAndClassChanges } from './scope-polyfill/polyfill'
 
 applyScopePolyfill()
 overrideHtmlElementAppendAndClassChanges()

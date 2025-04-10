@@ -12,7 +12,8 @@
     "src/app/shared/generated/**",
     "src/assets/api/*",
     "src/**/*.ico",
-    "src/**/*.svg"
+    "src/**/*.svg",
+    "scope-polyfill.ts"
   ],
   "plugins": ["@nx"],
   "overrides": [

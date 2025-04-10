@@ -61,7 +61,7 @@
         "outputPath": "dist/onecx-shell-ui",
         "index": "./src/index.html",
         "main": "./src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": ["zone.js", "src/polyfills.ts"],
         "tsConfig": "./tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [

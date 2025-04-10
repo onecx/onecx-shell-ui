@@ -14,6 +14,11 @@ app:
         spec:
           kcConfig:
             clientId: 'onecx-shell-ui'
+    # Microservice
+    microservice:
+      spec:
+        name: OneCX Shell UI
+        description: OneCX Shell Frontend
     # Slot
     slot:
       enabled: true

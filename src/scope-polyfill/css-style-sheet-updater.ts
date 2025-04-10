@@ -3,7 +3,6 @@ import {
   animationNameValueRegex,
   appendToUniqueSelectors,
   computeRootSelectorsForElements,
-  // fontFamilyValueRegex,
   matchScope,
   normalize,
   scopeFromToUniqueId,

@@ -151,7 +151,7 @@ export function createNodeList(nodes: Element[]) {
         }
       }
     }
-  }
+  } as any as NodeList
 }
 
 export function updateStyleSheets(mutationList: MutationRecord[]) {

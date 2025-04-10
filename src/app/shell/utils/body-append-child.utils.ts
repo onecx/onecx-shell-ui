@@ -28,13 +28,13 @@ export function bodyChildListenerInitializer() {
           {
             type: 'childList',
             target: document.body,
-            addedNodes: createNodeList([childToAppend]) as NodeList,
+            addedNodes: createNodeList([childToAppend]),
             attributeName: null,
             attributeNamespace: null,
             nextSibling: null,
             oldValue: null,
             previousSibling: null,
-            removedNodes: createNodeList([]) as NodeList
+            removedNodes: createNodeList([])
           } as MutationRecord
         ])
       }

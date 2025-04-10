@@ -13,7 +13,6 @@ export interface OcxOwnerNode extends HTMLStyleElement {
   ocxTo: string
   ocxScopeUniqueId: string
   ocxKeyFrames: string[]
-  // ocxFontFamilies: Set<string>;
 }
 
 export interface OcxCSSStyleSheet extends CSSStyleSheet {

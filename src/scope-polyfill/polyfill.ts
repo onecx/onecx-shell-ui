@@ -37,13 +37,13 @@ function overrideHtmlElementAppend() {
       {
         type: 'childList',
         target: this,
-        addedNodes: createNodeList([newChild]) as NodeList,
+        addedNodes: createNodeList([newChild]),
         attributeName: null,
         attributeNamespace: null,
         nextSibling: null,
         oldValue: null,
         previousSibling: null,
-        removedNodes: createNodeList([]) as NodeList
+        removedNodes: createNodeList([])
       } as MutationRecord
     ])
     return result
@@ -117,13 +117,13 @@ function updateStyleSheetsForClassChange(element: Node) {
     {
       type: 'attributes',
       target: element,
-      addedNodes: createNodeList([]) as NodeList,
+      addedNodes: createNodeList([]),
       attributeName: 'class',
       attributeNamespace: null,
       nextSibling: null,
       oldValue: null,
       previousSibling: null,
-      removedNodes: createNodeList([]) as NodeList
+      removedNodes: createNodeList([])
     } as MutationRecord
   ])
 }

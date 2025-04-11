@@ -20,6 +20,7 @@ export interface Route {
     remoteEntryUrl: string;
     appId: string;
     productName: string;
+    productVersion: string;
     technology?: Technologies;
     exposedModule: string;
     pathMatch: PathMatch;

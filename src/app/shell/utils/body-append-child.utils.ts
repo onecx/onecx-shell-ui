@@ -5,7 +5,7 @@ import {
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
   dataStyleIsolationKey
-} from 'src/scope-polyfill/utils'
+} from '@onecx/angular-utils'
 
 interface StyleData {
   styleId: string | undefined

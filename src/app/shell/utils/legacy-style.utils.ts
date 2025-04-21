@@ -4,7 +4,7 @@ import {
   dataNoPortalLayoutStylesAttribute,
   dataStyleIdAttribute,
   dataStyleIsolationAttribute
-} from 'src/scope-polyfill/utils'
+} from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
   return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))

@@ -42,8 +42,17 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
-import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/legacy-style.utils'
-import { bodyChildListenerInitializer } from './shell/utils/body-append-child.utils'
+import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
+import { bodyChildListenerInitializer } from './shell/utils/styles/body-append-child.utils'
+import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
+
+function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
+  return async () => {
+    await appStateService.isAuthenticated$.isInitialized
+    const css = await fetchShellStyles(http)
+    loadShellStyles(css)
+  }
+}
 
 function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   return async () => {
@@ -333,6 +342,12 @@ export function shareMfContainer() {
       provide: APP_INITIALIZER,
       useFactory: bodyChildListenerInitializer,
       deps: [],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: shellStylesInitializer,
+      deps: [AppStateService, HttpClient],
       multi: true
     }
   ],

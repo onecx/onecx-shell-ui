@@ -1,15 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-@import 'node_modules/primeflex/primeflex.scss';
-@import 'node_modules/primeicons/primeicons.css';
-
 @import 'node_modules/@onecx/shell-core/assets/styles.scss';
 
 body {
   overflow: hidden;
-}
-
-.layout-content {
-  overflow: auto;
 }
 
 // disable default settings of dialogs created by portal dialog service

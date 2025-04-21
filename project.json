@@ -84,7 +84,16 @@
           }
         ],
         "styles": [
-          "./src/styles.scss",
+          {
+            "input": "./src/global-styles.scss",
+            "bundleName": "global-styles",
+            "inject": true
+          },
+          {
+            "input": "./src/shell-styles.scss",
+            "bundleName": "shell-styles",
+            "inject": false
+          },
           {
             "input": "./src/portal-layout-styles.scss",
             "bundleName": "portal-layout-styles",

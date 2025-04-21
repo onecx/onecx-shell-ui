@@ -266,7 +266,7 @@ export function shareMfContainer() {
       }
     }),
     ShellCoreModule,
-    PortalCoreModule.forRoot('shell', true),
+    PortalCoreModule.forRoot('shell'),
     AngularRemoteComponentsModule
   ],
   providers: [

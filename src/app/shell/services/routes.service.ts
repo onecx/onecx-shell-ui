@@ -70,9 +70,8 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async convertToRoute(r: BffGeneratedRoute): Promise<Route> {
-    const path = await this.toRouteUrl(r.baseUrl)
     return {
-      path: path,
+      path: await this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
         breadcrumb: r.productName
@@ -233,9 +232,8 @@ export class RoutesService implements ShowContentProvider {
 
   private async createFallbackRoute(): Promise<Route> {
     const currentWorkspace = await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())
-    const routePath = await this.toRouteUrl(currentWorkspace.baseUrl)
     const route = {
-      path: routePath,
+      path: await this.toRouteUrl(currentWorkspace.baseUrl),
       pathMatch: PathMatch.full
     }
 
@@ -245,10 +243,9 @@ export class RoutesService implements ShowContentProvider {
         component: HomeComponent
       }
     }
-    const redirectTo = await this.createHomePageUrl(currentWorkspace.baseUrl, currentWorkspace.homePage)
     return {
       ...route,
-      redirectTo: redirectTo
+      redirectTo: await this.createHomePageUrl(currentWorkspace.baseUrl, currentWorkspace.homePage)
     }
   }
 

@@ -1,6 +1,7 @@
 import { AfterContentInit, Component, ElementRef, ViewChild } from '@angular/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { firstValueFrom } from 'rxjs'
+import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 
 @Component({
   standalone: false,
@@ -20,8 +21,8 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
     const styleId = `${currentMfe.productName}|${currentMfe.appId}`
 
     const element = document.createElement(currentMfe.elementName)
-    element.dataset['styleId'] = styleId
-    element.dataset['styleIsolation'] = ''
+    element.dataset[dataStyleIdKey] = styleId
+    element.dataset[dataStyleIsolationKey] = ''
     this.wrapper?.nativeElement.appendChild(element)
   }
 }

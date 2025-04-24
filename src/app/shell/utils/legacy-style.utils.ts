@@ -1,5 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { firstValueFrom } from 'rxjs'
+import {
+  dataNoPortalLayoutStylesAttribute,
+  dataStyleIdAttribute,
+  dataStyleIsolationAttribute
+} from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
   return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))
@@ -14,17 +19,30 @@ function loadPortalLayoutStylesVariables(css: string) {
   createStyleElement(extractVariablesFromCss(css), 'portalLayoutStylesVariables')
 }
 function loadPortalLayoutStylesStyles(css: string) {
+  const isScopeSupported = typeof CSSScopeRule !== 'undefined'
   createStyleElement(
-    `
-  @scope([data-style-id]:not([data-no-portal-layout-styles])) to ([data-style-isolation]) {
+    isScopeSupported
+      ? `
+  @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+    ${extractStylesFromCss(css)}
+  }
+  `
+      : `
+  @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
     ${extractStylesFromCss(css)}
   }
   `,
     'portalLayoutStylesStyles'
   )
   createStyleElement(
-    `
-  @scope(body > :not([data-no-portal-layout-styles])) to ([data-style-isolation]) {
+    isScopeSupported
+      ? `
+  @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+    ${extractStylesFromCss(css)}
+  }
+  `
+      : `
+  @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
     ${extractStylesFromCss(css)}
   }
   `,

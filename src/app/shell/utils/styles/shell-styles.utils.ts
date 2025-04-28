@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { firstValueFrom } from 'rxjs'
-import { createStyleElement, extractStylesFromCss, extractVariablesFromCss } from './styles.utils'
 import {
   dataStyleIdAttribute,
   dataStyleIsolationAttribute,
   isCssScopeRuleSupported,
-  shellScopeId
+  shellScopeId,
+  addStyleToHead,
+  extractRootCssVariables,
+  extractCssStyles
 } from '@onecx/angular-utils'
 
 export async function fetchShellStyles(http: HttpClient) {
@@ -14,18 +16,18 @@ export async function fetchShellStyles(http: HttpClient) {
 
 export function loadShellStyles(css: string) {
   const isScopeSupported = isCssScopeRuleSupported()
-  createStyleElement(
+  addStyleToHead(
     isScopeSupported
       ? `
-      ${extractVariablesFromCss(css)}
+      ${extractRootCssVariables(css)}
       @scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}]) {
-        ${extractStylesFromCss(css)}
+        ${extractCssStyles(css)}
       }
     `
       : `
-      ${extractVariablesFromCss(css)}
+      ${extractRootCssVariables(css)}
       @supports (@scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}])) {
-            ${extractStylesFromCss(css)}
+            ${extractCssStyles(css)}
         }
     `,
     {

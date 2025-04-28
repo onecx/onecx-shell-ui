@@ -20,14 +20,7 @@ import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologi
 import { HomeComponent } from '../components/home/home.component'
 import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
-import {
-  dataMfeStylesAttribute,
-  dataAppStylesAttribute,
-  dataAppStylesKey,
-  dataMfeStylesKey,
-  scopeIdFromProductNameAndAppId
-} from '@onecx/angular-utils'
-import { createMfeStyles, fetchMfeStyles, updateMfeStyles } from '../utils/styles/mfe-styles.utils'
+import { updateStylesForMfeChange } from '@onecx/angular-utils'
 import { HttpClient } from '@angular/common/http'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
@@ -144,36 +137,7 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updateAppStyles(r: BffGeneratedRoute) {
-    const scopeId = scopeIdFromProductNameAndAppId(r.productName, r.appId)
-
-    // Remove all styles used only by non-active mfe
-    const mfeStyles = Array.from(document.head.querySelectorAll<HTMLStyleElement>(`style[${dataMfeStylesAttribute}]`))
-    mfeStyles
-      .filter((styleElement) => styleElement.dataset[dataMfeStylesKey] !== scopeId)
-      .forEach((styleElement) => {
-        // Leave style used by the RC
-        if (styleElement.dataset[dataAppStylesKey] && Object.keys(styleElement.dataset).length > 2) {
-          delete styleElement.dataset[dataMfeStylesKey]
-          return
-    }
-
-        styleElement.remove()
-      })
-
-    const existingStyleElement = document.head.querySelector<HTMLStyleElement>(
-      `style[${dataAppStylesAttribute}="${scopeId}"]`
-    )
-
-    if (existingStyleElement) {
-      // Register for style usage
-      existingStyleElement.dataset[dataMfeStylesKey] = scopeId
-      return
-    }
-
-    // Create new style element if none was found for the current mfe
-    createMfeStyles(scopeId)
-    const css = await fetchMfeStyles(this.httpClient, r.url)
-    updateMfeStyles(css, scopeId)
+    await updateStylesForMfeChange(r.productName, r.appId, this.httpClient, r.url)
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {

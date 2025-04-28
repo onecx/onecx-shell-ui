@@ -4,7 +4,8 @@ import {
   dataIntermediateStyleIdKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
-  dataStyleIsolationKey
+  dataStyleIsolationKey,
+  isCssScopeRuleSupported
 } from '@onecx/angular-utils'
 
 interface StyleData {
@@ -23,7 +24,7 @@ export function bodyChildListenerInitializer() {
         removeStyleDataRecursive(newChild)
       }
       const result = originalAppendChild.call(this, childToAppend)
-      if (typeof CSSScopeRule === 'undefined') {
+      if (!isCssScopeRuleSupported()) {
         updateStyleSheets([
           {
             type: 'childList',

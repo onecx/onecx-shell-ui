@@ -36,8 +36,16 @@ export function loadPortalLayoutStyles(css: string) {
       [dataPortalLayoutStylesKey]: ''
     }
   )
+
   addStyleToHead(
+    isScopeSupported
+      ? `
+    ${extractRootCssVariables(css)}
+  @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+    ${extractCssStyles(css)}
+  }
     `
+      : `
     ${extractRootCssVariables(css)}
   @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
     ${extractCssStyles(css)}

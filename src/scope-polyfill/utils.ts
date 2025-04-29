@@ -1,5 +1,8 @@
 import { OcxCSSStyleSheet } from './data'
 
+// Duplicate definitions for some constants because cannot import libs in polyfill
+export const shellScopeId = 'shell-ui'
+
 export const dataStyleIdKey = 'styleId'
 export const dataStyleIsolationKey = 'styleIsolation'
 export const dataNoPortalLayoutStylesKey = 'noPortalLayoutStyles'
@@ -15,11 +18,16 @@ export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-
 
 export const portalLayoutStylesSheetId = `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`
 export const dynamicPortalLayoutStylesSheetId = `body>:not([${dataNoPortalLayoutStylesAttribute}])`
+export const shellStylesSheetId = `[${dataStyleIdAttribute}="${shellScopeId}"]`
 
 // eslint-disable-next-line no-useless-escape
 export const animationNameValueRegex = /animation-name:\s*([^\;]*)/
 const everythingNotACharacterOrNumberRegex = /[^a-zA-Z0-9-]/g
-
+// eslint-disable-next-line no-useless-escape
+const pseudoElementsRegex = /::[a-zA-Z\-]*[\s\{\:]?/g
+/**
+ * Maps mutationRecord list to unique nodes that were changed
+ */
 export function mutationListToUniqueNodes(mutationList: MutationRecord[]) {
   const set = new Set<Element>()
   for (const mutation of mutationList) {
@@ -34,21 +42,30 @@ export function mutationListToUniqueNodes(mutationList: MutationRecord[]) {
   return Array.from(set)
 }
 
-// Validate if style sheet contains only supports rule
-export function doesContainOnlySupportsRule(sheet: CSSStyleSheet) {
-  return (
-    sheet.cssRules.length === 1 &&
-    sheet.cssRules[0] instanceof CSSSupportsRule &&
-    sheet.ownerNode instanceof HTMLElement
-  )
+/**
+ * Returns if style sheet contains supports rule with scope
+ * */
+export function containsSupportsRule(sheet: CSSStyleSheet) {
+  return Array.from(sheet.cssRules).filter((rule) => rule instanceof CSSSupportsRule).length > 0
 }
 
-// If style sheet is a OneCX scoped style sheet
+/**
+ * Returns the supports rule from a style sheet or null
+ */
+export function findSupportsRule(sheet: CSSStyleSheet) {
+  return Array.from(sheet.cssRules).find((rule) => rule instanceof CSSSupportsRule) as CSSSupportsRule
+}
+
+/**
+ * Returns if style sheet is a OneCX scoped style sheet
+ */
 export function isScopedStyleSheet(sheet: CSSStyleSheet): sheet is OcxCSSStyleSheet {
   return (sheet.ownerNode as any).ocxMatch !== undefined
 }
 
-// Find scope match in a string
+/**
+ * Finds a match for scope rule in a text.
+ */
 export function matchScope(content: string): RegExpMatchArray | null {
   const scopeRegex =
     // eslint-disable-next-line no-useless-escape
@@ -56,7 +73,41 @@ export function matchScope(content: string): RegExpMatchArray | null {
   return scopeRegex.exec(content)
 }
 
-// Split selector into list of subselectors
+/**
+ * Removes pseudo elements (without parameters) from a selector.
+ *
+ * Example: ".pi-chevron-right::before" -> ".pi-chevron-right"
+ */
+export function removePseudoElements(selectorText: string) {
+  const matches = selectorText.match(pseudoElementsRegex)
+  if (!matches) return selectorText
+
+  let modifiedSelectorText = selectorText
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i]
+    const lastMatchChar = match[match.length - 1]
+    modifiedSelectorText = modifiedSelectorText.replace(match, [' {:'].includes(lastMatchChar) ? lastMatchChar : '')
+  }
+  return modifiedSelectorText
+}
+
+/**
+ * Appends a value to a selector before the first pseudo element.
+ *
+ * Example: ".pi::before" with value: ":where(:nth-child(1))" -> ".pi:where(:nth-child(1))::before"
+ */
+export function appendBeforeFirstPseudoElement(selectorText: string, valueToAppend: string): string {
+  const pseudoElementIndex = selectorText.search(pseudoElementsRegex)
+  if (pseudoElementIndex === -1) return `${selectorText}${valueToAppend}`
+
+  return `${selectorText.substring(0, pseudoElementIndex)}${valueToAppend}${selectorText.substring(pseudoElementIndex, selectorText.length)}`
+}
+
+/**
+ * Split selector into list of sub selectors.
+ *
+ * Example: ".pi, .pi .pi-chevron-right" -> [[".pi"], [".pi", ".pi pi-chevron-right"]]
+ */
 export function splitSelectorToSubSelectors(selectorText: string) {
   const uniqueSelectors = splitSelectorToUniqueSelectors(selectorText)
   const subSelectors: Array<Array<string>> = []
@@ -67,14 +118,25 @@ export function splitSelectorToSubSelectors(selectorText: string) {
   return subSelectors
 }
 
+/**
+ * Appends a value to each unique selector. Always appends before the first pseudo element.
+ *
+ * This is done because :where selector cannot be placed after pseudo elements like ::before because the selector is than invalid.
+ *
+ * Example: ".pi, .pi pi-chevron-right" with value: ":where(:nth-child(1))" -> ".pi:where(:nth-child(1)), .pi pi-chevron-right:where(:nth-child(1))"
+ */
 export function appendToUniqueSelectors(selectorText: string, valueToAppend: string) {
   return selectorText
     .split(',')
-    .map((s) => `${s.trim()}${valueToAppend}`)
+    .map((s) => appendBeforeFirstPseudoElement(s.trim(), valueToAppend))
     .join(',')
 }
 
-// For each element compute its selector starting from root
+/**
+ * Returns selector for all elements starting from root of the document using nth-child
+ *
+ * Example for first child of the root: ":root > :nth-child(1)"
+ */
 export function computeRootSelectorsForElements(elements: Array<Element>) {
   const selectors = []
   for (const element of elements) {
@@ -84,30 +146,49 @@ export function computeRootSelectorsForElements(elements: Array<Element>) {
   return selectors
 }
 
-// Remove white spaces, new lines, etc. from a string
+/**
+ * Remove white spaces, new lines, etc. from a string
+ */
 export function normalize(str: string): string {
   const newLineRegexGlobal = /\s+/g
   return str.replace(newLineRegexGlobal, '') ?? ''
 }
 
-// Map node to style id
-export function nodeToStyleIdSelector(node: HTMLElement) {
+/**
+ * Map HTMLElement node to css selector based on the node dataset attributes.
+ *
+ * Returns:
+ * - dynamic portal layout style selector for node with no information
+ * - shell style selectors if node was in shell's scope
+ * - portal layout styles selector if node was in app scope that needs portal layout styles
+ * - found scope selector if node was in app scope that does not need portal layout styles
+ */
+export function nodeToStyleIdSelectors(node: HTMLElement) {
   const styleId = node.dataset[dataStyleIdKey]
   const noPortalLayoutStyles = node.dataset[dataNoPortalLayoutStylesKey] === ''
 
+  // Node without styleId means it must have been added dynamically
   if (!styleId) {
-    return dynamicPortalLayoutStylesSheetId
+    return [dynamicPortalLayoutStylesSheetId]
+  }
+
+  // Node that is a child of shell requires to update shell styles and any styles with shell-ui style id
+  if (styleId === shellScopeId) {
+    return [shellStylesSheetId, `[${dataStyleIdAttribute}="${styleId}"]`]
   }
 
   return noPortalLayoutStyles
-    ? `[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`
-    : portalLayoutStylesSheetId
+    ? [`[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`]
+    : [portalLayoutStylesSheetId]
 }
 
+/**
+ * Map scope css rule from section to a unique style scope id
+ */
 export function scopeFromToUniqueId(from: string) {
-  if (from === `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`) {
+  if (from === portalLayoutStylesSheetId) {
     return 'portal-layout-styles'
-  } else if (from === `body>:not([${dataNoPortalLayoutStylesAttribute}])`) {
+  } else if (from === dynamicPortalLayoutStylesSheetId) {
     return 'dynamic-portal-layout-styles'
   }
 
@@ -115,12 +196,16 @@ export function scopeFromToUniqueId(from: string) {
   return styleIdMatch ? styleIdMatch[1].replace(everythingNotACharacterOrNumberRegex, '-') : ''
 }
 
-// Map mutation type 'attribute' to elements
+/**
+ * Map mutation type 'attribute' to elements
+ */
 function attributeMutationToNodes(mutation: MutationRecord): Element[] {
   return takeTargeNodeParentIfExistElseTargetNode(mutation)
 }
 
-// Map mutation type 'children' to elements
+/**
+ * Map mutation type 'children' to elements
+ */
 function childMutationToNodes(mutation: MutationRecord) {
   let nodes: Element[] = []
   if (mutation.target === document.body) {
@@ -137,18 +222,32 @@ function childMutationToNodes(mutation: MutationRecord) {
   return nodes
 }
 
-// Map mutation made to body element to elements
+/**
+ * Map mutation made to body element to elements
+ */
 function bodyMutationToNodes(mutation: MutationRecord) {
   return [...Array.from(mutation.addedNodes), ...Array.from(mutation.removedNodes)].filter(
     (node): node is Element => node.nodeType === Node.ELEMENT_NODE
   )
 }
 
-// Map mutation with added nodes to elements
+/**
+ * Map mutation with added nodes to elements
+ */
 function mutationWithAddedNodesToNodes(mutation: MutationRecord) {
   return takeTargeNodeParentIfExistElseTargetNode(mutation)
 }
 
+/**
+ * Map mutation with removed nodes to elements
+ */
+function mutationWithRemovedNodesToNodes(mutation: MutationRecord) {
+  return Array.from(mutation.removedNodes).filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
+}
+
+/**
+ * Returns mutation's target node parent or target node
+ */
 function takeTargeNodeParentIfExistElseTargetNode(mutation: MutationRecord) {
   if (mutation.target.parentElement) {
     return mutation.target.parentElement.nodeType === Node.ELEMENT_NODE
@@ -158,19 +257,21 @@ function takeTargeNodeParentIfExistElseTargetNode(mutation: MutationRecord) {
   return mutation.target.nodeType === Node.ELEMENT_NODE ? [mutation.target as Element] : []
 }
 
-// Map mutation with removed nodes to elements
-function mutationWithRemovedNodesToNodes(mutation: MutationRecord) {
-  return Array.from(mutation.removedNodes).filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
-}
-
+/**
+ * Returns selector list from selector by splitting them via comma
+ */
 function splitSelectorToUniqueSelectors(selectorText: string) {
   return selectorText.split(',').map((s) => s.trim())
 }
 
+/**
+ * Mapper class for mapping css selectors into sub selector chunks
+ */
 class SelectorToChunksMapper {
   currentSelector = ''
   chunks: string[] = []
   inPseudo = false
+  pseudoDepth = 0
 
   private reset() {
     this.currentSelector = ''
@@ -180,10 +281,15 @@ class SelectorToChunksMapper {
 
   private mapOpeningBrace() {
     this.inPseudo = true
+    this.pseudoDepth++
     this.currentSelector += '('
   }
 
   private mapClosingBrace() {
+    if (this.inPseudo) {
+      this.pseudoDepth--
+      if (this.pseudoDepth === 0) this.inPseudo = false
+    }
     this.currentSelector += ')'
   }
 
@@ -230,6 +336,9 @@ class SelectorToChunksMapper {
     return iterator
   }
 
+  /**
+   * Maps css selector to sub selector chunks
+   */
   map(selectorText: string) {
     this.reset()
 
@@ -281,6 +390,11 @@ class SelectorToChunksMapper {
   }
 }
 
+/**
+ * Returns selector for element starting from root of the document using nth-child
+ *
+ * Example for first child of the root: " > :nth-child(1)"
+ */
 function computeRootSelectorForElement(element: Element) {
   let currentElement: Element | null = element
   let selector = ''

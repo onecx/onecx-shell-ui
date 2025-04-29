@@ -45,6 +45,7 @@ import { ErrorPageComponent } from './shell/components/error-page.component'
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
 import { bodyChildListenerInitializer } from './shell/utils/styles/body-append-child.utils'
 import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
+import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 
 function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   return async () => {
@@ -348,6 +349,11 @@ export function shareMfContainer() {
       provide: APP_INITIALIZER,
       useFactory: shellStylesInitializer,
       deps: [AppStateService, HttpClient],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: styleChangesListenerInitializer,
       multi: true
     }
   ],

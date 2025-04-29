@@ -177,9 +177,11 @@ export function nodeToStyleIdSelectors(node: HTMLElement) {
     return [shellStylesSheetId, `[${dataStyleIdAttribute}="${styleId}"]`]
   }
 
+  const appStyles = `[${dataStyleIdAttribute}="${styleId}"]`
+
   return noPortalLayoutStyles
-    ? [`[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`]
-    : [portalLayoutStylesSheetId]
+    ? [appStyles, `[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`]
+    : [appStyles, portalLayoutStylesSheetId]
 }
 
 /**

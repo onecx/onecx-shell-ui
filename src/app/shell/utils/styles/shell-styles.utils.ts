@@ -15,23 +15,29 @@ export async function fetchShellStyles(http: HttpClient) {
 }
 
 export function loadShellStyles(css: string) {
-  const isScopeSupported = isCssScopeRuleSupported()
-  addStyleToHead(
-    isScopeSupported
-      ? `
-      ${extractRootRules(css)}
-      @scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}]) {
-        ${extractNonRootRules(css)}
-      }
-    `
-      : `
-      ${extractRootRules(css)}
-      @supports (@scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}])) {
-            ${extractNonRootRules(css)}
+  if (isCssScopeRuleSupported()) {
+    addStyleToHead(
+      `
+        ${extractRootRules(css)}
+        @scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}]) {
+          ${extractNonRootRules(css)}
         }
-    `,
-    {
-      shellStylesStyles: ''
-    }
-  )
+      `,
+      {
+        shellStylesStyles: ''
+      }
+    )
+  } else {
+    addStyleToHead(
+      `
+        ${extractRootRules(css)}
+        @supports (@scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}])) {
+              ${extractNonRootRules(css)}
+          }
+      `,
+      {
+        shellStylesStyles: ''
+      }
+    )
+  }
 }

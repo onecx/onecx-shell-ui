@@ -1,4 +1,4 @@
-import { dataStyleIdKey, replacePrimengPrefix } from '@onecx/angular-utils'
+import { dataNoPortalLayoutStylesKey, dataStyleIdKey, replacePrimengPrefix } from '@onecx/angular-utils'
 
 /**
  * Registers a listener that utilizes MutationObserver to validate styles added to the document head.
@@ -21,11 +21,7 @@ export function styleChangesListenerInitializer() {
 }
 
 function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
-  const newComponentStyleMutations = mutationList.filter((record) =>
-    doesContainAngularComponentStyle(record.addedNodes)
-  )
-
-  const newComponentStyleNodes = newComponentStyleMutations
+  const newComponentStyleNodes = mutationList
     .flatMap((mutation) => Array.from(mutation.addedNodes))
     .filter((node) => isAngularComponentStyle(node))
 
@@ -34,31 +30,44 @@ function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
       return
     }
 
-    const scopeId = getScopeIdFromNodeContent(node.textContent)
-    if (!scopeId) {
+    const { styleId, noPortalLayoutStyles } = getStyleDataFromNodeContent(node.textContent)
+    if (!styleId || !doesStyleDataRequireReplacement(styleId, noPortalLayoutStyles)) {
       return
     }
 
-    node.textContent = replacePrimengPrefix(node.textContent, scopeId)
+    node.textContent = replacePrimengPrefix(node.textContent, styleId)
   })
 }
 
-function doesContainAngularComponentStyle(nodeList: NodeList): boolean {
-  return Array.from(nodeList).filter((node) => isAngularComponentStyle(node)).length > 0
+function doesStyleDataRequireReplacement(styleId: string | null, noPortalLayoutStyles: string | null | undefined) {
+  if (!styleId) return false
+
+  return noPortalLayoutStyles === ''
 }
 
 function isAngularComponentStyle(node: Node): boolean {
   return node.textContent?.includes('[_nghost') ?? false
 }
 
-function getScopeIdFromNodeContent(nodeContent: string): string | null {
+function getStyleDataFromNodeContent(nodeContent: string): {
+  styleId: string | null
+  noPortalLayoutStyles: string | null | undefined
+} {
   const ngHostAttribute = getNgHostAttributeFromNodeContent(nodeContent)
-  if (!ngHostAttribute) return null
+  if (!ngHostAttribute)
+    return {
+      styleId: null,
+      noPortalLayoutStyles: null
+    }
 
   const ngHostElement = getElementWithNgHostAttribute(ngHostAttribute)
-  if (!ngHostElement) return null
+  if (!ngHostElement)
+    return {
+      styleId: null,
+      noPortalLayoutStyles: null
+    }
 
-  return getScopeIdForElement(ngHostElement)
+  return getScopeDataForElement(ngHostElement)
 }
 
 function getNgHostAttributeFromNodeContent(css: string): string | null {
@@ -75,11 +84,21 @@ function getElementWithNgHostAttribute(ngHostAttribute: string): HTMLElement | n
   return document.querySelector(`[${ngHostAttribute}]`)
 }
 
-function getScopeIdForElement(element: HTMLElement): string | null {
+function getScopeDataForElement(element: HTMLElement): {
+  styleId: string | null
+  noPortalLayoutStyles: string | null | undefined
+} {
   let currentElement: HTMLElement | null = element
   while (currentElement) {
-    if (currentElement.dataset[dataStyleIdKey]) return currentElement.dataset[dataStyleIdKey]
+    if (currentElement.dataset[dataStyleIdKey])
+      return {
+        styleId: currentElement.dataset[dataStyleIdKey],
+        noPortalLayoutStyles: currentElement.dataset[dataNoPortalLayoutStylesKey]
+      }
     currentElement = currentElement.parentElement
   }
-  return null
+  return {
+    styleId: null,
+    noPortalLayoutStyles: null
+  }
 }

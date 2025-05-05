@@ -17,42 +17,62 @@ export async function fetchPortalLayoutStyles(http: HttpClient) {
 }
 
 export function loadPortalLayoutStyles(css: string) {
-  const isScopeSupported = isCssScopeRuleSupported()
-  addStyleToHead(
-    isScopeSupported
-      ? `
-    ${extractRootRules(css)}
-  @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractNonRootRules(css)}
-  }
-  `
-      : `
-      ${extractRootRules(css)}
-      @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-        ${extractNonRootRules(css)}
-      }
-      `,
-    {
-      [dataPortalLayoutStylesKey]: ''
-    }
-  )
+  loadPortalLayoutStylesStyles(css)
+  loadDynamicPortalLayoutStylesStyles(css)
+}
 
-  addStyleToHead(
-    isScopeSupported
-      ? `
-    ${extractRootRules(css)}
-  @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractNonRootRules(css)}
-  }
-    `
-      : `
-    ${extractRootRules(css)}
-  @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-    ${extractNonRootRules(css)}
-  }
-  `,
-    {
-      [dataDynamicPortalLayoutStylesKey]: ''
+function loadPortalLayoutStylesStyles(css: string) {
+  if (isCssScopeRuleSupported()) {
+    addStyleToHead(
+      `
+      ${extractRootRules(css)}
+    @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${extractNonRootRules(css)}
     }
-  )
+    `,
+      {
+        [dataPortalLayoutStylesKey]: ''
+      }
+    )
+  } else {
+    addStyleToHead(
+      `
+        ${extractRootRules(css)}
+        @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+          ${extractNonRootRules(css)}
+        }
+        `,
+      {
+        [dataPortalLayoutStylesKey]: ''
+      }
+    )
+  }
+}
+
+function loadDynamicPortalLayoutStylesStyles(css: string) {
+  if (isCssScopeRuleSupported()) {
+    addStyleToHead(
+      `
+      ${extractRootRules(css)}
+    @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${extractNonRootRules(css)}
+    }
+      `,
+      {
+        [dataDynamicPortalLayoutStylesKey]: ''
+      }
+    )
+  } else {
+    addStyleToHead(
+      `
+      ${extractRootRules(css)}
+    @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+      ${extractNonRootRules(css)}
+    }
+    `,
+      {
+        [dataDynamicPortalLayoutStylesKey]: ''
+      }
+    )
+  }
 }

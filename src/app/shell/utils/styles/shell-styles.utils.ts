@@ -6,8 +6,8 @@ import {
   isCssScopeRuleSupported,
   shellScopeId,
   addStyleToHead,
-  extractRootCssVariables,
-  extractCssStyles
+  extractRootRules,
+  extractNonRootRules
 } from '@onecx/angular-utils'
 
 export async function fetchShellStyles(http: HttpClient) {
@@ -19,15 +19,15 @@ export function loadShellStyles(css: string) {
   addStyleToHead(
     isScopeSupported
       ? `
-      ${extractRootCssVariables(css)}
       @scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}]) {
-        ${extractCssStyles(css)}
+        ${extractRootRules(css)}
+        ${extractNonRootRules(css)}
       }
     `
       : `
-      ${extractRootCssVariables(css)}
       @supports (@scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}])) {
-            ${extractCssStyles(css)}
+        ${extractRootRules(css)}
+        ${extractNonRootRules(css)}
         }
     `,
     {

@@ -8,8 +8,8 @@ import {
   dataDynamicPortalLayoutStylesKey,
   isCssScopeRuleSupported,
   addStyleToHead,
-  extractCssStyles,
-  extractRootCssVariables
+  extractRootRules,
+  extractNonRootRules
 } from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
@@ -21,15 +21,15 @@ export function loadPortalLayoutStyles(css: string) {
   addStyleToHead(
     isScopeSupported
       ? `
-    ${extractRootCssVariables(css)}
-  @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractCssStyles(css)}
+      @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+    ${extractRootRules(css)}
+    ${extractNonRootRules(css)}
   }
   `
       : `
-      ${extractRootCssVariables(css)}
       @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-        ${extractCssStyles(css)}
+        ${extractRootRules(css)}
+        ${extractNonRootRules(css)}
       }
       `,
     {
@@ -40,15 +40,15 @@ export function loadPortalLayoutStyles(css: string) {
   addStyleToHead(
     isScopeSupported
       ? `
-    ${extractRootCssVariables(css)}
-  @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractCssStyles(css)}
+      @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+    ${extractRootRules(css)}
+    ${extractNonRootRules(css)}
   }
     `
       : `
-    ${extractRootCssVariables(css)}
-  @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-    ${extractCssStyles(css)}
+      @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+    ${extractRootRules(css)}
+    ${extractNonRootRules(css)}
   }
   `,
     {

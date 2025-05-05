@@ -14,9 +14,7 @@ import { ParametersService } from './parameters.service'
 
 describe('ParametersService', () => {
   let parametersService: ParametersService
-  let appStateService: AppStateService
   let appStateServiceMock: AppStateServiceMock
-  let remoteComponentsService: RemoteComponentsService
   let remoteComponentsServiceMock: RemoteComponentsServiceMock
   let parameterBffService: ParameterBffService
   let parametersPublisherMock: FakeTopic<ParametersTopicPayload>
@@ -29,7 +27,7 @@ describe('ParametersService', () => {
   }
 
   function publishRemoteComponents(remoteComponents: Partial<RemoteComponentsInfo>) {
-    return remoteComponentsService.remoteComponents$.publish({ components: [], slots: [], ...remoteComponents })
+    return remoteComponentsServiceMock.remoteComponents$.publish({ components: [], slots: [], ...remoteComponents })
   }
 
   beforeEach(() => {

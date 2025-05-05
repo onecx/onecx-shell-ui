@@ -8,8 +8,8 @@ import {
   dataDynamicPortalLayoutStylesKey,
   isCssScopeRuleSupported,
   addStyleToHead,
-  extractRootRules,
-  extractNonRootRules
+  extractNonRootRules,
+  extractRootRules
 } from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
@@ -17,42 +17,62 @@ export async function fetchPortalLayoutStyles(http: HttpClient) {
 }
 
 export function loadPortalLayoutStyles(css: string) {
-  const isScopeSupported = isCssScopeRuleSupported()
-  addStyleToHead(
-    isScopeSupported
-      ? `
-      @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractRootRules(css)}
-    ${extractNonRootRules(css)}
-  }
-  `
-      : `
-      @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-        ${extractRootRules(css)}
-        ${extractNonRootRules(css)}
-      }
-      `,
-    {
-      [dataPortalLayoutStylesKey]: ''
-    }
-  )
+  loadPortalLayoutStylesStyles(css)
+  loadDynamicPortalLayoutStylesStyles(css)
+}
 
-  addStyleToHead(
-    isScopeSupported
-      ? `
-      @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-    ${extractRootRules(css)}
-    ${extractNonRootRules(css)}
-  }
-    `
-      : `
-      @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-    ${extractRootRules(css)}
-    ${extractNonRootRules(css)}
-  }
-  `,
-    {
-      [dataDynamicPortalLayoutStylesKey]: ''
+function loadPortalLayoutStylesStyles(css: string) {
+  if (isCssScopeRuleSupported()) {
+    addStyleToHead(
+      `
+      @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${extractRootRules(css)}
+      ${extractNonRootRules(css)}
     }
-  )
+    `,
+      {
+        [dataPortalLayoutStylesKey]: ''
+      }
+    )
+  } else {
+    addStyleToHead(
+      `
+      @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+          ${extractRootRules(css)}
+          ${extractNonRootRules(css)}
+        }
+        `,
+      {
+        [dataPortalLayoutStylesKey]: ''
+      }
+    )
+  }
+}
+
+function loadDynamicPortalLayoutStylesStyles(css: string) {
+  if (isCssScopeRuleSupported()) {
+    addStyleToHead(
+      `
+      @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${extractRootRules(css)}
+      ${extractNonRootRules(css)}
+    }
+      `,
+      {
+        [dataDynamicPortalLayoutStylesKey]: ''
+      }
+    )
+  } else {
+    addStyleToHead(
+      `
+      @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+      ${extractRootRules(css)}
+      ${extractNonRootRules(css)}
+    }
+    `,
+      {
+        [dataDynamicPortalLayoutStylesKey]: ''
+      }
+    )
+  }
 }

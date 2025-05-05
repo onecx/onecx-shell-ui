@@ -1,3 +1,5 @@
+// Imports for portal layout styles crucial variables and styles.
+// Not importing theme default variables! Those are imported via 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss' on App initialization
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/shell/shell.scss';
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/primeng/theme-light.scss';
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/primeng/primeng.css';

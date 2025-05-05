@@ -1,4 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+  Style sheet for global styles.
+  This file should ONLY contain styles that are meant to be applied GLOBALLY.
+  Shell is going to load this style sheet with a link tag on the startup.
+
+  To define styles for Shell only, please refer to shell-styles.scss.
+*/
 @import 'node_modules/@onecx/shell-core/assets/styles.scss';
 
 body {

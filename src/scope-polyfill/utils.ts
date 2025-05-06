@@ -4,15 +4,19 @@ import { OcxCSSStyleSheet } from './data'
 export const shellScopeId = 'shell-ui'
 
 export const dataStyleIdKey = 'styleId'
+export const dataMfeElementKey = 'mfeElement'
 export const dataStyleIsolationKey = 'styleIsolation'
 export const dataNoPortalLayoutStylesKey = 'noPortalLayoutStyles'
 export const dataIntermediateStyleIdKey = 'intermediateStyleId'
+export const dataIntermediateMfeElementKey = 'intermediateMfeElement'
 export const dataIntermediateStyleIsolationKey = 'intermediateStyleIsolation'
 export const dataIntermediateNoPortalLayoutStylesKey = 'intermediateNoPortalLayoutStyles'
 export const dataStyleIdAttribute = 'data-style-id'
+export const dataMfeElementAttribute = 'data-mfe-element'
 export const dataStyleIsolationAttribute = 'data-style-isolation'
 export const dataNoPortalLayoutStylesAttribute = 'data-no-portal-layout-styles'
 export const dataIntermediateStyleIdAttribute = 'data-intermediate-style-id'
+export const dataIntermediateMfeElementAttribute = 'data-intermediate-mfe-element'
 export const dataIntermediateStyleIsolationAttribute = 'data-intermediate-style-isolation'
 export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-no-portal-layout-styles'
 
@@ -174,14 +178,13 @@ export function nodeToStyleIdSelectors(node: HTMLElement) {
 
   // Node that is a child of shell requires to update shell styles and any styles with shell-ui style id
   if (styleId === shellScopeId) {
-    return [shellStylesSheetId, `[${dataStyleIdAttribute}="${styleId}"]`]
+    return [shellStylesSheetId]
   }
 
-  const appStyles = `[${dataStyleIdAttribute}="${styleId}"]`
+  const appStyles = `[${dataStyleIdAttribute}="${styleId}"]:is([${dataNoPortalLayoutStylesAttribute}], [${dataMfeElementAttribute}])`
+  const primengAppStyles = `[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`
 
-  return noPortalLayoutStyles
-    ? [appStyles, `[${dataStyleIdAttribute}="${styleId}"][${dataNoPortalLayoutStylesAttribute}]`]
-    : [appStyles, portalLayoutStylesSheetId]
+  return noPortalLayoutStyles ? [appStyles, primengAppStyles] : [appStyles, portalLayoutStylesSheetId]
 }
 
 /**

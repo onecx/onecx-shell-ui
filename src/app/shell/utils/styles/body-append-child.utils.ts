@@ -2,15 +2,18 @@ import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
   dataIntermediateNoPortalLayoutStylesKey,
   dataIntermediateStyleIdKey,
+  dataMfeStylesKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
   dataStyleIsolationKey,
+  dataIntermediateMfeElementKey,
   isCssScopeRuleSupported
 } from '@onecx/angular-utils'
 
 interface StyleData {
   styleId: string | undefined
   noPortalLayoutStyles: string | undefined
+  mfeElement: string | undefined
 }
 
 export function bodyChildListenerInitializer() {
@@ -105,6 +108,7 @@ function removeStyleDataRecursive(element: Element) {
     delete (element as HTMLElement).dataset[dataStyleIsolationKey]
     delete (element as HTMLElement).dataset[dataStyleIdKey]
     delete (element as HTMLElement).dataset[dataNoPortalLayoutStylesKey]
+    delete (element as HTMLElement).dataset[dataMfeStylesKey]
   }
 
   for (const child of Array.from(element.children)) {
@@ -121,6 +125,9 @@ function appendStyleData(element: HTMLElement, styleData: StyleData) {
   if (styleData.noPortalLayoutStyles || styleData.noPortalLayoutStyles === '') {
     element.dataset[dataNoPortalLayoutStylesKey] = styleData.noPortalLayoutStyles
   }
+  if (styleData.mfeElement || styleData.mfeElement === '') {
+    element.dataset[dataMfeStylesKey] = styleData.mfeElement
+  }
 }
 
 function appendIntermediateStyleData(element: HTMLElement, styleData: StyleData) {
@@ -132,6 +139,9 @@ function appendIntermediateStyleData(element: HTMLElement, styleData: StyleData)
   if (styleData.noPortalLayoutStyles || styleData.noPortalLayoutStyles === '') {
     element.dataset[dataIntermediateNoPortalLayoutStylesKey] = styleData.noPortalLayoutStyles
   }
+  if (styleData.mfeElement || styleData.mfeElement === '') {
+    element.dataset[dataIntermediateMfeElementKey] = styleData.mfeElement
+  }
 }
 
 function getStyleDataOrIntermediateStyleData(element: HTMLElement): StyleData {
@@ -140,7 +150,9 @@ function getStyleDataOrIntermediateStyleData(element: HTMLElement): StyleData {
   return {
     styleId: styleElement.dataset[dataStyleIdKey] ?? styleElement.dataset[dataIntermediateStyleIdKey],
     noPortalLayoutStyles:
-      styleElement.dataset[dataNoPortalLayoutStylesKey] ?? styleElement.dataset[dataIntermediateNoPortalLayoutStylesKey]
+      styleElement.dataset[dataNoPortalLayoutStylesKey] ??
+      styleElement.dataset[dataIntermediateNoPortalLayoutStylesKey],
+    mfeElement: styleElement.dataset[dataMfeStylesKey] ?? styleElement.dataset[dataIntermediateMfeElementKey]
   }
 }
 

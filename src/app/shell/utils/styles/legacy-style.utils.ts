@@ -8,8 +8,7 @@ import {
   dataDynamicPortalLayoutStylesKey,
   isCssScopeRuleSupported,
   addStyleToHead,
-  extractNonRootRules,
-  extractRootRules
+  replaceRootWithScope
 } from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
@@ -26,8 +25,7 @@ function loadPortalLayoutStylesStyles(css: string) {
     addStyleToHead(
       `
       @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-      ${extractRootRules(css)}
-      ${extractNonRootRules(css)}
+      ${replaceRootWithScope(css)}
     }
     `,
       {
@@ -38,8 +36,7 @@ function loadPortalLayoutStylesStyles(css: string) {
     addStyleToHead(
       `
       @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-          ${extractRootRules(css)}
-          ${extractNonRootRules(css)}
+          ${replaceRootWithScope(css)}
         }
         `,
       {
@@ -54,8 +51,7 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
     addStyleToHead(
       `
       @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-      ${extractRootRules(css)}
-      ${extractNonRootRules(css)}
+      ${replaceRootWithScope(css)}
     }
       `,
       {
@@ -66,8 +62,7 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
     addStyleToHead(
       `
       @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-      ${extractRootRules(css)}
-      ${extractNonRootRules(css)}
+      ${replaceRootWithScope(css)}
     }
     `,
       {

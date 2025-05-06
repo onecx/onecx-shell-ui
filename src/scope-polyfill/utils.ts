@@ -22,7 +22,6 @@ export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-
 
 export const portalLayoutStylesSheetId = `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`
 export const dynamicPortalLayoutStylesSheetId = `body>:not([${dataNoPortalLayoutStylesAttribute}])`
-export const shellStylesSheetId = `[${dataStyleIdAttribute}="${shellScopeId}"]`
 
 // eslint-disable-next-line no-useless-escape
 export const animationNameValueRegex = /animation-name:\s*([^\;]*)/
@@ -176,9 +175,11 @@ export function nodeToStyleIdSelectors(node: HTMLElement) {
     return [dynamicPortalLayoutStylesSheetId]
   }
 
-  // Node that is a child of shell requires to update shell styles and any styles with shell-ui style id
   if (styleId === shellScopeId) {
-    return [shellStylesSheetId]
+    return [
+      `[${dataStyleIdAttribute}="${shellScopeId}"]`,
+      `[${dataStyleIdAttribute}="${shellScopeId}"][${dataNoPortalLayoutStylesAttribute}]`
+    ]
   }
 
   const appStyles = `[${dataStyleIdAttribute}="${styleId}"]:is([${dataNoPortalLayoutStylesAttribute}], [${dataMfeElementAttribute}])`

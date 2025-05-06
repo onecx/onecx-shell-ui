@@ -30,7 +30,7 @@ export class CssStyleSheetHandler {
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     // Save data about the scope so we can access it later and not recompute
-    (sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
+    ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFrom = normalize(from)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxTo = normalize(to)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxScopeUniqueId = scopeFromToUniqueId(normalize(from))
@@ -116,14 +116,16 @@ export class CssStyleSheetHandler {
     if (childrenCss) {
       let ruleStyleText = rule.style.cssText
       if (ruleStyleText) ruleStyleText = this.applyAnimationChangesToCssText(ruleStyleText, sheet)
-      return `${appendToUniqueSelectors(rule.selectorText, ':where(0)')} {${ruleStyleText}${childrenCss}}`
+      return `${this.constructDefaultSelector(rule)} {${ruleStyleText}${childrenCss}}`
     }
 
-    const updatedRuleText = rule.cssText.replace(
-      rule.selectorText,
-      appendToUniqueSelectors(rule.selectorText, ':where(0)')
-    )
+    const updatedRuleText = rule.cssText.replace(rule.selectorText, this.constructDefaultSelector(rule))
     return this.applyAnimationChangesToCssText(updatedRuleText, sheet)
+  }
+
+  private static constructDefaultSelector(rule: CSSStyleRule) {
+    if (rule.selectorText === ':scope') return `${rule.selectorText}:where(0)`
+    return appendToUniqueSelectors(rule.selectorText, ':where(0)')
   }
 
   private static applyAnimationChangesToCssText(cssText: string, sheet: OcxCSSStyleSheet) {
@@ -243,6 +245,10 @@ export class CssStyleSheetHandler {
   ) {
     const originalQuerySelectorText = (cssRule as any).ocxQuerySelectorText
     if (originalQuerySelectorText === undefined) return
+    if (originalQuerySelectorText === ':scope') {
+      return this.updateScopeSelector(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
+    }
+
     if (
       mutationData.skipMutationCheck
         ? true
@@ -252,6 +258,29 @@ export class CssStyleSheetHandler {
       for (const child of Array.from(cssRule?.cssRules) ?? []) {
         this.updateRule(child, fromNodes, sheet, mutationData, cachedSelectors)
       }
+    }
+  }
+
+  private static updateScopeSelector(
+    cssRule: CSSStyleRule & CSSGroupingRule,
+    fromNodes: Element[],
+    sheet: OcxCSSStyleSheet,
+    mutationData: MutationData,
+    cachedSelectors: SelectorPresenceMap
+  ) {
+    cssRule.selectorText = computeRootSelectorsForElements(fromNodes).join(', ')
+    this.updateStyleRuleChildren(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
+  }
+
+  private static updateStyleRuleChildren(
+    cssRule: CSSStyleRule & CSSGroupingRule,
+    fromNodes: Element[],
+    sheet: OcxCSSStyleSheet,
+    mutationData: MutationData,
+    cachedSelectors: SelectorPresenceMap
+  ) {
+    for (const child of Array.from(cssRule?.cssRules) ?? []) {
+      this.updateRule(child, fromNodes, sheet, mutationData, cachedSelectors)
     }
   }
 

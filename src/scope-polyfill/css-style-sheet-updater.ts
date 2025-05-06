@@ -28,8 +28,8 @@ export class CssStyleSheetHandler {
       console.warn('Expected to have a scoped sheet for:', sheetWithSupportsRule)
       return
     }
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     // Save data about the scope so we can access it later and not recompute
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFrom = normalize(from)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxTo = normalize(to)

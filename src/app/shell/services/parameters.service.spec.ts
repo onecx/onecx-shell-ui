@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing'
-import { AppStateService, RemoteComponentsService } from '@onecx/angular-integration-interface'
 import {
   AppStateServiceMock,
   FakeTopic,
@@ -43,9 +42,7 @@ describe('ParametersService', () => {
     parametersService = TestBed.inject(ParametersService)
     ;(parametersService as any).parametersPublisher = parametersPublisherMock
 
-    appStateService = TestBed.inject(AppStateService)
     appStateServiceMock = TestBed.inject(AppStateServiceMock)
-    remoteComponentsService = TestBed.inject(RemoteComponentsService)
     remoteComponentsServiceMock = TestBed.inject(RemoteComponentsServiceMock)
     parameterBffService = TestBed.inject(ParameterBffService)
   })

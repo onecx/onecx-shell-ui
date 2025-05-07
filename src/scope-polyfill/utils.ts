@@ -22,6 +22,7 @@ export const dataIntermediateNoPortalLayoutStylesAttribute = 'data-intermediate-
 
 export const portalLayoutStylesSheetId = `[${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])`
 export const dynamicPortalLayoutStylesSheetId = `body>:not([${dataNoPortalLayoutStylesAttribute}])`
+export const shellStylesSheetId = `[${dataStyleIdAttribute}="${shellScopeId}"]`
 
 // eslint-disable-next-line no-useless-escape
 export const animationNameValueRegex = /animation-name:\s*([^\;]*)/

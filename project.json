@@ -85,6 +85,10 @@
         ],
         "styles": [
           {
+            "input": "./src/splash.scss",
+            "inject": true
+          },
+          {
             "input": "./src/global-styles.scss",
             "bundleName": "global-styles",
             "inject": true

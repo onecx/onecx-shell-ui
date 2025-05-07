@@ -29,6 +29,7 @@ export class CssStyleSheetHandler {
       return
     }
     // Save data about the scope so we can access it later and not recompute
+    // Save data about the scope so we can access it later and not recompute
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFrom = normalize(from)

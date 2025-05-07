@@ -100,7 +100,34 @@ paths:
                 format: binary
         404:
           description: Not found
-
+  /parameters:
+    post:
+      x-onecx:
+        permissions:
+          parameter:
+            - read
+      tags:
+        - parameter
+      operationId: getParameters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetParametersRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetParametersResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
   /userProfile:
     get:
       x-onecx:
@@ -156,9 +183,62 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: 'Not Found'
-
 components:
   schemas:
+    GetParametersRequest:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: object
+          additionalProperties:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+    GetParametersResponse:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+    Parameter:
+      type: object
+      required:
+        - name
+        - applicationId
+        - productName
+        - value
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+        applicationId:
+          type: string
+        productName:
+          type: string
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/ParameterValue'
+        importValue:
+          $ref: '#/components/schemas/ParameterValue'
+    ParameterValue:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: integer
+        - type: object
     LoadWorkspaceConfigRequest:
       type: object
       required:

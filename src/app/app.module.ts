@@ -1,5 +1,5 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
@@ -18,34 +18,35 @@ import {
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
-import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
+import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
 
 import { EventsPublisher, EventsTopic, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
-import { environment } from 'src/environments/environment'
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
+import { environment } from 'src/environments/environment'
 
-import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { HomeComponent } from './shell/components/home/home.component'
 import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
+import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
-import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
 import { bodyChildListenerInitializer } from './shell/utils/styles/body-append-child.utils'
 import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
 import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
+import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
+import { ParametersService } from './shell/services/parameters.service'
 
 function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   return async () => {
@@ -84,6 +85,7 @@ export function workspaceConfigInitializer(
   themeService: ThemeService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
+  parametersService: ParametersService,
   router: Router
 ) {
   return async () => {
@@ -122,6 +124,7 @@ export function workspaceConfigInitializer(
           slots: loadWorkspaceConfigResponse.slots
         })
       ])
+      parametersService.initialize()
     }
   }
 }
@@ -303,7 +306,15 @@ export function shareMfContainer() {
     {
       provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
-      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, RemoteComponentsService, Router],
+      deps: [
+        WorkspaceConfigBffService,
+        RoutesService,
+        ThemeService,
+        AppStateService,
+        RemoteComponentsService,
+        ParametersService,
+        Router
+      ],
       multi: true
     },
     {

@@ -1,5 +1,6 @@
 import { AfterContentInit, Component, ElementRef, ViewChild } from '@angular/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
+import { dataMfeElementKey } from '@onecx/angular-utils'
 import { firstValueFrom } from 'rxjs'
 import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 
@@ -23,6 +24,7 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
     const element = document.createElement(currentMfe.elementName)
     element.dataset[dataStyleIdKey] = styleId
     element.dataset[dataStyleIsolationKey] = ''
+    element.dataset[dataMfeElementKey] = ''
     this.wrapper?.nativeElement.appendChild(element)
   }
 }

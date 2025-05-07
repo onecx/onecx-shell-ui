@@ -20,6 +20,8 @@ import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologi
 import { HomeComponent } from '../components/home/home.component'
 import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
+import { updateStylesForMfeChange } from '@onecx/angular-utils'
+import { HttpClient } from '@angular/common/http'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -39,7 +41,8 @@ export class RoutesService implements ShowContentProvider {
     private readonly portalMessageService: PortalMessageService,
     private readonly configurationService: ConfigurationService,
     private readonly permissionsCacheService: PermissionsCacheService,
-    private readonly permissionsService: PermissionBffService
+    private readonly permissionsService: PermissionBffService,
+    private readonly httpClient: HttpClient
   ) {
     router.events
       .pipe(
@@ -134,17 +137,7 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updateAppStyles(r: BffGeneratedRoute) {
-    let link = document.getElementById('ocx_app_styles') as any
-    if (!link) {
-      link = document.createElement('link')
-      link.id = 'ocx_app_styles'
-      link.rel = 'stylesheet'
-      link.media = 'all'
-      document.head.appendChild(link)
-    }
-    if (link.href !== Location.joinWithSlash(r.url, 'styles.css')) {
-      link.href = Location.joinWithSlash(r.url, 'styles.css')
-    }
+    await updateStylesForMfeChange(r.productName, r.appId, this.httpClient, r.url)
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {

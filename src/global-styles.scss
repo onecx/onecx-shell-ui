@@ -1,0 +1,26 @@
+/*
+  Style sheet for global styles.
+  This file should ONLY contain styles that are meant to be applied GLOBALLY.
+  Shell is going to load this style sheet with a link tag on the startup.
+
+  To define styles for Shell only, please refer to shell-styles.scss.
+*/
+$mobileBreakpoint: 991px !default;
+$fallbackFontFamily: Ubuntu, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+$fallbackFontSize: 1rem;
+:root {
+    --mobile-break-point: #{$mobileBreakpoint};
+    font-size: var(--font-size, $fallbackFontSize);
+}
+
+body {
+  font-family: var(--font-family, $fallbackFontFamily);
+  overflow: hidden;
+}
+
+// disable default settings of dialogs created by portal dialog service
+.buttonDialogScrollableContent {
+  overflow: unset;
+  max-height: unset !important;
+  margin-bottom: 1rem !important;
+}

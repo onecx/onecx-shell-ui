@@ -3,24 +3,34 @@ import {
   animationNameValueRegex,
   appendToUniqueSelectors,
   computeRootSelectorsForElements,
+  findSupportsRule,
   matchScope,
   normalize,
+  removePseudoElements,
   scopeFromToUniqueId,
   splitSelectorToSubSelectors
 } from './utils'
 
 export class CssStyleSheetHandler {
   //-------------------------Scope sheet creation-------------------------
+  /**
+   * Transforms style sheet to scoped style sheet that implements the OcxCSSStyleSheet interface.
+   */
   static changeToScopedSheet(sheetWithSupportsRule: CSSStyleSheet) {
-    // Leave information about this being a scoped sheet
-    const supportsRule = sheetWithSupportsRule.cssRules[0] as CSSSupportsRule
+    const supportsRule = findSupportsRule(sheetWithSupportsRule)
+    if (!supportsRule) {
+      console.warn('Expected style sheet with supports rule, but received one without any.')
+      return
+    }
+
     const [match, from, to] = matchScope(this.supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
     if (!match) {
       console.warn('Expected to have a scoped sheet for:', sheetWithSupportsRule)
       return
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
+    // Save data about the scope so we can access it later and not recompute
+    (sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxMatch = normalize(match)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxFrom = normalize(from)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxTo = normalize(to)
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxScopeUniqueId = scopeFromToUniqueId(normalize(from))
@@ -30,14 +40,18 @@ export class CssStyleSheetHandler {
   }
 
   private static supportsConditionTextToScopeRuleText(conditionText: string) {
+    // Removing braces from condition since its always wrapped with braces e.g., coditionText = (@scope(...))
     return conditionText.slice(1, -1)
   }
 
+  /**
+   * Deconstructs supports css rule so every scoped rule is available in the browser in a scoped manner initially with references to 0 elements.
+   */
   private static moveSupportsRulesToTopLevelAndApplyInitialScope(sheet: OcxCSSStyleSheet) {
-    if (sheet.cssRules.length !== 1 || !(sheet.cssRules[0] instanceof CSSSupportsRule)) return
+    const supportsRule = findSupportsRule(sheet)
+    if (!supportsRule) return
 
-    const supportsRule = sheet.cssRules[0]
-    sheet.deleteRule(0)
+    sheet.deleteRule(Array.from(sheet.cssRules).findIndex((rule) => rule === supportsRule))
     for (const supportsChildRule of Array.from(supportsRule.cssRules)) {
       sheet.insertRule(
         this.createSheetDefaultRuleText(supportsChildRule, sheet),
@@ -45,6 +59,7 @@ export class CssStyleSheetHandler {
       )
     }
 
+    // Save the original selector data for making updates
     for (const rule of Array.from(sheet.cssRules)) {
       this.setOcxSelectorText(rule)
     }
@@ -127,7 +142,11 @@ export class CssStyleSheetHandler {
 
   private static setOcxSelectorText(rule: CSSRule) {
     const ruleSelectorText = (rule as any).selectorText
-    if (ruleSelectorText) (rule as any).ocxSelectorText = this.constructOriginalSelector(ruleSelectorText)
+    if (ruleSelectorText) {
+      const selectorText = this.constructOriginalSelector(ruleSelectorText)
+      ;(rule as any).ocxSelectorText = selectorText
+      ;(rule as any).ocxQuerySelectorText = removePseudoElements(selectorText)
+    }
     for (const child of (rule as any).cssRules ?? []) {
       this.setOcxSelectorText(child)
     }
@@ -212,7 +231,9 @@ export class CssStyleSheetHandler {
     }
   }
 
-  // Update style rule and its children when the update is required
+  /**
+   * Validate if rule requires an update. If yes then find all elements in the scope that match the rule's selector and update the selector
+   */
   private static updateStyleRule(
     cssRule: CSSStyleRule & CSSGroupingRule,
     fromNodes: Element[],
@@ -220,14 +241,14 @@ export class CssStyleSheetHandler {
     mutationData: MutationData,
     cachedSelectors: SelectorPresenceMap
   ) {
-    const originalSelectorText = (cssRule as any).ocxSelectorText
-    if (originalSelectorText === undefined) return
+    const originalQuerySelectorText = (cssRule as any).ocxQuerySelectorText
+    if (originalQuerySelectorText === undefined) return
     if (
       mutationData.skipMutationCheck
         ? true
-        : this.doesRuleRequireUpdate(originalSelectorText, mutationData.mutatedElements, cachedSelectors)
+        : this.doesRuleRequireUpdate(originalQuerySelectorText, mutationData.mutatedElements, cachedSelectors)
     ) {
-      this.updateElementsMatchingSelectorsInScope(cssRule, originalSelectorText, fromNodes, sheet)
+      this.updateElementsMatchingSelectorsInScope(cssRule, fromNodes, sheet)
       for (const child of Array.from(cssRule?.cssRules) ?? []) {
         this.updateRule(child, fromNodes, sheet, mutationData, cachedSelectors)
       }
@@ -260,18 +281,19 @@ export class CssStyleSheetHandler {
   // Find all elements matching the selector in scope and replace rule selector
   private static updateElementsMatchingSelectorsInScope(
     cssStyleRule: CSSStyleRule,
-    selectorText: string,
     searchStartElements: Array<Element>,
     sheet: OcxCSSStyleSheet
   ) {
+    const originalQuerySelectorText = (cssStyleRule as any).ocxQuerySelectorText
+    const originalSelectorText = (cssStyleRule as any).ocxSelectorText
     const elementsMatchingSelector = searchStartElements
       .map((from) =>
-        from.querySelectorAll(':is(' + selectorText + '):not(:scope :is(' + sheet.ownerNode.ocxTo + ') *)')
+        from.querySelectorAll(':is(' + originalQuerySelectorText + '):not(:scope :is(' + sheet.ownerNode.ocxTo + ') *)')
       )
       .flatMap((nodeList) => Array.from(nodeList))
     const elementsRootSelectors = computeRootSelectorsForElements(elementsMatchingSelector)
     const whereSelector = elementsRootSelectors.length > 0 ? elementsRootSelectors.join(', ') : '0'
-    cssStyleRule.selectorText = appendToUniqueSelectors(selectorText, `:where(${whereSelector})`)
+    cssStyleRule.selectorText = appendToUniqueSelectors(originalSelectorText, `:where(${whereSelector})`)
   }
   //-------------------------Scope sheet update-------------------------
 }

@@ -1,12 +1,12 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
-import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
+import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
   AppStateService,
@@ -20,7 +20,7 @@ import {
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { createTranslateLoader, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
-import { SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, ShellCoreModule } from '@onecx/shell-core'
+import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
 
 import {
   CurrentLocationPublisher,
@@ -31,26 +31,27 @@ import {
   CurrentLocationTopicPayload
 } from '@onecx/integration-interface'
 
-import { catchError, filter, firstValueFrom, Observable, retry } from 'rxjs'
-import { environment } from 'src/environments/environment'
+import { catchError, filter, firstValueFrom, retry, Observable } from 'rxjs'
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
+import { environment } from 'src/environments/environment'
 
-import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { HomeComponent } from './shell/components/home/home.component'
 import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
+import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
-import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
+import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
+import { ParametersService } from './shell/services/parameters.service'
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -74,6 +75,7 @@ export function workspaceConfigInitializer(
   appStateService: AppStateService,
   capabilityService: ShellCapabilityService,
   remoteComponentsService: RemoteComponentsService,
+  parametersService: ParametersService,
   router: Router
 ) {
   return async () => {
@@ -112,6 +114,7 @@ export function workspaceConfigInitializer(
           slots: loadWorkspaceConfigResponse.slots
         })
       ])
+      parametersService.initialize()
     }
   }
 }
@@ -242,20 +245,19 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-declare const __webpack_share_scopes__: { default: unknown};
+declare const __webpack_share_scopes__: { default: unknown }
 
-declare global { 
+declare global {
   interface Window {
-    onecxWebpackContainer: any;
+    onecxWebpackContainer: any
   }
 }
 
-export function shareMfContainer(){
-  return async ()=>{
+export function shareMfContainer() {
+  return async () => {
     window.onecxWebpackContainer = __webpack_share_scopes__.default
   }
 }
-
 
 @NgModule({
   declarations: [
@@ -294,7 +296,7 @@ export function shareMfContainer(){
     {
       provide: TRANSLATION_PATH,
       useValue: './assets/i18n/',
-      multi: true,
+      multi: true
     },
     { provide: APP_CONFIG, useValue: environment },
     {
@@ -306,7 +308,16 @@ export function shareMfContainer(){
     {
       provide: APP_INITIALIZER,
       useFactory: workspaceConfigInitializer,
-      deps: [WorkspaceConfigBffService, RoutesService, ThemeService, AppStateService, ShellCapabilityService, RemoteComponentsService, Router],
+      deps: [
+        WorkspaceConfigBffService,
+        RoutesService,
+        ThemeService,
+        AppStateService,
+        ShellCapabilityService,
+        RemoteComponentsService,
+        ParametersService,
+        Router
+      ],
       multi: true
     },
     {

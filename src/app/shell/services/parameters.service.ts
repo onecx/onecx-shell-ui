@@ -14,12 +14,12 @@ type Cache = { parameters: (ApplicationParameters & { expirationDate: number })[
 
 @Injectable({ providedIn: 'root' })
 export class ParametersService {
-  private appStateService = inject(AppStateService)
-  private remoteComponentsService = inject(RemoteComponentsService)
-  private parameterBffService = inject(ParameterBffService)
+  private readonly appStateService = inject(AppStateService)
+  private readonly remoteComponentsService = inject(RemoteComponentsService)
+  private readonly parameterBffService = inject(ParameterBffService)
   private readonly cacheItemName = 'onecx-parameters-cache'
   private readonly cacheExpirationTimeMs = 3600 * 1000 // 1 hour
-  private parametersPublisher = new ParametersPublisher()
+  private readonly parametersPublisher = new ParametersPublisher()
 
   initialize() {
     //Not awaited on purpose

@@ -10,10 +10,8 @@ import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth
 import {
   APP_CONFIG,
   AppStateService,
-  Capability,
   ConfigurationService,
   RemoteComponentsService,
-  ShellCapabilityService,
   ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
@@ -25,13 +23,10 @@ import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PR
 import {
   CurrentLocationPublisher,
   EventsPublisher,
-  EventsTopic,
   NavigatedEventPayload,
-  TopicEventType,
-  CurrentLocationTopicPayload
 } from '@onecx/integration-interface'
 
-import { catchError, filter, firstValueFrom, retry, Observable } from 'rxjs'
+import { catchError, firstValueFrom, retry } from 'rxjs'
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
@@ -73,7 +68,6 @@ export function workspaceConfigInitializer(
   routesService: RoutesService,
   themeService: ThemeService,
   appStateService: AppStateService,
-  capabilityService: ShellCapabilityService,
   remoteComponentsService: RemoteComponentsService,
   parametersService: ParametersService,
   router: Router
@@ -107,7 +101,7 @@ export function workspaceConfigInitializer(
         publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
         routesService
           .init(loadWorkspaceConfigResponse.routes)
-          .then(urlChangeListenerInitializer(router, appStateService, capabilityService)),
+          .then(urlChangeListenerInitializer(router, appStateService)),
         themeService.apply(themeWithParsedProperties),
         remoteComponentsService.remoteComponents$.publish({
           components: loadWorkspaceConfigResponse.components,
@@ -212,7 +206,10 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService, capabilityService: ShellCapabilityService) {
+export function urlChangeListenerInitializer(
+  router: Router,
+  appStateService: AppStateService
+) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
@@ -222,11 +219,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       url,
       isFirst: true
     })
-    let observable: Observable<TopicEventType | CurrentLocationTopicPayload> = appStateService.currentLocation$.asObservable()
-    if (!capabilityService.hasCapability(Capability.CURRENT_LOCATION_TOPIC)) {
-      observable = new EventsTopic().pipe(filter((e) => e.type === 'navigated'))
-    }
-    observable.subscribe(() => {
+    appStateService.currentLocation$.subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length
       )}${location.search}${location.hash}`
@@ -313,7 +306,6 @@ export function shareMfContainer() {
         RoutesService,
         ThemeService,
         AppStateService,
-        ShellCapabilityService,
         RemoteComponentsService,
         ParametersService,
         Router

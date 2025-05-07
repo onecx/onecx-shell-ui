@@ -10,47 +10,6 @@
       rel="icon"
       type="image/x-icon"
     />
-    <!-- Shell styles for loading state -->
-    <style>
-      ocx-shell-root + .splash {
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        width: 100vw;
-        height: 100vh;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        color: #555;
-        z-index: 999;
-        position: fixed;
-        top: 0;
-        left: 0;
-        .splash-content {
-          padding: 1rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
-          .splash-loader {
-            animation: rotator 1.4s linear infinite;
-            .splash-path {
-              stroke-dasharray: 187;
-              stroke-dashoffset: 0;
-              transform-origin: center;
-              animation:
-                dash 1.4s ease-in-out infinite,
-                colors 5.6s ease-in-out infinite;
-            }
-          }
-        }
-      }
-
-      ocx-shell-root:empty + .splash {
-        display: flex;
-        opacity: 1;
-      }
-    </style>
     <!-- Force browser to use only light mode -->
     <style>
       :root {

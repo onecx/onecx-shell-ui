@@ -2,12 +2,12 @@ import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
   dataIntermediateNoPortalLayoutStylesKey,
   dataIntermediateStyleIdKey,
-  dataMfeStylesKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
   dataStyleIsolationKey,
   dataIntermediateMfeElementKey,
-  isCssScopeRuleSupported
+  isCssScopeRuleSupported,
+  dataMfeElementKey
 } from '@onecx/angular-utils'
 
 interface StyleData {
@@ -108,7 +108,7 @@ function removeStyleDataRecursive(element: Element) {
     delete (element as HTMLElement).dataset[dataStyleIsolationKey]
     delete (element as HTMLElement).dataset[dataStyleIdKey]
     delete (element as HTMLElement).dataset[dataNoPortalLayoutStylesKey]
-    delete (element as HTMLElement).dataset[dataMfeStylesKey]
+    delete (element as HTMLElement).dataset[dataMfeElementKey]
   }
 
   for (const child of Array.from(element.children)) {
@@ -126,7 +126,7 @@ function appendStyleData(element: HTMLElement, styleData: StyleData) {
     element.dataset[dataNoPortalLayoutStylesKey] = styleData.noPortalLayoutStyles
   }
   if (styleData.mfeElement || styleData.mfeElement === '') {
-    element.dataset[dataMfeStylesKey] = styleData.mfeElement
+    element.dataset[dataMfeElementKey] = styleData.mfeElement
   }
 }
 
@@ -152,7 +152,7 @@ function getStyleDataOrIntermediateStyleData(element: HTMLElement): StyleData {
     noPortalLayoutStyles:
       styleElement.dataset[dataNoPortalLayoutStylesKey] ??
       styleElement.dataset[dataIntermediateNoPortalLayoutStylesKey],
-    mfeElement: styleElement.dataset[dataMfeStylesKey] ?? styleElement.dataset[dataIntermediateMfeElementKey]
+    mfeElement: styleElement.dataset[dataMfeElementKey] ?? styleElement.dataset[dataIntermediateMfeElementKey]
   }
 }
 

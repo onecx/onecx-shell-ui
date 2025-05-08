@@ -246,6 +246,7 @@ export class CssStyleSheetHandler {
   ) {
     const originalQuerySelectorText = (cssRule as any).ocxQuerySelectorText
     if (originalQuerySelectorText === undefined) return
+    // Special case for styles that have to be applied for the @scope root
     if (originalQuerySelectorText === ':scope') {
       return this.updateScopeSelector(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
     }
@@ -269,6 +270,8 @@ export class CssStyleSheetHandler {
     mutationData: MutationData,
     cachedSelectors: SelectorPresenceMap
   ) {
+    // :scope selector has to be replaced with the selection of found @scope root elements
+    // e.g., :scope {} -> :where(:nth-child(1) > :nth-child(2)) {}
     cssRule.selectorText = computeRootSelectorsForElements(fromNodes).join(', ')
     this.updateStyleRuleChildren(cssRule, fromNodes, sheet, mutationData, cachedSelectors)
   }

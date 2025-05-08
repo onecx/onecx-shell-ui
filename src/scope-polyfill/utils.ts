@@ -176,9 +176,11 @@ export function nodeToStyleIdSelectors(node: HTMLElement) {
     return [dynamicPortalLayoutStylesSheetId]
   }
 
-  // Node that is a child of shell requires to update shell styles and any styles with shell-ui style id
   if (styleId === shellScopeId) {
-    return [shellStylesSheetId]
+    return [
+      `[${dataStyleIdAttribute}="${shellScopeId}"]`,
+      `[${dataStyleIdAttribute}="${shellScopeId}"][${dataNoPortalLayoutStylesAttribute}]`
+    ]
   }
 
   const appStyles = `[${dataStyleIdAttribute}="${styleId}"]:is([${dataNoPortalLayoutStylesAttribute}], [${dataMfeElementAttribute}])`

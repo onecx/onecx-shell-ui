@@ -8,8 +8,7 @@ import {
   dataDynamicPortalLayoutStylesKey,
   isCssScopeRuleSupported,
   addStyleToHead,
-  extractNonRootRules,
-  extractRootRules
+  replaceRootWithScope
 } from '@onecx/angular-utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
@@ -25,9 +24,8 @@ function loadPortalLayoutStylesStyles(css: string) {
   if (isCssScopeRuleSupported()) {
     addStyleToHead(
       `
-      ${extractRootRules(css)}
-    @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-      ${extractNonRootRules(css)}
+      @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${replaceRootWithScope(css)}
     }
     `,
       {
@@ -37,9 +35,8 @@ function loadPortalLayoutStylesStyles(css: string) {
   } else {
     addStyleToHead(
       `
-        ${extractRootRules(css)}
-        @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-          ${extractNonRootRules(css)}
+      @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+          ${replaceRootWithScope(css)}
         }
         `,
       {
@@ -53,9 +50,8 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
   if (isCssScopeRuleSupported()) {
     addStyleToHead(
       `
-      ${extractRootRules(css)}
-    @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
-      ${extractNonRootRules(css)}
+      @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
+      ${replaceRootWithScope(css)}
     }
       `,
       {
@@ -65,9 +61,8 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
   } else {
     addStyleToHead(
       `
-      ${extractRootRules(css)}
-    @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
-      ${extractNonRootRules(css)}
+      @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
+      ${replaceRootWithScope(css)}
     }
     `,
       {

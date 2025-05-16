@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+
 import { getLocation } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
 import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
@@ -19,12 +20,7 @@ import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx
 import { createTranslateLoader, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
-
-import {
-  CurrentLocationPublisher,
-  EventsPublisher,
-  NavigatedEventPayload,
-} from '@onecx/integration-interface'
+import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload } from '@onecx/integration-interface'
 
 import { catchError, firstValueFrom, retry } from 'rxjs'
 import {
@@ -206,10 +202,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(
-  router: Router,
-  appStateService: AppStateService
-) {
+export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''

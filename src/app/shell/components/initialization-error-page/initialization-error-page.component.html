@@ -28,11 +28,12 @@
       <i>{{ error.params }}</i>
     </div>
   </div>
+
   <button
     pButton
     class="mt-4 w-max"
     (click)="onLogout()"
-    [ariaLabel]="'LOGOUT' | translate"
+    [attr.aria-label]="'LOGOUT' | translate"
     [pTooltip]="'LOGOUT.TOOLTIP' | translate"
     tooltipPosition="top"
     tooltipEvent="hover"

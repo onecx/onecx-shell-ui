@@ -39,6 +39,8 @@ export function initializationErrorHandler(error: any, router: Router): Observab
       : ''
   )
 
-  router.navigate(['portal-initialization-error-page'], { fragment: params.toString() })
+  // only on first time: redirect and add message
+  if (!params.toString().includes('portal-initialization-error-page'))
+    router.navigate(['portal-initialization-error-page'], { fragment: params.toString() })
   return of(undefined)
 }

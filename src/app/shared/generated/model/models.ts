@@ -1,5 +1,7 @@
 export * from './accountSettings';
 export * from './colorScheme';
+export * from './getParametersRequest';
+export * from './getParametersResponse';
 export * from './getPermissionsRequest';
 export * from './getPermissionsResponse';
 export * from './getUserProfileResponse';
@@ -8,6 +10,8 @@ export * from './loadWorkspaceConfigRequest';
 export * from './loadWorkspaceConfigResponse';
 export * from './localeAndTimeSettings';
 export * from './menuMode';
+export * from './parameter';
+export * from './parameterValue';
 export * from './pathMatch';
 export * from './phoneType';
 export * from './problemDetailInvalidParam';

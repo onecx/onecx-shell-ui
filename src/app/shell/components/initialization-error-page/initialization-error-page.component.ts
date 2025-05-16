@@ -2,6 +2,8 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
 
+import { EventsPublisher } from '@onecx/integration-interface'
+
 interface InitializationError {
   message: string
   requestedUrl: string
@@ -16,6 +18,7 @@ interface InitializationError {
 })
 export class InitializationErrorPageComponent {
   error$: Observable<InitializationError>
+  public eventsPublisher$: EventsPublisher = new EventsPublisher()
 
   constructor(private readonly route: ActivatedRoute) {
     this.error$ = this.route.fragment.pipe(
@@ -31,5 +34,9 @@ export class InitializationErrorPageComponent {
         }
       })
     )
+  }
+
+  public onLogout(): void {
+    this.eventsPublisher$.publish({ type: 'authentication#logoutButtonClicked' })
   }
 }

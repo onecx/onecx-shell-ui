@@ -1,9 +1,11 @@
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { APP_INITIALIZER, NgModule } from '@angular/core'
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { catchError, firstValueFrom, retry } from 'rxjs'
+
 import { getLocation } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
 import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
@@ -19,14 +21,8 @@ import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx
 import { createTranslateLoader, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
+import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload } from '@onecx/integration-interface'
 
-import {
-  CurrentLocationPublisher,
-  EventsPublisher,
-  NavigatedEventPayload,
-} from '@onecx/integration-interface'
-
-import { catchError, firstValueFrom, retry } from 'rxjs'
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
@@ -38,15 +34,16 @@ import { environment } from 'src/environments/environment'
 import { HomeComponent } from './shell/components/home/home.component'
 import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
 import { PageNotFoundComponent } from './shell/components/not-found-page.component'
+import { ErrorPageComponent } from './shell/components/error-page.component'
+import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
+
+import { ParametersService } from './shell/services/parameters.service'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
-import { ErrorPageComponent } from './shell/components/error-page.component'
-import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
-import { ParametersService } from './shell/services/parameters.service'
 
 function publishCurrentWorkspace(
   appStateService: AppStateService,
@@ -206,10 +203,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(
-  router: Router,
-  appStateService: AppStateService
-) {
+export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''

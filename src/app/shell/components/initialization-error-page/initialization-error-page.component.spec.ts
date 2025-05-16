@@ -1,3 +1,4 @@
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
@@ -31,6 +32,7 @@ describe('InitializationErrorPageComponent', () => {
           en: require('../../../../assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
       providers: [{ provide: ActivatedRoute, useValue: route }]
     }).compileComponents()
 

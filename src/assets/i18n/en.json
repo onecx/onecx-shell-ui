@@ -3,6 +3,8 @@
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
   },
+  "LOGOUT": "Log out",
+  "LOGOUT.TOOLTIP": "Log out and go to Login Page",
   "WELCOME": {
     "TITLE": "Hello"
   },
@@ -22,6 +24,7 @@
   "INITIALIZATION_ERROR_PAGE": {
     "TITLE": "Something went wrong during Workspace initialization.",
     "SUBTITLE": "Please contact a Workspace administrator with the following information:",
+    "SECTION": "Error Message",
     "DETAILS": {
       "MESSAGE": "Error message",
       "REQUESTED_URL": "Requested URL",

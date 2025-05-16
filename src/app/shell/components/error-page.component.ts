@@ -18,9 +18,9 @@ import { getLocation } from '@onecx/accelerator'
       </div>
       <button
         pButton
-        (click)="reloadPage()"
-        routerLinkActive="router-link-active"
         class="w-max"
+        (click)="onReloadPage()"
+        routerLinkActive="router-link-active"
         [ariaLabel]="'ERROR_PAGE.ACTION' | translate"
         [pTooltip]="'ERROR_PAGE.ACTION.TOOLTIP' | translate"
         tooltipPosition="top"
@@ -33,11 +33,12 @@ import { getLocation } from '@onecx/accelerator'
 })
 export class ErrorPageComponent {
   requestedApplicationPath: string
+
   constructor(private readonly route: ActivatedRoute) {
     this.requestedApplicationPath = this.route.snapshot.paramMap.get('requestedApplicationPath') ?? ''
   }
 
-  reloadPage() {
+  public onReloadPage() {
     const pageLocation = getLocation()
     const reloadBaseUrl = Location.joinWithSlash(pageLocation.origin, pageLocation.deploymentPath)
     const reloadHref = Location.joinWithSlash(reloadBaseUrl, this.requestedApplicationPath)

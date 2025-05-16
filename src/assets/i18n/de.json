@@ -3,6 +3,8 @@
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnten nicht geladen werden."
   },
+  "LOGOUT": "Abmelden",
+  "LOGOUT.TOOLTIP": "Abmelden und zur Anmeldeseite wechseln",
   "WELCOME": {
     "TITLE": "Hallo"
   },
@@ -22,6 +24,7 @@
   "INITIALIZATION_ERROR_PAGE": {
     "TITLE": "Fehler bei der Initialisierung des Workspaces",
     "SUBTITLE": "Bitte kontaktieren Sie einen Workspace Administrator mit den folgenden Informationen:",
+    "SECTION": "Fehlermeldung",
     "DETAILS": {
       "MESSAGE": "Fehlermeldung",
       "REQUESTED_URL": "Aufgerufene URL",

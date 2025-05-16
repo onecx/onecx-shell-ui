@@ -4,6 +4,7 @@ import { of } from 'rxjs'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { InitializationErrorPageComponent } from './initialization-error-page.component'
+import { TooltipModule } from 'primeng/tooltip'
 
 describe('InitializationErrorPageComponent', () => {
   let component: InitializationErrorPageComponent
@@ -27,6 +28,7 @@ describe('InitializationErrorPageComponent', () => {
     TestBed.configureTestingModule({
       declarations: [InitializationErrorPageComponent],
       imports: [
+        TooltipModule,
         TranslateTestingModule.withTranslations({
           en: require('../../../../assets/i18n/en.json')
         }).withDefaultLanguage('en')

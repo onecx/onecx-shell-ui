@@ -1,6 +1,7 @@
-<div class="p-4">
+<section class="p-4" [attr.aria-label]="'INITIALIZATION_ERROR_PAGE.SECTION' | translate">
   <h1 class="md:text-xl text-lg mb-1">{{ 'INITIALIZATION_ERROR_PAGE.TITLE' | translate }}</h1>
   <p class="text-base">{{ 'INITIALIZATION_ERROR_PAGE.SUBTITLE' | translate }}</p>
+
   <div *ngIf="error$ | async as error" class="mt-3 flex flex-column row-gap-2 md:text-base text-sm">
     <div id="onecxInitializationErrorMessage" *ngIf="error.message">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.MESSAGE' | translate }}</div>
@@ -27,4 +28,15 @@
       <i>{{ error.params }}</i>
     </div>
   </div>
-</div>
+  <button
+    pButton
+    class="mt-4 w-max"
+    (click)="onLogout()"
+    [ariaLabel]="'LOGOUT' | translate"
+    [pTooltip]="'LOGOUT.TOOLTIP' | translate"
+    tooltipPosition="top"
+    tooltipEvent="hover"
+  >
+    {{ 'LOGOUT' | translate }}
+  </button>
+</section>

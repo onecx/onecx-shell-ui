@@ -19,10 +19,14 @@ import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx
 import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
+import {
+  CurrentLocationPublisher,
+  EventsPublisher,
+  NavigatedEventPayload,
+  Theme
+} from '@onecx/integration-interface'
 
-import { EventsPublisher, EventsTopic, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
-
-import { catchError, filter, firstValueFrom, retry } from 'rxjs'
+import { catchError, firstValueFrom, retry } from 'rxjs'
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
@@ -170,7 +174,17 @@ let isFirst = true
 let isInitialPageLoad = true
 const pushState = window.history.pushState
 window.history.pushState = (data: any, unused: string, url?: string) => {
+  const isRouterSync = data?.isRouterSync
+  if (data && 'isRouterSync' in data) {
+    delete data.isRouterSync
+  }
   pushState.bind(window.history)(data, unused, url)
+  if (!isRouterSync) {
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: false
+    })
+  }
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
@@ -187,7 +201,17 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
 
 const replaceState = window.history.replaceState
 window.history.replaceState = (data: any, unused: string, url?: string) => {
+  const isRouterSync = data?.isRouterSync
+  if (data && 'isRouterSync' in data) {
+    delete data.isRouterSync
+  }
   replaceState.bind(window.history)(data, unused, url)
+  if (!isRouterSync) {
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: false
+    })
+  }
   new EventsPublisher().publish({
     type: 'navigated',
     payload: {
@@ -202,13 +226,20 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
+export function urlChangeListenerInitializer(
+  router: Router,
+  appStateService: AppStateService
+) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
     let isFirstRoute = true
-    const observer = new EventsTopic()
-    observer.pipe(filter((e) => e.type === 'navigated')).subscribe(() => {
+    const url = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+    new CurrentLocationPublisher().publish({
+      url,
+      isFirst: true
+    })
+    appStateService.currentLocation$.subscribe(() => {
       const routerUrl = `${location.pathname.substring(
         getLocation().deploymentPath.length
       )}${location.search}${location.hash}`
@@ -216,7 +247,8 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
         lastUrl = routerUrl
         if (!isFirstRoute) {
           router.navigateByUrl(routerUrl, {
-            replaceUrl: true
+            replaceUrl: true,
+            state: { isRouterSync: true }
           })
         } else {
           isFirstRoute = false

@@ -19,6 +19,12 @@ export const angular18Preloader: Preloader = {
   exposedModule: './Angular18Loader'
 }
 
+export const angular20Preloader: Preloader = {
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  windowKey: 'angular-20',
+  exposedModule: './Angular20Loader'
+}
+
 export function loadPreloaderModule(preloader: Preloader) {
   return loadRemoteModule({
     type: 'module',

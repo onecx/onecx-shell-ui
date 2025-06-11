@@ -1,4 +1,4 @@
-import { loadRemoteModule } from '@angular-architects/module-federation-runtime'
+import { loadRemoteModule } from '@angular-architects/module-federation'
 import { getLocation } from '@onecx/accelerator'
 
 declare global {

@@ -33,5 +33,7 @@ cachePlatform(true)
     ngZone: getNgZone()
   })
   .then((ref) => {
+    const features = (ref as any)._moduleDef?.features
+    console.log('FEATURES:', features)
     return ref
   })

@@ -3,7 +3,7 @@ const { share, withModuleFederationPlugin } = require('@angular-architects/modul
 
 const webpackConfig = {
   ...withModuleFederationPlugin({
-    name: 'onecx-shell',
+    name: 'onecx-angular-20-loader',
     filename: 'remoteEntry.js',
     exposes: {
       './Angular20Loader': 'src/main.ts'

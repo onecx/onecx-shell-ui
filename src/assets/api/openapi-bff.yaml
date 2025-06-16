@@ -437,6 +437,8 @@ components:
           type: string
         organization:
           type: string
+        issuer:
+          type: string
         person:
           $ref: '#/components/schemas/UserPerson'
         accountSettings:

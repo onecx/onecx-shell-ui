@@ -16,6 +16,7 @@ import { UserPerson } from './userPerson';
 export interface UserProfile { 
     userId: string;
     organization?: string;
+    issuer?: string;
     person: UserPerson;
     accountSettings?: AccountSettings;
 }

@@ -6,14 +6,62 @@
   "sourceRoot": "./src",
   "tags": [],
   "targets": {
+    "build-18-loader": {
+      "executor": "@nx/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/pre_loaders/onecx-angular-18-loader",
+        "index": "./pre_loaders/angular-18/src/index.html",
+        "main": "./pre_loaders/angular-18/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "./pre_loaders/angular-18/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [],
+        "styles": [],
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "./pre_loaders/angular-18/webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "./pre_loaders/angular-18/webpack.config.js"
+          }
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
       "executor": "@nx/angular:webpack-browser",
+      "dependsOn": ["^build", "build-18-loader"],
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/onecx-shell-ui",
         "index": "./src/index.html",
         "main": "./src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": ["zone.js", "src/polyfills.ts"],
         "tsConfig": "./tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -28,9 +76,34 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/angular-accelerator/assets/",
             "output": "/onecx-angular-accelerator/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./dist/pre_loaders/",
+            "output": "./pre_loaders"
           }
         ],
-        "styles": ["./src/styles.scss"],
+        "styles": [
+          {
+            "input": "./src/splash.scss",
+            "inject": true
+          },
+          {
+            "input": "./src/global-styles.scss",
+            "bundleName": "global-styles",
+            "inject": true
+          },
+          {
+            "input": "./src/shell-styles.scss",
+            "bundleName": "shell-styles",
+            "inject": false
+          },
+          {
+            "input": "./src/portal-layout-styles.scss",
+            "bundleName": "portal-layout-styles",
+            "inject": false
+          }
+        ],
         "scripts": [],
         "customWebpackConfig": {
           "path": "./webpack.config.js"

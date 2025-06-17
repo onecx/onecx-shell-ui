@@ -5,6 +5,7 @@ import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
 
 @Component({
+  standalone: false,
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>

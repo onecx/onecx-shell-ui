@@ -1,0 +1,17 @@
+/*
+  Style sheet for shell styles.
+  This file should ONLY contain styles that are meant to be applied FOR SHELL'S CONTENT.
+  Shell is going to load this style sheet with a style tag on the startup and scope the styles to the Shell app only.
+
+  IMPORTANT: Styles defined in this file will be applied only to the children of the ocx-shell-root element.
+
+  To define global styles, please refer to global-styles.scss.
+*/
+@import 'node_modules/primeflex/primeflex.scss';
+@import 'node_modules/primeicons/primeicons.css';
+
+.layout-content {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}

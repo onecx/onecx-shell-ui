@@ -14,6 +14,7 @@ interface InitializationError {
 }
 
 @Component({
+  standalone: false,
   templateUrl: './initialization-error-page.component.html'
 })
 export class InitializationErrorPageComponent {

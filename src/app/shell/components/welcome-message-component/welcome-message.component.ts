@@ -4,6 +4,7 @@ import { AppStateService, UserService } from '@onecx/angular-integration-interfa
 import { CurrentWorkspaceTopic, UserProfileTopic } from '@onecx/integration-interface'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-welcome-message',
   templateUrl: './welcome-message.component.html'
 })

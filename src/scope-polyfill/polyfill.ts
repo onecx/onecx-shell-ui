@@ -69,7 +69,6 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
 
   if (!containsSupportsRule(styleElement.sheet)) return
 
-  // console.log("original", originalSupportsRule)
   const supportsRule = findSupportsRule(styleElement.sheet)
   if (!supportsRule) return
 
@@ -78,16 +77,16 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
     console.warn('Expected to have a scoped sheet for:', styleElement.sheet)
     return
   }
-
-  // console.log("Updated", normalizedFrom)
-
   styleElement.sheet.deleteRule(Array.from(styleElement.sheet.cssRules).findIndex((rule) => rule === supportsRule))
-
-  const rules = getWrapableRules(supportsRule.cssRules).map(value => value.cssText).join(" ").replace(/:scope/g, '&')
-  styleElement.sheet.insertRule(`${normalize(from)}{${rules}}`)
-  const unwrapedRules = getUnwrapableRules(supportsRule.cssRules)
-  for(const rule of unwrapedRules) {
-    styleElement.sheet.insertRule(rule.cssText)
+  
+  for (const rule of Array.from(supportsRule.cssRules)) {
+    if (isWrappableRule(rule)) {
+      const wrappedRuleText = rule.cssText.replace(/:scope/g, '&')
+      const wrapped = `${normalize(from)} {${wrappedRuleText}}`
+      styleElement.sheet.insertRule(wrapped)
+    } else {
+      styleElement.sheet.insertRule(rule.cssText)
+    }
   }
 }
 
@@ -96,12 +95,8 @@ function applyRuleChangeToRemainingStyles() {
   styleNodes.forEach(style => deconstructScopeRule(style as HTMLStyleElement))
 }
 
-function getWrapableRules(rules: CSSRuleList) {
-  return Array.from(rules).filter(rule => !(rule instanceof CSSKeyframesRule || CSSFontFaceRule))
-}
-
-function getUnwrapableRules(rules: CSSRuleList) {
-  return Array.from(rules).filter(rule => rule instanceof CSSKeyframesRule || CSSFontFaceRule)
+function isWrappableRule(rule: CSSRule) {
+  return !(rule instanceof CSSKeyframesRule || rule instanceof CSSFontFaceRule)
 }
 
 /**

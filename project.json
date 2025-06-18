@@ -28,7 +28,7 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
+              "maximumWarning": "1mb",
               "maximumError": "5mb"
             },
             {
@@ -53,9 +53,56 @@
       },
       "defaultConfiguration": "production"
     },
+    "build-20-loader": {
+      "executor": "@nx/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/pre_loaders/onecx-angular-20-loader",
+        "index": "./pre_loaders/angular-20/src/index.html",
+        "main": "./pre_loaders/angular-20/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "./pre_loaders/angular-20/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [],
+        "styles": [],
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "./pre_loaders/angular-20/webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "./pre_loaders/angular-20/webpack.config.js"
+          }
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
       "executor": "@nx/angular:webpack-browser",
-      "dependsOn": ["^build", "build-18-loader"],
+      "dependsOn": ["^build", "build-18-loader", "build-20-loader"],
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/onecx-shell-ui",

@@ -1,4 +1,4 @@
-import { loadRemoteModule } from '@angular-architects/module-federation-runtime'
+import { loadRemoteModule } from '@angular-architects/module-federation'
 import { getLocation } from '@onecx/accelerator'
 
 declare global {
@@ -17,6 +17,12 @@ export const angular18Preloader: Preloader = {
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
   windowKey: 'angular-18',
   exposedModule: './Angular18Loader'
+}
+
+export const angular20Preloader: Preloader = {
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  windowKey: 'angular-20',
+  exposedModule: './Angular20Loader'
 }
 
 export function loadPreloaderModule(preloader: Preloader) {

@@ -6,10 +6,21 @@ import {
   isScopedStyleSheet,
   mutationListToUniqueNodes,
   nodeToStyleIdSelectors,
-  normalize
+  normalize,
+  findSupportsRule,
+  matchScope,
+  supportsConditionTextToScopeRuleText
 } from './utils'
 
 const scopedSheetNodes = new Set()
+
+/**
+ * if PRECISION mode is selected
+ */
+export function applyPrecisionPolyfill() {
+  applyScopePolyfill()
+  overrideHtmlElementAppendAndClassChanges()
+}
 
 /**
  * Apply the scope polyfill. The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document. Any change in body of the document and its children related to attributes and the whole tree will cause the update.
@@ -27,6 +38,70 @@ export function applyScopePolyfill() {
       attributes: true
     })
   }
+}
+
+/**
+ * PERFORMANCE mode (default):
+ * Does not use polyfill and allows potential leakage to reduce performance-heavy operations
+ * Applies styles on the elements that are defined as "from" section of the @scope rule
+ */
+export function applyPerformancePolyfill() {
+  if (typeof CSSScopeRule === 'undefined') {
+    const observer = new MutationObserver((mutationList: MutationRecord[]) => {
+      for (const mutation of mutationList) {
+        for (const node of Array.from(mutation.addedNodes)) {
+          if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === 'STYLE') {
+            deconstructScopeRule(node as HTMLStyleElement)
+          }
+        }
+      }
+    })
+    observer.observe(document.head, {
+      subtree: true,
+      childList: true
+    })
+    applyRuleChangeToRemainingStyles()
+  }
+}
+
+function deconstructScopeRule(styleElement: HTMLStyleElement) {
+  if(!styleElement.sheet) return
+
+  if (!containsSupportsRule(styleElement.sheet)) return
+
+  // console.log("original", originalSupportsRule)
+  const supportsRule = findSupportsRule(styleElement.sheet)
+  if (!supportsRule) return
+
+  const [match, from] = matchScope(supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
+  if (!match) {
+    console.warn('Expected to have a scoped sheet for:', styleElement.sheet)
+    return
+  }
+
+  // console.log("Updated", normalizedFrom)
+
+  styleElement.sheet.deleteRule(Array.from(styleElement.sheet.cssRules).findIndex((rule) => rule === supportsRule))
+
+  const rules = getWrapableRules(supportsRule.cssRules).map(value => value.cssText).join(" ").replace(/:scope/g, '&')
+  styleElement.sheet.insertRule(`${normalize(from)}{${rules}}`)
+  const unwrapedRules = getUnwrapableRules(supportsRule.cssRules)
+  for(const rule of unwrapedRules) {
+    styleElement.sheet.insertRule(rule.cssText)
+  }
+}
+
+function applyRuleChangeToRemainingStyles() {
+  const styleNodes = document.head.querySelectorAll('style')
+  styleNodes.forEach(style => deconstructScopeRule(style as HTMLStyleElement))
+}
+
+function getWrapableRules(rules: CSSRuleList) {
+  return Array.from(rules).filter(rule => !(rule instanceof CSSKeyframesRule || CSSFontFaceRule))
+}
+
+function getUnwrapableRules(rules: CSSRuleList) {
+  return Array.from(rules).filter(rule => rule instanceof CSSKeyframesRule || CSSFontFaceRule)
 }
 
 /**

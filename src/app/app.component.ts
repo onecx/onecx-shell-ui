@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { PrimeNG } from 'primeng/config'
 import { merge, mergeMap } from 'rxjs'
 
-import { UserService } from '@onecx/angular-integration-interface'
+import { CONFIG_KEY, ConfigurationService, POLYFILL_SCOPE_MODE, UserService } from '@onecx/angular-integration-interface'
 
 @Component({
   standalone: false,
@@ -16,10 +16,11 @@ export class AppComponent implements OnInit {
   constructor(
     private readonly translateService: TranslateService,
     private readonly config: PrimeNG,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private configService: ConfigurationService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.userService.lang$.subscribe((lang) => {
       this.translateService.use(lang)
     })
@@ -30,5 +31,15 @@ export class AppComponent implements OnInit {
     )
       .pipe(mergeMap(() => this.translateService.get('SHELL')))
       .subscribe((res) => this.config.setTranslation(res))
+
+    
+    const mode = await this.configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
+    if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
+      console.log('Using SCOPE_MODE PRECISION')
+      // applyPrecisionPolyfill()
+    } else {
+      console.log('Using SCOPE_MODE PERFORMANCE.')
+    }
   }
+
 }

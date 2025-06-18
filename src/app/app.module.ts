@@ -21,12 +21,7 @@ import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx
 import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
 import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
-import {
-  CurrentLocationPublisher,
-  EventsPublisher,
-  NavigatedEventPayload,
-  Theme
-} from '@onecx/integration-interface'
+import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
 import { catchError, firstValueFrom, retry } from 'rxjs'
 import {
@@ -48,7 +43,7 @@ import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { ErrorPageComponent } from './shell/components/error-page.component'
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
-import { bodyChildListenerInitializer } from './shell/utils/styles/body-append-child.utils'
+import { dynamicContentInitializer } from './shell/utils/styles/body-append-child.utils'
 import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
 import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
@@ -243,10 +238,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-export function urlChangeListenerInitializer(
-  router: Router,
-  appStateService: AppStateService
-) {
+export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
@@ -407,7 +399,7 @@ export function shareMfContainer() {
     { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
     {
       provide: APP_INITIALIZER,
-      useFactory: bodyChildListenerInitializer,
+      useFactory: dynamicContentInitializer,
       deps: [],
       multi: true
     },

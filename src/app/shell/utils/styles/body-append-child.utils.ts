@@ -16,54 +16,104 @@ interface StyleData {
   mfeElement: string | undefined
 }
 
-export function bodyChildListenerInitializer() {
-  return async () => {
-    // When appending children to body create a wrapper with style isolation data and recompute style sheets for browsers not supporting @scope rule so all added elements are styled correctly immediately on the page
-    const originalAppendChild = document.body.appendChild
-    document.body.appendChild = function (newChild: any): any {
-      let childToAppend = newChild
-      if (newChild.nodeType === Node.ELEMENT_NODE) {
-        childToAppend = wrapWithStyleData(newChild, getStyleDataOrIntermediateStyleData(newChild))
-        removeStyleDataRecursive(newChild)
-      }
-      const result = originalAppendChild.call(this, childToAppend)
-      if (!isCssScopeRuleSupported()) {
-        updateStyleSheets([
-          {
-            type: 'childList',
-            target: document.body,
-            addedNodes: createNodeList([childToAppend]),
-            attributeName: null,
-            attributeNamespace: null,
-            nextSibling: null,
-            oldValue: null,
-            previousSibling: null,
-            removedNodes: createNodeList([])
-          } as MutationRecord
-        ])
-      }
-      return result
-    }
-
-    // When removing children from the body make sure to remove the wrapper with style isolation data
-    const originalRemoveChild = document.body.removeChild
-    document.body.removeChild = function (child: any): any {
-      let childToRemove = child
-      if (child.nodeType === Node.ELEMENT_NODE) {
-        childToRemove = findStyleDataWrapper(child)
-      }
-      return originalRemoveChild.call(this, childToRemove)
-    }
-
-    // When creating elements in PrimeNg make sure to include the style id data in them so when appending to the body we don't lose context of the current App
-    ;(document as any).createElementFromPrimeNg = function (context: any, tagName: any, options?: any): any {
-      const el = document.createElement(tagName, options)
-      const parent = context['this']?.el?.nativeElement
-      // Append intermediate data so the isolation does not happen by coincidence
-      parent && appendIntermediateStyleData(el, getStyleDataOrIntermediateStyleData(parent))
-      return el
-    }
+declare global {
+  interface Window {
+    onecxTriggerElement: any
   }
+}
+
+export function dynamicContentInitializer() {
+  return async () => {
+    ensureBodyChangesIncludeStyleData()
+    ensurePrimengDynamicDataIncludesIntermediateStyleData()
+    ensureMaterialDynamicDataIncludesIntermediateStyleData()
+    initializeOnecxTriggerElementListener()
+  }
+}
+
+function ensureBodyChangesIncludeStyleData() {
+  overwriteAppendChild()
+  overwriteRemoveChild()
+}
+
+// When creating elements in PrimeNg make sure to include the style id data in them so when appending to the body we don't lose context of the current App
+function ensurePrimengDynamicDataIncludesIntermediateStyleData() {
+  // eslint-disable-next-line @typescript-eslint/no-extra-semi
+  ;(document as any).createElementFromPrimeNg = function (context: any, tagName: any, options?: any): any {
+    const el = document.createElement(tagName, options)
+    const contextElement = context['this']?.el?.nativeElement
+    // Append intermediate data so the isolation does not happen by coincidence
+    contextElement && appendIntermediateStyleData(el, getStyleDataOrIntermediateStyleData(contextElement))
+    return el
+  }
+}
+
+// When creating elements in Angular Material make sure to include the style id data in them so when appending to the body we don't lose context of the current App
+function ensureMaterialDynamicDataIncludesIntermediateStyleData() {
+  // eslint-disable-next-line @typescript-eslint/no-extra-semi
+  ;(document as any).createElementFromMaterial = function (context: any, tagName: any, options?: any): any {
+    const el = document.createElement(tagName, options)
+    const contextElement = window.onecxTriggerElement
+    // Append intermediate data so the isolation does not happen by coincidence
+    contextElement && appendIntermediateStyleData(el, getStyleDataOrIntermediateStyleData(contextElement))
+    return el
+  }
+}
+
+function initializeOnecxTriggerElementListener() {
+  // Detect last used element and save it as the current trigger
+  document.addEventListener('mouseover', (event) => {
+    updateOnecxTriggerElement(event.target)
+  })
+
+  document.addEventListener('focusin', (event) => {
+    updateOnecxTriggerElement(event.target)
+  })
+}
+
+// When appending children to body create a wrapper with style isolation data and recompute style sheets for browsers not supporting @scope rule so all added elements are styled correctly immediately on the page
+function overwriteAppendChild() {
+  const originalAppendChild = document.body.appendChild
+  document.body.appendChild = function (newChild: any): any {
+    let childToAppend = newChild
+    if (newChild.nodeType === Node.ELEMENT_NODE) {
+      childToAppend = wrapWithStyleData(newChild, getStyleDataOrIntermediateStyleData(newChild))
+      removeStyleDataRecursive(newChild)
+    }
+    const result = originalAppendChild.call(this, childToAppend)
+    if (!isCssScopeRuleSupported()) {
+      updateStyleSheets([
+        {
+          type: 'childList',
+          target: document.body,
+          addedNodes: createNodeList([childToAppend]),
+          attributeName: null,
+          attributeNamespace: null,
+          nextSibling: null,
+          oldValue: null,
+          previousSibling: null,
+          removedNodes: createNodeList([])
+        } as MutationRecord
+      ])
+    }
+    return result
+  }
+}
+
+// When removing children from the body make sure to remove the wrapper with style isolation data
+function overwriteRemoveChild() {
+  const originalRemoveChild = document.body.removeChild
+  document.body.removeChild = function (child: any): any {
+    let childToRemove = child
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      childToRemove = findStyleDataWrapper(child)
+    }
+    return originalRemoveChild.call(this, childToRemove)
+  }
+}
+
+function updateOnecxTriggerElement(target: any) {
+  window.onecxTriggerElement = target
 }
 
 function wrapWithStyleData(element: HTMLElement, styleData: StyleData) {

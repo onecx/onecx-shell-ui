@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
-import { PrimeNGConfig } from 'primeng/api'
+import { PrimeNG } from 'primeng/config'
 import { merge, mergeMap } from 'rxjs'
 
 import { UserService } from '@onecx/angular-integration-interface'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-root',
   templateUrl: './app.component.html'
 })
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private readonly translateService: TranslateService,
-    private readonly config: PrimeNGConfig,
+    private readonly config: PrimeNG,
     private readonly userService: UserService
   ) {}
 

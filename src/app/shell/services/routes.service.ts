@@ -20,6 +20,8 @@ import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologi
 import { HomeComponent } from '../components/home/home.component'
 import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
+import { updateStylesForMfeChange } from '@onecx/angular-utils'
+import { HttpClient } from '@angular/common/http'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -39,7 +41,8 @@ export class RoutesService implements ShowContentProvider {
     private readonly portalMessageService: PortalMessageService,
     private readonly configurationService: ConfigurationService,
     private readonly permissionsCacheService: PermissionsCacheService,
-    private readonly permissionsService: PermissionBffService
+    private readonly permissionsService: PermissionBffService,
+    private readonly httpClient: HttpClient
   ) {
     router.events
       .pipe(
@@ -51,7 +54,7 @@ export class RoutesService implements ShowContentProvider {
 
   async init(routes: BffGeneratedRoute[]): Promise<unknown> {
     routes.sort(this.sortRoutes)
-    const generatedRoutes = routes.map((r) => this.convertToRoute(r))
+    const generatedRoutes = await Promise.all(routes.map((r) => this.convertToRoute(r)))
     if (!(await this.containsRouteForWorkspace(routes))) {
       console.log('🧭 Adding fallback route')
       generatedRoutes.push(await this.createFallbackRoute())
@@ -69,9 +72,9 @@ export class RoutesService implements ShowContentProvider {
     return (b.url ?? '').length - (a.url ?? '').length
   }
 
-  private convertToRoute(r: BffGeneratedRoute): Route {
+  private async convertToRoute(r: BffGeneratedRoute): Promise<Route> {
     return {
-      path: this.toRouteUrl(r.baseUrl),
+      path: await this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
         breadcrumb: r.productName
@@ -134,17 +137,7 @@ export class RoutesService implements ShowContentProvider {
   }
 
   private async updateAppStyles(r: BffGeneratedRoute) {
-    let link = document.getElementById('ocx_app_styles') as any
-    if (!link) {
-      link = document.createElement('link')
-      link.id = 'ocx_app_styles'
-      link.rel = 'stylesheet'
-      link.media = 'all'
-      document.head.appendChild(link)
-    }
-    if (link.href !== Location.joinWithSlash(r.url, 'styles.css')) {
-      link.href = Location.joinWithSlash(r.url, 'styles.css')
-    }
+    await updateStylesForMfeChange(r.productName, r.appId, this.httpClient, r.url)
   }
 
   private async updateMfeInfo(r: BffGeneratedRoute, joinedBaseUrl: string) {
@@ -203,11 +196,11 @@ export class RoutesService implements ShowContentProvider {
     }
   }
 
-  private toRouteUrl(url: string | undefined) {
+  private async toRouteUrl(url: string | undefined) {
     if (!url) {
       return url
     }
-    const SHELL_BASE_HREF = this.configurationService.getProperty(CONFIG_KEY.APP_BASE_HREF)
+    const SHELL_BASE_HREF = await this.configurationService.getProperty(CONFIG_KEY.APP_BASE_HREF)
     if (SHELL_BASE_HREF && url.startsWith(SHELL_BASE_HREF)) {
       url = url.slice(SHELL_BASE_HREF.length)
     }
@@ -226,13 +219,14 @@ export class RoutesService implements ShowContentProvider {
 
   private async containsRouteForWorkspace(routes: BffGeneratedRoute[]): Promise<boolean> {
     const baseUrl = (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl
-    return routes.find((r) => r.baseUrl === this.toRouteUrl(baseUrl)) !== undefined
+    const routeUrl = await this.toRouteUrl(baseUrl)
+    return routes.find((r) => r.baseUrl === routeUrl) !== undefined
   }
 
   private async createFallbackRoute(): Promise<Route> {
     const currentWorkspace = await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())
     const route = {
-      path: this.toRouteUrl(currentWorkspace.baseUrl),
+      path: await this.toRouteUrl(currentWorkspace.baseUrl),
       pathMatch: PathMatch.full
     }
 
@@ -244,7 +238,7 @@ export class RoutesService implements ShowContentProvider {
     }
     return {
       ...route,
-      redirectTo: this.createHomePageUrl(currentWorkspace.baseUrl, currentWorkspace.homePage)
+      redirectTo: await this.createHomePageUrl(currentWorkspace.baseUrl, currentWorkspace.homePage)
     }
   }
 

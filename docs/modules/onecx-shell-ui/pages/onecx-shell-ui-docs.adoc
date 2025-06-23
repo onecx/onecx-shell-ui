@@ -1,0 +1,102 @@
+== OneCX Shell UI
+
+
+=== What is Shell
+Shell is the backbone of OneCX and serves essential data and acts as wrapper for all other applications.
+
+
+=== Overview
+tbd
+
+
+=== Getting Started
+To start developing the OneCX Shell User Interface, you need to
+set up your local development environment. It’s recommended that you use
+WSL as the runtime for your application, as shown in the figure below.
+If you are using a different runtime, please check that you meet the
+requirements below.
+
+==== Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+* Java Development Kit (JDK) version 17
+* Maven build tool
+* Git
+* Docker + Docker Compose
+* Windows Subsystem for Linux (WSL) - recommended
+* NodeJS
+
+==== Clone the Repository
+
+Start by cloning the required repositories to your local machine using
+the following command:
+
+[source,bash]
+----
+git clone https://github.com/onecx/onecx-shell-ui.git
+----
+
+The repository `onecx-shell` contains the source code of
+the OneCX Shell product. 
+The repository `onecx-shell-ui` contains the source code of
+the OneCX Shell user interface as part of the product. 
+
+==== Update local DNS resolution
+Assuming you are using WSL, updating the local host file for local 
+development allows you to map domain names to specific IP addresses,
+making it easier to test and debug applications using custom domain names
+instead of IP addresses. To enable multiple services on the same port,
+we use traefik as a reverse proxy. A running traefik container is 
+therefore essential for your local setup to route your traffic to the
+appropriate Docker containers based on hostnames.
+
+*It is recommended that the WSL host file and the Windows host file are aligned.
+Unless you have disabled this behaviour, the WSL host file will be automatically
+generated from the Windows host file when WSL is restarted.*
+
+===== Update Windows host file
+Open the file `C:\Windows\System32\drivers\etc\hosts` in your favorite
+editor and add the following entries:
+
+[source,bash]
+----
+127.0.0.1       postgresdb
+127.0.0.1       keycloak-app
+127.0.0.1       traefik
+127.0.0.1       onecx-shell-ui
+127.0.0.1       onecx-shell-bff
+----
+
+===== Update WSL host file
+If needed, update the file `\etc\hosts` in `your` favorite linux editor and add the
+same entries like above.
+
+==== Starting OneCX dependencies
+In a local development environment, Docker Compose is used to define and
+manage multiple containers as a single application stack. It enables
+developers to easily start, stop, and configure all the necessary
+services and dependencies required by OneCX Shell using a
+simple configuration file.
+
+[source,bash]
+----
+mkdir onecx-shell
+cd onecx-shell
+docker compose up -d traefik postgresdb pgadmin keycloak-app
+----
+
+* `traefik`: Traefik is an ingress controller for Kubernetes deployments
+that enables dynamic traffic routing and load balancing based on defined
+rules and configurations.
+* `postgresdb`: PostgreSQL is an open-source relational database
+management system. It is used as persistence layer for storing and
+managing data of OneCX products, providing reliability and
+scalability.
+* `pgadmin`: pgAdmin is an open-source administration and development
+platform that offers a user-friendly graphical interface for managing
+and interacting with the local PostgreSQL database.
+This is optional. 
+* `keycloak`: Keycloak is an open-source identity and access management
+system that simplifies authentication, authorization, and single sign-on
+for web and mobile applications.

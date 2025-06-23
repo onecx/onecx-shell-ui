@@ -69,12 +69,9 @@ function portalLayoutStylesInitializer(appStateService: AppStateService, http: H
 function scopePolyfillInitializer(configService: ConfigurationService){
   return async () => {
     const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
-
     if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
-      console.log('Using SCOPE_MODE PRECISION')
       applyPrecisionPolyfill()
     } else {
-      console.log('Using SCOPE_MODE PERFORMANCE')
       applyPerformancePolyfill()
     }
   }

@@ -15,7 +15,7 @@ import {
 const scopedSheetNodes = new Set()
 
 /**
- * if PRECISION mode is selected
+ * Applies if PRECISION mode is selected
  */
 export function applyPrecisionPolyfill() {
   applyScopePolyfill()
@@ -41,33 +41,40 @@ export function applyScopePolyfill() {
 }
 
 /**
- * PERFORMANCE mode (default):
+ * Applies if PERFORMANCE mode (default) is selected:
  * Does not use polyfill and allows potential leakage to reduce performance-heavy operations
  * Applies styles on the elements that are defined as "from" section of the @scope rule
  */
 export function applyPerformancePolyfill() {
   if (typeof CSSScopeRule === 'undefined') {
     const observer = new MutationObserver((mutationList: MutationRecord[]) => {
-      for (const mutation of mutationList) {
-        for (const node of Array.from(mutation.addedNodes)) {
-          if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === 'STYLE') {
-            deconstructScopeRule(node as HTMLStyleElement)
-          }
-        }
-      }
+      updateStyleSheetsForPerformanceMode(mutationList)
     })
     observer.observe(document.head, {
       subtree: true,
-      childList: true
+      childList: true,
+      attributes: true
     })
     applyRuleChangeToRemainingStyles()
   }
 }
 
-function deconstructScopeRule(styleElement: HTMLStyleElement) {
-  if(!styleElement.sheet) return
+function updateStyleSheetsForPerformanceMode(mutationList: MutationRecord[]) {
+  for (const mutation of mutationList) {
+    const nodesToCheck = [...Array.from(mutation.addedNodes), mutation.target]
+    for (const node of nodesToCheck) {
+      if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === 'STYLE') {
+        deconstructScopeRule(node as HTMLStyleElement)
+      }
+    }
+  }
+}
 
-  if (!containsSupportsRule(styleElement.sheet)) return
+/**
+ * Deletes @supports rule from style sheet and reinserts rules at right position
+ */
+function deconstructScopeRule(styleElement: HTMLStyleElement) {
+  if(!styleElement.sheet || !containsSupportsRule(styleElement.sheet)) return
 
   const supportsRule = findSupportsRule(styleElement.sheet)
   if (!supportsRule) return
@@ -78,14 +85,14 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
     return
   }
   styleElement.sheet.deleteRule(Array.from(styleElement.sheet.cssRules).findIndex((rule) => rule === supportsRule))
-  
   for (const rule of Array.from(supportsRule.cssRules)) {
+    const index = styleElement.sheet.cssRules.length <= 0 ? 0 : styleElement.sheet.cssRules.length
     if (isWrappableRule(rule)) {
       const wrappedRuleText = rule.cssText.replace(/:scope/g, '&')
       const wrapped = `${normalize(from)} {${wrappedRuleText}}`
-      styleElement.sheet.insertRule(wrapped)
+      styleElement.sheet.insertRule(wrapped, index)
     } else {
-      styleElement.sheet.insertRule(rule.cssText)
+      styleElement.sheet.insertRule(rule.cssText, index)
     }
   }
 }

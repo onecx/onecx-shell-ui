@@ -1,4 +1,4 @@
 
-== onecx-bookmark-ui
+== onecx-shell-ui
 
 include::onecx-shell-ui-docs.adoc[opts=optional]

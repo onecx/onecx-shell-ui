@@ -15,7 +15,8 @@ import {
 const scopedSheetNodes = new Set()
 
 /**
- * Applies if PRECISION mode is selected
+ * Applies if PRECISION mode is selected:
+ * Scope polyfill is used when browser doesn't support @scope rule. This mode is performance-heavy but precise.
  */
 export function applyPrecisionPolyfill() {
   applyScopePolyfill()
@@ -43,7 +44,7 @@ export function applyScopePolyfill() {
 /**
  * Applies if PERFORMANCE mode (default) is selected:
  * Does not use polyfill and allows potential leakage to reduce performance-heavy operations
- * Applies styles on the elements that are defined as "from" section of the @scope rule
+ * Applies styles on the elements that are defined as "from" section of the @scope rule (e.g., "[data-style-id="shell-ui"][data-no-portal-layout-styles]")
  */
 export function applyPerformancePolyfill() {
   if (typeof CSSScopeRule === 'undefined') {
@@ -55,23 +56,32 @@ export function applyPerformancePolyfill() {
       childList: true,
       attributes: true
     })
-    applyRuleChangeToRemainingStyles()
+    deconstructExistingStyleSheets()
   }
 }
 
 function updateStyleSheetsForPerformanceMode(mutationList: MutationRecord[]) {
+  const styleElements = getStyleElementsToCheck(mutationList)
+  for(const styleElement of styleElements) {
+    deconstructScopeRule(styleElement)
+  }
+}
+
+function getStyleElementsToCheck(mutationList: MutationRecord[]) {
+  const styleElements: HTMLStyleElement[] = []
   for (const mutation of mutationList) {
     const nodesToCheck = [...Array.from(mutation.addedNodes), mutation.target]
     for (const node of nodesToCheck) {
       if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === 'STYLE') {
-        deconstructScopeRule(node as HTMLStyleElement)
+        styleElements.push(node as HTMLStyleElement)
       }
     }
   }
+  return styleElements
 }
 
 /**
- * Deletes @supports rule from style sheet and reinserts rules at right position
+ * Deletes @supports rule from style sheet and reinserts rules at right position with matched scope as selector
  */
 function deconstructScopeRule(styleElement: HTMLStyleElement) {
   if(!styleElement.sheet || !containsSupportsRule(styleElement.sheet)) return
@@ -97,11 +107,14 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
   }
 }
 
-function applyRuleChangeToRemainingStyles() {
+function deconstructExistingStyleSheets() {
   const styleNodes = document.head.querySelectorAll('style')
   styleNodes.forEach(style => deconstructScopeRule(style as HTMLStyleElement))
 }
 
+/**
+ * Returns true if css rule can be wrapped inside a selector (e.g. CSSKeyFramesRule and CSSFontFaceRule can not be nested inside a selector)
+ */
 function isWrappableRule(rule: CSSRule) {
   return !(rule instanceof CSSKeyframesRule || rule instanceof CSSFontFaceRule)
 }

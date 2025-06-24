@@ -109,7 +109,7 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
 
 function deconstructExistingStyleSheets() {
   const styleNodes = document.head.querySelectorAll('style')
-  styleNodes.forEach(style => deconstructScopeRule(style as HTMLStyleElement))
+  styleNodes.forEach(style => deconstructScopeRule(style))
 }
 
 /**

@@ -87,8 +87,7 @@ export function removePseudoElements(selectorText: string) {
   if (!matches) return selectorText
 
   let modifiedSelectorText = selectorText
-  for (let i = 0; i < matches.length; i++) {
-    const match = matches[i]
+  for (const match of matches) {
     const lastMatchChar = match[match.length - 1]
     modifiedSelectorText = modifiedSelectorText.replace(match, [' {:'].includes(lastMatchChar) ? lastMatchChar : '')
   }

@@ -72,7 +72,7 @@ function getStyleDataFromNodeContent(nodeContent: string): {
 
 function getNgHostAttributeFromNodeContent(css: string): string | null {
   const ngHostAttributeRegex = /_nghost-([^\]]*)/
-  const ngHostAttributeMatch = css.match(ngHostAttributeRegex)
+  const ngHostAttributeMatch = css.match(ngHostAttributeRegex) // NOSONAR
   if (ngHostAttributeMatch) {
     return ngHostAttributeMatch[0]
   }

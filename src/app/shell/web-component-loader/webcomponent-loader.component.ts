@@ -6,7 +6,7 @@ import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 
 @Component({
   standalone: false,
-  template: '<div #wrapper></div>'
+  template: '<div class="webcomponentwrapper" #wrapper></div>'
 })
 export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })

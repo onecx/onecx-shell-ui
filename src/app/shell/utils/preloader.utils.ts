@@ -1,4 +1,4 @@
-import { loadRemoteModule } from '@angular-architects/module-federation-runtime'
+import { loadRemoteModule } from '@angular-architects/module-federation'
 import { getLocation } from '@onecx/accelerator'
 
 declare global {
@@ -19,6 +19,18 @@ export const angular18Preloader: Preloader = {
   exposedModule: './Angular18Loader'
 }
 
+export const angular19Preloader: Preloader = {
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
+  windowKey: 'angular-19',
+  exposedModule: './Angular19Loader'
+}
+
+export const angular20Preloader: Preloader = {
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  windowKey: 'angular-20',
+  exposedModule: './Angular20Loader'
+}
+
 export function loadPreloaderModule(preloader: Preloader) {
   return loadRemoteModule({
     type: 'module',
@@ -29,6 +41,10 @@ export function loadPreloaderModule(preloader: Preloader) {
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   return new Promise((resolve) => {
+    if (window['onecxPreloaders'][preloader.windowKey]) {
+      resolve(true)
+      return
+    }
     const ensureIntevalId = setInterval(() => {
       if (window['onecxPreloaders'][preloader.windowKey]) {
         clearInterval(ensureIntevalId)

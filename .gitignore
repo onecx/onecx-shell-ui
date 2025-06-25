@@ -4,6 +4,7 @@
 dist
 tmp
 reports
+**/dummy.ts
 
 # dependencies
 node_modules

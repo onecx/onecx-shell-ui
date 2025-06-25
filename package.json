@@ -11,8 +11,9 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
+    "prebuild": "node ./create-dummies.js",
     "build": "nx build",
-    "postinstall": "npm install --prefix pre_loaders/angular-18",
+    "postinstall": "npm install --prefix pre_loaders/angular-18 && npm install --prefix pre_loaders/angular-19 && npm install --prefix pre_loaders/angular-20",
     "check": "nx lint --cache=true && npx prettier -c --cache .",
     "clean": "npm cache clean --force && rm -rf *.log dist reports .nx .angular .eslintcache ./node_modules/.cache/prettier/.prettier-cache",
     "lint": "nx lint --cache=true",

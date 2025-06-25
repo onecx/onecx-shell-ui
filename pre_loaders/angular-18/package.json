@@ -27,7 +27,6 @@
     "@onecx/integration-interface": "^5.43.0",
     "@onecx/keycloak-auth": "^5.43.0",
     "@onecx/portal-integration-angular": "^5.43.0",
-    "@onecx/portal-layout-styles": "^5.43.0",
     "@onecx/shell-core": "^5.43.0",
     "@onecx/angular-utils": "^5.43.0",
     "rxjs": "~7.8.1",

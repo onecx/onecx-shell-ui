@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.1.7",
-    "@angular/compiler-cli": "^19.1.7"
+    "@angular/compiler-cli": "^19.1.7",
+    "webpack": "5.94.0"
   }
 }

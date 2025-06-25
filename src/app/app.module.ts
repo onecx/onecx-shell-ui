@@ -12,7 +12,9 @@ import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth
 import {
   APP_CONFIG,
   AppStateService,
+  CONFIG_KEY,
   ConfigurationService,
+  POLYFILL_SCOPE_MODE,
   RemoteComponentsService,
   ThemeService,
   UserService
@@ -48,6 +50,7 @@ import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-st
 import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
+import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
 
 function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   return async () => {
@@ -62,6 +65,17 @@ function portalLayoutStylesInitializer(appStateService: AppStateService, http: H
     await appStateService.isAuthenticated$.isInitialized
     const css = await fetchPortalLayoutStyles(http)
     loadPortalLayoutStyles(css)
+  }
+}
+
+function scopePolyfillInitializer(configService: ConfigurationService){
+  return async () => {
+    const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
+    if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
+      applyPrecisionPolyfill()
+    } else {
+      applyPerformancePolyfill()
+    }
   }
 }
 
@@ -341,6 +355,12 @@ export function shareMfContainer() {
         ParametersService,
         Router
       ],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: scopePolyfillInitializer,
+      deps: [ConfigurationService],
       multi: true
     },
     {

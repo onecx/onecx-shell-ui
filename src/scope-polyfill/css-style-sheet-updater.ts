@@ -8,7 +8,8 @@ import {
   normalize,
   removePseudoElements,
   scopeFromToUniqueId,
-  splitSelectorToSubSelectors
+  splitSelectorToSubSelectors,
+  supportsConditionTextToScopeRuleText
 } from './utils'
 
 export class CssStyleSheetHandler {
@@ -23,7 +24,7 @@ export class CssStyleSheetHandler {
       return
     }
 
-    const [match, from, to] = matchScope(this.supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
+    const [match, from, to] = matchScope(supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
     if (!match) {
       console.warn('Expected to have a scoped sheet for:', sheetWithSupportsRule)
       return
@@ -38,11 +39,6 @@ export class CssStyleSheetHandler {
     ;(sheetWithSupportsRule as OcxCSSStyleSheet).ownerNode.ocxKeyFrames = []
 
     this.moveSupportsRulesToTopLevelAndApplyInitialScope(sheetWithSupportsRule as OcxCSSStyleSheet)
-  }
-
-  private static supportsConditionTextToScopeRuleText(conditionText: string) {
-    // Removing braces from condition since its always wrapped with braces e.g., coditionText = (@scope(...))
-    return conditionText.slice(1, -1)
   }
 
   /**

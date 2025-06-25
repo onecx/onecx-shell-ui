@@ -84,7 +84,7 @@
     "@angular/cdk": "^19.1.4",
     "@angular/cli": "~19.1.7",
     "@angular/compiler-cli": "^19.1.6",
-    "@angular/language-service": "^19.1.6",
+    "@angular/language-service": "^20.0.5",
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@nx/eslint": "20.4.4",

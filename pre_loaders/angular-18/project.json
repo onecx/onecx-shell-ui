@@ -1,0 +1,57 @@
+{
+  "name": "onecx-angular-18-loader",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "ocx-angular-18-loader",
+  "sourceRoot": "./src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "../../dist/pre_loaders/onecx-angular-18-loader",
+        "index": "./src/index.html",
+        "main": "./src/main.ts",
+        "tsConfig": "./tsconfig.app.json",
+        "customWebpackConfig": {
+          "path": "./webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "./webpack.config.js"
+          }
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    }
+  },
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  }
+}

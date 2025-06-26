@@ -1,6 +1,3 @@
-import { loadRemoteModule } from '@angular-architects/module-federation'
-import { getLocation } from '@onecx/accelerator'
-
 declare global {
   interface Window {
     onecxPreloaders: Record<string, any>
@@ -31,8 +28,9 @@ export const angular20Preloader: Preloader = {
   exposedModule: './Angular20Loader'
 }
 
-export function loadPreloaderModule(preloader: Preloader) {
-  return loadRemoteModule({
+export async function loadPreloaderModule(preloader: Preloader) {
+  const moduleFederation = await import('@angular-architects/module-federation')
+  return moduleFederation.loadRemoteModule({
     type: 'module',
     remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
     exposedModule: preloader.exposedModule
@@ -52,4 +50,13 @@ export function ensurePreloaderModuleLoaded(preloader: Preloader) {
       }
     }, 50)
   })
+}
+
+function getLocation() {
+  const baseHref = document.getElementsByTagName('base')[0]?.href ?? window.location.origin + '/'
+  const location = window.location as any
+  location.deploymentPath = baseHref.substring(window.location.origin.length)
+  location.applicationPath = window.location.href.substring(baseHref.length - 1)
+
+  return location
 }

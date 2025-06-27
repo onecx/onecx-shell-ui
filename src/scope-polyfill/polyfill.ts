@@ -6,10 +6,22 @@ import {
   isScopedStyleSheet,
   mutationListToUniqueNodes,
   nodeToStyleIdSelectors,
-  normalize
+  normalize,
+  findSupportsRule,
+  matchScope,
+  supportsConditionTextToScopeRuleText
 } from './utils'
 
 const scopedSheetNodes = new Set()
+
+/**
+ * Applies if PRECISION mode is selected:
+ * Scope polyfill is used when browser doesn't support @scope rule. This mode is performance-heavy but precise.
+ */
+export function applyPrecisionPolyfill() {
+  applyScopePolyfill()
+  overrideHtmlElementAppendAndClassChanges()
+}
 
 /**
  * Apply the scope polyfill. The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document. Any change in body of the document and its children related to attributes and the whole tree will cause the update.
@@ -27,6 +39,84 @@ export function applyScopePolyfill() {
       attributes: true
     })
   }
+}
+
+/**
+ * Applies if PERFORMANCE mode (default) is selected:
+ * Does not use polyfill and allows potential leakage to reduce performance-heavy operations
+ * Applies styles on the elements that are defined as "from" section of the @scope rule (e.g., "[data-style-id="shell-ui"][data-no-portal-layout-styles]")
+ */
+export function applyPerformancePolyfill() {
+  if (typeof CSSScopeRule === 'undefined') {
+    const observer = new MutationObserver((mutationList: MutationRecord[]) => {
+      updateStyleSheetsForPerformanceMode(mutationList)
+    })
+    observer.observe(document.head, {
+      subtree: true,
+      childList: true,
+      attributes: true
+    })
+    deconstructExistingStyleSheets()
+  }
+}
+
+function updateStyleSheetsForPerformanceMode(mutationList: MutationRecord[]) {
+  const styleElements = getStyleElementsToCheck(mutationList)
+  for(const styleElement of styleElements) {
+    deconstructScopeRule(styleElement)
+  }
+}
+
+function getStyleElementsToCheck(mutationList: MutationRecord[]) {
+  const styleElements: HTMLStyleElement[] = []
+  for (const mutation of mutationList) {
+    const nodesToCheck = [...Array.from(mutation.addedNodes), mutation.target]
+    for (const node of nodesToCheck) {
+      if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === 'STYLE') {
+        styleElements.push(node as HTMLStyleElement)
+      }
+    }
+  }
+  return styleElements
+}
+
+/**
+ * Deletes @supports rule from style sheet and reinserts rules at right position with matched scope as selector
+ */
+function deconstructScopeRule(styleElement: HTMLStyleElement) {
+  if(!styleElement.sheet || !containsSupportsRule(styleElement.sheet)) return
+
+  const supportsRule = findSupportsRule(styleElement.sheet)
+  if (!supportsRule) return
+
+  const [match, from] = matchScope(supportsConditionTextToScopeRuleText(supportsRule.conditionText)) ?? []
+  if (!match) {
+    console.warn('Expected to have a scoped sheet for:', styleElement.sheet)
+    return
+  }
+  styleElement.sheet.deleteRule(Array.from(styleElement.sheet.cssRules).findIndex((rule) => rule === supportsRule))
+  for (const rule of Array.from(supportsRule.cssRules)) {
+    const index = styleElement.sheet.cssRules.length <= 0 ? 0 : styleElement.sheet.cssRules.length
+    if (isWrappableRule(rule)) {
+      const wrappedRuleText = rule.cssText.replace(/:scope/g, '&')
+      const wrapped = `${normalize(from)} {${wrappedRuleText}}`
+      styleElement.sheet.insertRule(wrapped, index)
+    } else {
+      styleElement.sheet.insertRule(rule.cssText, index)
+    }
+  }
+}
+
+function deconstructExistingStyleSheets() {
+  const styleNodes = document.head.querySelectorAll('style')
+  styleNodes.forEach(style => deconstructScopeRule(style))
+}
+
+/**
+ * Returns true if css rule can be wrapped inside a selector (e.g. CSSKeyFramesRule and CSSFontFaceRule can not be nested inside a selector)
+ */
+function isWrappableRule(rule: CSSRule) {
+  return !(rule instanceof CSSKeyframesRule || rule instanceof CSSFontFaceRule)
 }
 
 /**

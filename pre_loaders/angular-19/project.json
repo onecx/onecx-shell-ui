@@ -10,7 +10,7 @@
       "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "../../dist/pre_loaders/onecx-angular-19-loader",
+        "outputPath": "dist/onecx-angular-19-loader",
         "index": "./src/index.html",
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",

@@ -11,7 +11,7 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
-    "prebuild": "node ./create-dummies.js && (cd ./pre_loaders/angular-18 && npm run build) && (cd ./pre_loaders/angular-19 && npm run build) && (cd ./pre_loaders/angular-20 && npm run build)",
+    "prebuild": "node ./create-dummies.js && bash ./build-preloaders-parallel.sh",
     "build": "nx build",
     "postinstall": "npm install --prefix pre_loaders/angular-18 && npm install --prefix pre_loaders/angular-19 && npm install --prefix pre_loaders/angular-20",
     "check": "nx lint --cache=true && npx prettier -c --cache .",

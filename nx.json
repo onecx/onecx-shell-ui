@@ -60,6 +60,5 @@
     }
   },
   "defaultProject": "onecx-shell-ui",
-  "useInferencePlugins": false,
-  "parallel": 1
+  "useInferencePlugins": false
 }

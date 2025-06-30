@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define source paths
-ANGULAR_PATHS=(
+PRELOADER_PATHS=(
   "./pre_loaders/angular-18/dist/onecx-angular-18-loader"
   "./pre_loaders/angular-19/dist/onecx-angular-19-loader"
   "./pre_loaders/angular-20/dist/onecx-angular-20-loader"
@@ -27,7 +27,7 @@ copy_preloader() {
 }
 
 # Loop through all defined paths
-for path in "${ANGULAR_PATHS[@]}"; do
+for path in "${PRELOADER_PATHS[@]}"; do
   copy_preloader "$path"
 done
 

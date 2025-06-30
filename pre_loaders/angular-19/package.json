@@ -42,5 +42,8 @@
     "@angular/compiler-cli": "^19.1.7",
     "webpack": "5.94.0",
     "nx": "20.8.2"
+  },
+  "overrides": {
+    "koa": "^2.16.1"
   }
 }

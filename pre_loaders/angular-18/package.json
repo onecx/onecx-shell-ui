@@ -46,6 +46,8 @@
     "nx": "20.4.4"
   },
   "overrides": {
-    "koa": "^2.16.1"
+    "@module-federation/dts-plugin": {
+      "koa": "^2.16.1"
+    }
   }
 }

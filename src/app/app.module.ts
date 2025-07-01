@@ -399,7 +399,7 @@ export function shareMfContainer() {
     {
       provide: APP_INITIALIZER,
       useFactory: dynamicContentInitializer,
-      deps: [],
+      deps: [ConfigurationService],
       multi: true
     },
     {

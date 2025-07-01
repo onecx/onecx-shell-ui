@@ -9,6 +9,7 @@ import {
   isCssScopeRuleSupported,
   dataMfeElementKey
 } from '@onecx/angular-utils'
+import { CONFIG_KEY, ConfigurationService, POLYFILL_SCOPE_MODE } from '@onecx/angular-integration-interface'
 
 interface StyleData {
   styleId: string | undefined
@@ -22,17 +23,18 @@ declare global {
   }
 }
 
-export function dynamicContentInitializer() {
+export function dynamicContentInitializer(configService: ConfigurationService) {
   return async () => {
-    ensureBodyChangesIncludeStyleData()
+    const polyfillMode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
+    ensureBodyChangesIncludeStyleData(polyfillMode)
     ensurePrimengDynamicDataIncludesIntermediateStyleData()
     ensureMaterialDynamicDataIncludesIntermediateStyleData()
     initializeOnecxTriggerElementListener()
   }
 }
 
-function ensureBodyChangesIncludeStyleData() {
-  overwriteAppendChild()
+function ensureBodyChangesIncludeStyleData(polyfillMode: string | undefined) {
+  overwriteAppendChild(polyfillMode)
   overwriteRemoveChild()
 }
 
@@ -72,7 +74,7 @@ function initializeOnecxTriggerElementListener() {
 }
 
 // When appending children to body create a wrapper with style isolation data and recompute style sheets for browsers not supporting @scope rule so all added elements are styled correctly immediately on the page
-function overwriteAppendChild() {
+function overwriteAppendChild(polyfillMode: string | undefined) {
   const originalAppendChild = document.body.appendChild
   document.body.appendChild = function (newChild: any): any {
     let childToAppend = newChild
@@ -81,7 +83,7 @@ function overwriteAppendChild() {
       removeStyleDataRecursive(newChild)
     }
     const result = originalAppendChild.call(this, childToAppend)
-    if (!isCssScopeRuleSupported()) {
+    if (!isCssScopeRuleSupported() && polyfillMode === POLYFILL_SCOPE_MODE.PRECISION) {
       updateStyleSheets([
         {
           type: 'childList',

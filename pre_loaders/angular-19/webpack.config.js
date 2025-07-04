@@ -1,8 +1,6 @@
 const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
 const { withModuleFederationPlugin, shareAll } = require('@angular-architects/module-federation/webpack')
 
-const shared = shareAll({ requiredVersion: 'auto', includeSecondaries: true }, undefined, './')
-
 const webpackConfig = {
   ...withModuleFederationPlugin({
     name: 'onecx-angular-19-loader',
@@ -10,7 +8,7 @@ const webpackConfig = {
     exposes: {
       './Angular19Loader': 'src/main.ts'
     },
-    shared: shared
+    shared: shareAll({ requiredVersion: 'auto', includeSecondaries: true }, undefined, './')
   })
 }
 

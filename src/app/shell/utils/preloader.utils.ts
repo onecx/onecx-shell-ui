@@ -52,7 +52,7 @@ export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   })
 }
 
-function getLocation() {
+export function getLocation() {
   const baseHref = document.getElementsByTagName('base')[0]?.href ?? window.location.origin + '/'
   const location = window.location as any
   location.deploymentPath = baseHref.substring(window.location.origin.length)

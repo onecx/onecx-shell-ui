@@ -94,3 +94,10 @@ Change it directly in the DB
     | remote_base_url  | remote_entry |
     | ------------- | ------------- |
     | http://localhost:4201/  | http://localhost:4201/remoteEntry.js |
+
+## Preloaders
+When building Shell application, Angular preloaders are going to be build and loaded during application startup to control package sharing. 
+
+IMPORTANT: The version of packages in preloaders and Shell has to be as high as possible to ensure that all microfrontends work properly. If any microfrontend has higher version it's possible that something is broken because Angular packages used are coming from preloader/Shell.
+
+In the pre_loaders directory definitions for all supported preloaders can be found. All preloaders are loaded by the Shell on the application startup.

@@ -25,7 +25,12 @@ const config: Config = {
   ],
   collectCoverage: true,
   coverageDirectory: '<rootDir>/reports/coverage/',
-  coveragePathIgnorePatterns: ['src/app/shared/generated'],
+  coveragePathIgnorePatterns: [
+    'src/app/shared/generated',
+    '<rootDir>/pre_loaders/',
+    '<rootDir>/src/main.ts',
+    '<rootDir>/src/bootstrap.ts'
+  ],
   coverageReporters: ['json', 'lcov', 'text', 'text-summary', 'html'],
   testResultsProcessor: 'jest-sonar-reporter',
   reporters: [
@@ -38,6 +43,12 @@ const config: Config = {
         reportedFilePath: 'absolute'
       }
     ]
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/pre_loaders/',
+    '<rootDir>/src/main.ts',
+    '<rootDir>/src/bootstrap.ts'
   ]
 }
 

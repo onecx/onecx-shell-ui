@@ -28,6 +28,10 @@ async function main() {
     const folders = await fs.readdir('./pre_loaders')
 
     for (const folder of folders) {
+      const folderPath = path.join('./pre_loaders', folder)
+      const folderStat = await fs.stat(folderPath)
+      if (!folderStat.isDirectory()) continue
+
       const packagePath = path.join('./pre_loaders', folder, 'package.json')
       const packageFile = await fs.readFile(packagePath, 'utf-8')
       const packageContent = JSON.parse(packageFile)

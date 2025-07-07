@@ -1,4 +1,4 @@
-import { loadPreloaderModule, ensurePreloaderModuleLoaded, getLocation } from './preloader.utils'
+import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
 import * as moduleFederation from '@angular-architects/module-federation'
 
 jest.mock('@angular-architects/module-federation', () => ({
@@ -6,8 +6,14 @@ jest.mock('@angular-architects/module-federation', () => ({
 }))
 
 describe('Preloader Utils', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('loadPreloaderModule', () => {
-    it('should load a remote module using module federation with correct data', async () => {
+    it('should load a remote module using module federation with document base href', async () => {
+      const dom = document
+      jest.spyOn(dom, 'getElementsByTagName').mockReturnValue([{ href: 'http://localhost/base/' }] as any)
       const mockPreloader = {
         relativeRemoteEntryUrl: 'mock/remoteEntry.js',
         windowKey: 'mock-key',
@@ -18,7 +24,33 @@ describe('Preloader Utils', () => {
 
       expect(moduleFederation.loadRemoteModule).toHaveBeenCalledWith({
         type: 'module',
-        remoteEntry: `${getLocation().deploymentPath}${mockPreloader.relativeRemoteEntryUrl}`,
+        remoteEntry: `/base/${mockPreloader.relativeRemoteEntryUrl}`,
+        exposedModule: mockPreloader.exposedModule
+      })
+      expect(result).toBe('MockModule')
+    })
+
+    it('should load a remote module using module federation with location origin', async () => {
+      const dom = document
+      jest.spyOn(dom, 'getElementsByTagName').mockReturnValue([undefined as any] as any)
+      Object.defineProperty(window, 'location', {
+        value: {
+          origin: 'http://localhost/baseOrigin/',
+          href: 'http://localhost/baseOrigin/admin'
+        },
+        writable: true
+      })
+      const mockPreloader = {
+        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+        windowKey: 'mock-key',
+        exposedModule: './MockModule'
+      }
+
+      const result = await loadPreloaderModule(mockPreloader)
+
+      expect(moduleFederation.loadRemoteModule).toHaveBeenCalledWith({
+        type: 'module',
+        remoteEntry: `/${mockPreloader.relativeRemoteEntryUrl}`,
         exposedModule: mockPreloader.exposedModule
       })
       expect(result).toBe('MockModule')

@@ -1,6 +1,9 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
+# Ignore dummies
+**/dummy.ts
+
+# compiled output#
 dist
 tmp
 reports
@@ -32,6 +35,8 @@ connect.lock
 typings
 *.log
 *.sh
+!build-preloaders-parallel.sh
+!copy-preloaders.sh
 
 # System Files
 .DS_Store

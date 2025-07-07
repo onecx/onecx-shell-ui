@@ -3,4 +3,4 @@ function f() {
 }
 
 ;(window as any)['onecxPreloaders'] ??= {}
-;(window as any)['onecxPreloaders']['angular-18'] = true
+;(window as any)['onecxPreloaders']['angular-20'] = true

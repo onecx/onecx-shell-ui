@@ -7,7 +7,7 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ng
 import { catchError, firstValueFrom, retry } from 'rxjs'
 
 import { getLocation } from '@onecx/accelerator'
-import { AngularAcceleratorMissingTranslationHandler } from '@onecx/angular-accelerator'
+import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
@@ -22,7 +22,6 @@ import {
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
 import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
-import { DEFAULT_LANG, PortalCoreModule } from '@onecx/portal-integration-angular'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
 import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
@@ -68,7 +67,7 @@ function portalLayoutStylesInitializer(appStateService: AppStateService, http: H
   }
 }
 
-function scopePolyfillInitializer(configService: ConfigurationService){
+function scopePolyfillInitializer(configService: ConfigurationService) {
   return async () => {
     const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
     if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
@@ -307,7 +306,7 @@ export function shareMfContainer() {
     RouterModule.forRoot(appRoutes),
     TranslateModule.forRoot({
       isolate: true,
-      defaultLanguage: DEFAULT_LANG,
+      defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
         useFactory: createTranslateLoader,
@@ -319,7 +318,7 @@ export function shareMfContainer() {
       }
     }),
     ShellCoreModule,
-    PortalCoreModule.forRoot('shell'),
+    AngularAcceleratorModule,
     AngularRemoteComponentsModule
   ],
   providers: [

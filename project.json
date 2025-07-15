@@ -22,7 +22,7 @@
           "./src/assets",
           {
             "glob": "**/*",
-            "input": "./node_modules/@onecx/portal-integration-angular/assets/",
+            "input": "./pre_loaders/angular-18/node_modules/@onecx/portal-integration-angular/assets/",
             "output": "/onecx-portal-lib/assets/"
           },
           {

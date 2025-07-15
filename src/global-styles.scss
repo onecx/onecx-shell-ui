@@ -20,6 +20,7 @@ $fallbackFontSize: 1rem;
 body {
   font-family: var(--font-family, $fallbackFontFamily);
   overflow: hidden;
+  background-color: var(--body-bg-color);
 
   a {
     text-decoration: none;

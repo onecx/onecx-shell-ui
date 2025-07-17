@@ -8,7 +8,12 @@ import { ReplaySubject, of } from 'rxjs'
 
 import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
 import { AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
-import { provideAppStateServiceMock, provideConfigurationServiceMock } from '@onecx/angular-integration-interface/mocks'
+import {
+  ConfigurationServiceMock,
+  provideAppStateServiceMock,
+  provideConfigurationServiceMock
+} from '@onecx/angular-integration-interface/mocks'
+import { CONFIG_KEY } from '@onecx/angular-integration-interface'
 
 import { OneCXVersionInfoComponent } from './version-info.component'
 
@@ -32,8 +37,11 @@ fdescribe('OneCXVersionInfoComponent', () => {
   }
   let mockAppStateService: MockAppStateService
 
+  let mockConfigurationService: ConfigurationServiceMock
+
   beforeEach(waitForAsync(() => {
     mockAppStateService = new MockAppStateService()
+
     baseUrlSubject = new ReplaySubject<any>(1)
     TestBed.configureTestingModule({
       declarations: [],
@@ -49,8 +57,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
         provideHttpClientTesting(),
         provideAppStateServiceMock(),
         provideConfigurationServiceMock(),
-        { provide: BASE_URL, useValue: baseUrlSubject },
-        { provide: AppStateService, useValue: mockAppStateService }
+        { provide: BASE_URL, useValue: baseUrlSubject }
       ]
     })
       .overrideComponent(OneCXVersionInfoComponent, {
@@ -60,6 +67,9 @@ fdescribe('OneCXVersionInfoComponent', () => {
         }
       })
       .compileComponents()
+
+    mockConfigurationService = TestBed.inject(ConfigurationServiceMock)
+    mockConfigurationService.config$.publish({ [CONFIG_KEY.APP_VERSION]: 'v1' })
 
     baseUrlSubject.next('base_url_mock')
   }))
@@ -87,6 +97,8 @@ fdescribe('OneCXVersionInfoComponent', () => {
     })
 
     it('should init remote component', () => {
+      mockConfigurationService.config$.publish({}) // empty config = no version
+
       const { component } = setUp()
 
       component.ocxInitRemoteComponent({ baseUrl: 'base_url' } as RemoteComponentConfig)

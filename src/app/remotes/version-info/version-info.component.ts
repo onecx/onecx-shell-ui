@@ -62,10 +62,10 @@ export class OneCXVersionInfoComponent implements ocxRemoteComponent, ocxRemoteW
     ]).pipe(
       map(([mfe, workspace]) => {
         const version: Version = { workspaceName: workspace.workspaceName }
-        const mfeInfoVersion = mfe?.version ? ' ' + mfe?.version : ''
+        const mfeInfoVersion = mfe.version ? ' ' + mfe.version : ''
         version.hostVersion = this.configurationService.getProperty(CONFIG_KEY.APP_VERSION) ?? ''
-        version.separator = mfe?.displayName || mfeInfoVersion !== '' ? ' - ' : ''
-        version.mfeInfo = mfe?.displayName ? mfe?.displayName + mfeInfoVersion : ''
+        version.separator = mfe.displayName || mfeInfoVersion !== '' ? ' - ' : ''
+        version.mfeInfo = mfe.displayName ? mfe.displayName + mfeInfoVersion : ''
         return version
       })
     )

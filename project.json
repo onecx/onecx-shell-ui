@@ -29,6 +29,11 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/angular-accelerator/assets/",
             "output": "/onecx-angular-accelerator/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/angular-utils/assets/",
+            "output": "/onecx-angular-utils/assets/"
           }
         ],
         "styles": [

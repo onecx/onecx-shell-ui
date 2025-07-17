@@ -16,7 +16,24 @@
         "tsConfig": "./tsconfig.app.json",
         "customWebpackConfig": {
           "path": "./webpack.config.js"
-        }
+        },
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/portal-integration-angular/assets/",
+            "output": "/onecx-portal-lib/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/angular-accelerator/assets/",
+            "output": "/onecx-angular-accelerator/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/angular-utils/assets/",
+            "output": "/onecx-angular-utils/assets/"
+          }
+        ]
       },
       "configurations": {
         "production": {

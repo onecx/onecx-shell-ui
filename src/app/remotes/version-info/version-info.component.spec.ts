@@ -12,7 +12,7 @@ import { provideAppStateServiceMock, provideConfigurationServiceMock } from '@on
 
 import { OneCXVersionInfoComponent } from './version-info.component'
 
-describe('OneCXVersionInfoComponent', () => {
+fdescribe('OneCXVersionInfoComponent', () => {
   function setUp() {
     const fixture = TestBed.createComponent(OneCXVersionInfoComponent)
     const component = fixture.componentInstance
@@ -39,8 +39,8 @@ describe('OneCXVersionInfoComponent', () => {
       declarations: [],
       imports: [
         TranslateTestingModule.withTranslations({
-          de: require('src/assets/i18n/de.json'),
-          en: require('src/assets/i18n/en.json')
+          de: require('./../../../assets/i18n/de.json'),
+          en: require('./../../../assets/i18n/en.json')
         }).withDefaultLanguage('en'),
         NoopAnimationsModule
       ],
@@ -79,7 +79,7 @@ describe('OneCXVersionInfoComponent', () => {
         permissions: ['permission'],
         baseUrl: 'base'
       }
-      spyOn(component, 'ocxInitRemoteComponent')
+      jest.spyOn(component, 'ocxInitRemoteComponent')
 
       component.ocxRemoteComponentConfig = mockConfig
 

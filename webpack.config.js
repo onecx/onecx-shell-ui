@@ -2,8 +2,12 @@ const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
 const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
 
-const webpackConfig = {
+const config = {
   ...withModuleFederationPlugin({
+    name: 'onecx-shell-ui',
+    exposes: {
+      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts'
+    },
     shared: share({
       '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular/common': {

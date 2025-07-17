@@ -14,6 +14,17 @@ app:
         spec:
           kcConfig:
             clientId: 'onecx-shell-ui'
+    # Microfrontend
+    microfrontend:
+      enabled: true
+      specs:
+        version-info:
+          exposedModule: "./OneCXVersionInfoComponent"
+          description: "Display version information of shell and current application"
+          type: COMPONENT
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-shell
+          tagName: ocx-version-info-component
     # Microservice
     microservice:
       spec:
@@ -37,10 +48,11 @@ app:
           description: 'Shell sub header menu'
         onecx-shell-footer:
           name: onecx-shell-footer
-          description: Shell footer  unused - to be deleted
+          description: 'Footer area'
+          deprecated: true
         onecx-page-footer:
           name: onecx-page-footer
-          description: Page Footer
+          description: 'Footer area on the page, usually filled by a Workspace Component which organized the content like logo, menu, version etc.'
         onecx-search-config:
           name: onecx-search-config
           description: 'Slot used by library components that can be used in all applications. Its defined in shell and should not be redefined in products that use the slots. Use this slot to manage search configurations on the search pages via assigned remote components.'

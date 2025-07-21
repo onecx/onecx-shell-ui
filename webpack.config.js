@@ -2,7 +2,7 @@ const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
 const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
 
-const config = {
+const webpackConfig = {
   ...withModuleFederationPlugin({
     name: 'onecx-shell-ui',
     exposes: {

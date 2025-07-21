@@ -30,7 +30,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
   type MFE = { displayName?: string | undefined; version?: string | undefined }
   const mfe: MFE = { displayName: 'OneCX Workspace UI', version: '1.0.0' }
 
-  let baseUrlSubject: ReplaySubject<any>
+  const rcConfig = new ReplaySubject<RemoteComponentConfig>(1)
   class MockAppStateService {
     currentWorkspace$ = { asObservable: () => of({ workspaceName: 'ADMIN' }) }
     currentMfe$ = { asObservable: () => of(mfe) }
@@ -42,7 +42,6 @@ fdescribe('OneCXVersionInfoComponent', () => {
   beforeEach(waitForAsync(() => {
     mockAppStateService = new MockAppStateService()
 
-    baseUrlSubject = new ReplaySubject<any>(1)
     TestBed.configureTestingModule({
       declarations: [],
       imports: [
@@ -57,7 +56,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
         provideHttpClientTesting(),
         provideAppStateServiceMock(),
         provideConfigurationServiceMock(),
-        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject }
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<RemoteComponentConfig>(1) }
       ]
     })
       .overrideComponent(OneCXVersionInfoComponent, {
@@ -71,7 +70,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
     mockConfigurationService = TestBed.inject(ConfigurationServiceMock)
     mockConfigurationService.config$.publish({ [CONFIG_KEY.APP_VERSION]: 'v1' })
 
-    baseUrlSubject.next('base_url_mock')
+    //rcConfig.next('base_url_mock')
   }))
 
   describe('initialize', () => {
@@ -103,7 +102,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
 
       component.ocxInitRemoteComponent({ baseUrl: 'base_url' } as RemoteComponentConfig)
 
-      baseUrlSubject.asObservable().subscribe((item) => {
+      rcConfig.asObservable().subscribe((item) => {
         expect(item).toEqual('base_url')
       })
     })

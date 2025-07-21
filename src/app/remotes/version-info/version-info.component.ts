@@ -45,8 +45,8 @@ type Version = {
 @UntilDestroy()
 export class OneCXVersionInfoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
   private readonly rcConfig = inject<ReplaySubject<string>>(REMOTE_COMPONENT_CONFIG)
-  readonly configurationService = inject(ConfigurationService)
   private readonly appState = inject(AppStateService)
+  public readonly configurationService = inject(ConfigurationService)
 
   @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(config)

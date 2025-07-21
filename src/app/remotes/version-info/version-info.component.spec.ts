@@ -6,7 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { ReplaySubject, of } from 'rxjs'
 
-import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-remote-components'
 import { AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
 import {
   ConfigurationServiceMock,
@@ -57,7 +57,7 @@ fdescribe('OneCXVersionInfoComponent', () => {
         provideHttpClientTesting(),
         provideAppStateServiceMock(),
         provideConfigurationServiceMock(),
-        { provide: BASE_URL, useValue: baseUrlSubject }
+        { provide: REMOTE_COMPONENT_CONFIG, useValue: baseUrlSubject }
       ]
     })
       .overrideComponent(OneCXVersionInfoComponent, {

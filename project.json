@@ -34,6 +34,11 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/angular-utils/assets/",
             "output": "/onecx-angular-utils/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@onecx/shell-core/assets/",
+            "output": "/onecx-shell-core/assets/"
           }
         ],
         "styles": [

@@ -54,5 +54,6 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
 
 module.exports = {
   ...webpackConfig,
-  plugins: [...plugins, modifyPrimeNgPlugin]
+  plugins: [...plugins, modifyPrimeNgPlugin],
+  module: { parser: { javascript: { importMeta: false } } },
 }

@@ -330,7 +330,7 @@ export function shareMfContainer() {
       provide: SKIP_STYLE_SCOPING,
       useValue: true
     },
-    provideTranslationPathFromMeta(import.meta, 'assets/i18n/'),
+    provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
     { provide: APP_CONFIG, useValue: environment },
     {
       provide: APP_INITIALIZER,

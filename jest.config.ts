@@ -1,7 +1,14 @@
 import type { Config } from 'jest'
 
-// list of patterns for which no transformation/transpiling should be run
+// list of patterns for which no transformation/transpiling should be made
 const ignoredModulePatterns: string = ['d3-.*', '(.*\.mjs$)'].join('|')
+// list of patterns excluded by testing/coverage
+const ignoredPathPatterns: string[] = [
+  '<rootDir>/pre_loaders/',
+  '<rootDir>/src/main.ts',
+  '<rootDir>/src/bootstrap.ts',
+  '<rootDir>/src/app/shared/generated'
+]
 
 const config: Config = {
   displayName: 'onecx-shell-ui',
@@ -10,7 +17,14 @@ const config: Config = {
   testEnvironment: 'jsdom',
   preset: './jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  snapshotSerializers: [
+    'jest-preset-angular/build/serializers/no-ng-attributes',
+    'jest-preset-angular/build/serializers/ng-snapshot',
+    'jest-preset-angular/build/serializers/html-comment'
+  ],
   testMatch: ['<rootDir>/src/app/**/*.spec.ts'],
+  testPathIgnorePatterns: ignoredPathPatterns,
+  // transformation
   moduleNameMapper: {
     '@primeng/themes': '<rootDir>/node_modules/@primeng/themes/index.mjs'
   },
@@ -24,19 +38,10 @@ const config: Config = {
       }
     ]
   },
-  snapshotSerializers: [
-    'jest-preset-angular/build/serializers/no-ng-attributes',
-    'jest-preset-angular/build/serializers/ng-snapshot',
-    'jest-preset-angular/build/serializers/html-comment'
-  ],
+  // reporting
   collectCoverage: true,
-  coverageDirectory: '<rootDir>/reports/coverage/',
-  coveragePathIgnorePatterns: [
-    '<rootDir>/pre_loaders/',
-    '<rootDir>/src/main.ts',
-    '<rootDir>/src/bootstrap.ts',
-    '<rootDir>/src/app/shared/generated'
-  ],
+  coverageDirectory: 'reports/coverage/',
+  coveragePathIgnorePatterns: ignoredPathPatterns,
   coverageReporters: ['json', 'text', 'text-summary', 'html'],
   testResultsProcessor: 'jest-sonar-reporter',
   reporters: [
@@ -44,13 +49,12 @@ const config: Config = {
     [
       'jest-sonar',
       {
-        outputDirectory: './reports',
+        outputDirectory: 'reports',
         outputName: 'sonarqube_report.xml',
         reportedFilePath: 'absolute'
       }
     ]
-  ],
-  testPathIgnorePatterns: ['/node_modules/', '/pre_loaders/', '/src/main.ts', '/src/bootstrap.ts']
+  ]
 }
 
 export default config

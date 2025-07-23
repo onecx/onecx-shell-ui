@@ -16,7 +16,7 @@ const config: Config = {
   },
   transformIgnorePatterns: [`node_modules/(?!${ignoredModulePatterns})`],
   transform: {
-    '^.+[^.].\\.(ts|mjs|js|html)$': [
+    '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
       {
         tsconfig: '<rootDir>/tsconfig.spec.json',

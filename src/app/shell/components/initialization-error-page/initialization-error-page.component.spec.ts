@@ -41,19 +41,37 @@ describe('InitializationErrorPageComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should create', () => {
-    expect(component).toBeTruthy()
+  describe('initialize', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy()
+    })
   })
 
-  it('should display the error details in the template', () => {
-    fixture.detectChanges()
-    const compiled = fixture.nativeElement as HTMLElement
+  describe('display', () => {
+    beforeEach(() => {
+      route = {
+        fragment: of(new URLSearchParams(fragmentParams).toString())
+      } as any
+    })
 
-    expect(compiled.querySelector('#onecxInitializationErrorMessage')?.textContent).toContain('Test Error')
-    expect(compiled.querySelector('#onecxInitializationErrorRequestedUrl')?.textContent).toContain('http://example.com')
-    expect(compiled.querySelector('#onecxInitializationErrorDetail')?.textContent).toContain('Detail message')
-    expect(compiled.querySelector('#onecxInitializationErrorErrorCode')?.textContent).toContain('404')
-    expect(compiled.querySelector('#onecxInitializationErrorInvalidParams')?.textContent).toContain('[param1: Invalid]')
-    expect(compiled.querySelector('#onecxInitializationErrorParams')?.textContent).toContain('[key1: value1]')
+    it('should display the error details in the template', () => {
+      fixture.detectChanges()
+      const compiled = fixture.nativeElement as HTMLElement
+
+      expect(compiled.querySelector('#onecxInitializationErrorMessage')?.textContent).toContain('Test Error')
+      expect(compiled.querySelector('#onecxInitializationErrorRequestedUrl')?.textContent).toContain(
+        'http://example.com'
+      )
+      expect(compiled.querySelector('#onecxInitializationErrorDetail')?.textContent).toContain('Detail message')
+      expect(compiled.querySelector('#onecxInitializationErrorErrorCode')?.textContent).toContain('404')
+      expect(compiled.querySelector('#onecxInitializationErrorInvalidParams')?.textContent).toContain(
+        '[param1: Invalid]'
+      )
+      expect(compiled.querySelector('#onecxInitializationErrorParams')?.textContent).toContain('[key1: value1]')
+    })
+  })
+
+  it('should log out', () => {
+    component.onLogout()
   })
 })

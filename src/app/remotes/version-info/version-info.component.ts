@@ -5,10 +5,9 @@ import { UntilDestroy } from '@ngneat/until-destroy'
 import { combineLatest, from, map, Observable, ReplaySubject } from 'rxjs'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
+import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 import {
   AngularRemoteComponentsModule,
-  REMOTE_COMPONENT_CONFIG,
-  RemoteComponentConfig,
   ocxRemoteComponent,
   ocxRemoteWebcomponent,
   provideTranslateServiceForRoot
@@ -17,9 +16,9 @@ import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
 import { remoteComponentTranslationPathFactory } from '@onecx/angular-utils'
 
-type Version = {
+export type Version = {
   workspaceName: string
-  hostVersion?: string
+  shellInfo?: string
   mfeInfo?: string
   separator?: string
 }
@@ -44,35 +43,37 @@ type Version = {
 })
 @UntilDestroy()
 export class OneCXVersionInfoComponent implements ocxRemoteComponent, ocxRemoteWebcomponent {
-  private readonly rcConfig = inject<ReplaySubject<string>>(REMOTE_COMPONENT_CONFIG)
+  private readonly rcConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly appState = inject(AppStateService)
-  public readonly configurationService = inject(ConfigurationService)
+  public readonly config = inject(ConfigurationService)
 
-  @Input() set ocxRemoteComponentConfig(config: RemoteComponentConfig) {
-    this.ocxInitRemoteComponent(config)
+  @Input() set ocxRemoteComponentConfig(rcConfig: RemoteComponentConfig) {
+    this.ocxInitRemoteComponent(rcConfig)
   }
 
-  public versionInfo$!: Observable<Version | undefined>
+  public versionInfo$: Observable<Version | undefined>
 
   constructor() {
     this.versionInfo$ = combineLatest([
       this.appState.currentMfe$.asObservable(),
       this.appState.currentWorkspace$.asObservable(),
-      this.configurationService.getProperty(CONFIG_KEY.APP_VERSION),
-      from(this.configurationService.isInitialized)
+      this.config.getProperty(CONFIG_KEY.APP_VERSION),
+      from(this.config.isInitialized)
     ]).pipe(
       map(([mfe, workspace, hostVersion]) => {
-        const version: Version = { workspaceName: workspace.workspaceName }
-        const mfeInfoVersion = mfe.version ? ' ' + mfe.version : ''
-        version.hostVersion = hostVersion
-        version.separator = mfe.displayName || mfeInfoVersion !== '' ? ' - ' : ''
-        version.mfeInfo = mfe.displayName ? mfe.displayName + mfeInfoVersion : ''
+        const mfeVersion = mfe.version ?? ''
+        const version: Version = {
+          workspaceName: workspace.workspaceName,
+          shellInfo: hostVersion,
+          mfeInfo: mfe.displayName ? mfe.displayName + (mfeVersion ? ' ' + mfeVersion : '') : '',
+          separator: mfe.displayName || mfe.version ? ' - ' : ''
+        }
         return version
       })
     )
   }
 
-  public ocxInitRemoteComponent(remoteComponentConfig: RemoteComponentConfig) {
-    this.rcConfig.next(remoteComponentConfig.baseUrl)
+  public ocxInitRemoteComponent(rcConfig: RemoteComponentConfig) {
+    this.rcConfig.next(rcConfig)
   }
 }

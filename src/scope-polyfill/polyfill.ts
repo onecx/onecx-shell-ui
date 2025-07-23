@@ -192,10 +192,10 @@ export function updateStyleSheets(mutationList: MutationRecord[]) {
         if (!scopeSelectorsCache.has(sheet.ownerNode.ocxMatch)) {
           scopeSelectorsCache.set(sheet.ownerNode.ocxMatch, new Map())
         }
-        //@typescript-eslint/no-non-null-assertion
         executeManualUpdateOfStyleSheet(
           sheet,
           nodesFromMutationList,
+          //@typescript-eslint/no-non-null-assertion
           scopeSelectorsCache.get(sheet.ownerNode.ocxMatch)!
         )
       }

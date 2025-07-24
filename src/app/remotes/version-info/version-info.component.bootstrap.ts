@@ -3,12 +3,15 @@ import { TranslateLoader } from '@ngx-translate/core'
 import { ReplaySubject } from 'rxjs'
 
 import { bootstrapRemoteComponent } from '@onecx/angular-webcomponents'
+import { provideTranslateServiceForRoot } from '@onecx/angular-remote-components'
 import {
+  createTranslateLoader,
   REMOTE_COMPONENT_CONFIG,
   RemoteComponentConfig,
-  provideTranslateServiceForRoot
-} from '@onecx/angular-remote-components'
-import { TRANSLATION_PATH, createTranslateLoader, remoteComponentTranslationPathFactory } from '@onecx/angular-utils'
+  remoteComponentTranslationPathFactory,
+  TRANSLATION_PATH
+} from '@onecx/angular-utils'
+
 import { environment } from 'src/environments/environment'
 
 import { OneCXVersionInfoComponent } from './version-info.component'

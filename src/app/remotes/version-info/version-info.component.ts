@@ -5,18 +5,19 @@ import { UntilDestroy } from '@ngneat/until-destroy'
 import { combineLatest, from, map, Observable, ReplaySubject } from 'rxjs'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
-//import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
+import {
+  REMOTE_COMPONENT_CONFIG,
+  RemoteComponentConfig,
+  remoteComponentTranslationPathFactory
+} from '@onecx/angular-utils'
 import {
   AngularRemoteComponentsModule,
   ocxRemoteComponent,
   ocxRemoteWebcomponent,
-  provideTranslateServiceForRoot,
-  REMOTE_COMPONENT_CONFIG,
-  RemoteComponentConfig
+  provideTranslateServiceForRoot
 } from '@onecx/angular-remote-components'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
-import { remoteComponentTranslationPathFactory } from '@onecx/angular-utils'
 
 export type Version = {
   workspaceName: string

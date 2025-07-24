@@ -25,7 +25,7 @@
     "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
     "test": "nx test",
     "test:ci": "nx test --no-color --watch=false --browsers=ChromeHeadless --coverage",
-    "sonar": "npx sonarqube-scanner -Dproject.settings=sonar-local-project.properties",
+    "sonar": "npx sonar-scanner -Dsonar.project.settings=sonar-project.properties",
     "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
     "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",

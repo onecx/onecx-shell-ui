@@ -1,0 +1,12 @@
+@if (versionInfo$ | async; as version) {
+<div class="w-full text-right">
+  <span aria-label="Workspace" pTooltip="Workspace" tooltipPosition="top" tooltipEvent="hover">
+    {{ version.workspaceName }}
+  </span>
+  <span aria-label="Shell" pTooltip="Shell" tooltipPosition="top" tooltipEvent="hover"> {{ version.shellInfo }} </span>
+  <span>{{ version.separator }}</span>
+  <span aria-label="Microfrontend" pTooltip="Microfrontend" tooltipPosition="top" tooltipEvent="hover">
+    {{ version.mfeInfo }}
+  </span>
+</div>
+}

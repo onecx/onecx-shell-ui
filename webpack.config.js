@@ -4,6 +4,10 @@ const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-
 
 const webpackConfig = {
   ...withModuleFederationPlugin({
+    name: 'onecx-shell-ui',
+    exposes: {
+      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts'
+    },
     shared: share({
       '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular/common': {

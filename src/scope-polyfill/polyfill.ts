@@ -62,7 +62,7 @@ export function applyPerformancePolyfill() {
 
 function updateStyleSheetsForPerformanceMode(mutationList: MutationRecord[]) {
   const styleElements = getStyleElementsToCheck(mutationList)
-  for(const styleElement of styleElements) {
+  for (const styleElement of styleElements) {
     deconstructScopeRule(styleElement)
   }
 }
@@ -84,7 +84,7 @@ function getStyleElementsToCheck(mutationList: MutationRecord[]) {
  * Deletes @supports rule from style sheet and reinserts rules at right position with matched scope as selector
  */
 function deconstructScopeRule(styleElement: HTMLStyleElement) {
-  if(!styleElement.sheet || !containsSupportsRule(styleElement.sheet)) return
+  if (!styleElement.sheet || !containsSupportsRule(styleElement.sheet)) return
 
   const supportsRule = findSupportsRule(styleElement.sheet)
   if (!supportsRule) return
@@ -109,7 +109,7 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
 
 function deconstructExistingStyleSheets() {
   const styleNodes = document.head.querySelectorAll('style')
-  styleNodes.forEach(style => deconstructScopeRule(style))
+  styleNodes.forEach((style) => deconstructScopeRule(style))
 }
 
 /**
@@ -195,7 +195,7 @@ export function updateStyleSheets(mutationList: MutationRecord[]) {
         executeManualUpdateOfStyleSheet(
           sheet,
           nodesFromMutationList,
-          scopeSelectorsCache.get(sheet.ownerNode.ocxMatch)!
+          scopeSelectorsCache.get(sheet.ownerNode.ocxMatch) ?? new Map()
         )
       }
     }

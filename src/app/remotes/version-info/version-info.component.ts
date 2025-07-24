@@ -5,12 +5,14 @@ import { UntilDestroy } from '@ngneat/until-destroy'
 import { combineLatest, from, map, Observable, ReplaySubject } from 'rxjs'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 
-import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
+//import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 import {
   AngularRemoteComponentsModule,
   ocxRemoteComponent,
   ocxRemoteWebcomponent,
-  provideTranslateServiceForRoot
+  provideTranslateServiceForRoot,
+  REMOTE_COMPONENT_CONFIG,
+  RemoteComponentConfig
 } from '@onecx/angular-remote-components'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
@@ -62,10 +64,11 @@ export class OneCXVersionInfoComponent implements ocxRemoteComponent, ocxRemoteW
     ]).pipe(
       map(([mfe, workspace, hostVersion]) => {
         const mfeVersion = mfe.version ?? ''
+        const mfeInfo = mfe.displayName + (mfe.version ? ' ' + mfeVersion : '')
         const version: Version = {
           workspaceName: workspace.workspaceName,
           shellInfo: hostVersion,
-          mfeInfo: mfe.displayName ? mfe.displayName + (mfeVersion ? ' ' + mfeVersion : '') : '',
+          mfeInfo: mfe.displayName ? mfeInfo : '',
           separator: mfe.displayName || mfe.version ? ' - ' : ''
         }
         return version

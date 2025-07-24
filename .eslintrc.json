@@ -18,8 +18,18 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": { "ecmaVersion": 2018 },
-  "plugins": ["@nx", "@typescript-eslint"],
+  "plugins": ["@nx", "deprecation", "@typescript-eslint"],
   "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": ["plugin:deprecation/recommended"],
+      "parserOptions": {
+        "project": ["./tsconfig.*?.json"]
+      },
+      "rules": {
+        "deprecation/deprecation": "warn"
+      }
+    },
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],

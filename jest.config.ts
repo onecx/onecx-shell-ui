@@ -41,9 +41,9 @@ const config: Config = {
   },
   // reporting
   collectCoverage: true,
-  coverageDirectory: 'reports/coverage/',
+  coverageDirectory: '<rootDir>/reports/coverage/',
   coveragePathIgnorePatterns: ignoredPathPatterns,
-  coverageReporters: ['json', 'text', 'text-summary', 'html'],
+  coverageReporters: ['json', 'text', 'lcov', 'text-summary'],
   testResultsProcessor: 'jest-sonar-reporter',
   reporters: [
     'default',

@@ -25,7 +25,7 @@
     "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
     "test": "nx test",
     "test:ci": "nx test --no-color --watch=false --browsers=ChromeHeadless --coverage",
-    "sonar": "npx sonarqube-scanner -Dproject.settings=sonar-local-project.properties",
+    "sonar": "npx sonar-scanner",
     "apigen-cleanup": "rm -rf $npm_package_config_openapiOutput",
     "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
@@ -122,13 +122,12 @@
     "nx": "20.8.2",
     "prettier": "^3.6.1",
     "sonar-scanner": "^3.1.0",
-    "sonarqube-scanner": "4.3.0",
     "stylus": "0.64.0",
     "stylus-loader": "8.1.1",
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.2",
     "typescript": "~5.8.3",
-    "webpack": "5.94.0"
+    "webpack": "5.95.0"
   },
   "overrides": {
     "@openapitools/openapi-generator-cli": {

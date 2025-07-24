@@ -1,5 +1,5 @@
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { APP_INITIALIZER, NgModule } from '@angular/core'
+import { NgModule, provideAppInitializer } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
@@ -337,13 +337,13 @@ export function shareMfContainer() {
     },
     { provide: APP_CONFIG, useValue: environment },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: permissionProxyInitializer,
       deps: [PermissionProxyService],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: workspaceConfigInitializer,
       deps: [
         WorkspaceConfigBffService,
@@ -357,37 +357,37 @@ export function shareMfContainer() {
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: scopePolyfillInitializer,
       deps: [ConfigurationService],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: userProfileInitializer,
       deps: [UserProfileBffService, UserService, AppStateService, Router],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: slotInitializer,
       deps: [SLOT_SERVICE],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: configurationServiceInitializer,
       deps: [ConfigurationService],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: portalLayoutStylesInitializer,
       deps: [AppStateService, HttpClient],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: shareMfContainer,
       multi: true
     },
@@ -396,19 +396,19 @@ export function shareMfContainer() {
     { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
     { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: dynamicContentInitializer,
       deps: [ConfigurationService],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: shellStylesInitializer,
       deps: [AppStateService, HttpClient],
       multi: true
     },
     {
-      provide: APP_INITIALIZER,
+      provide: provideAppInitializer,
       useFactory: styleChangesListenerInitializer,
       multi: true
     }

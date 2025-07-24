@@ -2,6 +2,7 @@
   "root": true,
   "ignorePatterns": [
     ".angular/**",
+    ".nx/**",
     ".husky/**",
     ".github/**",
     ".scannerwork/**",
@@ -13,16 +14,17 @@
     "src/assets/api/*",
     "src/**/*.ico",
     "src/**/*.svg",
-    "scope-polyfill.ts"
+    "src/scope-polyfill/*"
   ],
-  "plugins": ["@nx"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "ecmaVersion": 2018 },
+  "plugins": ["@nx", "@typescript-eslint"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
       "rules": {
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
+        "@typescript-eslint/no-extra-semi": "error"
       }
     },
     {

@@ -23,14 +23,12 @@ declare global {
   }
 }
 
-export function dynamicContentInitializer(configService: ConfigurationService) {
-  return async () => {
-    const polyfillMode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
-    ensureBodyChangesIncludeStyleData(polyfillMode)
-    ensurePrimengDynamicDataIncludesIntermediateStyleData()
-    ensureMaterialDynamicDataIncludesIntermediateStyleData()
-    initializeOnecxTriggerElementListener()
-  }
+export async function dynamicContentInitializer(configService: ConfigurationService) {
+  const polyfillMode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
+  ensureBodyChangesIncludeStyleData(polyfillMode)
+  ensurePrimengDynamicDataIncludesIntermediateStyleData()
+  ensureMaterialDynamicDataIncludesIntermediateStyleData()
+  initializeOnecxTriggerElementListener()
 }
 
 function ensureBodyChangesIncludeStyleData(polyfillMode: string | undefined) {

@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { TranslateTestingModule } from 'ngx-translate-testing'
-import { ReplaySubject, of } from 'rxjs'
+import { firstValueFrom, of, ReplaySubject } from 'rxjs'
 
 import { BASE_URL, RemoteComponentConfig } from '@onecx/angular-remote-components'
 import { AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
@@ -15,7 +15,7 @@ import {
 } from '@onecx/angular-integration-interface/mocks'
 import { CONFIG_KEY } from '@onecx/angular-integration-interface'
 
-import { OneCXVersionInfoComponent } from './version-info.component'
+import { OneCXVersionInfoComponent, Version } from './version-info.component'
 
 fdescribe('OneCXVersionInfoComponent', () => {
   function setUp() {
@@ -108,70 +108,65 @@ fdescribe('OneCXVersionInfoComponent', () => {
     })
 
     describe('version info', () => {
-      xit('should getting version info', (done) => {
-        mockConfigurationService.config$.publish({}) // empty config = no version
+      it('should getting version info, but no shell version', async () => {
+        const mfe: MFE = { displayName: 'OneCX Workspace UI' }
+        mockAppStateService.currentMfe$ = { asObservable: () => of(mfe) }
+        mockConfigurationService.config$.publish({})
+        const { component } = setUp()
+        const mockVersion: Version = {
+          workspaceName: 'ADMIN',
+          shellInfo: '',
+          mfeInfo: 'OneCX Workspace UI',
+          separator: ' - '
+        }
+        const versionInfo = await firstValueFrom(component.versionInfo$)
+
+        expect(versionInfo).toEqual(mockVersion)
+      })
+
+      it('should getting version info - without mfe version info', async () => {
         const mfe: MFE = { displayName: 'OneCX Workspace UI' }
         mockAppStateService.currentMfe$ = { asObservable: () => of(mfe) }
         const { component } = setUp()
+        const mockVersion: Version = {
+          workspaceName: 'ADMIN',
+          shellInfo: '',
+          mfeInfo: 'OneCX Workspace UI',
+          separator: ' - '
+        }
+        const versionInfo = await firstValueFrom(component.versionInfo$)
 
-        component.versionInfo$.subscribe((version) => {
-          expect(version).toEqual({
-            workspaceName: 'ADMIN',
-            shellInfo: '',
-            separator: ' - ',
-            mfeInfo: 'OneCX Workspace UI 1.0.0'
-          })
-          done()
-        })
+        expect(versionInfo).toEqual(mockVersion)
       })
 
-      it('should getting version info - without mfe version info', (done) => {
-        const mfe: MFE = { displayName: 'OneCX Workspace UI' }
-        mockAppStateService.currentMfe$ = { asObservable: () => of(mfe) }
-
-        const { component } = setUp()
-
-        component.versionInfo$.subscribe((version) => {
-          expect(version).toEqual({
-            workspaceName: 'ADMIN',
-            shellInfo: '',
-            separator: ' - ',
-            mfeInfo: 'OneCX Workspace UI'
-          })
-          done()
-        })
-      })
-
-      it('should getting version info - without mfe display name', (done) => {
+      it('should getting version info - without mfe display name', async () => {
         const mfe: MFE = { version: '1.1.0' }
         mockAppStateService.currentMfe$ = { asObservable: () => of(mfe) }
         const { component } = setUp()
+        const mockVersion: Version = {
+          workspaceName: 'ADMIN',
+          shellInfo: '',
+          mfeInfo: '',
+          separator: ' - '
+        }
+        const versionInfo = await firstValueFrom(component.versionInfo$)
 
-        component.versionInfo$.subscribe((version) => {
-          expect(version).toEqual({
-            workspaceName: 'ADMIN',
-            shellInfo: '',
-            separator: ' - ',
-            mfeInfo: ''
-          })
-          done()
-        })
+        expect(versionInfo).toEqual(mockVersion)
       })
 
-      it('should getting version info - without mfe info', (done) => {
+      it('should getting version info - without mfe data', async () => {
         const mfe: MFE = {}
         mockAppStateService.currentMfe$ = { asObservable: () => of(mfe) }
         const { component } = setUp()
+        const mockVersion: Version = {
+          workspaceName: 'ADMIN',
+          shellInfo: '',
+          mfeInfo: '',
+          separator: ''
+        }
+        const versionInfo = await firstValueFrom(component.versionInfo$)
 
-        component.versionInfo$.subscribe((version) => {
-          expect(version).toEqual({
-            workspaceName: 'ADMIN',
-            shellInfo: '',
-            separator: '',
-            mfeInfo: ''
-          })
-          done()
-        })
+        expect(versionInfo).toEqual(mockVersion)
       })
     })
   })

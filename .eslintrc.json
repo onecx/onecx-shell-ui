@@ -2,6 +2,7 @@
   "root": true,
   "ignorePatterns": [
     ".angular/**",
+    ".nx/**",
     ".husky/**",
     ".github/**",
     ".scannerwork/**",
@@ -12,16 +13,28 @@
     "src/app/shared/generated/**",
     "src/assets/api/*",
     "src/**/*.ico",
-    "src/**/*.svg"
+    "src/**/*.svg",
+    "src/scope-polyfill/*"
   ],
-  "plugins": ["@nx"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "ecmaVersion": 2018 },
+  "plugins": ["@nx", "deprecation", "@typescript-eslint"],
   "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": ["plugin:deprecation/recommended"],
+      "parserOptions": {
+        "project": ["./tsconfig.*?.json"]
+      },
+      "rules": {
+        "deprecation/deprecation": "warn"
+      }
+    },
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
       "rules": {
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
+        "@typescript-eslint/no-extra-semi": "error"
       }
     },
     {
@@ -54,7 +67,8 @@
         ],
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "none" }],
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-explicit-any": "off",
+        "@angular-eslint/prefer-standalone": "off"
       }
     },
     {

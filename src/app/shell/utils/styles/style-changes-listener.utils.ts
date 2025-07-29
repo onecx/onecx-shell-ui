@@ -9,15 +9,11 @@ import { dataNoPortalLayoutStylesKey, dataStyleIdKey, replacePrimengPrefix } fro
  *
  * The listener finds the scopeId data by looking for "_nghost" owner and looking for the closest styleId element.
  */
-export function styleChangesListenerInitializer() {
-  return async () => {
-    const observer = new MutationObserver((mutationList: MutationRecord[]) =>
-      updateAngularComponentsStyles(mutationList)
-    )
-    observer.observe(document.head, {
-      childList: true
-    })
-  }
+export async function styleChangesListenerInitializer() {
+  const observer = new MutationObserver((mutationList: MutationRecord[]) => updateAngularComponentsStyles(mutationList))
+  observer.observe(document.head, {
+    childList: true
+  })
 }
 
 function updateAngularComponentsStyles(mutationList: MutationRecord[]) {

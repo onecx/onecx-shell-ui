@@ -1,5 +1,5 @@
+import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
@@ -51,30 +51,24 @@ import { WelcomeMessageComponent } from './shell/components/welcome-message-comp
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
 
-function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  return async () => {
-    await appStateService.isAuthenticated$.isInitialized
-    const css = await fetchShellStyles(http)
-    loadShellStyles(css)
-  }
+async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
+  await appStateService.isAuthenticated$.isInitialized
+  const css = await fetchShellStyles(http)
+  loadShellStyles(css)
 }
 
-function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  return async () => {
-    await appStateService.isAuthenticated$.isInitialized
-    const css = await fetchPortalLayoutStyles(http)
-    loadPortalLayoutStyles(css)
-  }
+async function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
+  await appStateService.isAuthenticated$.isInitialized
+  const css = await fetchPortalLayoutStyles(http)
+  loadPortalLayoutStyles(css)
 }
 
-function scopePolyfillInitializer(configService: ConfigurationService) {
-  return async () => {
-    const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
-    if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
-      applyPrecisionPolyfill()
-    } else {
-      applyPerformancePolyfill()
-    }
+async function scopePolyfillInitializer(configService: ConfigurationService) {
+  const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
+  if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
+    applyPrecisionPolyfill()
+  } else {
+    applyPerformancePolyfill()
   }
 }
 
@@ -93,7 +87,7 @@ function publishCurrentWorkspace(
   })
 }
 
-export function workspaceConfigInitializer(
+export async function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
   themeService: ThemeService,
@@ -102,82 +96,78 @@ export function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
-  return async () => {
-    await appStateService.isAuthenticated$.isInitialized
-    const loadWorkspaceConfigResponse = await firstValueFrom(
-      workspaceConfigBffService
-        .loadWorkspaceConfig({
-          path: getLocation().applicationPath
-        })
-        .pipe(
-          retry({ delay: 500, count: 3 }),
-          catchError((error) => {
-            return initializationErrorHandler(error, router)
-          })
-        )
-    )
-
-    if (loadWorkspaceConfigResponse) {
-      const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-        string,
-        Record<string, string>
-      >
-      const themeWithParsedProperties = {
-        ...loadWorkspaceConfigResponse.theme,
-        properties: parsedProperties
-      }
-
-      await Promise.all([
-        publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-        routesService
-          .init(loadWorkspaceConfigResponse.routes)
-          .then(urlChangeListenerInitializer(router, appStateService)),
-        apply(themeService, themeWithParsedProperties),
-        remoteComponentsService.remoteComponents$.publish({
-          components: loadWorkspaceConfigResponse.components,
-          slots: loadWorkspaceConfigResponse.slots
-        })
-      ])
-      parametersService.initialize()
-    }
-  }
-}
-
-export function userProfileInitializer(
-  userProfileBffService: UserProfileBffService,
-  userService: UserService,
-  appStateService: AppStateService,
-  router: Router
-) {
-  return async () => {
-    await appStateService.isAuthenticated$.isInitialized
-    const getUserProfileResponse = await firstValueFrom(
-      userProfileBffService.getUserProfile().pipe(
+  await appStateService.isAuthenticated$.isInitialized
+  const loadWorkspaceConfigResponse = await firstValueFrom(
+    workspaceConfigBffService
+      .loadWorkspaceConfig({
+        path: getLocation().applicationPath
+      })
+      .pipe(
         retry({ delay: 500, count: 3 }),
         catchError((error) => {
           return initializationErrorHandler(error, router)
         })
       )
-    )
+  )
 
-    if (getUserProfileResponse) {
-      console.log('ORGANIZATION : ', getUserProfileResponse.userProfile.organization)
-
-      await userService.profile$.publish(getUserProfileResponse.userProfile)
+  if (loadWorkspaceConfigResponse) {
+    const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
+      string,
+      Record<string, string>
+    >
+    const themeWithParsedProperties = {
+      ...loadWorkspaceConfigResponse.theme,
+      properties: parsedProperties
     }
+
+    await Promise.all([
+      publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+      routesService
+        .init(loadWorkspaceConfigResponse.routes)
+        .then(urlChangeListenerInitializer(router, appStateService)),
+      apply(themeService, themeWithParsedProperties),
+      remoteComponentsService.remoteComponents$.publish({
+        components: loadWorkspaceConfigResponse.components,
+        slots: loadWorkspaceConfigResponse.slots
+      })
+    ])
+    parametersService.initialize()
+  }
+}
+
+export async function userProfileInitializer(
+  userProfileBffService: UserProfileBffService,
+  userService: UserService,
+  appStateService: AppStateService,
+  router: Router
+) {
+  await appStateService.isAuthenticated$.isInitialized
+  const getUserProfileResponse = await firstValueFrom(
+    userProfileBffService.getUserProfile().pipe(
+      retry({ delay: 500, count: 3 }),
+      catchError((error) => {
+        return initializationErrorHandler(error, router)
+      })
+    )
+  )
+
+  if (getUserProfileResponse) {
+    console.log('ORGANIZATION : ', getUserProfileResponse.userProfile.organization)
+
+    await userService.profile$.publish(getUserProfileResponse.userProfile)
   }
 }
 
 export function slotInitializer(slotService: SlotService) {
-  return () => slotService.init()
+  slotService.init()
 }
 
 export function permissionProxyInitializer(permissionProxyService: PermissionProxyService) {
-  return () => permissionProxyService.init()
+  permissionProxyService.init()
 }
 
 export function configurationServiceInitializer(configurationService: ConfigurationService) {
-  return () => configurationService.init()
+  configurationService.init()
 }
 
 let isFirst = true
@@ -285,10 +275,8 @@ declare global {
   }
 }
 
-export function shareMfContainer() {
-  return async () => {
-    window.onecxWebpackContainer = __webpack_share_scopes__.default
-  }
+export async function shareMfContainer() {
+  window.onecxWebpackContainer = __webpack_share_scopes__.default
 }
 
 @NgModule({
@@ -332,82 +320,56 @@ export function shareMfContainer() {
     },
     provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
     { provide: APP_CONFIG, useValue: environment },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: permissionProxyInitializer,
-      deps: [PermissionProxyService],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: workspaceConfigInitializer,
-      deps: [
-        WorkspaceConfigBffService,
-        RoutesService,
-        ThemeService,
-        AppStateService,
-        RemoteComponentsService,
-        ParametersService,
-        Router
-      ],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: scopePolyfillInitializer,
-      deps: [ConfigurationService],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: userProfileInitializer,
-      deps: [UserProfileBffService, UserService, AppStateService, Router],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: slotInitializer,
-      deps: [SLOT_SERVICE],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: configurationServiceInitializer,
-      deps: [ConfigurationService],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: portalLayoutStylesInitializer,
-      deps: [AppStateService, HttpClient],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: shareMfContainer,
-      multi: true
-    },
+    provideAppInitializer(() => {
+      permissionProxyInitializer(inject(PermissionProxyService))
+    }),
+    provideAppInitializer(() => {
+      return workspaceConfigInitializer(
+        inject(WorkspaceConfigBffService),
+        inject(RoutesService),
+        inject(ThemeService),
+        inject(AppStateService),
+        inject(RemoteComponentsService),
+        inject(ParametersService),
+        inject(Router)
+      )
+    }),
+    provideAppInitializer(() => {
+      return scopePolyfillInitializer(inject(ConfigurationService))
+    }),
+    provideAppInitializer(() => {
+      return configurationServiceInitializer(inject(ConfigurationService))
+    }),
+    provideAppInitializer(() => {
+      return dynamicContentInitializer(inject(ConfigurationService))
+    }),
+    provideAppInitializer(() => {
+      return userProfileInitializer(
+        inject(UserProfileBffService),
+        inject(UserService),
+        inject(AppStateService),
+        inject(Router)
+      )
+    }),
+    provideAppInitializer(() => {
+      return slotInitializer(inject(SLOT_SERVICE))
+    }),
+    provideAppInitializer(() => {
+      return portalLayoutStylesInitializer(inject(AppStateService), inject(HttpClient))
+    }),
+    provideAppInitializer(() => {
+      return shareMfContainer()
+    }),
+    provideAppInitializer(() => {
+      return shellStylesInitializer(inject(AppStateService), inject(HttpClient))
+    }),
+    provideAppInitializer(() => {
+      return styleChangesListenerInitializer()
+    }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
     { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: dynamicContentInitializer,
-      deps: [ConfigurationService],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: shellStylesInitializer,
-      deps: [AppStateService, HttpClient],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: styleChangesListenerInitializer,
-      multi: true
-    }
+    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
   ],
   bootstrap: [AppComponent]
 })

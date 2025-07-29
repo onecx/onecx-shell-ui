@@ -42,7 +42,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.13",
     "@angular/compiler-cli": "^18.2.13",
-    "webpack": "5.94.0",
+    "webpack": "5.95.0",
     "nx": "20.4.4"
   },
   "overrides": {

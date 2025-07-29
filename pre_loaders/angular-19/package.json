@@ -40,7 +40,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.1.7",
     "@angular/compiler-cli": "^19.1.7",
-    "webpack": "5.94.0",
+    "webpack": "5.95.0",
     "nx": "20.8.2"
   },
   "overrides": {

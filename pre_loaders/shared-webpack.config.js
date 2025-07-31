@@ -20,7 +20,8 @@ function createWebpackConfig(loaderName, exposedModule, exposedKey) {
     plugins,
     output: { uniqueName: loaderName, publicPath: 'auto' },
     experiments: { ...webpackConfig.experiments, topLevelAwait: true },
-    optimization: { runtimeChunk: false, splitChunks: false }
+    optimization: { runtimeChunk: false, splitChunks: false },
+    module: { parser: { javascript: { importMeta: false } } },
   }
 }
 

@@ -6,10 +6,9 @@ import { bootstrapRemoteComponent } from '@onecx/angular-webcomponents'
 import { provideTranslateServiceForRoot } from '@onecx/angular-remote-components'
 import {
   createTranslateLoader,
+  provideTranslationPathFromMeta,
   REMOTE_COMPONENT_CONFIG,
-  RemoteComponentConfig,
-  remoteComponentTranslationPathFactory,
-  TRANSLATION_PATH
+  RemoteComponentConfig
 } from '@onecx/angular-utils'
 
 import { environment } from 'src/environments/environment'
@@ -26,11 +25,5 @@ bootstrapRemoteComponent(OneCXVersionInfoComponent, 'ocx-version-info-component'
       deps: [HttpClient]
     }
   }),
-  {
-    provide: TRANSLATION_PATH,
-    useFactory: (remoteComponentConfig: ReplaySubject<RemoteComponentConfig>) =>
-      remoteComponentTranslationPathFactory('assets/i18n/')(remoteComponentConfig),
-    multi: true,
-    deps: [REMOTE_COMPONENT_CONFIG]
-  }
+  provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/')
 ])

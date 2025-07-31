@@ -9,7 +9,6 @@ import {
   ocxRemoteComponent,
   ocxRemoteWebcomponent
 } from '@onecx/angular-remote-components'
-import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
 
 export type Version = {
@@ -23,7 +22,7 @@ export type Version = {
   selector: 'ocx-shell-version-info',
   templateUrl: './version-info.component.html',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, AngularAcceleratorModule],
+  imports: [AngularRemoteComponentsModule, CommonModule],
   providers: [{ provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) }],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

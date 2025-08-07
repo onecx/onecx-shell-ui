@@ -21,12 +21,10 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
     let childToAppend = newChild
     if (newChild.nodeType === Node.ELEMENT_NODE && newChild instanceof HTMLElement) {
       const onecxTriggerElement = getOnecxTriggerElement()
-      const styleData =
-        (getStyleDataOrIntermediateStyleData(newChild) ?? onecxTriggerElement)
-          ? onecxTriggerElement
-            ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
-            : null
-          : null
+      const triggerElementStyleData = onecxTriggerElement
+        ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
+        : null
+      const styleData = getStyleDataOrIntermediateStyleData(newChild) ? triggerElementStyleData : null
       if (styleData) {
         childToAppend = wrapWithStyleData(newChild, styleData)
         removeStyleDataRecursive(newChild)

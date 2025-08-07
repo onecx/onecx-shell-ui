@@ -21,7 +21,7 @@ import {
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
-import { createTranslateLoader, provideThemeConfig, SKIP_STYLE_SCOPING, TRANSLATION_PATH } from '@onecx/angular-utils'
+import { createTranslateLoader,  provideThemeConfig, SKIP_STYLE_SCOPING, provideTranslationPathFromMeta } from '@onecx/angular-utils'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
 import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
 
@@ -318,11 +318,7 @@ export async function shareMfContainer() {
       provide: SKIP_STYLE_SCOPING,
       useValue: true
     },
-    {
-      provide: TRANSLATION_PATH,
-      useValue: './assets/i18n/',
-      multi: true
-    },
+    provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
     { provide: APP_CONFIG, useValue: environment },
     provideAppInitializer(() => {
       permissionProxyInitializer(inject(PermissionProxyService))

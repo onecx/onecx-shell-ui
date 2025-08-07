@@ -9,8 +9,8 @@ import {
   ocxRemoteComponent,
   ocxRemoteWebcomponent
 } from '@onecx/angular-remote-components'
-import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 export type Version = {
   workspaceName: string

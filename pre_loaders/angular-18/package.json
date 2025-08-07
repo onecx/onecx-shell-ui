@@ -17,13 +17,14 @@
     "@angular/core": "^18.2.13",
     "@angular/elements": "^18.2.13",
     "@angular/forms": "^18.2.13",
+    "@angular/localize": "^18.2.13",
     "@angular/platform-browser": "^18.2.13",
     "@angular/platform-browser-dynamic": "^18.2.13",
-    "@angular/router": "^18.2.13",
     "@angular/platform-server": "^18.2.13",
-    "@angular/localize": "^18.2.13",
+    "@angular/router": "^18.2.13",
     "@angular/service-worker": "^18.2.13",
     "@ngx-translate/core": "^15.0.0",
+    "@nx/angular": "20.4.4",
     "@onecx/accelerator": "^5.47.2",
     "@onecx/angular-accelerator": "^5.47.2",
     "@onecx/angular-auth": "^5.47.2",
@@ -35,15 +36,15 @@
     "@onecx/portal-integration-angular": "^5.47.2",
     "@onecx/shell-core": "^5.47.2",
     "@onecx/angular-utils": "^5.47.2",
-    "rxjs": "~7.8.1",
     "primeng": "^17.18.15",
-    "@nx/angular": "20.4.4"
+    "rxjs": "~7.8.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.13",
     "@angular/compiler-cli": "^18.2.13",
-    "webpack": "5.95.0",
-    "nx": "20.4.4"
+    "nx": "20.4.4",
+    "modify-source-webpack-plugin": "^4.1.0",
+    "webpack": "5.95.0"
   },
   "overrides": {
     "@module-federation/dts-plugin": {

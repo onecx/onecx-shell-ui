@@ -1,6 +1,6 @@
 declare global {
   interface Window {
-    onecxTriggerElement: any
+    onecxTriggerElement: EventTarget | null
   }
 }
 
@@ -19,6 +19,6 @@ export function getOnecxTriggerElement() {
   return window.onecxTriggerElement
 }
 
-function updateOnecxTriggerElement(target: any) {
+function updateOnecxTriggerElement(target: EventTarget | null) {
   window.onecxTriggerElement = target
 }

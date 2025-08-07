@@ -77,16 +77,16 @@ export function findStyleDataWrapper(element: HTMLElement): HTMLElement {
  * Recursively removes style data from an element and its children.
  * @param element HTMLElement to remove style data from.
  */
-export function removeStyleDataRecursive(element: Element): void {
-  if ((element as HTMLElement).dataset) {
-    delete (element as HTMLElement).dataset[dataStyleIsolationKey]
-    delete (element as HTMLElement).dataset[dataStyleIdKey]
-    delete (element as HTMLElement).dataset[dataNoPortalLayoutStylesKey]
-    delete (element as HTMLElement).dataset[dataMfeElementKey]
+export function removeStyleDataRecursive(element: HTMLElement): void {
+  if (element.dataset) {
+    delete element.dataset[dataStyleIsolationKey]
+    delete element.dataset[dataStyleIdKey]
+    delete element.dataset[dataNoPortalLayoutStylesKey]
+    delete element.dataset[dataMfeElementKey]
   }
 
   for (const child of Array.from(element.children)) {
-    removeStyleDataRecursive(child)
+    child instanceof HTMLElement && removeStyleDataRecursive(child)
   }
 }
 
@@ -133,7 +133,7 @@ export function appendIntermediateStyleData(element: HTMLElement, styleData: Sty
  * @param element HTMLElement to get style data from
  * @returns StyleData object or null if no style data is found.
  */
-export function getStyleDataOrIntermediateStyleData(element: HTMLElement): StyleData | null {
+export function getStyleDataOrIntermediateStyleData(element: Node | EventTarget): StyleData | null {
   const styleElement = findElementWithStyleDataOrIntermediateStyleData(element)
   if (!styleElement) return null
 
@@ -151,11 +151,11 @@ export function getStyleDataOrIntermediateStyleData(element: HTMLElement): Style
  * @param startNode Starting node to search from
  * @returns The closest parent element with style data or intermediate style data, or null if not found.
  */
-export function findElementWithStyleDataOrIntermediateStyleData(startNode: HTMLElement): HTMLElement | null {
+export function findElementWithStyleDataOrIntermediateStyleData(startNode: Node | EventTarget): HTMLElement | null {
   let currentNode = startNode
   const hasStyleData = (node: HTMLElement) => node.dataset[dataStyleIdKey] || node.dataset[dataIntermediateStyleIdKey]
-  while (!hasStyleData(currentNode) && currentNode.parentElement) {
+  while (currentNode instanceof HTMLElement && !hasStyleData(currentNode) && currentNode.parentElement) {
     currentNode = currentNode.parentElement
   }
-  return hasStyleData(currentNode) ? currentNode : null
+  return currentNode instanceof HTMLElement && hasStyleData(currentNode) ? currentNode : null
 }

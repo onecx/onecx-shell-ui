@@ -17,13 +17,15 @@ export function ensureBodyChangesIncludeStyleData(polyfillMode: string | undefin
 // When appending children to body create a wrapper with style isolation data and recompute style sheets for browsers not supporting @scope rule so all added elements are styled correctly immediately on the page
 function overwriteAppendChild(polyfillMode: string | undefined) {
   const originalAppendChild = document.body.appendChild
-  document.body.appendChild = function (newChild: any): any {
+  document.body.appendChild = function (newChild: Node): any {
     let childToAppend = newChild
-    if (newChild.nodeType === Node.ELEMENT_NODE) {
+    if (newChild.nodeType === Node.ELEMENT_NODE && newChild instanceof HTMLElement) {
       const onecxTriggerElement = getOnecxTriggerElement()
       const styleData =
         (getStyleDataOrIntermediateStyleData(newChild) ?? onecxTriggerElement)
-          ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
+          ? onecxTriggerElement
+            ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
+            : null
           : null
       if (styleData) {
         childToAppend = wrapWithStyleData(newChild, styleData)
@@ -53,9 +55,9 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
 // When removing children from the body make sure to remove the wrapper with style isolation data
 function overwriteRemoveChild() {
   const originalRemoveChild = document.body.removeChild
-  document.body.removeChild = function (child: any): any {
+  document.body.removeChild = function (child: Node): any {
     let childToRemove = child
-    if (child.nodeType === Node.ELEMENT_NODE) {
+    if (child.nodeType === Node.ELEMENT_NODE && child instanceof HTMLElement) {
       childToRemove = findStyleDataWrapper(child)
     }
     return originalRemoveChild.call(this, childToRemove)

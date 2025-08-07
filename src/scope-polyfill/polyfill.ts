@@ -137,7 +137,7 @@ export function overrideHtmlElementAppendAndClassChanges() {
 /**
  * Creates an object compatible with NodeList interface based on the provided nodes.
  */
-export function createNodeList(nodes: Element[]) {
+export function createNodeList(nodes: Node[]) {
   return {
     nodes: nodes,
     length: nodes.length,

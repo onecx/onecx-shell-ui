@@ -42,16 +42,16 @@ app:
           description: 'Shell horizontal menu within shell header right'
         onecx-shell-header-left:
           name: onecx-shell-header-left
-          description: 'Shell header left region: logo'
+          description: "Shell header left region: logo"
         onecx-shell-header-right:
           name: onecx-shell-header-right
-          description: 'Shell header right region: horizontal menu, top bar'
+          description: "Shell header right region: horizontal menu, top bar"
         onecx-shell-sub-header:
           name: onecx-shell-sub-header
-          description: 'Shell sub header region: banner bar'
+          description: "Shell sub header region: banner bar"
         onecx-shell-footer:
           name: onecx-shell-footer
-          description: 'Footer area on the page: logo, footer menu, version info etc.'
+          description: "Footer area on the page: logo, footer menu, version info etc."
         onecx-page-footer:
           name: onecx-page-footer
           description: 'Footer area on the page, usually filled by a Workspace Component which organized the content like logo, menu, version etc.'

@@ -54,11 +54,11 @@ app:
           description: "Footer area on the page: logo, footer menu, version info etc."
         onecx-page-footer:
           name: onecx-page-footer
-          description: 'Footer area on the page, usually filled by a Workspace Component which organized the content like logo, menu, version etc.'
+          description: "Footer area on the page, usually filled by a Workspace Component which organized the content like logo, menu, version etc."
           deprecated: true
         onecx-search-config:
           name: onecx-search-config
-          description: 'Slot used by library components that can be used in all applications. Its defined in shell and should not be redefined in products that use the slots. Use this slot to manage search configurations on the search pages via assigned remote components.'
+          description: "Slot used by library components that can be used in all applications. Its defined in shell and should not be redefined in products that use the slots. Use this slot to manage search configurations on the search pages via assigned remote components."
         onecx-column-group-selection:
           name: onecx-column-group-selection
-          description: 'Slot used by library components that can be used in all applications. Its defined in shell and should not be redefined in products that use the slots. Use this slot to manage table column group selection via assigned remote components.'
+          description: "Slot used by library components that can be used in all applications. Its defined in shell and should not be redefined in products that use the slots. Use this slot to manage table column group selection via assigned remote components."

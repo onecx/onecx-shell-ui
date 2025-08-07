@@ -17,11 +17,11 @@
     "@angular/core": "^20.0.6",
     "@angular/elements": "^20.0.6",
     "@angular/forms": "^20.0.6",
+    "@angular/localize": "^20.0.6",
     "@angular/platform-browser": "^20.0.6",
     "@angular/platform-browser-dynamic": "^20.0.6",
-    "@angular/router": "^20.0.6",
     "@angular/platform-server": "^20.0.6",
-    "@angular/localize": "^20.0.6",
+    "@angular/router": "^20.0.6",
     "@angular/service-worker": "^20.0.6",
     "@ngx-translate/core": "^16.0.4",
     "@nx/angular": "21.2.1",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.4",
     "@angular/compiler-cli": "^20.0.6",
+    "modify-source-webpack-plugin": "^4.1.0",
     "nx": "21.2.1",
     "webpack": "5.95.0"
   },

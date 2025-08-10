@@ -39,6 +39,21 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/shell-core/assets/",
             "output": "/onecx-shell-core/assets/"
+          },
+          {
+            "glob": "**/*",
+            "input": "./pre_loaders/angular-18/dist/onecx-angular-18-loader",
+            "output": "/pre_loaders/onecx-angular-18-loader"
+          },
+          {
+            "glob": "**/*",
+            "input": "./pre_loaders/angular-19/dist/onecx-angular-19-loader",
+            "output": "/pre_loaders/onecx-angular-19-loader"
+          },
+          {
+            "glob": "**/*",
+            "input": "./pre_loaders/angular-20/dist/onecx-angular-20-loader",
+            "output": "/pre_loaders/onecx-angular-20-loader"
           }
         ],
         "styles": [

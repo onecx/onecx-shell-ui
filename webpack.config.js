@@ -44,5 +44,6 @@ const plugins = config.plugins.filter((plugin) => !(plugin instanceof ModifyEntr
 
 module.exports = {
   ...config,
-  plugins
+  plugins,
+  module: { parser: { javascript: { importMeta: false } } }
 }

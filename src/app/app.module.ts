@@ -220,7 +220,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
-  if (typeof data.navigationId !== 'undefined' && data.navigationId === -1) {
+  if (typeof data?.navigationId !== 'undefined' && data?.navigationId === -1) {
     console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
     return
   }

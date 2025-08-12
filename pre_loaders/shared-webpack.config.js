@@ -2,10 +2,30 @@ const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src
 const { withModuleFederationPlugin, shareAll } = require('@angular-architects/module-federation/webpack')
 const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
 
+/**
+ * When module federation loads a package it checks:
+ * - eager flag - if package should be eagerly loaded
+ * - loaded flag - if package is already loaded
+ * - name of the webpack output
+ *
+ * If the following conditions are met:
+ * - there is a package registered that matches the required shared package
+ * - the matched package is not loaded yet
+ * - the sharing config of that package is not eager
+ *
+ * then the package is chosen based on the name of the webpack output.
+ *
+ * The algorithm used for choosing the packgage is string comparison. E.g., 'a' > 'b'.
+ *
+ * To make sure that the preloader is chosen over other packages, we use a magic character
+ * that is greater than any other character in the Unicode table.
+ */
+const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
+
 function createWebpackConfig(loaderName, exposedModule, exposedKey) {
   const webpackConfig = {
     ...withModuleFederationPlugin({
-      name: loaderName,
+      name: magicChar + loaderName,
       filename: 'remoteEntry.js',
       exposes: {
         [exposedKey]: exposedModule
@@ -37,10 +57,10 @@ function createWebpackConfig(loaderName, exposedModule, exposedKey) {
   return {
     ...webpackConfig,
     plugins: [...plugins, modifyPrimeNgPlugin],
-    output: { uniqueName: loaderName, publicPath: 'auto' },
+    output: { uniqueName: magicChar + loaderName, publicPath: 'auto' },
     experiments: { ...webpackConfig.experiments, topLevelAwait: true },
     optimization: { runtimeChunk: false, splitChunks: false },
-    module: { parser: { javascript: { importMeta: false } } },
+    module: { parser: { javascript: { importMeta: false } } }
   }
 }
 

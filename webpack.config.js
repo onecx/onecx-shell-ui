@@ -3,10 +3,6 @@ const { share, withModuleFederationPlugin } = require('@angular-architects/modul
 
 const config = {
   ...withModuleFederationPlugin({
-    name: 'onecx-shell-ui',
-    exposes: {
-      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts'
-    },
     shared: share({
       '@angular/core': { requiredVersion: 'auto', includeSecondaries: true, singleton: true },
       '@angular/common': {

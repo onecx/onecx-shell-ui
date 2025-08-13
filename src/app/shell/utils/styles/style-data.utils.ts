@@ -14,14 +14,17 @@ interface StyleData {
   mfeElement: string | undefined
 }
 
+export const dataWrapperElementAttribute = 'data-dynamic-wrapper-element'
+export const dataWrapperElementKey = 'dynamicWrapperElement'
+
 /**
- * Wraps an HTMLElement with style data attributes.
- * @param element HTMLElement to wrap with style data
+ * Wraps an HTMLElement a div element with style data attributes.
+ * @param element HTMLElement to wrap
  * @param styleData StyleData object containing style information.
  * @returns A new HTMLElement that wraps the original element with style data attributes.
  */
-export function wrapWithStyleData(element: HTMLElement, styleData: StyleData) {
-  const dataStyleWrapper = createDataStyleWrapper(styleData)
+export function wrapWithDiv(element: HTMLElement, styleData?: StyleData) {
+  const dataStyleWrapper = createWrapper(styleData)
 
   dataStyleWrapper.appendChild(element)
   observeStyleDataWrapper(dataStyleWrapper)
@@ -33,9 +36,10 @@ export function wrapWithStyleData(element: HTMLElement, styleData: StyleData) {
  * @param styleData StyleData object containing style information.
  * @returns A new HTMLElement that wraps the style data.
  */
-export function createDataStyleWrapper(styleData: StyleData) {
+export function createWrapper(styleData?: StyleData) {
   const wrapper = document.createElement('div')
-  appendStyleData(wrapper, styleData)
+  wrapper.dataset[dataWrapperElementKey] = ''
+  styleData && appendStyleData(wrapper, styleData)
 
   return wrapper
 }
@@ -67,10 +71,10 @@ export function observeStyleDataWrapper(wrapper: HTMLElement) {
  */
 export function findStyleDataWrapper(element: HTMLElement): HTMLElement | null {
   let currentNode = element
-  while (currentNode.dataset[dataStyleIsolationKey] !== '' && currentNode.parentElement) {
+  while (currentNode.dataset[dataWrapperElementKey] !== '' && currentNode.parentElement) {
     currentNode = currentNode.parentElement
   }
-  if (currentNode.dataset[dataStyleIsolationKey] === '') {
+  if (currentNode.dataset[dataWrapperElementKey] === '') {
     return currentNode
   }
   return null

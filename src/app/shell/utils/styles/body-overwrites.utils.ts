@@ -5,7 +5,7 @@ import {
   findStyleDataWrapper,
   getStyleDataOrIntermediateStyleData,
   removeStyleDataRecursive,
-  wrapWithStyleData
+  wrapWithDiv
 } from './style-data.utils'
 import { getOnecxTriggerElement } from './onecx-trigger-element.utils'
 
@@ -25,11 +25,9 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
         ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
         : null
       const childElementStyleData = getStyleDataOrIntermediateStyleData(newChild)
-      const styleData = childElementStyleData ? childElementStyleData : (triggerElementStyleData ?? null)
-      if (styleData) {
-        childToAppend = wrapWithStyleData(newChild, styleData)
-        removeStyleDataRecursive(newChild)
-      }
+      const styleData = childElementStyleData ? childElementStyleData : (triggerElementStyleData ?? undefined)
+      childToAppend = wrapWithDiv(newChild, styleData)
+      removeStyleDataRecursive(newChild)
     }
     const result = originalAppendChild.call(this, childToAppend)
     if (!isCssScopeRuleSupported() && polyfillMode === POLYFILL_SCOPE_MODE.PRECISION) {

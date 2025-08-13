@@ -24,7 +24,8 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
       const triggerElementStyleData = onecxTriggerElement
         ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
         : null
-      const styleData = getStyleDataOrIntermediateStyleData(newChild) ? triggerElementStyleData : null
+      const childElementStyleData = getStyleDataOrIntermediateStyleData(newChild)
+      const styleData = childElementStyleData ? childElementStyleData : (triggerElementStyleData ?? null)
       if (styleData) {
         childToAppend = wrapWithStyleData(newChild, styleData)
         removeStyleDataRecursive(newChild)

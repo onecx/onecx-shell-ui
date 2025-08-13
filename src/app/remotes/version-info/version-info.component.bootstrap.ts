@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { TranslateLoader } from '@ngx-translate/core'
 import { ReplaySubject } from 'rxjs'
 
@@ -25,5 +25,6 @@ bootstrapRemoteComponent(OneCXVersionInfoComponent, 'ocx-version-info-component'
       deps: [HttpClient]
     }
   }),
+  provideHttpClient(withInterceptorsFromDi()),
   provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/')
 ])

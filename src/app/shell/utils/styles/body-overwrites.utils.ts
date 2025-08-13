@@ -56,7 +56,7 @@ function overwriteRemoveChild() {
   document.body.removeChild = function (child: Node): any {
     let childToRemove = child
     if (child.nodeType === Node.ELEMENT_NODE && child instanceof HTMLElement) {
-      childToRemove = findStyleDataWrapper(child)
+      childToRemove = findStyleDataWrapper(child) ?? child
     }
     return originalRemoveChild.call(this, childToRemove)
   }

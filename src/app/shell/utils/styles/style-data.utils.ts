@@ -63,14 +63,17 @@ export function observeStyleDataWrapper(wrapper: HTMLElement) {
 /**
  * Finds the closest parent element with style data.
  * @param element HTMLElement to search from
- * @returns The closest parent element with style data, or the element itself if it has style data.
+ * @returns The closest parent element with style data, the element itself if it has style data or null if no style data is found.
  */
-export function findStyleDataWrapper(element: HTMLElement): HTMLElement {
+export function findStyleDataWrapper(element: HTMLElement): HTMLElement | null {
   let currentNode = element
   while (currentNode.dataset[dataStyleIsolationKey] !== '' && currentNode.parentElement) {
     currentNode = currentNode.parentElement
   }
-  return currentNode
+  if (currentNode.dataset[dataStyleIsolationKey] === '') {
+    return currentNode
+  }
+  return null
 }
 
 /**

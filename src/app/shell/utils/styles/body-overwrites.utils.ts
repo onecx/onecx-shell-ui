@@ -5,7 +5,7 @@ import {
   findStyleDataWrapper,
   getStyleDataOrIntermediateStyleData,
   removeStyleDataRecursive,
-  wrapWithStyleData
+  wrapWithDiv
 } from './style-data.utils'
 import { getOnecxTriggerElement } from './onecx-trigger-element.utils'
 
@@ -24,11 +24,10 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
       const triggerElementStyleData = onecxTriggerElement
         ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
         : null
-      const styleData = getStyleDataOrIntermediateStyleData(newChild) ? triggerElementStyleData : null
-      if (styleData) {
-        childToAppend = wrapWithStyleData(newChild, styleData)
-        removeStyleDataRecursive(newChild)
-      }
+      const childElementStyleData = getStyleDataOrIntermediateStyleData(newChild)
+      const styleData = childElementStyleData ?? triggerElementStyleData ?? undefined
+      childToAppend = wrapWithDiv(newChild, styleData)
+      removeStyleDataRecursive(newChild)
     }
     const result = originalAppendChild.call(this, childToAppend)
     if (!isCssScopeRuleSupported() && polyfillMode === POLYFILL_SCOPE_MODE.PRECISION) {
@@ -56,7 +55,7 @@ function overwriteRemoveChild() {
   document.body.removeChild = function (child: Node): any {
     let childToRemove = child
     if (child.nodeType === Node.ELEMENT_NODE && child instanceof HTMLElement) {
-      childToRemove = findStyleDataWrapper(child)
+      childToRemove = findStyleDataWrapper(child) ?? child
     }
     return originalRemoveChild.call(this, childToRemove)
   }

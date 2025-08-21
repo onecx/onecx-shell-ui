@@ -7,14 +7,21 @@
 */
 
 // Import theme_defaults so default theme variables are available on the page
-@import "node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss";
+@import 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss';
 
 $mobileBreakpoint: 991px !default;
-$fallbackFontFamily: Ubuntu, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+$fallbackFontFamily:
+  Ubuntu,
+  Helvetica Neue Light,
+  Helvetica Neue,
+  Helvetica,
+  Arial,
+  Lucida Grande,
+  sans-serif;
 $fallbackFontSize: 1rem;
 :root {
-    --mobile-break-point: #{$mobileBreakpoint};
-    font-size: var(--font-size, $fallbackFontSize);
+  --mobile-break-point: #{$mobileBreakpoint};
+  font-size: var(--font-size, $fallbackFontSize);
 }
 
 body {

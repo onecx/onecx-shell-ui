@@ -6,7 +6,7 @@ import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { catchError, firstValueFrom, retry } from 'rxjs'
 
-import { getLocation } from '@onecx/accelerator'
+import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
@@ -21,9 +21,20 @@ import {
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
-import { createTranslateLoader,  provideThemeConfig, SKIP_STYLE_SCOPING, provideTranslationPathFromMeta } from '@onecx/angular-utils'
+import {
+  createTranslateLoader,
+  provideThemeConfig,
+  SKIP_STYLE_SCOPING,
+  provideTranslationPathFromMeta
+} from '@onecx/angular-utils'
 import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
-import { CurrentLocationPublisher, EventsPublisher, NavigatedEventPayload, Theme } from '@onecx/integration-interface'
+import {
+  CurrentLocationPublisher,
+  EventsPublisher,
+  NavigatedEventPayload,
+  Theme,
+  UserProfile
+} from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
@@ -153,6 +164,10 @@ export async function userProfileInitializer(
 
   if (getUserProfileResponse) {
     console.log('ORGANIZATION : ', getUserProfileResponse.userProfile.organization)
+
+    const profile: UserProfile = { ...getUserProfileResponse.userProfile }
+    profile.settings ??= {}
+    profile.settings.locales ? normalizeLocales(profile.settings.locales) : getNormalizedBrowserLocales()
 
     await userService.profile$.publish(getUserProfileResponse.userProfile)
   }

@@ -26,6 +26,8 @@ updates:
     ignore:
       - dependency-name: "nx*"
       - dependency-name: "@nx*"
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

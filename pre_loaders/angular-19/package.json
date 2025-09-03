@@ -25,7 +25,7 @@
     "@angular/service-worker": "^19.2.14",
     "@ngx-translate/core": "^16.0.4",
     "@nx/angular": "20.4.4",
-    "@onecx/accelerator": "^6.6.0",
+    "@onecx/accelerator": "^6.7.0",
     "@onecx/angular-accelerator": "^6.6.0",
     "@onecx/angular-auth": "^6.6.0",
     "@onecx/angular-integration-interface": "^6.6.0",

@@ -42,7 +42,7 @@
     "modify-source-webpack-plugin": "^4.1.0",
     "@angular/compiler-cli": "^19.1.7",
     "nx": "20.8.2",
-    "webpack": "5.95.0"
+    "webpack": "5.101.3"
   },
   "overrides": {
     "@module-federation/dts-plugin": {

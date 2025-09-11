@@ -217,11 +217,18 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
 const replaceState = window.history.replaceState
 window.history.replaceState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
+  let preventLocationPropagation = false
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
-  replaceState.bind(window.history)(data, unused, url)
-  if (!isRouterSync) {
+
+  // Edge Case Handling: React Router initialization with a replaceState call
+  preventLocationPropagation = checkAndHandleReactRouterInitialization(data, url)
+  
+  if (!preventLocationPropagation)
+    replaceState.bind(window.history)(data, unused, url)
+
+  if (!isRouterSync && !preventLocationPropagation) {
     new CurrentLocationPublisher().publish({
       url,
       isFirst: false
@@ -241,12 +248,37 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
+/**
+ * Checks if the replaceState call is from react-router initialization
+ * If so, it replaces the state without publishing the location change
+ * This prevents publishing an undefined URL but keeps idx in the history state
+ * @param data 
+ * @param url 
+ * @returns whether the location propagation should be prevented
+ */
+function checkAndHandleReactRouterInitialization(data: any, url?: string) {
+  if (data && 'idx' in data && data.idx === 0 && url === undefined) {
+    const _url = _constructCurrentURL();
+    replaceState.bind(window.history)(data, '', _url)
+    return true
+  }
+  return false
+}
+
+/**
+ * Constructs the current URL relative to the deployment path
+ * @returns the current URL
+ */
+function _constructCurrentURL() {
+  return `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+}
+
 export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
     let isFirstRoute = true
-    const url = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+    const url = _constructCurrentURL();
     new CurrentLocationPublisher().publish({
       url,
       isFirst: true
@@ -388,4 +420,4 @@ export async function shareMfContainer() {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

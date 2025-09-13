@@ -123,7 +123,8 @@ function originalCssBasedDeconstructScopeRule(
     .filter(isUnwrappableRule)
     .map((r) => r.cssText)
     .join('')
-  const newStyleContent = `${unwrappableRulesContent} ${fromSelector} {${actualCss}}`
+  const fromSelectorWithWhere = `:where(${fromSelector})`
+  const newStyleContent = `${unwrappableRulesContent} ${fromSelectorWithWhere} {${actualCss}}`
   newStyleElement.appendChild(document.createTextNode(newStyleContent))
 
   // Remove old style element

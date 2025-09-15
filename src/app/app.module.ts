@@ -222,9 +222,14 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     delete data.isRouterSync
   }
 
-  // Edge Case Handling: React Router initialization with a replaceState call
-  preventLocationPropagation = checkAndHandleReactRouterInitialization(data, url)
-  
+  // Edge Case Handling: React Router initialization with a replaceState call  
+  if (checkIfReactRouterInitialization(data, url)) {
+    const _url = _constructCurrentURL();
+    // Use current URL (instead of undefined) but keep data from react-router
+    replaceState.bind(window.history)(data, '', _url)
+    preventLocationPropagation = true
+  }
+
   if (!preventLocationPropagation)
     replaceState.bind(window.history)(data, unused, url)
 
@@ -250,16 +255,12 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
 
 /**
  * Checks if the replaceState call is from react-router initialization
- * If so, it replaces the state without publishing the location change
- * This prevents publishing an undefined URL but keeps idx in the history state
  * @param data 
  * @param url 
  * @returns whether the location propagation should be prevented
  */
-function checkAndHandleReactRouterInitialization(data: any, url?: string) {
+function checkIfReactRouterInitialization(data: any, url?: string) {
   if (data && 'idx' in data && data.idx === 0 && url === undefined) {
-    const _url = _constructCurrentURL();
-    replaceState.bind(window.history)(data, '', _url)
     return true
   }
   return false

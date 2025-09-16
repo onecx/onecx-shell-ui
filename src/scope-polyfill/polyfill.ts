@@ -24,7 +24,9 @@ export function applyPrecisionPolyfill() {
 }
 
 /**
- * Apply the scope polyfill. The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document. Any change in body of the document and its children related to attributes and the whole tree will cause the update.
+ * Apply the scope polyfill.
+ * The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document.
+ * Any change in body of the document and its children related to attributes and the whole tree will cause the update.
  *
  * The polyfill assumes that:
  * - single style sheet is related to a single scope
@@ -102,10 +104,13 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
 }
 
 /**
- * This function operates on the original css that was used to create the style element. It replaces :root with & and wraps all rules with the selector coming from the @scope rule. The rules that cannot be wrapped (e.g., CSSKeyFramesRule and CSSFontFaceRule) are reinserted as they are on the top of the style sheet.
+ * This function operates on the original css that was used to create the style element.
+ * It replaces :root with & and wraps all rules with the selector coming from the @scope rule.
+ * The rules that cannot be wrapped (e.g., CSSKeyFramesRule and CSSFontFaceRule) are reinserted as they are on the top of the style sheet.
  *
  * Its important that this function will create a new style sheet and remove the old one. Without that operation some style will not be applied correctly (e.g., border shorthand).
  * @param styleElement - HTMLStyleElement
+ * @param supportsRule - CSSSupportsRule that contains the @scope rule
  * @param fromSelector - selector coming from the @scope rule (e.g., [data-style-id="shell-ui"])
  */
 function originalCssBasedDeconstructScopeRule(
@@ -143,7 +148,8 @@ function originalCssBasedDeconstructScopeRule(
 }
 
 /**
- * This function operates on the CSSStyleSheet and deconstructs the @supports rule by deleting it and reinserting all rules inside the @supports rule. Each rule that can be wrapped inside a selector (e.g., CSSStyleRule) is wrapped with the selector coming from the @scope rule.
+ * This function operates on the CSSStyleSheet and deconstructs the @supports rule by deleting it and reinserting all rules inside the @supports rule.
+ * Each rule that can be wrapped inside a selector (e.g., CSSStyleRule) is wrapped with the selector coming from the @scope rule.
  * @param sheet - CSSStyleSheet
  * @param supportsRule - CSSSupportsRule that contains the @scope rule
  * @param fromSelector - selector coming from the @scope rule (e.g., [data-style-id="shell-ui"])
@@ -228,7 +234,8 @@ export function createNodeList(nodes: Node[]) {
 /**
  * Updates scoped style sheets. Scope style sheet is a style sheet that was already transformed by this polyfill that implements OcxCSSStyleSheet interface.
  *
- * This function will transform new style sheets containing supports css rule to a style sheet that is understandable by all browsers that do not support the scope css rule. After that operation, the style sheet will be considered updated if necessary.
+ * This function will transform new style sheets containing supports css rule to a style sheet that is understandable by all browsers that do not support the scope css rule.
+ * After that operation, the style sheet will be considered updated if necessary.
  *
  * Based on the provided mutations this function will select a subset of scoped style sheets that require an update.
  *

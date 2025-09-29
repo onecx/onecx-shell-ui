@@ -31,7 +31,7 @@
     "@angular/compiler-cli": "^20.0.6",
     "modify-source-webpack-plugin": "^4.1.0",
     "nx": "21.2.1",
-    "webpack": "5.95.0"
+    "webpack": "5.102.0"
   },
   "overrides": {
     "ora": "5.4.1"

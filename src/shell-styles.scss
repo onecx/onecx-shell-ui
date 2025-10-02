@@ -10,14 +10,15 @@
 @import 'node_modules/primeflex/primeflex.scss';
 @import 'node_modules/primeicons/primeicons.css';
 
-.onex-body {
+.onecx-body {
   overflow: auto;
   display: flex;
   flex-direction: column;
+  height:100%;
 }
 
 // Important for allowing MFEs to grow and fill the available space
-.onex-body>ng-component {
+.onecx-body>ng-component {
   flex-grow: 1;
 }
 

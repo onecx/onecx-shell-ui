@@ -222,16 +222,15 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     delete data.isRouterSync
   }
 
-  // Edge Case Handling: React Router initialization with a replaceState call  
+  // Edge Case Handling: React Router initialization with a replaceState call
   if (checkIfReactRouterInitialization(data, url)) {
-    const _url = _constructCurrentURL();
+    const _url = _constructCurrentURL()
     // Use current URL (instead of undefined) but keep data from react-router
     replaceState.bind(window.history)(data, '', _url)
     preventLocationPropagation = true
   }
 
-  if (!preventLocationPropagation)
-    replaceState.bind(window.history)(data, unused, url)
+  if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url)
 
   if (!isRouterSync && !preventLocationPropagation) {
     new CurrentLocationPublisher().publish({
@@ -255,8 +254,8 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
 
 /**
  * Checks if the replaceState call is from react-router initialization
- * @param data 
- * @param url 
+ * @param data
+ * @param url
  * @returns whether the location propagation should be prevented
  */
 function checkIfReactRouterInitialization(data: any, url?: string) {
@@ -279,7 +278,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
     let isFirstRoute = true
-    const url = _constructCurrentURL();
+    const url = _constructCurrentURL()
     new CurrentLocationPublisher().publish({
       url,
       isFirst: true
@@ -315,7 +314,7 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
-declare const __webpack_share_scopes__: { default: unknown }
+declare const __webpack_share_scopes__: object
 
 declare global {
   interface Window {
@@ -324,7 +323,7 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__.default
+  window.onecxWebpackContainer = __webpack_share_scopes__
 }
 
 @NgModule({
@@ -421,4 +420,4 @@ export async function shareMfContainer() {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

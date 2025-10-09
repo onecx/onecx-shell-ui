@@ -6,6 +6,6 @@ import { environment } from './environments/environment'
 ShellCapabilityService.setCapabilities([
   Capability.PARAMETERS_TOPIC,
   Capability.CURRENT_LOCATION_TOPIC,
-  Capability.PUBLISH_STATIC_MENU_VISIBILITY
+  Capability.ACTIVENESS_AWARE_MENUS
 ])
 bootstrapModule(AppModule, 'shell', environment.production)

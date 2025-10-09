@@ -314,7 +314,7 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
-declare const __webpack_share_scopes__: object
+declare const __webpack_share_scopes__: any
 
 declare global {
   interface Window {

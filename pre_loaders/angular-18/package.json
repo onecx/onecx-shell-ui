@@ -40,7 +40,7 @@
     "rxjs": "~7.8.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^18.2.13",
+    "@angular-devkit/build-angular": "^18.2.21",
     "@angular/compiler-cli": "^18.2.13",
     "nx": "20.4.4",
     "modify-source-webpack-plugin": "^4.1.0",

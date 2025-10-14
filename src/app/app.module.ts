@@ -230,7 +230,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     preventLocationPropagation = true
   }
 
-  if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url)
+  if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url) // NOSONAR
 
   if (!isRouterSync && !preventLocationPropagation) {
     new CurrentLocationPublisher().publish({
@@ -323,7 +323,7 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__
+  window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
 }
 
 @NgModule({

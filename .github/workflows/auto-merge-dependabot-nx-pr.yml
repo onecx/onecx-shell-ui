@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto Approve
-        uses: actions/github-script@v4
+        uses: actions/github-script@v8
         with:
           script: |
             const result = await github.pulls.createReview({
@@ -39,7 +39,7 @@ jobs:
           GIT_COMMITTER_NAME: tkit-dev
           GIT_COMMITTER_EMAIL: tkit-dev@1000kit.org
       - name: Auto Approve
-        uses: actions/github-script@v4
+        uses: actions/github-script@v8
         with:
           script: |
             const result = await github.pulls.createReview({

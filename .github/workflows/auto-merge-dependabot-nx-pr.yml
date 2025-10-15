@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto Approve
-        uses: actions/github-script@v4
+        uses: actions/github-script@v8
         with:
           script: |
             const result = await github.pulls.createReview({
@@ -28,7 +28,7 @@ jobs:
     if: false
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
@@ -39,7 +39,7 @@ jobs:
           GIT_COMMITTER_NAME: tkit-dev
           GIT_COMMITTER_EMAIL: tkit-dev@1000kit.org
       - name: Auto Approve
-        uses: actions/github-script@v4
+        uses: actions/github-script@v8
         with:
           script: |
             const result = await github.pulls.createReview({

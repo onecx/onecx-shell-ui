@@ -103,7 +103,7 @@
     "@swc/core": "1.13.5",
     "@swc/helpers": "0.5.17",
     "@types/jest": "29.5.14",
-    "@types/node": "22.15.33",
+    "@types/node": "22.18.10",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "esbuild": "^0.25.8",
@@ -129,8 +129,8 @@
     "stylus-loader": "8.1.2",
     "ts-jest": "^29.4.5",
     "ts-node": "10.9.2",
-    "typescript": "~5.8.3",
-    "webpack": "5.98.0"
+    "typescript": "~5.9.3",
+    "webpack": "5.102.1"
   },
   "overrides": {
     "@openapitools/openapi-generator-cli": {

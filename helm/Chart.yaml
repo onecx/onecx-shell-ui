@@ -12,6 +12,6 @@ maintainers:
     email: tkit_dev@1000kit.org
 dependencies:
   - name: helm-angular-app
-    version: ^0
+    version: 0.21.0
     repository: oci://ghcr.io/onecx/charts
     alias: app

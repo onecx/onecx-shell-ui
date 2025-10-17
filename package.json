@@ -97,10 +97,10 @@
     "@nx/jest": "20.4.4",
     "@nx/js": "20.4.4",
     "@nx/workspace": "20.4.4",
-    "@openapitools/openapi-generator-cli": "^2.20.6",
+    "@openapitools/openapi-generator-cli": "^2.25.0",
     "@schematics/angular": "~19.2.15",
     "@swc-node/register": "1.10.10",
-    "@swc/core": "1.12.6",
+    "@swc/core": "1.13.5",
     "@swc/helpers": "0.5.17",
     "@types/jest": "29.5.14",
     "@types/node": "22.15.33",
@@ -109,7 +109,7 @@
     "esbuild": "^0.25.8",
     "esbuild-jest": "^0.5.0",
     "eslint": "^8.57.1",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "9.1.2",
     "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "^5.5.1",
@@ -126,11 +126,11 @@
     "prettier": "^3.6.1",
     "sonar-scanner": "^3.1.0",
     "stylus": "0.64.0",
-    "stylus-loader": "8.1.1",
-    "ts-jest": "^29.4.0",
+    "stylus-loader": "8.1.2",
+    "ts-jest": "^29.4.5",
     "ts-node": "10.9.2",
     "typescript": "~5.8.3",
-    "webpack": "5.95.0"
+    "webpack": "5.98.0"
   },
   "overrides": {
     "@openapitools/openapi-generator-cli": {

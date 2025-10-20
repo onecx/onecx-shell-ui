@@ -14,16 +14,16 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  height:100%;
+  height: 100%;
   position: relative;
 }
 
 // Important for allowing MFEs to grow and fill the available space
-.onecx-body>ng-component {
+.onecx-body > ng-component {
   flex-grow: 1;
 }
 
 // Important for allowing MFEs to grow and fill the available space
 .webcomponentwrapper {
-  height:100%
+  height: 100%;
 }

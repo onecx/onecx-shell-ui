@@ -26,7 +26,7 @@ export function loadShellStyles(css: string) {
       }
     )
   } else {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @supports (@scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}])) {
           ${replaceRootWithScope(css)}
@@ -36,5 +36,6 @@ export function loadShellStyles(css: string) {
         shellStylesStyles: ''
       }
     )
+    ;(styleElement as any).onecxOriginalCss = css
   }
 }

@@ -439,10 +439,14 @@ components:
           type: string
         issuer:
           type: string
+        tenantId:
+          type: string
         person:
           $ref: '#/components/schemas/UserPerson'
         accountSettings:
           $ref: '#/components/schemas/AccountSettings'
+        settings:
+          type: object
     UserPerson:
       type: object
       properties:

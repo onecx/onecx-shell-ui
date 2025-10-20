@@ -6,7 +6,7 @@ import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
-import { getLocation } from '@onecx/accelerator'
+import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
 import {
@@ -33,7 +33,8 @@ import {
   EventsPublisher,
   EventsTopic,
   NavigatedEventPayload,
-  Theme
+  Theme,
+  UserProfile
 } from '@onecx/integration-interface'
 
 import {
@@ -165,6 +166,10 @@ export async function userProfileInitializer(
   if (getUserProfileResponse) {
     console.log('ORGANIZATION : ', getUserProfileResponse.userProfile.organization)
 
+    const profile: UserProfile = { ...getUserProfileResponse.userProfile }
+    profile.settings ??= {}
+    profile.settings.locales ? normalizeLocales(profile.settings.locales) : getNormalizedBrowserLocales()
+
     await userService.profile$.publish(getUserProfileResponse.userProfile)
   }
 }
@@ -217,6 +222,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
 const replaceState = window.history.replaceState
 window.history.replaceState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
+  let preventLocationPropagation = false
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
@@ -224,8 +230,17 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
     console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
     return
   }
-  replaceState.bind(window.history)(data, unused, url)
-  if (!isRouterSync) {
+  // Edge Case Handling: React Router initialization with a replaceState call
+  if (checkIfReactRouterInitialization(data, url)) {
+    const _url = _constructCurrentURL()
+    // Use current URL (instead of undefined) but keep data from react-router
+    replaceState.bind(window.history)(data, '', _url)
+    preventLocationPropagation = true
+  }
+
+  if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url) // NOSONAR
+
+  if (!isRouterSync && !preventLocationPropagation) {
     new CurrentLocationPublisher().publish({
       url,
       isFirst: false
@@ -245,12 +260,33 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
+/**
+ * Checks if the replaceState call is from react-router initialization
+ * @param data
+ * @param url
+ * @returns whether the location propagation should be prevented
+ */
+function checkIfReactRouterInitialization(data: any, url?: string) {
+  if (data && 'idx' in data && data.idx === 0 && url === undefined) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Constructs the current URL relative to the deployment path
+ * @returns the current URL
+ */
+function _constructCurrentURL() {
+  return `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+}
+
 export function urlChangeListenerInitializer(router: Router, appStateService: AppStateService) {
   return async () => {
     await appStateService.isAuthenticated$.isInitialized
     let lastUrl = ''
     let isFirstRoute = true
-    const url = `${location.pathname.substring(getLocation().deploymentPath.length)}${location.search}${location.hash}`
+    const url = _constructCurrentURL()
     new CurrentLocationPublisher().publish({
       url,
       isFirst: true
@@ -295,7 +331,7 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
-declare const __webpack_share_scopes__: { default: unknown }
+declare const __webpack_share_scopes__: any
 
 declare global {
   interface Window {
@@ -304,7 +340,7 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__.default
+  window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
 }
 
 @NgModule({

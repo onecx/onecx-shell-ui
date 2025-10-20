@@ -25,6 +25,7 @@ app:
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-shell
           tagName: ocx-version-info-component
+          deprecated: true
     # Microservice
     microservice:
       spec:

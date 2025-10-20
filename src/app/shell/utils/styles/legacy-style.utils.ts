@@ -33,7 +33,7 @@ function loadPortalLayoutStylesStyles(css: string) {
       }
     )
   } else {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @supports(@scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
           ${replaceRootWithScope(css)}
@@ -43,9 +43,12 @@ function loadPortalLayoutStylesStyles(css: string) {
         [dataPortalLayoutStylesKey]: ''
       }
     )
+    ;(styleElement as any).onecxOriginalCss = css
   }
 }
 
+// This could be merged with loadPortalLayoutStylesStyles but its important to preserve functionality of PRECISION mode polyfill
+// which most likely relies on the fact that the dynamic styles are in a separate style element
 function loadDynamicPortalLayoutStylesStyles(css: string) {
   if (isCssScopeRuleSupported()) {
     addStyleToHead(
@@ -59,7 +62,7 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
       }
     )
   } else {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @supports(@scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}])) {
       ${replaceRootWithScope(css)}
@@ -69,5 +72,6 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
         [dataDynamicPortalLayoutStylesKey]: ''
       }
     )
+    ;(styleElement as any).onecxOriginalCss = css
   }
 }

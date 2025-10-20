@@ -24,7 +24,9 @@ export function applyPrecisionPolyfill() {
 }
 
 /**
- * Apply the scope polyfill. The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document. Any change in body of the document and its children related to attributes and the whole tree will cause the update.
+ * Apply the scope polyfill.
+ * The polyfill updates all scoped style sheets on a page based on the observed changes to the body of the document.
+ * Any change in body of the document and its children related to attributes and the whole tree will cause the update.
  *
  * The polyfill assumes that:
  * - single style sheet is related to a single scope
@@ -94,15 +96,74 @@ function deconstructScopeRule(styleElement: HTMLStyleElement) {
     console.warn('Expected to have a scoped sheet for:', styleElement.sheet)
     return
   }
-  styleElement.sheet.deleteRule(Array.from(styleElement.sheet.cssRules).findIndex((rule) => rule === supportsRule))
+  if (!(styleElement as any).onecxOriginalCss) {
+    return legacyDeconstructScopeRule(styleElement.sheet, supportsRule, from)
+  }
+
+  return originalCssBasedDeconstructScopeRule(styleElement, supportsRule, from)
+}
+
+/**
+ * This function operates on the original css that was used to create the style element.
+ * It replaces :root with & and wraps all rules with the selector coming from the @scope rule.
+ * The rules that cannot be wrapped (e.g., CSSKeyFramesRule and CSSFontFaceRule) are reinserted as they are on the top of the style sheet.
+ *
+ * Its important that this function will create a new style sheet and remove the old one. Without that operation some style will not be applied correctly (e.g., border shorthand).
+ * @param styleElement - HTMLStyleElement
+ * @param supportsRule - CSSSupportsRule that contains the @scope rule
+ * @param fromSelector - selector coming from the @scope rule (e.g., [data-style-id="shell-ui"])
+ */
+function originalCssBasedDeconstructScopeRule(
+  styleElement: HTMLStyleElement,
+  supportsRule: CSSSupportsRule,
+  fromSelector: string
+) {
+  if (!styleElement.sheet) return
+  const originalCss = (styleElement as any).onecxOriginalCss as string
+
+  // Construct new style element with available selector and original css with :root replaced with & and unwrappable rules extracted from supports rule to the top of the style sheet
+  const actualCss = originalCss.replace(/:root/g, '&')
+  const newStyleElement = document.createElement('style')
+  const unwrappableRulesContent = Array.from(supportsRule.cssRules)
+    .filter(isUnwrappableRule)
+    .map((r) => r.cssText)
+    .join('')
+  const fromSelectorWithWhere = `:where(${fromSelector})`
+  const newStyleContent = `${unwrappableRulesContent} ${fromSelectorWithWhere} {${actualCss}}`
+  newStyleElement.appendChild(document.createTextNode(newStyleContent))
+
+  // Remove old style element
+  document.head.removeChild(styleElement)
+
+  // Copy attributes from old style element to new one
+  const attributes = styleElement.attributes
+  for (let i = 0; i < attributes.length; i++) {
+    const attr = attributes.item(i)
+    if (attr) {
+      newStyleElement.setAttribute(attr.name, attr.value)
+    }
+  }
+  // Insert new style element
+  document.head.appendChild(newStyleElement)
+}
+
+/**
+ * This function operates on the CSSStyleSheet and deconstructs the @supports rule by deleting it and reinserting all rules inside the @supports rule.
+ * Each rule that can be wrapped inside a selector (e.g., CSSStyleRule) is wrapped with the selector coming from the @scope rule.
+ * @param sheet - CSSStyleSheet
+ * @param supportsRule - CSSSupportsRule that contains the @scope rule
+ * @param fromSelector - selector coming from the @scope rule (e.g., [data-style-id="shell-ui"])
+ */
+function legacyDeconstructScopeRule(sheet: CSSStyleSheet, supportsRule: CSSSupportsRule, fromSelector: string) {
+  sheet.deleteRule(Array.from(sheet.cssRules).findIndex((rule) => rule === supportsRule))
   for (const rule of Array.from(supportsRule.cssRules)) {
-    const index = styleElement.sheet.cssRules.length <= 0 ? 0 : styleElement.sheet.cssRules.length
+    const index = sheet.cssRules.length <= 0 ? 0 : sheet.cssRules.length
     if (isWrappableRule(rule)) {
       const wrappedRuleText = rule.cssText.replace(/:scope/g, '&')
-      const wrapped = `${normalize(from)} {${wrappedRuleText}}`
-      styleElement.sheet.insertRule(wrapped, index)
+      const wrapped = `${normalize(fromSelector)} {${wrappedRuleText}}`
+      sheet.insertRule(wrapped, index)
     } else {
-      styleElement.sheet.insertRule(rule.cssText, index)
+      sheet.insertRule(rule.cssText, index)
     }
   }
 }
@@ -117,6 +178,13 @@ function deconstructExistingStyleSheets() {
  */
 function isWrappableRule(rule: CSSRule) {
   return !(rule instanceof CSSKeyframesRule || rule instanceof CSSFontFaceRule)
+}
+
+/**
+ * Returns true if css rule can not be wrapped inside a selector (e.g. CSSKeyFramesRule and CSSFontFaceRule can not be nested inside a selector)
+ */
+function isUnwrappableRule(rule: CSSRule) {
+  return !isWrappableRule(rule)
 }
 
 /**
@@ -166,7 +234,8 @@ export function createNodeList(nodes: Node[]) {
 /**
  * Updates scoped style sheets. Scope style sheet is a style sheet that was already transformed by this polyfill that implements OcxCSSStyleSheet interface.
  *
- * This function will transform new style sheets containing supports css rule to a style sheet that is understandable by all browsers that do not support the scope css rule. After that operation, the style sheet will be considered updated if necessary.
+ * This function will transform new style sheets containing supports css rule to a style sheet that is understandable by all browsers that do not support the scope css rule.
+ * After that operation, the style sheet will be considered updated if necessary.
  *
  * Based on the provided mutations this function will select a subset of scoped style sheets that require an update.
  *

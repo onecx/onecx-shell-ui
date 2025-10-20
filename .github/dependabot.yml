@@ -5,7 +5,9 @@ updates:
       - "/"
       - "/pre_loaders/angular-*"
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+      time: "09:00"
     labels:
       - dependencies
     groups:
@@ -23,12 +25,65 @@ updates:
         update-types:
         - "minor"
         - "patch"
+      testing:
+        applies-to: version-updates
+        patterns:
+          - "jasmine*"
+          - "karma*"
+          - "@types/jasmine"
+          - "protractor"
+          - "cypress"
+          - "@cypress/*"
+        update-types:
+          - "minor"
+          - "patch"
+      linting:
+        applies-to: version-updates
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "prettier"
+          - "tslint*"
+        update-types:
+          - "minor"
+          - "patch"
+      build-tools:
+        applies-to: version-updates
+        patterns:
+          - "webpack*"
+          - "@types/*"
+          - "typescript"
+          - "@angular-architects/*"
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "nx*"
       - dependency-name: "@nx*"
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: daily
     labels:
       - docker-image
+  - package-ecosystem: "helm"
+    directory: "/helm"
+    schedule:
+      interval: daily
+    labels:
+      - helm
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: "09:00"
+    labels:
+      - github-actions
+      - dependencies

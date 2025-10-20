@@ -17,7 +17,9 @@ export interface UserProfile {
     userId: string;
     organization?: string;
     issuer?: string;
+    tenantId?: string;
     person: UserPerson;
     accountSettings?: AccountSettings;
+    settings?: object;
 }
 

@@ -194,7 +194,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
-  if (typeof data.navigationId !== 'undefined' && data.navigationId === -1) {
+  if (data.navigationId !== 'undefined' && data.navigationId === -1) {
     console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
     return
   }
@@ -226,7 +226,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
-  if (typeof data?.navigationId !== 'undefined' && data?.navigationId === -1) {
+  if (data?.navigationId !== 'undefined' && data?.navigationId === -1) {
     console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
     return
   }
@@ -310,8 +310,8 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
 
     const eventsTopic = new EventsTopic()
     eventsTopic.pipe(filter((event) => event.type === 'revertNavigation')).subscribe((event) => {
-      if (window.history.length > 1) {
-        window.history.back()
+      if (globalThis.history.length > 1) {
+        globalThis.history.back()
       } else {
         console.log('No previous route in history.')
       }

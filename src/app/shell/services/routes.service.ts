@@ -12,7 +12,6 @@ import {
   PortalMessageService
 } from '@onecx/angular-integration-interface'
 import { PermissionsTopic } from '@onecx/integration-interface'
-import { PermissionsCacheService, ShowContentProvider } from '@onecx/shell-core'
 
 import { appRoutes } from 'src/app/app.routes'
 import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
@@ -22,6 +21,8 @@ import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
 import { updateStylesForMfeChange } from '@onecx/angular-utils'
 import { HttpClient } from '@angular/common/http'
+import { ShowContentProvider } from '../shell-interface/show-content-provider'
+import { PermissionsCacheService } from './permissions-cache.service'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',

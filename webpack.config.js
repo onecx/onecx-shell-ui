@@ -31,8 +31,7 @@ const webpackConfig = {
       '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/portal-layout-styles': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/shell-core': { requiredVersion: 'auto', includeSecondaries: true }
+      '@onecx/portal-layout-styles': { requiredVersion: 'auto', includeSecondaries: true }
     })
   })
 }

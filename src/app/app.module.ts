@@ -27,7 +27,6 @@ import {
   SKIP_STYLE_SCOPING,
   provideTranslationPathFromMeta
 } from '@onecx/angular-utils'
-import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
 import {
   CurrentLocationPublisher,
   EventsPublisher,
@@ -61,6 +60,18 @@ import { styleChangesListenerInitializer } from './shell/utils/styles/style-chan
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
+import { ShellSrcDirective } from './shell/directives/src.directive'
+import { TooltipModule } from 'primeng/tooltip'
+import { CommonModule } from '@angular/common';
+import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
+import { providePrimeNG } from 'primeng/config';
+import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
+import { HeaderComponent } from './shell/components/portal-header/header.component'
+import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
+import { SHOW_CONTENT_PROVIDER } from './shell/shell-interface/show-content-provider'
+import { WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from './shell/shell-interface/workspace-config-bff-service-provider'
+import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   await appStateService.isAuthenticated$.isInitialized
@@ -333,12 +344,19 @@ export async function shareMfContainer() {
     ErrorPageComponent,
     HomeComponent,
     WelcomeMessageComponent,
-    InitializationErrorPageComponent
+    PortalViewportComponent,
+    HeaderComponent,
+    GlobalErrorComponent,
+    AppLoadingSpinnerComponent,
+    InitializationErrorPageComponent,
+    ShellSrcDirective,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CommonModule,
     RouterModule.forRoot(appRoutes),
+    TranslateModule,
     TranslateModule.forRoot({
       isolate: true,
       defaultLanguage: 'en',
@@ -352,15 +370,18 @@ export async function shareMfContainer() {
         useClass: AngularAcceleratorMissingTranslationHandler
       }
     }),
-    ShellCoreModule,
     AngularAcceleratorModule,
-    AngularRemoteComponentsModule
+    AngularRemoteComponentsModule,
+    TooltipModule,
+    ToastModule,
+    SkeletonModule,
   ],
   providers: [
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
+    providePrimeNG(),
     {
       provide: SKIP_STYLE_SCOPING,
       useValue: true

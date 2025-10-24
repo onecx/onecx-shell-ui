@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, OnInit, inject } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, inject } from '@angular/core'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import {
   AppStateService,
@@ -16,10 +16,30 @@ import {
   WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER,
   WorkspaceConfigBffService,
 } from '../../shell-interface/workspace-config-bff-service-provider'
-import { SlotService } from '@onecx/angular-remote-components'
+import { AngularRemoteComponentsModule, SlotService } from '@onecx/angular-remote-components'
+import { CommonModule } from '@angular/common'
+import { RouterModule } from '@angular/router'
+import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
+import { HeaderComponent } from '../portal-header/header.component'
+import { GlobalErrorComponent } from '../error-component/global-error.component'
+import { ToastModule } from 'primeng/toast'
+import { TranslateModule } from '@ngx-translate/core'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    AngularAcceleratorModule,
+    AngularRemoteComponentsModule,
+    ToastModule,
+    HeaderComponent,
+    GlobalErrorComponent,
+    AppLoadingSpinnerComponent,
+    RouterModule,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
   styleUrls: ['./portal-viewport.component.scss'],

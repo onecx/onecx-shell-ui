@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { catchError, firstValueFrom, retry } from 'rxjs'
-
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
@@ -60,7 +59,6 @@ import { styleChangesListenerInitializer } from './shell/utils/styles/style-chan
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
-import { ShellSrcDirective } from './shell/directives/src.directive'
 import { TooltipModule } from 'primeng/tooltip'
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
@@ -344,19 +342,13 @@ export async function shareMfContainer() {
     ErrorPageComponent,
     HomeComponent,
     WelcomeMessageComponent,
-    PortalViewportComponent,
-    HeaderComponent,
-    GlobalErrorComponent,
-    AppLoadingSpinnerComponent,
     InitializationErrorPageComponent,
-    ShellSrcDirective,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     CommonModule,
     RouterModule.forRoot(appRoutes),
-    TranslateModule,
     TranslateModule.forRoot({
       isolate: true,
       defaultLanguage: 'en',
@@ -375,6 +367,10 @@ export async function shareMfContainer() {
     TooltipModule,
     ToastModule,
     SkeletonModule,
+    PortalViewportComponent,
+    HeaderComponent,
+    GlobalErrorComponent,
+    AppLoadingSpinnerComponent,
   ],
   providers: [
     provideThemeConfig(),

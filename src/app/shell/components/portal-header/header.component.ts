@@ -1,12 +1,25 @@
 import { animate, style, transition, trigger } from '@angular/animations'
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { Observable } from 'rxjs'
-
 import { Theme, ThemeService } from '@onecx/angular-integration-interface'
+import { CommonModule } from '@angular/common'
+import { TranslateModule } from '@ngx-translate/core'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
+import { TooltipModule } from 'primeng/tooltip'
+
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    AngularAcceleratorModule,
+    AngularRemoteComponentsModule,
+    TooltipModule,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   selector: 'ocx-shell-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],

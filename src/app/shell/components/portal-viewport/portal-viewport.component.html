@@ -1,10 +1,4 @@
-<div
-  *ngIf="!globalErrMsg; else globalError"
-  [ngClass]="{
-  'p-input-filled': inputStyle === 'filled', 
-  'p-ripple-disabled': !ripple,
-}"
->
+<div *ngIf="!globalErrMsg; else globalError" >
   <ng-container *ngIf="themeService.currentTheme$ | async; else noTheme">
     <ocx-shell-header [menuButtonTitle]="menuButtonTitle"></ocx-shell-header>
 

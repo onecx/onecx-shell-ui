@@ -6,7 +6,6 @@ import { Observable } from 'rxjs'
 import { Theme, ThemeService } from '@onecx/angular-integration-interface'
 
 @Component({
-  standalone: false,
   selector: 'ocx-shell-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
@@ -28,7 +27,7 @@ export class HeaderComponent {
   @Input() homeNavTitle = 'Home'
   @Output() menuButtonClick: EventEmitter<any> = new EventEmitter()
 
-  private themeService = inject(ThemeService)
+  private readonly themeService = inject(ThemeService)
 
   menuExpanded = false
   // slot configuration: get theme logo

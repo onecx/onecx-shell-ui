@@ -2,14 +2,13 @@ import { Component, Input, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
-  standalone: false,
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',
   styleUrls: ['./global-error.component.scss'],
 })
 export class GlobalErrorComponent {
-  private router = inject(Router)
-  private route = inject(ActivatedRoute)
+  private readonly router = inject(Router)
+  private readonly route = inject(ActivatedRoute)
 
   @Input()
   errCode: string | undefined

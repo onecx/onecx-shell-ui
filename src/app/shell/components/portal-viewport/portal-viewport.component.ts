@@ -19,25 +19,24 @@ import {
 import { SlotService } from '@onecx/angular-remote-components'
 
 @Component({
-  standalone: false,
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
   styleUrls: ['./portal-viewport.component.scss'],
 })
 @UntilDestroy()
 export class PortalViewportComponent implements OnInit {
-  private primengConfig = inject(PrimeNG)
-  private messageService = inject(MessageService)
-  private appStateService = inject(AppStateService)
-  private portalMessageService = inject(PortalMessageService)
-  private userService = inject(UserService)
+  private readonly primengConfig = inject(PrimeNG)
+  private readonly messageService = inject(MessageService)
+  private readonly appStateService = inject(AppStateService)
+  private readonly portalMessageService = inject(PortalMessageService)
+  private readonly userService = inject(UserService)
   themeService = inject(ThemeService)
-  private httpClient = inject(HttpClient)
+  private readonly httpClient = inject(HttpClient)
   showContentProvider = inject<ShowContentProvider | undefined>(SHOW_CONTENT_PROVIDER, { optional: true })
   workspaceConfigBffService = inject<WorkspaceConfigBffService | undefined>(WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, {
     optional: true,
   })
-  private slotService = inject(SlotService)
+  private readonly slotService = inject(SlotService)
 
   menuButtonTitle = ''
 

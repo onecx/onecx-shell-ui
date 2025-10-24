@@ -2,7 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Directive, ElementRef, EventEmitter, Input, Output, inject } from '@angular/core'
 
 // eslint-disable-next-line @angular-eslint/directive-selector
-@Directive({ selector: '[ocxShellSrc]' })
+@Directive({ selector: '[ocxShellSrc]', standalone: false })
 export class ShellSrcDirective {
   private readonly el = inject(ElementRef)
   private readonly httpClient = inject(HttpClient)

@@ -19,6 +19,7 @@ import {
 import { SlotService } from '@onecx/angular-remote-components'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
   styleUrls: ['./portal-viewport.component.scss'],

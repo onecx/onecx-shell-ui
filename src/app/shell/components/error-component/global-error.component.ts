@@ -2,6 +2,7 @@ import { Component, Input, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
+  standalone: false,
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',
   styleUrls: ['./global-error.component.scss'],

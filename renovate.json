@@ -2,65 +2,77 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "minimumReleaseAge": "30 days",
-  "includePaths": [
-    "package.json",
-    "pre_loaders/**/package.json"
-  ],
+  "includePaths": ["package.json", "pre_loaders/**/package.json"],
   "separateMultipleMajor": true,
   "separateMinorPatch": false,
   "packageRules": [
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root Angular",
-      "matchPackagePatterns": ["^@angular/", "^@angular-devkit/"],
       "matchDepTypes": ["dependencies", "devDependencies"],
-      "excludePackagePatterns": ["^@nx/", "^@onecx/"],
-      "excludePackageNames": ["nx"],
       "groupSlug": "root-angular",
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "/^@angular//",
+        "/^@angular-devkit//",
+        "!/^@nx//",
+        "!/^@onecx//",
+        "!nx"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 Loader",
-      "matchPackagePatterns": ["^@angular/", "^@angular-devkit/"],
       "matchDepTypes": ["dependencies", "devDependencies"],
-      "excludePackagePatterns": ["^@nx/", "^@onecx/"],
-      "excludePackageNames": ["nx"],
       "groupSlug": "angular-18-loader",
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "/^@angular//",
+        "/^@angular-devkit//",
+        "!/^@nx//",
+        "!/^@onecx//",
+        "!nx"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 Loader",
-      "matchPackagePatterns": ["^@angular/", "^@angular-devkit/"],
       "matchDepTypes": ["dependencies", "devDependencies"],
-      "excludePackagePatterns": ["^@nx/", "^@onecx/"],
-      "excludePackageNames": ["nx"],
       "groupSlug": "angular-19-loader",
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "/^@angular//",
+        "/^@angular-devkit//",
+        "!/^@nx//",
+        "!/^@onecx//",
+        "!nx"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 Loader",
-      "matchPackagePatterns": ["^@angular/", "^@angular-devkit/"],
       "matchDepTypes": ["dependencies", "devDependencies"],
-      "excludePackagePatterns": ["^@nx/", "^@onecx/"],
-      "excludePackageNames": ["nx"],
       "groupSlug": "angular-20-loader",
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "/^@angular//",
+        "/^@angular-devkit//",
+        "!/^@nx//",
+        "!/^@onecx//",
+        "!nx"
+      ]
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root NX",
-      "matchPackagePatterns": ["^@nx/", "^nx$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "root-nx",
       "prPriority": 8,
@@ -75,12 +87,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/^@nx//", "/^nx$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 NX",
-      "matchPackagePatterns": ["^@nx/", "^nx$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-18-nx",
       "prPriority": 8,
@@ -95,12 +107,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/^@nx//", "/^nx$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 NX",
-      "matchPackagePatterns": ["^@nx/", "^nx$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-19-nx",
       "prPriority": 8,
@@ -115,12 +127,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/^@nx//", "/^nx$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 NX",
-      "matchPackagePatterns": ["^@nx/", "^nx$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-20-nx",
       "prPriority": 8,
@@ -135,12 +147,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/^@nx//", "/^nx$/"]
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root OneCX Libraries",
-      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "root-onecx",
       "prPriority": 9,
@@ -156,12 +168,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 OneCX Libraries",
-      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-18-onecx",
       "prPriority": 9,
@@ -177,12 +189,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 OneCX Libraries",
-      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-19-onecx",
       "prPriority": 9,
@@ -198,12 +210,12 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 OneCX Libraries",
-      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-20-onecx",
       "prPriority": 9,
@@ -219,50 +231,51 @@
         ],
         "fileFilters": ["**/*", "!node_modules/**"],
         "executionMode": "branch"
-      }
+      },
+      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root PrimeNG",
-      "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "root-primeng",
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 PrimeNG",
-      "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-18-primeng",
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 PrimeNG",
-      "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-19-primeng",
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 PrimeNG",
-      "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-20-primeng",
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root Angular Architects Module Federation",
       "matchPackageNames": [
         "@angular-architects/module-federation",
@@ -274,7 +287,7 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 Module Federation",
       "matchPackageNames": [
         "@angular-architects/module-federation",
@@ -286,7 +299,7 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 Module Federation",
       "matchPackageNames": [
         "@angular-architects/module-federation",
@@ -298,7 +311,7 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 Module Federation",
       "matchPackageNames": [
         "@angular-architects/module-federation",
@@ -310,7 +323,7 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "groupName": "Root Webpack",
       "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
       "matchDepTypes": ["dependencies", "devDependencies"],
@@ -320,7 +333,7 @@
       "enabled": false
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 Webpack",
       "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
       "matchDepTypes": ["dependencies", "devDependencies"],
@@ -330,7 +343,7 @@
       "enabled": false
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 Webpack",
       "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
       "matchDepTypes": ["dependencies", "devDependencies"],
@@ -340,7 +353,7 @@
       "enabled": false
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 Webpack",
       "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
       "matchDepTypes": ["dependencies", "devDependencies"],
@@ -350,10 +363,8 @@
       "enabled": false
     },
     {
-      "matchFiles": ["package.json"],
+      "matchFileNames": ["package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "excludePackagePatterns": ["^@nx/", "^nx$", "^@onecx/", "^@angular/", "^@angular-devkit/"],
       "groupName": "Root DevDependencies",
       "groupSlug": "root-devdeps",
       "automerge": true,
@@ -361,13 +372,20 @@
       "automergeStrategy": "merge",
       "platformAutomerge": true,
       "labels": ["dependencies", "automerge"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!webpack",
+        "!modify-source-webpack-plugin",
+        "!/^@nx//",
+        "!/^nx$/",
+        "!/^@onecx//",
+        "!/^@angular//",
+        "!/^@angular-devkit//"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-18/package.json"],
+      "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "excludePackagePatterns": ["^@nx/", "^nx$", "^@onecx/", "^@angular/", "^@angular-devkit/"],
       "groupName": "Angular 18 DevDependencies",
       "groupSlug": "angular-18-devdeps",
       "automerge": true,
@@ -375,13 +393,20 @@
       "automergeStrategy": "merge",
       "platformAutomerge": true,
       "labels": ["dependencies", "automerge"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!webpack",
+        "!modify-source-webpack-plugin",
+        "!/^@nx//",
+        "!/^nx$/",
+        "!/^@onecx//",
+        "!/^@angular//",
+        "!/^@angular-devkit//"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-19/package.json"],
+      "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "excludePackagePatterns": ["^@nx/", "^nx$", "^@onecx/", "^@angular/", "^@angular-devkit/"],
       "groupName": "Angular 19 DevDependencies",
       "groupSlug": "angular-19-devdeps",
       "automerge": true,
@@ -389,13 +414,20 @@
       "automergeStrategy": "merge",
       "platformAutomerge": true,
       "labels": ["dependencies", "automerge"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!webpack",
+        "!modify-source-webpack-plugin",
+        "!/^@nx//",
+        "!/^nx$/",
+        "!/^@onecx//",
+        "!/^@angular//",
+        "!/^@angular-devkit//"
+      ]
     },
     {
-      "matchFiles": ["pre_loaders/angular-20/package.json"],
+      "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "excludePackagePatterns": ["^@nx/", "^nx$", "^@onecx/", "^@angular/", "^@angular-devkit/"],
       "groupName": "Angular 20 DevDependencies",
       "groupSlug": "angular-20-devdeps",
       "automerge": true,
@@ -403,13 +435,22 @@
       "automergeStrategy": "merge",
       "platformAutomerge": true,
       "labels": ["dependencies", "automerge"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!webpack",
+        "!modify-source-webpack-plugin",
+        "!/^@nx//",
+        "!/^nx$/",
+        "!/^@onecx//",
+        "!/^@angular//",
+        "!/^@angular-devkit//"
+      ]
     },
     {
       "description": "Block OneCX major updates - OneCX packages should stay on current major version",
-      "matchPackagePatterns": ["^@onecx/"],
       "matchUpdateTypes": ["major"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["/^@onecx//"]
     },
     {
       "description": "Block all major updates globally - must be last rule",
@@ -431,5 +472,10 @@
   "labels": ["dependencies"],
   "assigneesFromCodeOwners": true,
   "enabledManagers": ["npm"],
-  "platformAutomerge": true
+  "platformAutomerge": true,
+  "allowedCommands": [
+    "git stash",
+    "npx nx migrate",
+    "npm install"
+  ]
 }

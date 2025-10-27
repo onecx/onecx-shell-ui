@@ -17,7 +17,7 @@
       "excludePackageNames": ["nx"],
       "groupSlug": "root-angular",
       "prPriority": 10,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -28,7 +28,7 @@
       "excludePackageNames": ["nx"],
       "groupSlug": "angular-18-loader",
       "prPriority": 10,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -39,7 +39,7 @@
       "excludePackageNames": ["nx"],
       "groupSlug": "angular-19-loader",
       "prPriority": 10,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -50,7 +50,7 @@
       "excludePackageNames": ["nx"],
       "groupSlug": "angular-20-loader",
       "prPriority": 10,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -59,7 +59,7 @@
       "matchPackagePatterns": ["^@nx/", "^nx$"],
       "groupSlug": "root-nx",
       "prPriority": 8,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "postUpgradeTasks": {
         "commands": [
@@ -78,7 +78,7 @@
       "matchPackagePatterns": ["^@nx/", "^nx$"],
       "groupSlug": "angular-18-nx",
       "prPriority": 8,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "postUpgradeTasks": {
         "commands": [
@@ -97,7 +97,7 @@
       "matchPackagePatterns": ["^@nx/", "^nx$"],
       "groupSlug": "angular-19-nx",
       "prPriority": 8,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "postUpgradeTasks": {
         "commands": [
@@ -116,7 +116,7 @@
       "matchPackagePatterns": ["^@nx/", "^nx$"],
       "groupSlug": "angular-20-nx",
       "prPriority": 8,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "postUpgradeTasks": {
         "commands": [
@@ -132,11 +132,11 @@
     {
       "matchFiles": ["package.json"],
       "groupName": "Root OneCX Libraries",
-      "matchPackagePatterns": ["^@onecx/", "nx-plugin$"],
+      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "groupSlug": "root-onecx",
       "prPriority": 9,
-      "schedule": ["before 6am on monday"],
-      "matchUpdateTypes": ["minor"],
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
       "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
       "postUpgradeTasks": {
         "commands": [
@@ -152,11 +152,11 @@
     {
       "matchFiles": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 OneCX Libraries",
-      "matchPackagePatterns": ["^@onecx/", "nx-plugin$"],
+      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "groupSlug": "angular-18-onecx",
       "prPriority": 9,
-      "schedule": ["before 6am on monday"],
-      "matchUpdateTypes": ["minor"],
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
       "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
       "postUpgradeTasks": {
         "commands": [
@@ -172,11 +172,11 @@
     {
       "matchFiles": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 OneCX Libraries",
-      "matchPackagePatterns": ["^@onecx/", "nx-plugin$"],
+      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "groupSlug": "angular-19-onecx",
       "prPriority": 9,
-      "schedule": ["before 6am on monday"],
-      "matchUpdateTypes": ["minor"],
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
       "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
       "postUpgradeTasks": {
         "commands": [
@@ -192,11 +192,11 @@
     {
       "matchFiles": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 OneCX Libraries",
-      "matchPackagePatterns": ["^@onecx/", "nx-plugin$"],
+      "matchPackagePatterns": ["(^@onecx/)|(nx-plugin$)"],
       "groupSlug": "angular-20-onecx",
       "prPriority": 9,
-      "schedule": ["before 6am on monday"],
-      "matchUpdateTypes": ["minor"],
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
       "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
       "postUpgradeTasks": {
         "commands": [
@@ -215,7 +215,7 @@
       "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "groupSlug": "root-primeng",
       "prPriority": 6,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -224,7 +224,7 @@
       "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "groupSlug": "angular-18-primeng",
       "prPriority": 6,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -233,7 +233,7 @@
       "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "groupSlug": "angular-19-primeng",
       "prPriority": 6,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -242,7 +242,7 @@
       "matchPackagePatterns": ["^@primeng/", "^primeng$"],
       "groupSlug": "angular-20-primeng",
       "prPriority": 6,
-      "schedule": ["before 6am on monday"],
+      "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
@@ -399,7 +399,7 @@
     "automerge": false
   },
   "timezone": "Europe/Vienna",
-  "schedule": ["before 6am on monday"],
+  "schedule": ["before 6am every weekday"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 8,
   "semanticCommits": "enabled",

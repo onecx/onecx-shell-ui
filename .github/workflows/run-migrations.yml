@@ -96,6 +96,11 @@ jobs:
             rm -f migrations.json
           fi
 
+      - name: Format code with Prettier
+        run: |
+            # Format all files that might have been changed
+            npx prettier --write . || echo "Prettier formatting completed"
+
       - name: Commit migration changes
         run: |
           git config --local user.email "action@github.com"
@@ -205,6 +210,11 @@ jobs:
             npx nx migrate --run-migrations --if-exists || echo "No migrations to run"
             rm -f migrations.json
           fi
+
+      - name: Format code with Prettier
+        run: |
+            # Format all files that might have been changed
+            npx prettier --write . || echo "Prettier formatting completed"
 
       - name: Commit migration changes
         run: |

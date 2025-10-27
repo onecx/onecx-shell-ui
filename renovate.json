@@ -66,16 +66,7 @@
       "prPriority": 8,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "npx nx migrate {{{newVersion}}} --from={{{currentVersion}}}",
-          "npm install",
-          "npx nx migrate --run-migrations"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["nx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-18/package.json"],
@@ -86,16 +77,7 @@
       "prPriority": 8,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "npx nx migrate {{{newVersion}}} --from={{{currentVersion}}}",
-          "npm install",
-          "npx nx migrate --run-migrations"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["nx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-19/package.json"],
@@ -106,16 +88,7 @@
       "prPriority": 8,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "npx nx migrate {{{newVersion}}} --from={{{currentVersion}}}",
-          "npm install",
-          "npx nx migrate --run-migrations"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["nx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-20/package.json"],
@@ -126,16 +99,7 @@
       "prPriority": 8,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "npx nx migrate {{{newVersion}}} --from={{{currentVersion}}}",
-          "npm install",
-          "npx nx migrate --run-migrations"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["nx-migration-required"]
     },
     {
       "matchFiles": ["package.json"],
@@ -146,17 +110,7 @@
       "prPriority": 9,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}]; do npx nx migrate $pkg; done",
-          "npm install",
-          "NX_MIGRATE_SKIP_INSTALL=true npx nx migrate --run-migrations --if-exists"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["onecx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-18/package.json"],
@@ -167,17 +121,7 @@
       "prPriority": 9,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}]; do npx nx migrate $pkg; done",
-          "npm install",
-          "NX_MIGRATE_SKIP_INSTALL=true npx nx migrate --run-migrations --if-exists"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["onecx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-19/package.json"],
@@ -188,17 +132,7 @@
       "prPriority": 9,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}]; do npx nx migrate $pkg; done",
-          "npm install",
-          "NX_MIGRATE_SKIP_INSTALL=true npx nx migrate --run-migrations --if-exists"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["onecx-migration-required"]
     },
     {
       "matchFiles": ["pre_loaders/angular-20/package.json"],
@@ -209,17 +143,7 @@
       "prPriority": 9,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "description": "OneCX packages: only minor updates, no patch updates to avoid breaking changes",
-      "postUpgradeTasks": {
-        "commands": [
-          "git stash",
-          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}]; do npx nx migrate $pkg; done",
-          "npm install",
-          "NX_MIGRATE_SKIP_INSTALL=true npx nx migrate --run-migrations --if-exists"
-        ],
-        "fileFilters": ["**/*", "!node_modules/**"],
-        "executionMode": "branch"
-      }
+      "addLabels": ["onecx-migration-required"]
     },
     {
       "matchFiles": ["package.json"],

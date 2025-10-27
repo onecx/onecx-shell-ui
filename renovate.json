@@ -472,10 +472,5 @@
   "labels": ["dependencies"],
   "assigneesFromCodeOwners": true,
   "enabledManagers": ["npm"],
-  "platformAutomerge": true,
-  "allowedCommands": [
-    "git stash",
-    "npx nx migrate",
-    "npm install"
-  ]
+  "platformAutomerge": true
 }

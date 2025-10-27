@@ -336,7 +336,6 @@
       "automergeType": "pr",
       "automergeStrategy": "merge",
       "platformAutomerge": true,
-      "ignoreTests": true,
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"]
     },
@@ -351,7 +350,6 @@
       "automergeType": "pr",
       "automergeStrategy": "merge",
       "platformAutomerge": true,
-      "ignoreTests": true,
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"]
     },
@@ -366,7 +364,6 @@
       "automergeType": "pr",
       "automergeStrategy": "merge",
       "platformAutomerge": true,
-      "ignoreTests": true,
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"]
     },
@@ -381,7 +378,6 @@
       "automergeType": "pr",
       "automergeStrategy": "merge",
       "platformAutomerge": true,
-      "ignoreTests": true,
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"]
     },

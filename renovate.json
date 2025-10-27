@@ -141,7 +141,7 @@
       "postUpgradeTasks": {
         "commands": [
           "git stash",
-          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}}; do npx nx migrate $pkg; done",
+          "for pkg in {{{#each upgrades}}}{{depName}}@{{newVersion}} {{/each}}]; do npx nx migrate $pkg; done",
           "npm install",
           "NX_MIGRATE_SKIP_INSTALL=true npx nx migrate --run-migrations --if-exists"
         ],
@@ -384,6 +384,12 @@
       "ignoreTests": true,
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "description": "Block OneCX major updates - OneCX packages should stay on current major version",
+      "matchPackagePatterns": ["^@onecx/"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     },
     {
       "description": "Block all major updates globally - must be last rule",

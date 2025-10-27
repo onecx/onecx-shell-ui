@@ -9,8 +9,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  run-nx-migration:
-    if: contains(github.event.label.name, 'nx-migration-required')
+  run-migrations:
+    if: contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required')
     runs-on: ubuntu-latest
     
     steps:
@@ -19,7 +19,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Fetch full history
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,8 +27,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Extract package versions from PR
-        id: extract-versions
+      - name: Extract all changed packages
+        id: extract-packages
         run: |
           set -e
           
@@ -37,51 +37,75 @@ jobs:
           
           # Get the merge base
           merge_base=$(git merge-base HEAD origin/${{ github.event.pull_request.base.ref }})
-          echo "Merge base: $merge_base"
           
           # Find all changed package.json files
           changed_files=$(git diff --name-only $merge_base...HEAD | grep package.json || true)
           
-          echo "Changed package.json files:"
-          echo "$changed_files"
+          echo "Changed package.json files: $changed_files"
           
-          # Extract NX package updates
-          nx_packages=""
+          # Extract ALL package updates by comparing JSON
+          all_migrations=""
           if [[ -n "$changed_files" ]]; then
             for file in $changed_files; do
               if [[ -f "$file" ]]; then
                 echo "Processing $file"
-                # Look for @nx/ packages in the diff
-                nx_updates=$(git diff $merge_base...HEAD "$file" | grep -E '^\+.*"@nx/|^\+.*"nx"' | sed 's/^+[[:space:]]*//' | sed 's/[",:]//g' | awk '{print $1 $2}' | sed 's/"//g' || true)
-                if [[ -n "$nx_updates" ]]; then
-                  echo "Found NX updates in $file: $nx_updates"
-                  nx_packages="$nx_packages $nx_updates"
+                
+                # Get old and new package.json content
+                old_content=$(git show $merge_base:$file 2>/dev/null || echo '{}')
+                new_content=$(cat "$file")
+                
+                # Extract all changed packages using Node.js
+                migrations=$(node -e "
+                  const oldPkg = JSON.parse(\`$old_content\`);
+                  const newPkg = JSON.parse(\`$new_content\`);
+                  
+                  const oldDeps = { ...oldPkg.dependencies, ...oldPkg.devDependencies };
+                  const newDeps = { ...newPkg.dependencies, ...newPkg.devDependencies };
+                  
+                  const migrations = [];
+                  
+                  // Check for ALL package updates with --from parameter
+                  for (const [pkg, newVersion] of Object.entries(newDeps)) {
+                    if (oldDeps[pkg] && oldDeps[pkg] !== newVersion) {
+                      migrations.push(\`\${pkg}@\${newVersion} --from=\${pkg}@\${oldDeps[pkg]}\`);
+                      console.error(\`Found update: \${pkg} from \${oldDeps[pkg]} to \${newVersion}\`);
+                    }
+                  }
+                  
+                  console.log(migrations.join('|'));
+                ")
+                
+                if [[ -n "$migrations" ]]; then
+                  if [[ -n "$all_migrations" ]]; then
+                    all_migrations="$all_migrations|$migrations"
+                  else
+                    all_migrations="$migrations"
+                  fi
                 fi
               fi
             done
           fi
           
-          # Clean up the packages string
-          nx_packages=$(echo "$nx_packages" | xargs)
-          
-          echo "nx_packages=$nx_packages" >> $GITHUB_OUTPUT
-          echo "Final NX packages to migrate: '$nx_packages'"
+          echo "all_migrations=$all_migrations" >> $GITHUB_OUTPUT
+          echo "Final migrations to run: '$all_migrations'"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run NX migrations
-        if: steps.extract-versions.outputs.nx_packages != ''
+      - name: Run migrations for all changed packages
+        if: steps.extract-packages.outputs.all_migrations != ''
         run: |
           set -e
           
-          echo "Running migrations for packages: ${{ steps.extract-versions.outputs.nx_packages }}"
+          echo "Running migrations: ${{ steps.extract-packages.outputs.all_migrations }}"
           
-          # Run migrations for each NX package
-          for pkg in ${{ steps.extract-versions.outputs.nx_packages }}; do
-            if [[ -n "$pkg" && "$pkg" != " " ]]; then
-              echo "Running migration for: $pkg"
-              npx nx migrate "$pkg" || echo "Migration for $pkg failed or not needed"
+          # Split migrations by | and run each one
+          IFS='|' read -ra MIGRATIONS <<< "${{ steps.extract-packages.outputs.all_migrations }}"
+          
+          for migration in "${MIGRATIONS[@]}"; do
+            if [[ -n "$migration" && "$migration" != " " ]]; then
+              echo "Running: npx nx migrate $migration"
+              npx nx migrate $migration || echo "No migrations for '$migration' or migration failed"
             fi
           done
           
@@ -96,144 +120,34 @@ jobs:
             rm -f migrations.json
           fi
 
-      - name: Format code with Prettier
-        run: |
-            # Format all files that might have been changed
-            npx prettier --write . || echo "Prettier formatting completed"
-
       - name: Commit migration changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
+          # Pull any changes from remote first
+          git pull origin ${{ github.event.pull_request.head.ref }} || echo "No remote changes to pull"
+          
           if [[ -n "$(git status --porcelain)" ]]; then
             git add .
-            git commit -m "refactor: run NX migrations
+            git commit --no-verify -m "refactor: run package migrations
 
             Auto-generated by GitHub Actions after dependency updates."
-            git push --force
+            
+            # Push to the PR branch
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
             
             echo "Migration changes committed and pushed"
           else
             echo "No changes to commit from migrations"
           fi
           
-          # Remove the label since we processed it
-          gh pr edit ${{ github.event.pull_request.number }} --remove-label "nx-migration-required"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  run-onecx-migration:
-    if: contains(github.event.label.name, 'onecx-migration-required')
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout PR
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Fetch full history
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Extract OneCX package versions from PR
-        id: extract-onecx-versions
-        run: |
-          set -e
-          
-          # Ensure we have the base branch
-          git fetch origin ${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
-          
-          # Get the merge base
-          merge_base=$(git merge-base HEAD origin/${{ github.event.pull_request.base.ref }})
-          echo "Merge base: $merge_base"
-          
-          # Find all changed package.json files
-          changed_files=$(git diff --name-only $merge_base...HEAD | grep package.json || true)
-          
-          echo "Changed package.json files:"
-          echo "$changed_files"
-          
-          # Extract OneCX package updates
-          onecx_packages=""
-          if [[ -n "$changed_files" ]]; then
-            for file in $changed_files; do
-              if [[ -f "$file" ]]; then
-                echo "Processing $file"
-                # Look for @onecx/ packages in the diff
-                onecx_updates=$(git diff $merge_base...HEAD "$file" | grep -E '^\+.*"@onecx/' | sed 's/^+[[:space:]]*//' | sed 's/[",:]//g' | awk '{print $1 $2}' | sed 's/"//g' || true)
-                if [[ -n "$onecx_updates" ]]; then
-                  echo "Found OneCX updates in $file: $onecx_updates"
-                  onecx_packages="$onecx_packages $onecx_updates"
-                fi
-              fi
-            done
+          # Determine which label to remove based on the event
+          if [[ "${{ contains(github.event.label.name, 'nx-migration-required') }}" == "true" ]]; then
+            gh pr edit ${{ github.event.pull_request.number }} --remove-label "nx-migration-required"
           fi
-          
-          # Clean up the packages string
-          onecx_packages=$(echo "$onecx_packages" | xargs)
-          
-          echo "onecx_packages=$onecx_packages" >> $GITHUB_OUTPUT
-          echo "Final OneCX packages to migrate: '$onecx_packages'"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run OneCX migrations
-        if: steps.extract-onecx-versions.outputs.onecx_packages != ''
-        run: |
-          set -e
-          
-          echo "Running migrations for packages: ${{ steps.extract-onecx-versions.outputs.onecx_packages }}"
-          
-          # Run migrations for each OneCX package
-          for pkg in ${{ steps.extract-onecx-versions.outputs.onecx_packages }}; do
-            if [[ -n "$pkg" && "$pkg" != " " ]]; then
-              echo "Running migration for: $pkg"
-              npx nx migrate "$pkg" || echo "Migration for $pkg failed or not needed"
-            fi
-          done
-          
-          # Install any new dependencies from migrations
-          export NX_MIGRATE_SKIP_INSTALL=true
-          if [[ -f "package.json" ]]; then
-            npm install
+          if [[ "${{ contains(github.event.label.name, 'onecx-migration-required') }}" == "true" ]]; then
+            gh pr edit ${{ github.event.pull_request.number }} --remove-label "onecx-migration-required"
           fi
-          
-          # Run the actual migrations if they exist
-          if [[ -f "migrations.json" ]]; then
-            npx nx migrate --run-migrations --if-exists || echo "No migrations to run"
-            rm -f migrations.json
-          fi
-
-      - name: Format code with Prettier
-        run: |
-            # Format all files that might have been changed
-            npx prettier --write . || echo "Prettier formatting completed"
-
-      - name: Commit migration changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git add .
-            git commit -m "refactor: run OneCX migrations
-
-            Auto-generated by GitHub Actions after dependency updates."
-            git push --force
-            
-            echo "Migration changes committed and pushed"
-          else
-            echo "No changes to commit from migrations"
-          fi
-          
-          # Remove the label since we processed it
-          gh pr edit ${{ github.event.pull_request.number }} --remove-label "onecx-migration-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

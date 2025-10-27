@@ -7,7 +7,7 @@
     "pre_loaders/**/package.json"
   ],
   "separateMultipleMajor": true,
-  "separateMinorPatch": true,
+  "separateMinorPatch": false,
   "packageRules": [
     {
       "matchFiles": ["package.json"],

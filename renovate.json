@@ -320,7 +320,7 @@
     {
       "matchFiles": ["package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
+      "excludePackageNames": ["webpack", "modify-source-webpack-plugin", "nx"],
       "groupName": "Root DevDependencies",
       "groupSlug": "root-devdeps",
       "automerge": true,
@@ -334,7 +334,7 @@
     {
       "matchFiles": ["pre_loaders/angular-18/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
+      "excludePackageNames": ["webpack", "modify-source-webpack-plugin", "nx"],
       "groupName": "Angular 18 DevDependencies",
       "groupSlug": "angular-18-devdeps",
       "automerge": true,
@@ -348,7 +348,7 @@
     {
       "matchFiles": ["pre_loaders/angular-19/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
+      "excludePackageNames": ["webpack", "modify-source-webpack-plugin", "nx"],
       "groupName": "Angular 19 DevDependencies",
       "groupSlug": "angular-19-devdeps",
       "automerge": true,
@@ -362,7 +362,7 @@
     {
       "matchFiles": ["pre_loaders/angular-20/package.json"],
       "matchDepTypes": ["devDependencies"],
-      "excludePackageNames": ["webpack", "modify-source-webpack-plugin"],
+      "excludePackageNames": ["webpack", "modify-source-webpack-plugin", "nx"],
       "groupName": "Angular 20 DevDependencies",
       "groupSlug": "angular-20-devdeps",
       "automerge": true,

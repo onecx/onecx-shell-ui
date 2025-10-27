@@ -19,12 +19,12 @@ import {
 import { AngularRemoteComponentsModule, SlotService } from '@onecx/angular-remote-components'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
-import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
 import { HeaderComponent } from '../portal-header/header.component'
 import { GlobalErrorComponent } from '../error-component/global-error.component'
 import { ToastModule } from 'primeng/toast'
 import { TranslateModule } from '@ngx-translate/core'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
 
 @Component({
   standalone: true,
@@ -95,31 +95,33 @@ export class PortalViewportComponent implements OnInit {
               : (this.workspaceConfigBffService?.getThemeFaviconByName(theme.name ?? '') ?? of())
           ).pipe(
             filter((blob) => !!blob),
-            mergeMap((blob) => {
-              return from(
-                new Promise((resolve) => {
-                  const reader = new FileReader()
-                  reader.onload = (e) => resolve(e.target?.result)
-                  reader.readAsDataURL(blob)
-                })
-              )
-            })
+            mergeMap((blob) => from(this.readBlobAsDataURL(blob)))
           )
         })
       )
       .subscribe((url) => {
-        let link = document.querySelector("link[rel~='icon']") as any
+        let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null
         if (!link) {
           link = document.createElement('link')
           link.rel = 'icon'
           document.head.appendChild(link)
         }
-        link.href = url
+        if (typeof url === 'string' && url !== null) {
+          link.href = url
+        }
       })
 
     this.isVerticalMenuComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.verticalMenuSlotName)
     this.isFooterComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.footerSlotName)
   }
+
+  private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target?.result ?? null);
+    reader.readAsDataURL(blob);
+  });
+}
 
   ngOnInit() {
     this.primengConfig.ripple.set(true)

@@ -1,7 +1,6 @@
 import { Component, Input, inject } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { RouterModule } from '@angular/router'
 
 @Component({
   standalone: true,
@@ -28,6 +27,6 @@ export class GlobalErrorComponent {
   }
 
   reload() {
-    window.location.reload()
+    globalThis.location.reload()
   }
 }

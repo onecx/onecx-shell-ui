@@ -123,7 +123,8 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"],
+      "minimumReleaseAge": "0 days"
     },
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
@@ -134,7 +135,8 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"],
+      "minimumReleaseAge": "0 days"
     },
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
@@ -145,7 +147,8 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"],
+      "minimumReleaseAge": "0 days"
     },
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
@@ -156,7 +159,8 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"],
+      "minimumReleaseAge": "0 days"
     },
     {
       "matchFileNames": ["package.json"],

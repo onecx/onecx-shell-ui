@@ -15,10 +15,10 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "/^@angular//",
-        "/^@angular-devkit//",
-        "!/^@nx//",
-        "!/^@onecx//",
+        "/^@angular\\//",
+        "/^@angular-devkit\\//",
+        "!/^@nx\\//",
+        "!/^@onecx\\//",
         "!nx"
       ]
     },
@@ -31,10 +31,10 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "/^@angular//",
-        "/^@angular-devkit//",
-        "!/^@nx//",
-        "!/^@onecx//",
+        "/^@angular\\//",
+        "/^@angular-devkit\\//",
+        "!/^@nx\\//",
+        "!/^@onecx\\//",
         "!nx"
       ]
     },
@@ -47,10 +47,10 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "/^@angular//",
-        "/^@angular-devkit//",
-        "!/^@nx//",
-        "!/^@onecx//",
+        "/^@angular\\//",
+        "/^@angular-devkit\\//",
+        "!/^@nx\\//",
+        "!/^@onecx\\//",
         "!nx"
       ]
     },
@@ -63,10 +63,10 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "/^@angular//",
-        "/^@angular-devkit//",
-        "!/^@nx//",
-        "!/^@onecx//",
+        "/^@angular\\//",
+        "/^@angular-devkit\\//",
+        "!/^@nx\\//",
+        "!/^@onecx\\//",
         "!nx"
       ]
     },
@@ -79,7 +79,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["nx-migration-required"],
-      "matchPackageNames": ["/^@nx//", "/^nx$/"]
+      "matchPackageNames": ["/^@nx\\//", "/^nx$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
@@ -90,7 +90,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["nx-migration-required"],
-      "matchPackageNames": ["/^@nx//", "/^nx$/"]
+      "matchPackageNames": ["/^@nx\\//", "/^nx$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
@@ -101,7 +101,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["nx-migration-required"],
-      "matchPackageNames": ["/^@nx//", "/^nx$/"]
+      "matchPackageNames": ["/^@nx\\//", "/^nx$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
@@ -112,7 +112,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["nx-migration-required"],
-      "matchPackageNames": ["/^@nx//", "/^nx$/"]
+      "matchPackageNames": ["/^@nx\\//", "/^nx$/"]
     },
     {
       "matchFileNames": ["package.json"],
@@ -123,7 +123,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
@@ -134,7 +134,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
@@ -145,7 +145,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
@@ -156,7 +156,7 @@
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
       "addLabels": ["onecx-migration-required"],
-      "matchPackageNames": ["/(^@onecx/)|(nx-plugin$)/"]
+      "matchPackageNames": ["/(^@onecx\\/)|(nx-plugin$)/"]
     },
     {
       "matchFileNames": ["package.json"],
@@ -166,7 +166,7 @@
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
+      "matchPackageNames": ["/^@primeng\\//", "/^primeng$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
@@ -176,7 +176,7 @@
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
+      "matchPackageNames": ["/^@primeng\\//", "/^primeng$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
@@ -186,7 +186,7 @@
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
+      "matchPackageNames": ["/^@primeng\\//", "/^primeng$/"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
@@ -196,7 +196,7 @@
       "prPriority": 6,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": ["/^@primeng//", "/^primeng$/"]
+      "matchPackageNames": ["/^@primeng\\//", "/^primeng$/"]
     },
     {
       "matchFileNames": ["package.json"],
@@ -300,11 +300,11 @@
       "matchPackageNames": [
         "!webpack",
         "!modify-source-webpack-plugin",
-        "!/^@nx//",
+        "!/^@nx\\//",
         "!/^nx$/",
-        "!/^@onecx//",
-        "!/^@angular//",
-        "!/^@angular-devkit//"
+        "!/^@onecx\\//",
+        "!/^@angular\\//",
+        "!/^@angular-devkit\\//"
       ]
     },
     {
@@ -321,11 +321,11 @@
       "matchPackageNames": [
         "!webpack",
         "!modify-source-webpack-plugin",
-        "!/^@nx//",
+        "!/^@nx\\//",
         "!/^nx$/",
-        "!/^@onecx//",
-        "!/^@angular//",
-        "!/^@angular-devkit//"
+        "!/^@onecx\\//",
+        "!/^@angular\\//",
+        "!/^@angular-devkit\\//"
       ]
     },
     {
@@ -342,11 +342,11 @@
       "matchPackageNames": [
         "!webpack",
         "!modify-source-webpack-plugin",
-        "!/^@nx//",
+        "!/^@nx\\//",
         "!/^nx$/",
-        "!/^@onecx//",
-        "!/^@angular//",
-        "!/^@angular-devkit//"
+        "!/^@onecx\\//",
+        "!/^@angular\\//",
+        "!/^@angular-devkit\\//"
       ]
     },
     {
@@ -363,18 +363,18 @@
       "matchPackageNames": [
         "!webpack",
         "!modify-source-webpack-plugin",
-        "!/^@nx//",
+        "!/^@nx\\//",
         "!/^nx$/",
-        "!/^@onecx//",
-        "!/^@angular//",
-        "!/^@angular-devkit//"
+        "!/^@onecx\\//",
+        "!/^@angular\\//",
+        "!/^@angular-devkit\\//"
       ]
     },
     {
       "description": "Block OneCX major updates - OneCX packages should stay on current major version",
       "matchUpdateTypes": ["major"],
       "enabled": false,
-      "matchPackageNames": ["/^@onecx//"]
+      "matchPackageNames": ["/^@onecx\\//"]
     },
     {
       "description": "Block all major updates globally - must be last rule",

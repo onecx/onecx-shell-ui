@@ -113,10 +113,6 @@ jobs:
           echo "migration_commands=$migration_commands" >> $GITHUB_OUTPUT
           echo "Final migration commands to run: '$migration_commands'"
 
-      - name: Install root dependencies
-        if: steps.check-migration.outputs.skip_migration == 'false'
-        run: npm ci
-
       - name: Run migrations per directory
         if: steps.check-migration.outputs.skip_migration == 'false' && steps.extract-packages.outputs.migration_commands != ''
         run: |

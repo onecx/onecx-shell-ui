@@ -27,7 +27,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Extract all changed packages
+      - name: Extract changed packages per directory
         id: extract-packages
         run: |
           set -e
@@ -43,19 +43,23 @@ jobs:
           
           echo "Changed package.json files: $changed_files"
           
-          # Extract ALL package updates by comparing JSON
-          all_migrations=""
+          # Process each package.json file separately with its directory
+          migration_commands=""
           if [[ -n "$changed_files" ]]; then
             for file in $changed_files; do
               if [[ -f "$file" ]]; then
                 echo "Processing $file"
                 
+                # Get the directory of this package.json
+                package_dir=$(dirname "$file")
+                echo "Package directory: $package_dir"
+                
                 # Get old and new package.json content
                 old_content=$(git show $merge_base:$file 2>/dev/null || echo '{}')
                 new_content=$(cat "$file")
                 
-                # Extract all changed packages using Node.js
-                migrations=$(node -e "
+                # Extract changed packages for this specific package.json using Node.js
+                file_migrations=$(node -e "
                   const oldPkg = JSON.parse(\`$old_content\`);
                   const newPkg = JSON.parse(\`$new_content\`);
                   
@@ -67,90 +71,96 @@ jobs:
                   // Check for ALL package updates with --from parameter
                   for (const [pkg, newVersion] of Object.entries(newDeps)) {
                     if (oldDeps[pkg] && oldDeps[pkg] !== newVersion) {
-                      migrations.push(\`\${pkg}@\${newVersion} --from=\${pkg}@\${oldDeps[pkg]}\`);
-                      console.error(\`Found update: \${pkg} from \${oldDeps[pkg]} to \${newVersion}\`);
+                      migrations.push(\`$package_dir:\${pkg}@\${newVersion} --from=\${pkg}@\${oldDeps[pkg]}\`);
+                      console.error(\`Found update in $package_dir: \${pkg} from \${oldDeps[pkg]} to \${newVersion}\`);
                     }
                   }
                   
                   console.log(migrations.join('|'));
                 ")
                 
-                if [[ -n "$migrations" ]]; then
-                  if [[ -n "$all_migrations" ]]; then
-                    all_migrations="$all_migrations|$migrations"
+                if [[ -n "$file_migrations" ]]; then
+                  if [[ -n "$migration_commands" ]]; then
+                    migration_commands="$migration_commands|$file_migrations"
                   else
-                    all_migrations="$migrations"
+                    migration_commands="$file_migrations"
                   fi
                 fi
               fi
             done
           fi
           
-          echo "all_migrations=$all_migrations" >> $GITHUB_OUTPUT
-          echo "Final migrations to run: '$all_migrations'"
+          echo "migration_commands=$migration_commands" >> $GITHUB_OUTPUT
+          echo "Final migration commands to run: '$migration_commands'"
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      - name: Run migrations for all changed packages
-        if: steps.extract-packages.outputs.all_migrations != ''
+      - name: Run migrations per directory
+        if: steps.extract-packages.outputs.migration_commands != ''
         run: |
           set -e
           
           echo "=========================================="
-          echo "🚀 STARTING PACKAGE MIGRATIONS"
+          echo "🚀 STARTING PACKAGE MIGRATIONS PER DIRECTORY"
           echo "=========================================="
-          echo "Migrations to run: ${{ steps.extract-packages.outputs.all_migrations }}"
+          echo "Migration commands: ${{ steps.extract-packages.outputs.migration_commands }}"
           echo "=========================================="
           
-          # Split migrations by | and run each one
-          IFS='|' read -ra MIGRATIONS <<< "${{ steps.extract-packages.outputs.all_migrations }}"
+          # Split migration commands by | and run each one in its directory
+          IFS='|' read -ra MIGRATION_COMMANDS <<< "${{ steps.extract-packages.outputs.migration_commands }}"
           
-          migration_count=0
-          for migration in "${MIGRATIONS[@]}"; do
-            if [[ -n "$migration" && "$migration" != " " ]]; then
-              migration_count=$((migration_count + 1))
+          for cmd in "${MIGRATION_COMMANDS[@]}"; do
+            if [[ -n "$cmd" && "$cmd" != " " ]]; then
+              # Extract directory and migration command
+              dir=$(echo "$cmd" | cut -d':' -f1)
+              migration=$(echo "$cmd" | cut -d':' -f2-)
               
               echo ""
               echo "┌─────────────────────────────────────────┐"
-              echo "│ Migration #$migration_count"
-              echo "│ Running: nx migrate $migration"
+              echo "│ Running in directory: $dir"
+              echo "│ Migration: nx migrate $migration"
               echo "└─────────────────────────────────────────┘"
               
-              npx nx migrate $migration || echo "❌ No migrations for '$migration' or migration failed"
+              # Change to the package directory and run migration
+              (
+                cd "$dir" || { echo "❌ Failed to change to directory $dir"; continue; }
+                
+                echo "📂 Working directory: $(pwd)"
+                
+                # Install dependencies in this directory if package.json exists
+                if [[ -f "package.json" ]]; then
+                  echo "📦 Installing dependencies in $dir..."
+                  npm ci || echo "⚠️ Failed to install dependencies in $dir, continuing..."
+                fi
+                
+                echo "🔧 Running migration: npx nx migrate $migration"
+                npx nx migrate $migration || echo "❌ No migrations for '$migration' in $dir or migration failed"
+                
+                # Install any new dependencies from migrations
+                if [[ -f "package.json" ]]; then
+                  echo "📦 Installing new dependencies after migration..."
+                  npm install || echo "⚠️ Failed to install new dependencies in $dir"
+                fi
+                
+                # Run the actual migrations if they exist
+                if [[ -f "migrations.json" ]]; then
+                  echo "🔧 Found migrations.json in $dir - executing migration scripts..."
+                  npx nx migrate --run-migrations || echo "❌ No migrations to run in $dir"
+                  echo "✅ Migration scripts completed in $dir"
+                else
+                  echo "ℹ️ No migrations.json found in $dir"
+                fi
+              )
               
-              echo "✅ Migration #$migration_count completed"
+              echo "✅ Completed migration in directory: $dir"
               echo "─────────────────────────────────────────"
             fi
           done
           
           echo ""
           echo "=========================================="
-          echo "📦 INSTALLING MIGRATION DEPENDENCIES"
-          echo "=========================================="
-          
-          # Install any new dependencies from migrations
-          if [[ -f "package.json" ]]; then
-            npm install
-          fi
-          
-          echo ""
-          echo "=========================================="
-          echo "🔧 RUNNING MIGRATION SCRIPTS"
-          echo "=========================================="
-          
-          # Run the actual migrations
-          if [[ -f "migrations.json" ]]; then
-            echo "Found migrations.json - executing migration scripts..."
-            npx nx migrate --run-migrations || echo "❌ No migrations to run"
-            echo "✅ Migration scripts completed"
-          else
-            echo "ℹ️ No migrations.json found - no migration scripts to run"
-          fi
-          
-          echo ""
-          echo "=========================================="
-          echo "🎉 ALL MIGRATIONS COMPLETED"
+          echo "🎉 ALL DIRECTORY MIGRATIONS COMPLETED"
           echo "=========================================="
 
       - name: Commit all migration changes
@@ -167,11 +177,14 @@ jobs:
             echo "📝 COMMITTING ALL MIGRATION CHANGES"
             echo "=========================================="
             
+            echo "Changed files:"
+            git status --porcelain
+            
             git add .
-            git commit --no-verify -m "refactor: run package migrations
+            git commit --no-verify -m "refactor: run package migrations per directory
 
             Auto-generated by GitHub Actions after dependency updates.
-            Includes migrations.json for team coordination and reproducible builds."
+            Migrations run in their respective package directories for proper context."
             
             # Push to the PR branch
             git push origin HEAD:${{ github.event.pull_request.head.ref }}

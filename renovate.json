@@ -356,5 +356,7 @@
   "assigneesFromCodeOwners": true,
   "enabledManagers": ["npm"],
   "platformAutomerge": true,
-  "rangeStrategy": "bump"
+  "rangeStrategy": "bump",
+  "ignoreReviewers": [],
+  "rebaseWhen": "behind-base-branch"
 }

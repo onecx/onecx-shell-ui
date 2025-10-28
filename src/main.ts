@@ -11,8 +11,8 @@ const preloaders = [angular18Preloader, angular19Preloader, angular20Preloader]
 
 Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)]).then(() => {
   import('@module-federation/enhanced/runtime')
-    .then(({ init }) => {
-      init({
+    .then(({ createInstance }) => {
+      createInstance({
         name: 'onecx-shell-ui',
         remotes: []
       })

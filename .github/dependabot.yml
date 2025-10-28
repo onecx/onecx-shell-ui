@@ -53,7 +53,7 @@ updates:
           - "webpack*"
           - "@types/*"
           - "typescript"
-          - "@angular-architects/*"
+          # - "@angular-architects/*"
         update-types:
           - "minor"
           - "patch"

@@ -6,45 +6,48 @@ declare global {
 
 export interface Preloader {
   relativeRemoteEntryUrl: string
-  windowKey: string
+  remoteName: string
   exposedModule: string
 }
 
 export const angular18Preloader: Preloader = {
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
-  windowKey: 'angular-18',
+  remoteName: 'angular-18',
   exposedModule: './Angular18Loader'
 }
 
 export const angular19Preloader: Preloader = {
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
-  windowKey: 'angular-19',
+  remoteName: 'angular-19',
   exposedModule: './Angular19Loader'
 }
 
 export const angular20Preloader: Preloader = {
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
-  windowKey: 'angular-20',
+  remoteName: 'angular-20',
   exposedModule: './Angular20Loader'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {
-  const moduleFederation = await import('@angular-architects/module-federation')
-  return moduleFederation.loadRemoteModule({
-    type: 'module',
-    remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-    exposedModule: preloader.exposedModule
-  })
+  const moduleFederation = await import('@module-federation/enhanced/runtime')
+  moduleFederation.registerRemotes([
+    {
+      type: 'module',
+      entry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
+      name: preloader.remoteName
+    }
+  ])
+  moduleFederation.loadRemote(preloader.remoteName + '/' + preloader.exposedModule)
 }
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   return new Promise((resolve) => {
-    if (window['onecxPreloaders'][preloader.windowKey]) {
+    if (window['onecxPreloaders'][preloader.remoteName]) {
       resolve(true)
       return
     }
     const ensureIntevalId = setInterval(() => {
-      if (window['onecxPreloaders'][preloader.windowKey]) {
+      if (window['onecxPreloaders'][preloader.remoteName]) {
         clearInterval(ensureIntevalId)
         resolve(true)
       }

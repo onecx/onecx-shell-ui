@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { Location } from '@angular/common'
-import { LoadRemoteModuleOptions, loadRemoteModule } from '@angular-architects/module-federation'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
 
@@ -22,6 +21,8 @@ import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
 import { updateStylesForMfeChange } from '@onecx/angular-utils'
 import { HttpClient } from '@angular/common/http'
+import { types } from '@module-federation/runtime-core'
+import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
@@ -93,8 +94,9 @@ export class RoutesService implements ShowContentProvider {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r))
+        registerRemotes([this.toLoadRemoteEntryOptions(r)])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
+        const m = await loadRemote<any>(r.productName + '/' + r.appId + '/' + exposedModule)
         console.log(`Load remote module ${exposedModule} finished.`)
         if (r.technology === Technologies.Angular) {
           return m[exposedModule]
@@ -179,20 +181,19 @@ export class RoutesService implements ShowContentProvider {
     throw err
   }
 
-  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): LoadRemoteModuleOptions {
-    const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
+  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): types.Remote {
     if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
       return {
         type: 'module',
-        remoteEntry: r.remoteEntryUrl,
-        exposedModule: './' + exposedModule
+        entry: r.remoteEntryUrl,
+        name: r.productName + '/' + r.appId
       }
     }
     return {
       type: 'script',
-      remoteName: r.remoteName ?? '',
-      remoteEntry: r.remoteEntryUrl,
-      exposedModule: './' + exposedModule
+      alias: r.remoteName ?? '', // TODO: check
+      entry: r.remoteEntryUrl,
+      name: r.productName + '/' + r.appId
     }
   }
 

@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { catchError, firstValueFrom, retry } from 'rxjs'
+import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
@@ -31,6 +31,7 @@ import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PR
 import {
   CurrentLocationPublisher,
   EventsPublisher,
+  EventsTopic,
   NavigatedEventPayload,
   Theme,
   UserProfile
@@ -193,6 +194,10 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
+  if (data.navigationId !== 'undefined' && data.navigationId === -1) {
+    console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
+    return
+  }
   pushState.bind(window.history)(data, unused, url)
   if (!isRouterSync) {
     new CurrentLocationPublisher().publish({
@@ -221,7 +226,10 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
   }
-
+  if (data?.navigationId !== 'undefined' && data?.navigationId === -1) {
+    console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
+    return
+  }
   // Edge Case Handling: React Router initialization with a replaceState call
   if (checkIfReactRouterInitialization(data, url)) {
     const _url = _constructCurrentURL()
@@ -297,6 +305,15 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
         } else {
           isFirstRoute = false
         }
+      }
+    })
+
+    const eventsTopic = new EventsTopic()
+    eventsTopic.pipe(filter((event) => event.type === 'revertNavigation')).subscribe((event) => {
+      if (globalThis.history.length > 1) {
+        globalThis.history.back()
+      } else {
+        console.log('No previous route in history.')
       }
     })
   }

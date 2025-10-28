@@ -355,5 +355,6 @@
   "labels": ["dependencies"],
   "assigneesFromCodeOwners": true,
   "enabledManagers": ["npm"],
-  "platformAutomerge": true
+  "platformAutomerge": true,
+  "rangeStrategy": "bump"
 }

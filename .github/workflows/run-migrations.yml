@@ -1,0 +1,253 @@
+name: Run Migrations
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run-migrations:
+    if: |
+      (github.event.action == 'labeled' && (contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required'))) ||
+      (github.event.action == 'synchronize' && github.event.pull_request.user.login == 'renovate[bot]' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.CI_PAT }}
+          fetch-depth: 0
+
+      - name: Check if migration already completed
+        id: check-migration
+        run: |
+          # Check if the last commit was from migration workflow
+          last_commit_message=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[-1].messageHeadline')
+          
+          if [[ "$last_commit_message" == *"refactor: run package migrations per directory"* ]]; then
+            echo "skip_migration=true" >> $GITHUB_OUTPUT
+            echo "🚫 Last commit was migration, skipping to avoid infinite loop"
+          else
+            echo "skip_migration=false" >> $GITHUB_OUTPUT
+            echo "✅ No recent migration commit, proceeding with migration"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_PAT }}
+
+      - name: Setup Node.js
+        if: steps.check-migration.outputs.skip_migration == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Extract changed packages per directory
+        if: steps.check-migration.outputs.skip_migration == 'false'
+        id: extract-packages
+        run: |
+          set -e
+          
+          # Ensure we have the base branch
+          git fetch origin ${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+          
+          # Get the merge base
+          merge_base=$(git merge-base HEAD origin/${{ github.event.pull_request.base.ref }})
+          
+          # Find all changed package.json files
+          changed_files=$(git diff --name-only $merge_base...HEAD | grep package.json || true)
+          
+          echo "Changed package.json files: $changed_files"
+          
+          # Process each package.json file separately with its directory
+          migration_commands=""
+          if [[ -n "$changed_files" ]]; then
+            for file in $changed_files; do
+              if [[ -f "$file" ]]; then
+                echo "Processing $file"
+                
+                # Get the directory of this package.json
+                package_dir=$(dirname "$file")
+                echo "Package directory: $package_dir"
+                
+                # Get old and new package.json content
+                old_content=$(git show $merge_base:$file 2>/dev/null || echo '{}')
+                new_content=$(cat "$file")
+                
+                # Extract changed packages for this specific package.json using Node.js
+                file_migrations=$(node -e "
+                  const oldPkg = JSON.parse(\`$old_content\`);
+                  const newPkg = JSON.parse(\`$new_content\`);
+                  
+                  const oldDeps = { ...oldPkg.dependencies, ...oldPkg.devDependencies };
+                  const newDeps = { ...newPkg.dependencies, ...newPkg.devDependencies };
+                  
+                  const migrations = [];
+                  
+                  // Check for ALL package updates with --from parameter
+                  for (const [pkg, newVersion] of Object.entries(newDeps)) {
+                    if (oldDeps[pkg] && oldDeps[pkg] !== newVersion) {
+                      migrations.push(\`$package_dir:\${pkg}@\${newVersion} --from=\${pkg}@\${oldDeps[pkg]}\`);
+                      console.error(\`Found update in $package_dir: \${pkg} from \${oldDeps[pkg]} to \${newVersion}\`);
+                    }
+                  }
+                  
+                  console.log(migrations.join('|'));
+                ")
+                
+                if [[ -n "$file_migrations" ]]; then
+                  if [[ -n "$migration_commands" ]]; then
+                    migration_commands="$migration_commands|$file_migrations"
+                  else
+                    migration_commands="$file_migrations"
+                  fi
+                fi
+              fi
+            done
+          fi
+          
+          echo "migration_commands=$migration_commands" >> $GITHUB_OUTPUT
+          echo "Final migration commands to run: '$migration_commands'"
+
+      - name: Run migrations per directory
+        if: steps.check-migration.outputs.skip_migration == 'false' && steps.extract-packages.outputs.migration_commands != ''
+        run: |
+          set -e
+          
+          echo "=========================================="
+          echo "🚀 STARTING PACKAGE MIGRATIONS PER DIRECTORY"
+          echo "=========================================="
+          echo "Migration commands: ${{ steps.extract-packages.outputs.migration_commands }}"
+          echo "=========================================="
+          
+          # Split migration commands by | and run each one in its directory
+          IFS='|' read -ra MIGRATION_COMMANDS <<< "${{ steps.extract-packages.outputs.migration_commands }}"
+          
+          for cmd in "${MIGRATION_COMMANDS[@]}"; do
+            if [[ -n "$cmd" && "$cmd" != " " ]]; then
+              # Extract directory and migration command
+              dir=$(echo "$cmd" | cut -d':' -f1)
+              migration=$(echo "$cmd" | cut -d':' -f2-)
+              
+              echo ""
+              echo "┌─────────────────────────────────────────┐"
+              echo "│ Running in directory: $dir"
+              echo "│ Migration: nx migrate $migration"
+              echo "└─────────────────────────────────────────┘"
+              
+              # Change to the package directory and run migration
+              (
+                cd "$dir" || { echo "❌ Failed to change to directory $dir"; continue; }
+                
+                echo "📂 Working directory: $(pwd)"
+                
+                # Install dependencies in this directory if package.json exists
+                if [[ -f "package.json" ]]; then
+                  echo "📦 Installing dependencies in $dir..."
+                  npm ci || echo "⚠️ Failed to install dependencies in $dir, continuing..."
+                fi
+                
+                echo "🔧 Running migration: npx nx migrate $migration"
+                npx nx migrate $migration || echo "❌ No migrations for '$migration' in $dir or migration failed"
+                
+                # Install any new dependencies from migrations
+                if [[ -f "package.json" ]]; then
+                  echo "📦 Installing new dependencies after migration..."
+                  npm install || echo "⚠️ Failed to install new dependencies in $dir"
+                fi
+                
+                # Run the actual migrations if they exist
+                if [[ -f "migrations.json" ]]; then
+                  echo "🔧 Found migrations.json in $dir - executing migration scripts..."
+                  npx nx migrate --run-migrations || echo "❌ No migrations to run in $dir"
+                  echo "✅ Migration scripts completed in $dir"
+                else
+                  echo "ℹ️ No migrations.json found in $dir"
+                fi
+              )
+              
+              echo "✅ Completed migration in directory: $dir"
+              echo "─────────────────────────────────────────"
+            fi
+          done
+          
+          echo ""
+          echo "=========================================="
+          echo "🎉 ALL DIRECTORY MIGRATIONS COMPLETED"
+          echo "=========================================="
+
+      - name: Commit all migration changes
+        if: steps.check-migration.outputs.skip_migration == 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo ""
+            echo "=========================================="
+            echo "📝 COMMITTING ALL MIGRATION CHANGES"
+            echo "=========================================="
+            
+            echo "Changed files:"
+            git status --porcelain
+            
+            # Add migration changes first
+            echo "📦 Adding migration changes..."
+            git add .
+            
+            # Try to pull and merge, but prioritize our migration changes
+            echo "📥 Pulling remote changes (migration changes will win conflicts)..."
+            git pull origin ${{ github.event.pull_request.head.ref }} --strategy-option=ours || {
+              echo "⚠️ Pull failed, forcing our migration changes..."
+              
+              # If pull fails, reset to remote and re-apply our changes
+              git fetch origin ${{ github.event.pull_request.head.ref }}
+              
+              # Commit our migration changes first
+              git commit --no-verify -m "refactor: run package migrations per directory
+
+            Auto-generated by GitHub Actions after dependency updates.
+            Migrations run in their respective package directories for proper context." || echo "Nothing to commit"
+              
+              # Force merge with our changes winning
+              git merge origin/${{ github.event.pull_request.head.ref }} -X ours --no-edit || {
+                echo "🔧 Merge failed, using hard reset approach..."
+                
+                # Hard reset approach: save our changes, reset to remote, re-apply
+                git reset --soft HEAD~1  # Undo our commit but keep changes staged
+                git reset --hard origin/${{ github.event.pull_request.head.ref }}  # Reset to remote
+                git add .  # Re-add our migration changes
+              }
+            }
+            
+            # Final commit if there are still changes
+            if [[ -n "$(git status --porcelain)" ]]; then
+              git commit --no-verify -m "refactor: run package migrations per directory
+
+            Auto-generated by GitHub Actions after dependency updates.
+            Migrations run in their respective package directories for proper context."
+            fi
+            
+            # Force push to ensure our changes are applied
+            echo "🚀 Force pushing migration changes..."
+            git push --force-with-lease origin HEAD:${{ github.event.pull_request.head.ref }}
+            
+            echo "✅ All migration changes committed and pushed (migration changes won)"
+            echo "📋 Labels kept for future rebases"
+            echo "=========================================="
+          else
+            # No local changes, just try to pull
+            echo "📥 No local changes, pulling remote updates..."
+            git pull origin ${{ github.event.pull_request.head.ref }} || echo "No remote changes to pull or pull failed"
+            
+            echo ""
+            echo "=========================================="
+            echo "ℹ️ NO MIGRATION CHANGES TO COMMIT"
+            echo "=========================================="
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_PAT }}

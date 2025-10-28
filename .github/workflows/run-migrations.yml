@@ -2,7 +2,7 @@ name: Run Migrations
 
 on:
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize]
 
 permissions:
   contents: write
@@ -10,11 +10,30 @@ permissions:
 
 jobs:
   run-migrations:
-    if: contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required')
+    if: |
+      (github.event.action == 'labeled' && (contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required'))) ||
+      (github.event.action == 'synchronize' && github.event.pull_request.user.login == 'renovate[bot]' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
     runs-on: ubuntu-latest
     
     steps:
+      - name: Check if migration already completed
+        id: check-migration
+        run: |
+          # Check if the last commit was from migration workflow
+          last_commit_message=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[-1].messageHeadline')
+          
+          if [[ "$last_commit_message" == *"refactor: run package migrations per directory"* ]]; then
+            echo "skip_migration=true" >> $GITHUB_OUTPUT
+            echo "🚫 Last commit was migration, skipping to avoid infinite loop"
+          else
+            echo "skip_migration=false" >> $GITHUB_OUTPUT
+            echo "✅ No recent migration commit, proceeding with migration"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_PAT }}
+
       - name: Checkout PR
+        if: steps.check-migration.outputs.skip_migration == 'false'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -22,12 +41,14 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node.js
+        if: steps.check-migration.outputs.skip_migration == 'false'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Extract changed packages per directory
+        if: steps.check-migration.outputs.skip_migration == 'false'
         id: extract-packages
         run: |
           set -e
@@ -94,10 +115,11 @@ jobs:
           echo "Final migration commands to run: '$migration_commands'"
 
       - name: Install root dependencies
+        if: steps.check-migration.outputs.skip_migration == 'false'
         run: npm ci
 
       - name: Run migrations per directory
-        if: steps.extract-packages.outputs.migration_commands != ''
+        if: steps.check-migration.outputs.skip_migration == 'false' && steps.extract-packages.outputs.migration_commands != ''
         run: |
           set -e
           
@@ -164,6 +186,7 @@ jobs:
           echo "=========================================="
 
       - name: Commit all migration changes
+        if: steps.check-migration.outputs.skip_migration == 'false'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -219,6 +242,7 @@ jobs:
             git push --force-with-lease origin HEAD:${{ github.event.pull_request.head.ref }}
             
             echo "✅ All migration changes committed and pushed (migration changes won)"
+            echo "📋 Labels kept for future rebases"
             echo "=========================================="
           else
             # No local changes, just try to pull
@@ -229,14 +253,6 @@ jobs:
             echo "=========================================="
             echo "ℹ️ NO MIGRATION CHANGES TO COMMIT"
             echo "=========================================="
-          fi
-          
-          # Determine which label to remove based on the event
-          if [[ "${{ contains(github.event.label.name, 'nx-migration-required') }}" == "true" ]]; then
-            gh pr edit ${{ github.event.pull_request.number }} --remove-label "nx-migration-required"
-          fi
-          if [[ "${{ contains(github.event.label.name, 'onecx-migration-required') }}" == "true" ]]; then
-            gh pr edit ${{ github.event.pull_request.number }} --remove-label "onecx-migration-required"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.CI_PAT }}

@@ -11,11 +11,6 @@ import {
 import { MessageService } from 'primeng/api'
 import { PrimeNG } from 'primeng/config'
 import { filter, first, from, mergeMap, Observable, of } from 'rxjs'
-import { SHOW_CONTENT_PROVIDER, ShowContentProvider } from '../../shell-interface/show-content-provider'
-import {
-  WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER,
-  WorkspaceConfigBffService,
-} from '../../shell-interface/workspace-config-bff-service-provider'
 import { AngularRemoteComponentsModule, SlotService } from '@onecx/angular-remote-components'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
@@ -25,6 +20,8 @@ import { ToastModule } from 'primeng/toast'
 import { TranslateModule } from '@ngx-translate/core'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
+import { RoutesService } from '../../services/routes.service'
+import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
 
 @Component({
   standalone: true,
@@ -53,10 +50,8 @@ export class PortalViewportComponent implements OnInit {
   private readonly userService = inject(UserService)
   themeService = inject(ThemeService)
   private readonly httpClient = inject(HttpClient)
-  showContentProvider = inject<ShowContentProvider | undefined>(SHOW_CONTENT_PROVIDER, { optional: true })
-  workspaceConfigBffService = inject<WorkspaceConfigBffService | undefined>(WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, {
-    optional: true,
-  })
+  routesService = inject(RoutesService)
+  workspaceConfigBffService = inject(WorkspaceConfigBffService)
   private readonly slotService = inject(SlotService)
 
   menuButtonTitle = ''
@@ -100,7 +95,7 @@ export class PortalViewportComponent implements OnInit {
         })
       )
       .subscribe((url) => {
-        let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null
+        let link = document.querySelector("link[rel~='icon']") as any
         if (!link) {
           link = document.createElement('link')
           link.rel = 'icon'

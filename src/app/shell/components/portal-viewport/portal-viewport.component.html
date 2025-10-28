@@ -18,7 +18,7 @@
           <ocx-slot name="onecx-shell-sub-header"></ocx-slot>
         </div>
         <div class="onecx-body">
-          <ng-container *ngIf="!showContentProvider || (showContentProvider.showContent$ | async); else appLoading">
+          <ng-container *ngIf="!routesService || (routesService.showContent$ | async); else appLoading">
             <ng-content></ng-content>
             <router-outlet></router-outlet>
           </ng-container>

@@ -67,8 +67,6 @@ import { providePrimeNG } from 'primeng/config';
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { HeaderComponent } from './shell/components/portal-header/header.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
-import { SHOW_CONTENT_PROVIDER } from './shell/shell-interface/show-content-provider'
-import { WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from './shell/shell-interface/workspace-config-bff-service-provider'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
@@ -431,9 +429,7 @@ export async function shareMfContainer() {
       return styleChangesListenerInitializer()
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' },
-    { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
+    { provide: BASE_PATH, useValue: './shell-bff' }
   ],
   bootstrap: [AppComponent]
 })

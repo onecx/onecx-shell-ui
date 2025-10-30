@@ -168,6 +168,12 @@ jobs:
                 else
                   echo "ℹ️ No migrations.json found in $dir"
                 fi
+
+                 # Install any new dependencies from migrations
+                if [[ -f "package.json" ]]; then
+                  echo "📦 Installing new dependencies after migration..."
+                  npm install || echo "⚠️ Failed to install new dependencies in $dir"
+                fi
               )
               
               echo "✅ Completed migration in directory: $dir"

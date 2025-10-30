@@ -95,7 +95,7 @@ export class PortalViewportComponent implements OnInit {
         })
       )
       .subscribe((url) => {
-        let link : HTMLLinkElement | null = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null
+        let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']")
         if (!link) {
           link = document.createElement('link')
           link.rel = 'icon'

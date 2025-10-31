@@ -1,13 +1,12 @@
-import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { catchError, firstValueFrom, retry } from 'rxjs'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
-import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
+import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
   AppStateService,
@@ -19,12 +18,9 @@ import {
   UserService
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
+import { catchError, firstValueFrom, retry } from 'rxjs'
 
-import {
-  createTranslateLoader,
-  SKIP_STYLE_SCOPING,
-  provideTranslationPathFromMeta
-} from '@onecx/angular-utils'
+import { createTranslateLoader, provideTranslationPathFromMeta, SKIP_STYLE_SCOPING } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
 import {
@@ -50,25 +46,25 @@ import { PermissionProxyService } from './shell/services/permission-proxy.servic
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
+import { CommonModule } from '@angular/common'
+import { providePrimeNG } from 'primeng/config'
+import { SkeletonModule } from 'primeng/skeleton'
+import { ToastModule } from 'primeng/toast'
+import { TooltipModule } from 'primeng/tooltip'
+import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
+import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
+import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
 import { ErrorPageComponent } from './shell/components/error-page.component'
-import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
-import { dynamicContentInitializer } from './shell/utils/styles/dynamic-content-initializer.utils'
-import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
-import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
+import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
-import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
-import { TooltipModule } from 'primeng/tooltip'
-import { CommonModule } from '@angular/common';
-import { ToastModule } from 'primeng/toast';
-import { SkeletonModule } from 'primeng/skeleton';
-import { providePrimeNG } from 'primeng/config';
-import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
-import { HeaderComponent } from './shell/components/portal-header/header.component'
-import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
-import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
+import { mapSlots } from './shell/utils/slot-names-mapper'
+import { dynamicContentInitializer } from './shell/utils/styles/dynamic-content-initializer.utils'
+import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
+import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
+import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   await appStateService.isAuthenticated$.isInitialized
@@ -147,7 +143,7 @@ export async function workspaceConfigInitializer(
       apply(themeService, themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish({
         components: loadWorkspaceConfigResponse.components,
-        slots: loadWorkspaceConfigResponse.slots
+        slots: mapSlots(loadWorkspaceConfigResponse).slots
       })
     ])
     parametersService.initialize()
@@ -341,7 +337,7 @@ export async function shareMfContainer() {
     ErrorPageComponent,
     HomeComponent,
     WelcomeMessageComponent,
-    InitializationErrorPageComponent,
+    InitializationErrorPageComponent
   ],
   imports: [
     BrowserModule,
@@ -367,9 +363,8 @@ export async function shareMfContainer() {
     ToastModule,
     SkeletonModule,
     PortalViewportComponent,
-    HeaderComponent,
     GlobalErrorComponent,
-    AppLoadingSpinnerComponent,
+    AppLoadingSpinnerComponent
   ],
   providers: [
     provideThemeConfig(),
@@ -430,7 +425,8 @@ export async function shareMfContainer() {
       return styleChangesListenerInitializer()
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' }
+    { provide: BASE_PATH, useValue: './shell-bff' },
+    EventsPublisher
   ],
   bootstrap: [AppComponent]
 })

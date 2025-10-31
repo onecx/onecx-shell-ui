@@ -17,14 +17,12 @@ import { getLocation } from '@onecx/accelerator'
         </p>
       </div>
       <button
-        pButton
         class="w-max"
         (click)="onReloadPage()"
+        [ngStyle]="{ cursor: 'pointer' }"
         routerLinkActive="router-link-active"
-        [ariaLabel]="'ERROR_PAGE.ACTION' | translate"
-        [pTooltip]="'ERROR_PAGE.ACTION.TOOLTIP' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
+        [attr.aria-label]="'ERROR_PAGE.ACTION' | translate"
+        [attr.title]="'ERROR_PAGE.ACTION.TOOLTIP' | translate"
       >
         {{ 'ERROR_PAGE.ACTION' | translate }}
       </button>
@@ -42,6 +40,6 @@ export class ErrorPageComponent {
     const pageLocation = getLocation()
     const reloadBaseUrl = Location.joinWithSlash(pageLocation.origin, pageLocation.deploymentPath)
     const reloadHref = Location.joinWithSlash(reloadBaseUrl, this.requestedApplicationPath)
-    window.location.href = reloadHref
+    globalThis.location.href = reloadHref
   }
 }

@@ -30,13 +30,10 @@
   </div>
 
   <button
-    pButton
     class="mt-4 w-max"
     (click)="onLogout()"
     [attr.aria-label]="'LOGOUT' | translate"
-    [pTooltip]="'LOGOUT.TOOLTIP' | translate"
-    tooltipPosition="top"
-    tooltipEvent="hover"
+    [attr.title]="'LOGOUT.TOOLTIP' | translate"
   >
     {{ 'LOGOUT' | translate }}
   </button>

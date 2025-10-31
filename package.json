@@ -130,13 +130,5 @@
     "ts-node": "10.9.2",
     "typescript": "~5.8.3",
     "webpack": "5.98.0"
-  },
-  "overrides": {
-    "@openapitools/openapi-generator-cli": {
-      "axios": "^1.8.3"
-    },
-    "@module-federation/dts-plugin": {
-      "koa": "^2.16.1"
-    }
   }
 }

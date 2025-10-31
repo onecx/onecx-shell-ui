@@ -397,7 +397,7 @@
     "minimumReleaseAge": null,
     "automerge": false
   },
-  "lockFileMaintenance ": {
+  "lockFileMaintenance": {
     "enabled": true
   },
   "timezone": "Europe/Vienna",

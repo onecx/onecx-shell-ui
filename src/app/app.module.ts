@@ -20,12 +20,8 @@ import {
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
-import {
-  createTranslateLoader,
-  provideThemeConfig,
-  SKIP_STYLE_SCOPING,
-  provideTranslationPathFromMeta
-} from '@onecx/angular-utils'
+import { createTranslateLoader, SKIP_STYLE_SCOPING, provideTranslationPathFromMeta } from '@onecx/angular-utils'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 import {
   CurrentLocationPublisher,
   EventsPublisher,
@@ -60,10 +56,10 @@ import { WelcomeMessageComponent } from './shell/components/welcome-message-comp
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
 import { TooltipModule } from 'primeng/tooltip'
-import { CommonModule } from '@angular/common';
-import { ToastModule } from 'primeng/toast';
-import { SkeletonModule } from 'primeng/skeleton';
-import { providePrimeNG } from 'primeng/config';
+import { CommonModule } from '@angular/common'
+import { ToastModule } from 'primeng/toast'
+import { SkeletonModule } from 'primeng/skeleton'
+import { providePrimeNG } from 'primeng/config'
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { HeaderComponent } from './shell/components/portal-header/header.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
@@ -340,7 +336,7 @@ export async function shareMfContainer() {
     ErrorPageComponent,
     HomeComponent,
     WelcomeMessageComponent,
-    InitializationErrorPageComponent,
+    InitializationErrorPageComponent
   ],
   imports: [
     BrowserModule,
@@ -368,7 +364,7 @@ export async function shareMfContainer() {
     PortalViewportComponent,
     HeaderComponent,
     GlobalErrorComponent,
-    AppLoadingSpinnerComponent,
+    AppLoadingSpinnerComponent
   ],
   providers: [
     provideThemeConfig(),

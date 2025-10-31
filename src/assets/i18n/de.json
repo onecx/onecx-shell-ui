@@ -33,5 +33,10 @@
       "INVALID_PARAMS": "Ungültige Parameter",
       "PARAMS": "Parameter"
     }
+  },
+  "OCX_HEADER": {
+    "HEADER_LEFT": "Kopfzeile links",
+    "HEADER_CENTER": "Kopfzeile mitte",
+    "HEADER_RIGHT": "Kopfzeile rechts"
   }
 }

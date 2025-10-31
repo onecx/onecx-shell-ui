@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { PermissionsRpcTopic } from '@onecx/integration-interface'
-import { PermissionsCacheService } from '@onecx/shell-core'
 import { catchError, filter, map, mergeMap, of, retry } from 'rxjs'
 import { PermissionBffService } from 'src/app/shared/generated'
+import { PermissionsCacheService } from './permissions-cache.service'
 
 @Injectable({ providedIn: 'root' })
 export class PermissionProxyService {

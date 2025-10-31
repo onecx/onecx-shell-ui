@@ -7,7 +7,7 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ng
 import { catchError, firstValueFrom, retry } from 'rxjs'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
-import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
+import { provideTokenInterceptor } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
   AppStateService,
@@ -69,6 +69,9 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { HeaderComponent } from './shell/components/portal-header/header.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
+import { AuthServiceWrapper } from './shell/services/auth/auth-service-wrapper'
+import { KeycloakAuthService } from './shell/services/auth/adapters/keycloak-auth.service'
+import { DisabledAuthService } from './shell/services/auth/adapters/disabled-auth.service'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   await appStateService.isAuthenticated$.isInitialized
@@ -332,6 +335,22 @@ declare global {
 
 export async function shareMfContainer() {
   window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
+}
+
+function provideAuthServices() {
+  return [AuthServiceWrapper, KeycloakAuthService, DisabledAuthService]
+}
+
+function provideAuthService() {
+  return [
+    provideAuthServices(),
+    provideAppInitializer(async () => {
+      const configService = inject(ConfigurationService)
+      const authServiceWrapper = inject(AuthServiceWrapper)
+      await configService.isInitialized
+      await authServiceWrapper.init()
+    }),
+  ]
 }
 
 @NgModule({

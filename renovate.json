@@ -397,6 +397,9 @@
     "minimumReleaseAge": null,
     "automerge": false
   },
+  "lockFileMaintenance ": {
+    "enabled": true
+  },
   "timezone": "Europe/Vienna",
   "schedule": ["before 6am every weekday"],
   "prConcurrentLimit": 5,

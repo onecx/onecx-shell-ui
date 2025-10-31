@@ -375,6 +375,12 @@
       ]
     },
     {
+      "description": "Security updates - always allowed even major",
+      "matchCategories": ["security"],
+      "enabled": true,
+      "rangeStrategy": "update-lockfile"
+    },
+    {
       "description": "Block OneCX major updates - OneCX packages should stay on current major version",
       "matchUpdateTypes": ["major"],
       "enabled": false,

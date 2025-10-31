@@ -122,7 +122,7 @@
     "prettier": "^3.6.2",
     "sonar-scanner": "^3.1.0",
     "ts-node": "10.9.2",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.3",
     "webpack": "5.98.0"
   },
   "overrides": {

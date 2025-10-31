@@ -22,10 +22,11 @@ import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx
 
 import {
   createTranslateLoader,
-  provideThemeConfig,
   SKIP_STYLE_SCOPING,
   provideTranslationPathFromMeta
 } from '@onecx/angular-utils'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
+
 import {
   CurrentLocationPublisher,
   EventsPublisher,

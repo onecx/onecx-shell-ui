@@ -1,5 +1,6 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
 
+// TODO: Move to libs
 const config: ModuleFederationConfig = {
   name: 'onecx-shell-ui',
   remotes: [],

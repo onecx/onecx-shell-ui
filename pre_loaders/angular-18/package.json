@@ -48,10 +48,10 @@
   },
   "overrides": {
     "@module-federation/dts-plugin": {
-      "koa": "^2.16.1"
+      "koa": "^2.16.2"
     },
-    "esbuild": "^0.25.0",
-    "vite": "^6.1.7",
+    "esbuild": "^0.25.10",
+    "vite": "^6.3.6",
     "@vitejs/plugin-basic-ssl": "^1.2.0"
   }
 }

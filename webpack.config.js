@@ -25,9 +25,8 @@ module.exports = async (config) => {
     ...moduleFederationConfig
   })
 
+  // let Nx / module federation compose the base config
   config = fromModuleFederation(config)
-
-  console.log('MyConfig', config)
 
   return {
     ...config,
@@ -38,7 +37,7 @@ module.exports = async (config) => {
         ...config.module?.parser,
         javascript: {
           ...(config.module?.parser?.javascript || {}),
-          importMeta: true
+          importMeta: false
         }
       }
     }

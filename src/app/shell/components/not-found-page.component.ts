@@ -14,13 +14,11 @@ import { Workspace } from '@onecx/integration-interface'
       </div>
       <button
         *ngIf="workspace$ | async as workspace"
-        pButton
         class="w-max"
         [routerLink]="[workspace.baseUrl]"
-        [ariaLabel]="'NOT_FOUND_PAGE.ACTION' | translate"
-        [pTooltip]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
-        tooltipPosition="top"
-        tooltipEvent="hover"
+        [ngStyle]="{ cursor: 'pointer' }"
+        [attr.aria-label]="'NOT_FOUND_PAGE.ACTION' | translate"
+        [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
       >
         {{ 'NOT_FOUND_PAGE.ACTION' | translate }}
       </button>

@@ -1,42 +1,61 @@
-<div *ngIf="!globalErrMsg; else globalError" >
+<div *ngIf="!globalErrMsg; else globalError" class="onecx-viewport-wrapper">
   <ng-container *ngIf="themeService.currentTheme$ | async; else noTheme">
-    <ocx-shell-header [menuButtonTitle]="menuButtonTitle"></ocx-shell-header>
+    <!-- Header slot group -->
+    <header class="onecx-header" id="ocx_header">
+      <ocx-shell-slot-group
+        name="onecx-shell-header"
+        direction="row"
+        [ngStyle]="{display: 'flex', width: '100%'}"
+        [groupStyles]="{'align-items': 'center', width: '100%'}"
+        [slotClassStart]="'flex flex-row flex-nowrap justify-content-start align-items-center'"
+        [slotInputs]="slotHeaderInputs"
+        [slotOutputs]="slotHeaderOutputs"
+      ></ocx-shell-slot-group>
+    </header>
 
-    <p-toast [style]="{'word-break': 'break-word'}"></p-toast>
-
+    <!-- SubHeader slot group -->
     <div class="onecx-subheader">
-      <!-- Placeholder for onecx-shell-subheader slot group -->
+      <ocx-shell-slot-group name="onecx-shell-sub-header"></ocx-shell-slot-group>
     </div>
     <div class="onecx-body-wrapper">
+      <!-- BodyStart slot group -->
       <div class="onecx-body-start">
-        <!-- Placeholder for onecx-shell-body-start slot group -->
-        <ocx-slot [name]="verticalMenuSlotName"> </ocx-slot>
+        <ocx-shell-slot-group
+          name="onecx-shell-body-start"
+          direction="column"
+          [groupStyles]="{display: 'flex', height: '100%'}"
+        ></ocx-shell-slot-group>
       </div>
       <div class="onecx-body-center">
-        <!-- Placeholder for onecx-shell-body-header slot group -->
+        <!-- BodyHeader slot group -->
         <div class="onecx-body-header">
-          <ocx-slot name="onecx-shell-sub-header"></ocx-slot>
+          <ocx-shell-slot-group name="onecx-shell-body-header"></ocx-shell-slot-group>
         </div>
+        <!-- Body slot group -->
         <div class="onecx-body">
           <ng-container *ngIf="!routesService || (routesService.showContent$ | async); else appLoading">
             <ng-content></ng-content>
             <router-outlet></router-outlet>
           </ng-container>
         </div>
-        <!-- Placeholder for onecx-shell-body-footer slot group -->
-        <div class="onecx-body-footer"></div>
+        <!-- BodyFooter slot group -->
+        <div class="onecx-body-footer">
+          <ocx-shell-slot-group name="onecx-shell-body-footer"></ocx-shell-slot-group>
+        </div>
       </div>
-      <!-- Placeholder for onecx-shell-body-end slot group -->
-      <div class="onecx-body-end"></div>
+      <!-- BodyEnd slot group -->
+      <div class="onecx-body-end">
+        <ocx-shell-slot-group
+          name="onecx-shell-body-end"
+          direction="column"
+          [groupStyles]="{display: 'flex', height: '100%'}"
+        ></ocx-shell-slot-group>
+      </div>
     </div>
+
+    <!-- Footer slot group -->
     <footer>
-      <!-- Placeholder for onecx-shell-footer slot group -->
-      <ocx-slot
-        [name]="footerSlotName"
-        class="onecx-shell-footer mx-3 h-full flex flex-row flex-wrap align-items-center column-gap-3 row-gap-1 text-sm"
-        [inputs]="{ imageStyleClass: 'h-1rem vertical-align-middle' }"
-      >
-      </ocx-slot>
+      <ocx-shell-slot-group name="onecx-shell-footer"></ocx-shell-slot-group>
     </footer>
   </ng-container>
 </div>
@@ -57,3 +76,6 @@
 <ng-template #appLoading>
   <ocx-shell-loading-spinner></ocx-shell-loading-spinner>
 </ng-template>
+
+<!-- Extensions slot for adding custom functionality -->
+<ocx-slot class="extensions-slot" name="onecx-shell-extensions"></ocx-slot>

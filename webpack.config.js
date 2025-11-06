@@ -6,7 +6,8 @@ const webpackConfig = {
   ...withModuleFederationPlugin({
     name: 'onecx-shell-ui',
     exposes: {
-      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts'
+      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts',
+      './OneCXShellExtensionsComponent': 'src/app/remotes/shell-extensions/shell-extensions.component.main.ts'
     },
     shared: share({
       '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },

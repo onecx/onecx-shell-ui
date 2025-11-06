@@ -143,7 +143,7 @@ export async function workspaceConfigInitializer(
       apply(themeService, themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish({
         components: loadWorkspaceConfigResponse.components,
-        slots: mapSlots(loadWorkspaceConfigResponse).slots
+        slots: mapSlots(loadWorkspaceConfigResponse.slots)
       })
     ])
     parametersService.initialize()
@@ -425,8 +425,7 @@ export async function shareMfContainer() {
       return styleChangesListenerInitializer()
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' },
-    EventsPublisher
+    { provide: BASE_PATH, useValue: './shell-bff' }
   ],
   bootstrap: [AppComponent]
 })

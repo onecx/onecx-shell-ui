@@ -1,5 +1,4 @@
 import { Slot } from '@onecx/integration-interface'
-import { LoadWorkspaceConfigResponse } from 'src/app/shared/generated'
 
 export const slotNamesMapping: Record<string, string> = {
   'onecx-shell-vertical-menu': 'onecx-shell-body-start-start',
@@ -45,20 +44,17 @@ function mergeSlotsByName(slots: Slot[]): Slot[] {
 }
 
 /**
- * Normalizes slot names in the workspace config to the slot group naming convention.
+ * Normalizes slot names to the slot group naming convention.
  * - Slot names listed in slotNamesMapping are replaced with their mapped values.
  * - All other slot names remain unchanged.
  * - After mapping, slots with the same name are merged, combining their components and removing duplicates.
  *
- * @param workspaceConfig The workspace config object to normalize.
- * @returns Workspace config with normalized and merged slot names.
+ * @param slots Array of Slot objects to normalize.
+ * @returns Normalized and merged slots.
  */
-export function mapSlots(workspaceConfig: LoadWorkspaceConfigResponse): LoadWorkspaceConfigResponse {
-  const mappedSlots = mapSlotNames(workspaceConfig.slots)
+export function mapSlots(slots: Slot[]): Slot[] {
+  const mappedSlots = mapSlotNames(slots)
   const mergedSlots = mergeSlotsByName(mappedSlots)
-  
-  return {
-    ...workspaceConfig,
-    slots: mergedSlots
-  }
+
+  return mergedSlots
 }

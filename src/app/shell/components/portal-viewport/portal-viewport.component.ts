@@ -70,11 +70,11 @@ export class PortalViewportComponent implements OnInit {
   public logoLoadingEmitter = new EventEmitter<boolean>()
   public themeLogoLoadingFailed = false
 
-  slotInputs = {
+  slotHeaderInputs = {
     imageStyleClass: 'max-h-3rem max-w-9rem vertical-align-middle'
   }
 
-  slotOutputs = {
+  slotHeaderOutputs = {
     imageLoadingFailed: this.logoLoadingEmitter
   }
 

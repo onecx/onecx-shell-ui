@@ -66,7 +66,10 @@ describe('SlotGroupComponent', () => {
 
     fixture.detectChanges()
 
-    eventsPublisher = TestBed.inject(EventsPublisher) as unknown as EventsPublisherMock
+    // Spy on the eventsPublisher instance that was created by the component
+    const componentEventsPublisher = (component as any).eventsPublisher
+    jest.spyOn(componentEventsPublisher, 'publish')
+    eventsPublisher = componentEventsPublisher
 
     resizeObserverMock = (component as any).resizeObserver as ResizeObserverMock
 

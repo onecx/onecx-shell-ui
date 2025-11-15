@@ -23,14 +23,14 @@
     "@angular/platform-server": "^20.3.3",
     "@angular/router": "^20.3.3",
     "@angular/service-worker": "^20.3.3",
-    "@nx/angular": "21.6.3",
+    "@nx/angular": "21.6.5",
     "rxjs": "~7.8.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.5",
     "@angular/compiler-cli": "^20.3.3",
     "modify-source-webpack-plugin": "^4.1.0",
-    "nx": "21.6.3",
+    "nx": "21.6.5",
     "webpack": "5.101.2"
   },
   "overrides": {

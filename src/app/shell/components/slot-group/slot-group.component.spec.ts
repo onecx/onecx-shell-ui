@@ -460,11 +460,37 @@ describe('SlotGroupComponent', () => {
         expect(containerStyles).toEqual(expectedDefaultStyles)
       })
 
-      it('should update when direction changes', async () => {
+      it('should update when direction changes to column', async () => {
         componentRef.setInput('direction', 'column')
 
         const expectedContainerStyles = {
           'flex-direction': 'column',
+          height: '100%'
+        }
+
+        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction', 'height'])
+
+        expect(containerStyles).toEqual(expectedContainerStyles)
+      })
+
+      it('should apply correct styles for row-reverse direction', async () => {
+        componentRef.setInput('direction', 'row-reverse')
+
+        const expectedContainerStyles = {
+          'flex-direction': 'row-reverse',
+          width: '100%'
+        }
+
+        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction', 'width'])
+
+        expect(containerStyles).toEqual(expectedContainerStyles)
+      })
+
+      it('should apply correct styles for column-reverse direction', async () => {
+        componentRef.setInput('direction', 'column-reverse')
+
+        const expectedContainerStyles = {
+          'flex-direction': 'column-reverse',
           height: '100%'
         }
 

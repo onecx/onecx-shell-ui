@@ -74,7 +74,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   private readonly resizeSubject = new Subject<{ width: number; height: number }>()
   private readonly resizeDebounceTimeMs = 100
 
-  private readonly eventsPublisher = inject(EventsPublisher)
+  private readonly eventsPublisher = new EventsPublisher()
 
   private readonly elementRef = inject(ElementRef)
 

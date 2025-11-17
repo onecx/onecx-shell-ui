@@ -24,18 +24,6 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   slotClasses = input<SlotClassType>('')
 
-  slotStyleStart = input<{ [key: string]: any }>({})
-
-  slotClassStart = input<SlotClassType>('')
-
-  slotStyleCenter = input<{ [key: string]: any }>({})
-
-  slotClassCenter = input<SlotClassType>('')
-
-  slotStyleEnd = input<{ [key: string]: any }>({})
-
-  slotClassEnd = input<SlotClassType>('')
-
   slotInputs = input<Record<string, unknown>>({})
 
   slotOutputs = input<Record<string, EventEmitter<any>>>({})
@@ -44,10 +32,36 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   groupClasses = input<SlotClassType>('')
 
+  rcWrapperStyles = input<{ [key: string]: any }>({})
+
+  rcWrapperClasses = input<SlotClassType>('')
+
+  // slot-group container styles
   containerStyles = computed(() => {
+    const direction = this.direction()
+    const defaultStyles: { [key: string]: any } = {
+      'flex-direction': direction
+    }
+
+    if (direction === 'row' || direction === 'row-reverse') {
+      defaultStyles['width'] = '100%'
+    } else if (direction === 'column' || direction === 'column-reverse') {
+      defaultStyles['height'] = '100%'
+    }
+
     return {
-      'flex-direction': this.direction(),
+      ...defaultStyles,
       ...this.groupStyles()
+    }
+  })
+
+  // slot styles applied to each slot inside the slot-group
+  computedSlotStyles = computed(() => {
+    return {
+      display: 'flex',
+      'flex-direction': this.direction(),
+      'align-items': 'center',
+      ...this.slotStyles()
     }
   })
 

@@ -5,9 +5,9 @@ export const slotNamesMapping: Record<string, string> = {
   'onecx-shell-horizontal-menu': 'onecx-shell-header-center',
   'onecx-shell-header-left': 'onecx-shell-header-start',
   'onecx-shell-header-right': 'onecx-shell-header-end',
-  'onecx-shell-sub-header': 'onecx-shell-sub-header-center',
-  'onecx-shell-footer': 'onecx-shell-footer-start',
-  'onecx-page-footer': 'onecx-shell-footer-start'
+  'onecx-shell-sub-header': 'onecx-shell-body-header-center',
+  'onecx-shell-footer': 'onecx-shell-body-footer-start',
+  'onecx-page-footer': 'onecx-shell-body-footer-start'
 }
 
 /**

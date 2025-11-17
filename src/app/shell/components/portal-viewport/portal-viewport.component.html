@@ -2,15 +2,14 @@
   <ng-container *ngIf="themeService.currentTheme$ | async; else noTheme">
     <!-- Header slot group -->
     <header class="onecx-header" id="ocx_header">
-      <ocx-shell-slot-group
-        name="onecx-shell-header"
-        direction="row"
-        [ngStyle]="{display: 'flex', width: '100%'}"
-        [groupStyles]="{'align-items': 'center', width: '100%'}"
-        [slotClassStart]="'flex flex-row flex-nowrap justify-content-start align-items-center'"
-        [slotInputs]="slotHeaderInputs"
-        [slotOutputs]="slotHeaderOutputs"
-      ></ocx-shell-slot-group>
+      <section [ngStyle]="{width: '100%'}" [attr.aria-label]="'Start'">
+        <ocx-shell-slot-group
+          name="onecx-shell-header"
+          direction="row"
+          [slotInputs]="slotHeaderInputs"
+          [slotOutputs]="slotHeaderOutputs"
+        ></ocx-shell-slot-group>
+      </section>
     </header>
 
     <!-- SubHeader slot group -->
@@ -23,7 +22,6 @@
         <ocx-shell-slot-group
           name="onecx-shell-body-start"
           direction="column"
-          [groupStyles]="{display: 'flex', height: '100%'}"
         ></ocx-shell-slot-group>
       </div>
       <div class="onecx-body-center">
@@ -48,7 +46,6 @@
         <ocx-shell-slot-group
           name="onecx-shell-body-end"
           direction="column"
-          [groupStyles]="{display: 'flex', height: '100%'}"
         ></ocx-shell-slot-group>
       </div>
     </div>

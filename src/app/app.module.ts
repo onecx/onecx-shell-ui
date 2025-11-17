@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
-
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideTokenInterceptor, provideAuthService } from '@onecx/angular-auth'
@@ -21,13 +20,9 @@ import {
 } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 
-import {
-  createTranslateLoader,
-  provideThemeConfig,
-  SKIP_STYLE_SCOPING,
-  provideTranslationPathFromMeta
-} from '@onecx/angular-utils'
-import { ShellCoreModule, SHOW_CONTENT_PROVIDER, WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER } from '@onecx/shell-core'
+import { createTranslateLoader, SKIP_STYLE_SCOPING, provideTranslationPathFromMeta } from '@onecx/angular-utils'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
+
 import {
   CurrentLocationPublisher,
   EventsPublisher,
@@ -62,6 +57,15 @@ import { styleChangesListenerInitializer } from './shell/utils/styles/style-chan
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
+import { TooltipModule } from 'primeng/tooltip'
+import { CommonModule } from '@angular/common'
+import { ToastModule } from 'primeng/toast'
+import { SkeletonModule } from 'primeng/skeleton'
+import { providePrimeNG } from 'primeng/config'
+import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
+import { HeaderComponent } from './shell/components/portal-header/header.component'
+import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
+import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
   await appStateService.isAuthenticated$.isInitialized
@@ -355,6 +359,7 @@ export async function shareMfContainer() {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CommonModule,
     RouterModule.forRoot(appRoutes),
     TranslateModule.forRoot({
       isolate: true,
@@ -369,15 +374,22 @@ export async function shareMfContainer() {
         useClass: AngularAcceleratorMissingTranslationHandler
       }
     }),
-    ShellCoreModule,
     AngularAcceleratorModule,
-    AngularRemoteComponentsModule
+    AngularRemoteComponentsModule,
+    TooltipModule,
+    ToastModule,
+    SkeletonModule,
+    PortalViewportComponent,
+    HeaderComponent,
+    GlobalErrorComponent,
+    AppLoadingSpinnerComponent
   ],
   providers: [
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
+    providePrimeNG(),
     {
       provide: SKIP_STYLE_SCOPING,
       useValue: true
@@ -431,9 +443,7 @@ export async function shareMfContainer() {
       return styleChangesListenerInitializer()
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' },
-    { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
+    { provide: BASE_PATH, useValue: './shell-bff' }
   ],
   bootstrap: [AppComponent]
 })

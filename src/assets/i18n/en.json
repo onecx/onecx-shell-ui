@@ -33,5 +33,10 @@
       "INVALID_PARAMS": "Invalid parameter",
       "PARAMS": "Parameter"
     }
+  },
+  "OCX_HEADER": {
+    "HEADER_LEFT": "Header left",
+    "HEADER_CENTER": "Header center",
+    "HEADER_RIGHT": "Header right"
   }
 }

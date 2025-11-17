@@ -11,20 +11,20 @@
   },
   "dependencies": {
     "@angular-architects/module-federation": "18.0.6",
-    "@angular/animations": "^18.2.13",
-    "@angular/common": "^18.2.13",
-    "@angular/compiler": "^18.2.13",
-    "@angular/core": "^18.2.13",
-    "@angular/elements": "^18.2.13",
-    "@angular/forms": "^18.2.13",
-    "@angular/localize": "^18.2.13",
-    "@angular/platform-browser": "^18.2.13",
-    "@angular/platform-browser-dynamic": "^18.2.13",
-    "@angular/platform-server": "^18.2.13",
-    "@angular/router": "^18.2.13",
-    "@angular/service-worker": "^18.2.13",
+    "@angular/animations": "^18.2.14",
+    "@angular/common": "^18.2.14",
+    "@angular/compiler": "^18.2.14",
+    "@angular/core": "^18.2.14",
+    "@angular/elements": "^18.2.14",
+    "@angular/forms": "^18.2.14",
+    "@angular/localize": "^18.2.14",
+    "@angular/platform-browser": "^18.2.14",
+    "@angular/platform-browser-dynamic": "^18.2.14",
+    "@angular/platform-server": "^18.2.14",
+    "@angular/router": "^18.2.14",
+    "@angular/service-worker": "^18.2.14",
     "@ngx-translate/core": "^15.0.0",
-    "@nx/angular": "20.4.4",
+    "@nx/angular": "20.8.2",
     "@onecx/accelerator": "^5.50.0",
     "@onecx/angular-accelerator": "^5.50.0",
     "@onecx/angular-auth": "^5.50.0",
@@ -37,18 +37,21 @@
     "@onecx/shell-core": "^5.50.0",
     "@onecx/angular-utils": "^5.50.0",
     "primeng": "^17.18.15",
-    "rxjs": "~7.8.1"
+    "rxjs": "~7.8.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.21",
-    "@angular/compiler-cli": "^18.2.13",
-    "nx": "20.4.4",
+    "@angular/compiler-cli": "^18.2.14",
+    "nx": "20.8.2",
     "modify-source-webpack-plugin": "^4.1.0",
     "webpack": "5.95.0"
   },
   "overrides": {
     "@module-federation/dts-plugin": {
-      "koa": "^2.16.1"
-    }
+      "koa": "^2.16.2"
+    },
+    "esbuild": "^0.25.10",
+    "vite": "^6.3.6",
+    "@vitejs/plugin-basic-ssl": "^1.2.0"
   }
 }

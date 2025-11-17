@@ -24,18 +24,6 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   slotClasses = input<SlotClassType>('')
 
-  slotStyleStart = input<{ [key: string]: any }>({})
-
-  slotClassStart = input<SlotClassType>('')
-
-  slotStyleCenter = input<{ [key: string]: any }>({})
-
-  slotClassCenter = input<SlotClassType>('')
-
-  slotStyleEnd = input<{ [key: string]: any }>({})
-
-  slotClassEnd = input<SlotClassType>('')
-
   slotInputs = input<Record<string, unknown>>({})
 
   slotOutputs = input<Record<string, EventEmitter<any>>>({})
@@ -44,10 +32,22 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   groupClasses = input<SlotClassType>('')
 
+  rcWrapperStyles = input<{ [key: string]: any }>({})
+
+  rcWrapperClasses = input<SlotClassType>('')
+
   containerStyles = computed(() => {
     return {
       'flex-direction': this.direction(),
       ...this.groupStyles()
+    }
+  })
+
+  computedSlotStyles = computed(() => {
+    return {
+      display: 'flex',
+      'flex-direction': this.direction(),
+      'align-items': 'center'
     }
   })
 

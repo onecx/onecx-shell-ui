@@ -167,14 +167,14 @@ describe('SlotGroupComponent', () => {
       })
     })
 
-    describe('slotStyles input signal', () => {
-      it('should have default empty object for slotStyles', () => {
-        expect(component.slotStyles()).toEqual({})
+    describe('rcWrapperStyles input signal', () => {
+      it('should have default empty object for rcWrapperStyles', () => {
+        expect(component.rcWrapperStyles()).toEqual({})
       })
 
-      it('should pass slotStyles to all child slots', async () => {
+      it('should pass rcWrapperStyles to all child slots', async () => {
         const styles = { padding: '10px', margin: '5px' }
-        componentRef.setInput('slotStyles', styles)
+        componentRef.setInput('rcWrapperStyles', styles)
 
         const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['padding', 'margin'])
         const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['padding', 'margin'])
@@ -187,10 +187,10 @@ describe('SlotGroupComponent', () => {
 
       it('should dynamically update slot styles for all child slots when slotStyles input changes', async () => {
         const initialStyles = { color: 'red' }
-        componentRef.setInput('slotStyles', initialStyles)
+        componentRef.setInput('rcWrapperStyles', initialStyles)
 
         const updatedStyles = { color: 'green', 'font-weight': 'bold' }
-        componentRef.setInput('slotStyles', updatedStyles)
+        componentRef.setInput('rcWrapperStyles', updatedStyles)
 
         const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['color', 'font-weight'])
         const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['color', 'font-weight'])
@@ -202,7 +202,7 @@ describe('SlotGroupComponent', () => {
       })
     })
 
-    describe('slotClasses input signal', () => {
+    describe('rcWrapperClasses input signal', () => {
       let startSlotDivs: DivHarness[]
       let centerSlotDivs: DivHarness[]
       let endSlotDivs: DivHarness[]
@@ -222,15 +222,15 @@ describe('SlotGroupComponent', () => {
         endSlotDivs = await endSlot.getSlotDivContainers()
       })
 
-      it('should have default empty string for slotClasses', () => {
-        expect(component.slotClasses()).toBe('')
+      it('should have default empty string for rcWrapperClasses', () => {
+        expect(component.rcWrapperClasses()).toBe('')
       })
 
-      it('should apply slotClasses of type string to all child slot divs', async () => {
+      it('should apply rcWrapperClasses of type string to all child slot divs', async () => {
         const classesString = 'string-class1 string-class2'
         const expectedClasses = ['string-class1', 'string-class2']
 
-        componentRef.setInput('slotClasses', classesString)
+        componentRef.setInput('rcWrapperClasses', classesString)
 
         const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
 
@@ -251,10 +251,10 @@ describe('SlotGroupComponent', () => {
         }
       })
 
-      it('should apply slotClasses of type string array to all child slot divs', async () => {
+      it('should apply rcWrapperClasses of type string array to all child slot divs', async () => {
         const classesArray = ['array-class1', 'array-class2']
 
-        componentRef.setInput('slotClasses', classesArray)
+        componentRef.setInput('rcWrapperClasses', classesArray)
 
         const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
 
@@ -275,11 +275,11 @@ describe('SlotGroupComponent', () => {
         }
       })
 
-      it('should apply slotClasses of type string Set to all child slot divs', async () => {
+      it('should apply rcWrapperClasses of type string Set to all child slot divs', async () => {
         const classesSet = new Set(['set-class1', 'set-class2'])
         const expectedClasses = ['set-class1', 'set-class2']
 
-        componentRef.setInput('slotClasses', classesSet)
+        componentRef.setInput('rcWrapperClasses', classesSet)
 
         const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
 
@@ -300,11 +300,11 @@ describe('SlotGroupComponent', () => {
         }
       })
 
-      it('should apply slotClasses of type object to all child slot divs', async () => {
+      it('should apply rcWrapperClasses of type object to all child slot divs', async () => {
         const classesObject = { 'object-class1': true, 'object-class2': false, 'object-class3': true }
         const expectedClasses = ['object-class1', 'object-class3']
 
-        componentRef.setInput('slotClasses', classesObject)
+        componentRef.setInput('rcWrapperClasses', classesObject)
 
         const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
 
@@ -426,7 +426,7 @@ describe('SlotGroupComponent', () => {
         expect(containerSlotClasses).toEqual(groupClassesArray)
       })
 
-      it('should apply groupClasses of type string to container div', async () => {
+      it('should apply groupClasses of type Set to container div', async () => {
         const groupClassesSet = new Set(['test-group-class', 'another-class'])
         const expectedClasses = ['test-group-class', 'another-class']
 
@@ -437,7 +437,7 @@ describe('SlotGroupComponent', () => {
         expect(containerSlotClasses).toEqual(expectedClasses)
       })
 
-      it('should apply groupClasses of type string to container div', async () => {
+      it('should apply groupClasses of type object to container div', async () => {
         const groupClassesObject = { 'test-group-class': true, 'another-class': false, 'third-class': true }
         const expectedClasses = ['test-group-class', 'third-class']
 
@@ -450,10 +450,11 @@ describe('SlotGroupComponent', () => {
     })
 
     describe('containerStyles computed signal', () => {
-      it('should compute containerStyles with default direction', () => {
+      it('should compute containerStyles with default direction and default width 100%', () => {
         const containerStyles = component.containerStyles()
         const expectedDefaultStyles = {
-          'flex-direction': 'row'
+          'flex-direction': 'row',
+          width: '100%'
         }
 
         expect(containerStyles).toEqual(expectedDefaultStyles)
@@ -463,10 +464,11 @@ describe('SlotGroupComponent', () => {
         componentRef.setInput('direction', 'column')
 
         const expectedContainerStyles = {
-          'flex-direction': 'column'
+          'flex-direction': 'column',
+          height: '100%'
         }
 
-        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction'])
+        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction', 'height'])
 
         expect(containerStyles).toEqual(expectedContainerStyles)
       })
@@ -476,10 +478,11 @@ describe('SlotGroupComponent', () => {
 
         const expectedContainerStyles = {
           'flex-direction': 'row',
+          width: '100%',
           padding: '10px'
         }
 
-        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction', 'padding'])
+        const containerStyles = await slotGroupHarness.getContainerStyles(['flex-direction', 'width', 'padding'])
 
         expect(containerStyles).toEqual(expectedContainerStyles)
 
@@ -487,12 +490,14 @@ describe('SlotGroupComponent', () => {
 
         const expectedUpdatedContainerStyles = {
           'flex-direction': 'row',
+          width: '100%',
           padding: '20px',
           margin: '5px'
         }
 
         const updatedContainerStyles = await slotGroupHarness.getContainerStyles([
           'flex-direction',
+          'width',
           'padding',
           'margin'
         ])
@@ -511,8 +516,8 @@ describe('SlotGroupComponent', () => {
         const classes = 'multi-class another-class'
         const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('slotStyles', styles)
-        componentRef.setInput('slotClasses', classes)
+        componentRef.setInput('rcWrapperStyles', styles)
+        componentRef.setInput('rcWrapperClasses', classes)
 
         const startSlotDivs = await slotGroupHarness.getStartSlotDivContainers()
 
@@ -540,8 +545,8 @@ describe('SlotGroupComponent', () => {
         const classes = 'multi-class another-class'
         const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('slotStyles', styles)
-        componentRef.setInput('slotClasses', classes)
+        componentRef.setInput('rcWrapperStyles', styles)
+        componentRef.setInput('rcWrapperClasses', classes)
 
         const centerSlotDivs = await slotGroupHarness.getCenterSlotDivContainers()
 
@@ -569,8 +574,8 @@ describe('SlotGroupComponent', () => {
         const classes = 'multi-class another-class'
         const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('slotStyles', styles)
-        componentRef.setInput('slotClasses', classes)
+        componentRef.setInput('rcWrapperStyles', styles)
+        componentRef.setInput('rcWrapperClasses', classes)
 
         const endSlotDivs = await slotGroupHarness.getEndSlotDivContainers()
 
@@ -600,8 +605,8 @@ describe('SlotGroupComponent', () => {
         const classes = 'multi-class another-class'
         const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('slotStyles', styles)
-        componentRef.setInput('slotClasses', classes)
+        componentRef.setInput('rcWrapperStyles', styles)
+        componentRef.setInput('rcWrapperClasses', classes)
 
         const allSlotDivs = await slotGroupHarness.getAllSlotDivContainers()
         const allSlots = await slotGroupHarness.getAllSlots()

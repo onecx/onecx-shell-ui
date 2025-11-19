@@ -1,3 +1,8 @@
+:imagesdir: ../images
+
+:idprefix:
+:idseparator: -
+
 == OneCX Shell UI
 
 
@@ -103,7 +108,9 @@ for web and mobile applications.
 
 ==== Slot Groups
 
-Slot Groups are a layout mechanism in OneCX Shell UI that organize multiple slots into structured regions. They enable flexible positioning and dynamic loading of remote components within defined areas of the shell interface.
+Slot Groups are a layout mechanism in OneCX Shell UI that organize multiple slots into structured regions. They enable flexible positioning and dynamic loading of remote components within defined areas of the shell interface's portal viewport.
+
+image::slot_groups_portal_viewport.png[]
 
 ===== Overview
 

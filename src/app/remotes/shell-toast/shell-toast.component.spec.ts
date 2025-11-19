@@ -12,10 +12,10 @@ import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-u
 
 import { MessageService } from 'primeng/api'
 import { ToastModule } from 'primeng/toast'
-import { OneCXShellExtensionsComponent } from './shell-extensions.component'
+import { OneCXShellToastComponent } from './shell-toast.component'
 
 function setUp() {
-  const fixture = TestBed.createComponent(OneCXShellExtensionsComponent)
+  const fixture = TestBed.createComponent(OneCXShellToastComponent)
   const component = fixture.componentInstance
 
   // Get services from component's injector (not TestBed) because overrideComponent provides separate instances
@@ -57,7 +57,7 @@ describe('OneCXShellExtensionsComponent', () => {
         MessageService
       ]
     })
-      .overrideComponent(OneCXShellExtensionsComponent, {
+      .overrideComponent(OneCXShellToastComponent, {
         set: {
           imports: [TranslateTestingModule, CommonModule, ToastModule],
           providers: [

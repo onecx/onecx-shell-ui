@@ -17,14 +17,14 @@ import { ToastModule } from 'primeng/toast'
 
 // Should be moved out of shell to another repo later, so that primeNG dependency can be started to be removed from shell
 @Component({
-  selector: 'ocx-shell-extensions',
-  templateUrl: './shell-extensions.component.html',
+  selector: 'ocx-shell-toast',
+  templateUrl: './shell-toast.component.html',
   standalone: true,
   imports: [AngularRemoteComponentsModule, CommonModule, AngularAcceleratorModule, ToastModule],
   providers: [{ provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) }, MessageService]
 })
 @UntilDestroy()
-export class OneCXShellExtensionsComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnInit {
+export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnInit {
   private readonly rcConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
   private readonly primengConfig = inject(PrimeNG)
   private readonly messageService = inject(MessageService)

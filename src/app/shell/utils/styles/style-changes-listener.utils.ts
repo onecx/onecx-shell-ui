@@ -10,12 +10,26 @@ import { dataNoPortalLayoutStylesKey, dataStyleIdKey, replacePrimengPrefix } fro
  * The listener finds the scopeId data by looking for "_nghost" owner and looking for the closest styleId element.
  */
 export async function styleChangesListenerInitializer() {
-  const observer = new MutationObserver((mutationList: MutationRecord[]) => updateAngularComponentsStyles(mutationList))
+  const observer = new MutationObserver((mutationList: MutationRecord[]) => updateStyles(mutationList))
   observer.observe(document.head, {
     childList: true
   })
 }
 
+function updateStyles(mutationList: MutationRecord[]) {
+  updateAngularComponentsStyles(mutationList)
+}
+
+/**
+ * Updates styles of Angular components added to the document head.
+ *
+ * Affects only styles that:
+ * - are Angular component styles (contain "_nghost" attribute).
+ * - have styleId defined.
+ * - do not have noPortalLayoutStyles defined.
+ * - require PrimeNg prefix replacement.
+ * @param mutationList
+ */
 function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
   const newComponentStyleNodes = mutationList
     .flatMap((mutation) => Array.from(mutation.addedNodes))

@@ -12,7 +12,9 @@ export function ensurePrimengDynamicDataIncludesIntermediateStyleData() {
       (contextElement ? getStyleDataOrIntermediateStyleData(contextElement) : null) ??
       (onecxTrigger ? getStyleDataOrIntermediateStyleData(onecxTrigger) : null)
     // Append intermediate data so the isolation does not happen by coincidence
-    styleData && appendIntermediateStyleData(el, styleData)
+    if (styleData) {
+      appendIntermediateStyleData(el, styleData)
+    }
     return el
   }
 }

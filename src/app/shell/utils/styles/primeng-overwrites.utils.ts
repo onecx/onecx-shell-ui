@@ -1,5 +1,5 @@
 import { getOnecxTriggerElement } from './onecx-trigger-element.utils'
-import { appendIntermediateStyleData, getStyleDataOrIntermediateStyleData } from './style-data.utils'
+import { appendIntermediateStyleData, getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
 
 // When creating elements in PrimeNg make sure to include the style id data in them so when appending to the body we don't lose context of the current App
 export function ensurePrimengDynamicDataIncludesIntermediateStyleData() {
@@ -15,6 +15,7 @@ export function ensurePrimengDynamicDataIncludesIntermediateStyleData() {
     if (styleData) {
       appendIntermediateStyleData(el, styleData)
     }
+    markElement(el, 'createElementFromPrimeNg')
     return el
   }
 }

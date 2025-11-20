@@ -1,4 +1,6 @@
-import { getStyleDataOrIntermediateStyleData } from './style-data.utils'
+import { getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
+
+export const MARKED_FOR_WRAPPING = 'markedForWrapping'
 
 // When creating style elements via Renderer from Angular Core, make sure to include the style id data in the style elements so when appending to the head we don't lose context of the current App
 export function ensureAngularComponentStylesContainStyleId() {
@@ -38,8 +40,9 @@ export function ensureAngularComponentStylesContainStyleId() {
       )
       return el
     }
-    // TODO: export attribute name
-    el.dataset['wrappingRequiredStyleId'] = styleData.styleId
+    el.dataset[MARKED_FOR_WRAPPING] = styleData.styleId
+    markElement(el, 'ensureAngularComponentStylesContainStyleId')
+
     return el
   }
 }

@@ -5,7 +5,7 @@ import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
-import { SlotGroupHarness } from '@onecx/angular-remote-components/testing'
+import { SlotGroupHarness } from './slot-group.harness'
 import { By } from '@angular/platform-browser'
 import { EventsPublisher, EventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
 import { DivHarness } from '@onecx/angular-testing'
@@ -75,9 +75,9 @@ describe('SlotGroupComponent', () => {
 
     slotServiceMock = TestBed.inject(SLOT_SERVICE) as unknown as SlotServiceMock
 
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot-start')
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot-center')
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot-end')
+    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.start')
+    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.center')
+    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.end')
 
     slotGroupHarness = await TestbedHarnessEnvironment.harnessForFixture(fixture, SlotGroupHarness)
   })
@@ -155,9 +155,9 @@ describe('SlotGroupComponent', () => {
         const centerSlot = await slotGroupHarness.getCenterSlot()
         const endSlot = await slotGroupHarness.getEndSlot()
 
-        expect(await startSlot?.getName()).toBe('new-test-slot-start')
-        expect(await centerSlot?.getName()).toBe('new-test-slot-center')
-        expect(await endSlot?.getName()).toBe('new-test-slot-end')
+        expect(await startSlot?.getName()).toBe('new-test-slot.start')
+        expect(await centerSlot?.getName()).toBe('new-test-slot.center')
+        expect(await endSlot?.getName()).toBe('new-test-slot.end')
       })
     })
 
@@ -534,7 +534,7 @@ describe('SlotGroupComponent', () => {
 
     describe('slotStyles and slotClasses with multiple components in a slot', () => {
       it('should apply slotStyles and slotClasses to every start slot div when multiple components are assigned to start slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-start')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.start')
 
         const styles = { padding: '10px', color: 'blue' }
         const expectedStyles = { padding: '10px', color: 'blue' }
@@ -563,7 +563,7 @@ describe('SlotGroupComponent', () => {
       })
 
       it('should apply slotStyles and slotClasses to every center slot div when multiple components are assigned to center slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-center')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
 
         const styles = { padding: '10px', color: 'blue' }
         const expectedStyles = { padding: '10px', color: 'blue' }
@@ -592,7 +592,7 @@ describe('SlotGroupComponent', () => {
       })
 
       it('should apply slotStyles and slotClasses to every end slot div when multiple components are assigned to end slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-end')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
 
         const styles = { padding: '10px', color: 'blue' }
         const expectedStyles = { padding: '10px', color: 'blue' }
@@ -621,9 +621,9 @@ describe('SlotGroupComponent', () => {
       })
 
       it('should apply slotStyles and slotClasses to every slot div in all slots when multiple components are assigned to all slots', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-start')
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-center')
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot-end')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.start')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
+        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
 
         const styles = { padding: '10px', color: 'blue' }
         const expectedStyles = { padding: '10px', color: 'blue' }

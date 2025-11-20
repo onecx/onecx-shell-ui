@@ -13,10 +13,10 @@ import {
 
 import { environment } from 'src/environments/environment'
 
-import { OneCXShellExtensionsComponent } from './shell-extensions.component'
+import { OneCXShellToastComponent } from './shell-toast.component'
 import { provideAnimations } from '@angular/platform-browser/animations'
 
-bootstrapRemoteComponent(OneCXShellExtensionsComponent, 'ocx-shell-extensions-component', environment.production, [
+bootstrapRemoteComponent(OneCXShellToastComponent, 'ocx-shell-toast-component', environment.production, [
   { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<RemoteComponentConfig>(1) },
   provideAnimations(),
   provideTranslateServiceForRoot({

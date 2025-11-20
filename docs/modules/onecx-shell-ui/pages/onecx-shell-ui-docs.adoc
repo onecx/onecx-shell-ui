@@ -1,3 +1,8 @@
+:imagesdir: ../images
+
+:idprefix:
+:idseparator: -
+
 == OneCX Shell UI
 
 
@@ -100,3 +105,169 @@ This is optional.
 * `keycloak`: Keycloak is an open-source identity and access management
 system that simplifies authentication, authorization, and single sign-on
 for web and mobile applications.
+
+==== Slot Groups
+
+Slot Groups are a layout mechanism in OneCX Shell UI that organize multiple slots into structured regions. They enable flexible positioning and dynamic loading of remote components within defined areas of the shell interface's portal viewport.
+
+image::slot_groups_portal_viewport.png[]
+
+===== Overview
+
+A Slot Group is a container component that divides content into three distinct regions:
+
+* **start:** The beginning region of the slot group
+* **center:** The middle region of the slot group  
+* **end:** The ending region of the slot group
+
+Each slot group automatically creates three named slots based on its name: `<name>.start`, `<name>.center`, and `<name>.end`. Remote components can be loaded into any of these slots dynamically based on configuration.
+
+===== Configuration Properties
+
+[cols="2,2,5"]
+|===
+|Property |Type |Description
+
+|`name` (required)
+|`string`
+|Unique identifier for the slot group. Automatically generates three slots: `<name>.start`, `<name>.center`, `<name>.end`
+
+|`direction`
+|`'row' \| 'row-reverse' \| 'column' \| 'column-reverse'`
+|Controls the flex direction for laying out slots. Default: `'row'`
+
+|`slotStyles`
+|`{ [key: string]: any }`
+|CSS styles object applied to each individual slot within the group
+
+|`slotClasses`
+|`string \| string[] \| Set<string> \| { [key: string]: any }`
+|CSS classes applied to each individual slot within the group
+
+|`slotInputs`
+|`Record<string, unknown>`
+|Input properties passed to all remote components loaded in the slots
+
+|`slotOutputs`
+|`Record<string, EventEmitter<any>>`
+|Output event handlers bound to all remote components loaded in the slots
+
+|`groupStyles`
+|`{ [key: string]: any }`
+|CSS styles object applied to the slot group container element
+
+|`groupClasses`
+|`string \| string[] \| Set<string> \| { [key: string]: any }`
+|CSS classes applied to the slot group container element
+
+|`rcWrapperStyles`
+|`{ [key: string]: any }`
+|CSS styles applied to the remote component wrapper elements
+
+|`rcWrapperClasses`
+|`string \| string[] \| Set<string> \| { [key: string]: any }`
+|CSS classes applied to the remote component wrapper elements
+|===
+
+===== Usage Example
+
+[source,html]
+----
+<ocx-shell-slot-group
+  name="onecx-shell-header"
+  direction="row"
+></ocx-shell-slot-group>
+----
+
+This example creates a horizontal slot group named `onecx-shell-header` with three available slots:
+
+* `onecx-shell-header.start`
+* `onecx-shell-header.center`
+* `onecx-shell-header.end`
+
+===== Layout Behavior
+
+The slot group uses CSS Flexbox for layout:
+
+* **Row directions** (`row`, `row-reverse`): Sets width to 100% and uses `justify-content: space-between`
+* **Column directions** (`column`, `column-reverse`): Sets height to 100% and uses `justify-content: space-between`
+
+Each slot within the group is configured with:
+
+* `display: flex`
+* `flex-direction` matching the group direction
+* `align-items: center`
+
+===== Resize Events
+
+The Slot Group Component automatically monitors size changes and publishes resize events to the OneCX Topic event system. This allows remote components to respond dynamically to layout changes.
+
+**Event Details:**
+
+* **Event Type:** `SLOT_GROUP_RESIZED` (from `@onecx/integration-interface`)
+* **Debounce Time:** 100ms
+* **Payload:**
+** `slotName`: The name of the slot group
+** `slotDetails`: Object containing `width` and `height` properties
+
+**Implementation:**
+
+The component uses a `ResizeObserver` to monitor the slot group's dimensions. When changes occur, they are debounced and published through the `EventsPublisher` TopicPublisher, making them available to all micro frontends in the shell.
+
+[source,typescript]
+----
+// Remote components can subscribe to resize events
+eventsPublisher.subscribe(EventType.SLOT_GROUP_RESIZED, (event) => {
+  console.log('Slot group resized:', event.payload.slotName);
+  console.log('New dimensions:', event.payload.slotDetails);
+});
+----
+
+==== OneCX Extensions Slot
+
+The `onecx-shell-extensions` slot is a dedicated slot designed for hosting extension components that enhance Shell UI functionality.
+
+===== Purpose
+
+The extensions slot provides a standardized integration point for example such as:
+
+* **Utility Components:** Tools and helpers
+* **Custom Integrations:** Third-party or custom micro frontend extensions
+
+===== Integration
+
+Extension components are registered through the OneCX slot configuration system and loaded dynamically.
+
+===== Configuration
+
+Extensions are defined in the slot configuration and can be managed through the OneCX Workspace UI or configured in the helm values yaml file.
+
+Each extension component loaded into the `onecx-shell-extensions` slot receives standard slot inputs and can emit events back to the shell through the OneCX Topic event system.
+
+==== Shell Toast Remote Component
+
+The Shell Toast component provides a centralized, application-wide notification system for displaying messages across the OneCX Shell and all loaded micro frontends.
+
+===== Overview
+
+`OneCXShellToastComponent` is a standalone remote component that can be embedded as a web component. It integrates with the OneCX messaging infrastructure to display toast notifications using PrimeNG components.
+
+**Key Features:**
+
+* Centralized message handling for all micro frontends
+* PrimeNG Toast integration
+* Automatic subscription to portal-wide messages
+* Translation support for internationalization
+* Word-wrap styling for long messages
+
+===== Setup and Configuration
+
+To enable toast messages by using the `OneCXShellToastComponent`, it must be configured in the `onecx-shell-extensions` slot. This ensures that the toast container is available globally for all micro frontends.
+
+**Configuration Steps:**
+
+1. Register the `onecx-shell-extensions` slot in the slot configuration of your workspace
+2. Assign the `OneCXShellToastComponent` to the `onecx-shell-extensions` slot
+3. The component will automatically subscribe to the `PortalMessageService` message stream
+
+Once configured in the extensions slot, any micro frontend can send messages through the `PortalMessageService`, and they will be displayed as toast notifications to the user.

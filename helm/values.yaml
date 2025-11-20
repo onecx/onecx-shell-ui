@@ -26,13 +26,13 @@ app:
           remoteName: onecx-shell
           tagName: ocx-version-info-component
           deprecated: true
-        shell-extensions:
-          exposedModule: "./OneCXShellExtensionsComponent"
-          description: "Display shell extensions"
+        shell-toast:
+          exposedModule: "./OneCXShellToastComponent"
+          description: "Display shell toast notifications"
           type: COMPONENT
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-shell
-          tagName: ocx-shell-extensions-component
+          tagName: ocx-shell-toast-component
           deprecated: true
     # Microservice
     microservice:

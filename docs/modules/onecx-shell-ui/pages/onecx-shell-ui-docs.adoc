@@ -116,9 +116,9 @@ image::slot_groups_portal_viewport.png[]
 
 A Slot Group is a container component that divides content into three distinct regions:
 
-* **start** - The beginning region of the slot group
-* **center** - The middle region of the slot group  
-* **end** - The ending region of the slot group
+* **start:** The beginning region of the slot group
+* **center:** The middle region of the slot group  
+* **end:** The ending region of the slot group
 
 Each slot group automatically creates three named slots based on its name: `<name>.start`, `<name>.center`, and `<name>.end`. Remote components can be loaded into any of these slots dynamically based on configuration.
 
@@ -180,6 +180,7 @@ Each slot group automatically creates three named slots based on its name: `<nam
 ----
 
 This example creates a horizontal slot group named `onecx-shell-header` with three available slots:
+
 * `onecx-shell-header.start`
 * `onecx-shell-header.center`
 * `onecx-shell-header.end`
@@ -192,6 +193,7 @@ The slot group uses CSS Flexbox for layout:
 * **Column directions** (`column`, `column-reverse`): Sets height to 100% and uses `justify-content: space-between`
 
 Each slot within the group is configured with:
+
 * `display: flex`
 * `flex-direction` matching the group direction
 * `align-items: center`
@@ -229,8 +231,8 @@ The `onecx-shell-extensions` slot is a dedicated slot designed for hosting exten
 
 The extensions slot provides a standardized integration point for example such as:
 
-* **Utility Components** - Tools and helpers
-* **Custom Integrations** - Third-party or custom micro frontend extensions
+* **Utility Components:** Tools and helpers
+* **Custom Integrations:** Third-party or custom micro frontend extensions
 
 ===== Integration
 

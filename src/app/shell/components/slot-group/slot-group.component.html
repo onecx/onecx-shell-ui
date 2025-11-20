@@ -1,6 +1,6 @@
 <div style="display: flex; justify-content: space-between" [ngStyle]="containerStyles()" [ngClass]="groupClasses()">
   <ocx-slot
-    [name]="name() + '-start'"
+    [name]="name() + '.start'"
     [ngStyle]="computedSlotStyles()"
     [ngClass]="slotClasses()"
     [slotStyles]="rcWrapperStyles()"
@@ -9,7 +9,7 @@
     [outputs]="slotOutputs()"
   ></ocx-slot>
   <ocx-slot
-    [name]="name() + '-center'"
+    [name]="name() + '.center'"
     [ngStyle]="computedSlotStyles()"
     [ngClass]="slotClasses()"
     [slotStyles]="rcWrapperStyles()"
@@ -18,7 +18,7 @@
     [outputs]="slotOutputs()"
   ></ocx-slot>
   <ocx-slot
-    [name]="name() + '-end'"
+    [name]="name() + '.end'"
     [ngStyle]="computedSlotStyles()"
     [ngClass]="slotClasses()"
     [slotStyles]="rcWrapperStyles()"

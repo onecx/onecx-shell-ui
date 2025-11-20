@@ -7,7 +7,7 @@ const webpackConfig = {
     name: 'onecx-shell-ui',
     exposes: {
       './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts',
-      './OneCXShellExtensionsComponent': 'src/app/remotes/shell-extensions/shell-extensions.component.main.ts'
+      './OneCXShellToastComponent': 'src/app/remotes/shell-toast/shell-toast.component.main.ts'
     },
     shared: share({
       '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },

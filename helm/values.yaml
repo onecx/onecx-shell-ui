@@ -44,91 +44,80 @@ app:
       enabled: true
       specs:
         # Header
-        onecx-shell-header-start:
-          name: onecx-shell-header-start
+        onecx-shell-header.start:
+          name: onecx-shell-header.start
           description: "Start region of the shell header (e.g. logo)"
-        onecx-shell-header-center:
-          name: onecx-shell-header-center
+        onecx-shell-header.center:
+          name: onecx-shell-header.center
           description: "Center region of the shell header (e.g. horizontal menu, search bar)"
-        onecx-shell-header-end:
-          name: onecx-shell-header-end
+        onecx-shell-header.end:
+          name: onecx-shell-header.end
           description: "End region of the shell header (e.g. user profile)"
 
         # SubHeader
-        onecx-shell-sub-header-start:
-          name: onecx-shell-sub-header-start
+        onecx-shell-sub-header.start:
+          name: onecx-shell-sub-header.start
           description: "Start region of the shell sub header (e.g. bookmarks)"
-        onecx-shell-sub-header-center:
-          name: onecx-shell-sub-header-center
+        onecx-shell-sub-header.center:
+          name: onecx-shell-sub-header.center
           description: "Center region of the shell sub header (e.g. banner bar)"
-        onecx-shell-sub-header-end:
-          name: onecx-shell-sub-header-end
+        onecx-shell-sub-header.end:
+          name: onecx-shell-sub-header.end
           description: "End region of the shell sub header (e.g. action buttons)"
 
         # BodyStart
-        onecx-shell-body-start-start:
-          name: onecx-shell-body-start-start
+        onecx-shell-body-start.start:
+          name: onecx-shell-body-start.start
           description: "Start region of the shell body start (e.g. quick links)"
-        onecx-shell-body-start-center:
-          name: onecx-shell-body-start-center
+        onecx-shell-body-start.center:
+          name: onecx-shell-body-start.center
           description: "Center region of the shell body start (e.g. sidebar navigation)"
-        onecx-shell-body-start-end:
-          name: onecx-shell-body-start-end
+        onecx-shell-body-start.end:
+          name: onecx-shell-body-start.end
           description: "End region of the shell body start (e.g. action buttons)"
 
         # BodyHeader
-        onecx-shell-body-header-start:
-          name: onecx-shell-body-header-start
+        onecx-shell-body-header.start:
+          name: onecx-shell-body-header.start
           description: "Start region of the shell body header (e.g. breadcrumbs)"
-        onecx-shell-body-header-center:
-          name: onecx-shell-body-header-center
+        onecx-shell-body-header.center:
+          name: onecx-shell-body-header.center
           description: "Center region of the shell body header (e.g. title)"
-        onecx-shell-body-header-end:
-          name: onecx-shell-body-header-end
+        onecx-shell-body-header.end:
+          name: onecx-shell-body-header.end
           description: "End region of the shell body header (e.g. action buttons)"
 
-        # Body
-        onecx-shell-body-start:
-          name: onecx-shell-body-start
-          description: "Start region of the shell body (content area)"
-        onecx-shell-body-center:
-          name: onecx-shell-body-center
-          description: "Center region of the shell body (content area)"
-        onecx-shell-body-end:
-          name: onecx-shell-body-end
-          description: "End region of the shell body (content area)"
-
         # BodyFooter
-        onecx-shell-body-footer-start:
-          name: onecx-shell-body-footer-start
+        onecx-shell-body-footer.start:
+          name: onecx-shell-body-footer.start
           description: "Start region of the shell body footer (e.g. info)"
-        onecx-shell-body-footer-center:
-          name: onecx-shell-body-footer-center
+        onecx-shell-body-footer.center:
+          name: onecx-shell-body-footer.center
           description: "Center region of the shell body footer (e.g. comment section)"
-        onecx-shell-body-footer-end:
-          name: onecx-shell-body-footer-end
+        onecx-shell-body-footer.end:
+          name: onecx-shell-body-footer.end
           description: "End region of the shell body footer (e.g. action buttons)"
 
         # BodyEnd
-        onecx-shell-body-end-start:
-          name: onecx-shell-body-end-start
+        onecx-shell-body-end.start:
+          name: onecx-shell-body-end.start
           description: "Start region of the shell body end (e.g. quick links)"
-        onecx-shell-body-end-center:
-          name: onecx-shell-body-end-center
+        onecx-shell-body-end.center:
+          name: onecx-shell-body-end.center
           description: "Center region of the shell body end (e.g. sidebar navigation)"
-        onecx-shell-body-end-end:
-          name: onecx-shell-body-end-end
+        onecx-shell-body-end.end:
+          name: onecx-shell-body-end.end
           description: "End region of the shell body end (e.g. action buttons)"
 
         # Footer
-        onecx-shell-footer-start:
-          name: onecx-shell-footer-start
+        onecx-shell-footer.start:
+          name: onecx-shell-footer.start
           description: "Start region of the shell footer (e.g. logo)"
-        onecx-shell-footer-center:
-          name: onecx-shell-footer-center
+        onecx-shell-footer.center:
+          name: onecx-shell-footer.center
           description: "Center region of the shell footer (e.g. footer menu)"
-        onecx-shell-footer-end:
-          name: onecx-shell-footer-end
+        onecx-shell-footer.end:
+          name: onecx-shell-footer.end
           description: "End region of the shell footer (e.g. version info)"
 
         # Extensions

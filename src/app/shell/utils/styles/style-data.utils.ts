@@ -23,6 +23,7 @@ export const dataWrapperElementKey = 'dynamicWrapperElement'
  * @param value - The value to mark the element with.
  */
 export function markElement(element: any, value: string) {
+  element.onecx ??= {}
   element.onecx.markers ??= []
   element.onecx.markers.push(value)
 }

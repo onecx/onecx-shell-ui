@@ -13,23 +13,17 @@
     </header>
 
     <!-- SubHeader slot group -->
-    <div class="onecx-subheader">
-      <ocx-shell-slot-group name="onecx-shell-sub-header"></ocx-shell-slot-group>
-    </div>
+    <ocx-shell-slot-group class="onecx-subheader" name="onecx-shell-sub-header"></ocx-shell-slot-group>
     <div class="onecx-body-wrapper">
       <!-- BodyStart slot group -->
-      <div class="onecx-body-start">
-        <ocx-shell-slot-group
-          name="onecx-shell-body-start"
-          direction="column"
-        ></ocx-shell-slot-group>
-      </div>
+      <ocx-shell-slot-group
+        class="onecx-body-start"
+        name="onecx-shell-body-start"
+        direction="column"
+      ></ocx-shell-slot-group>
       <div class="onecx-body-center">
         <!-- BodyHeader slot group -->
-        <div class="onecx-body-header">
-          <ocx-shell-slot-group name="onecx-shell-body-header"></ocx-shell-slot-group>
-        </div>
-        <!-- Body slot group -->
+        <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
         <div class="onecx-body">
           <ng-container *ngIf="!routesService || (routesService.showContent$ | async); else appLoading">
             <ng-content></ng-content>
@@ -37,17 +31,14 @@
           </ng-container>
         </div>
         <!-- BodyFooter slot group -->
-        <div class="onecx-body-footer">
-          <ocx-shell-slot-group name="onecx-shell-body-footer"></ocx-shell-slot-group>
-        </div>
+        <ocx-shell-slot-group class="onecx-body-footer" name="onecx-shell-body-footer"></ocx-shell-slot-group>
       </div>
       <!-- BodyEnd slot group -->
-      <div class="onecx-body-end">
-        <ocx-shell-slot-group
-          name="onecx-shell-body-end"
-          direction="column"
-        ></ocx-shell-slot-group>
-      </div>
+      <ocx-shell-slot-group
+        class="onecx-body-end"
+        name="onecx-shell-body-end"
+        direction="column"
+      ></ocx-shell-slot-group>
     </div>
 
     <!-- Footer slot group -->

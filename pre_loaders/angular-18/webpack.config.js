@@ -1,3 +1,7 @@
+const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
+const { withModuleFederationPlugin, shareAll } = require('@angular-architects/module-federation/webpack')
+const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
+
 /**
  * When module federation loads a package it checks:
  * - eager flag - if package should be eagerly loaded

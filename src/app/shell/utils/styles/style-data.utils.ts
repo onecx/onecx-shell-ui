@@ -18,6 +18,17 @@ export const dataWrapperElementAttribute = 'data-dynamic-wrapper-element'
 export const dataWrapperElementKey = 'dynamicWrapperElement'
 
 /**
+ * Marks an element with a specific value for tracking purposes.
+ * @param element - The element to be marked.
+ * @param value - The value to mark the element with.
+ */
+export function markElement(element: any, value: string) {
+  element.onecx ??= {}
+  element.onecx.markers ??= []
+  element.onecx.markers.push(value)
+}
+
+/**
  * Wraps an HTMLElement a div element with style data attributes.
  * @param element HTMLElement to wrap
  * @param styleData StyleData object containing style information.

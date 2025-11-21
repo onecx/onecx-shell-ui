@@ -53,9 +53,27 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
   ]
 })
 
+// Replace createElement only in @angular/platform-browser SharedStylesHost
+const modifyAngularCorePlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return module.resource && module.resource.includes('@angular/platform-browser')
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          "this\\.doc\\.createElement\\(\\'style\\'",
+          "this.doc.createElementFromSharedStylesHost({'this': this, 'arguments': Array.from(arguments)},'style'"
+        )
+      ]
+    }
+  ]
+})
+
 module.exports = {
   ...webpackConfig,
-  plugins: [...plugins, modifyPrimeNgPlugin],
+  plugins: [...plugins, modifyPrimeNgPlugin, modifyAngularCorePlugin],
   output: { uniqueName: magicChar + 'onecx-angular-20-loader', publicPath: 'auto' },
   experiments: { ...webpackConfig.experiments, topLevelAwait: true },
   optimization: { runtimeChunk: false, splitChunks: false },

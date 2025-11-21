@@ -10,6 +10,7 @@ import {
   addStyleToHead,
   replaceRootWithScope
 } from '@onecx/angular-utils'
+import { markElement } from './style-data.utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
   return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))
@@ -22,7 +23,7 @@ export function loadPortalLayoutStyles(css: string) {
 
 function loadPortalLayoutStylesStyles(css: string) {
   if (isCssScopeRuleSupported()) {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @scope([${dataStyleIdAttribute}]:not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
       ${replaceRootWithScope(css)}
@@ -32,6 +33,7 @@ function loadPortalLayoutStylesStyles(css: string) {
         [dataPortalLayoutStylesKey]: ''
       }
     )
+    markElement(styleElement, dataPortalLayoutStylesKey)
   } else {
     const styleElement = addStyleToHead(
       `
@@ -44,6 +46,7 @@ function loadPortalLayoutStylesStyles(css: string) {
       }
     )
     ;(styleElement as any).onecxOriginalCss = css
+    markElement(styleElement, dataPortalLayoutStylesKey)
   }
 }
 
@@ -51,7 +54,7 @@ function loadPortalLayoutStylesStyles(css: string) {
 // which most likely relies on the fact that the dynamic styles are in a separate style element
 function loadDynamicPortalLayoutStylesStyles(css: string) {
   if (isCssScopeRuleSupported()) {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @scope(body > :not([${dataNoPortalLayoutStylesAttribute}])) to ([${dataStyleIsolationAttribute}]) {
       ${replaceRootWithScope(css)}
@@ -61,6 +64,7 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
         [dataDynamicPortalLayoutStylesKey]: ''
       }
     )
+    markElement(styleElement, dataDynamicPortalLayoutStylesKey)
   } else {
     const styleElement = addStyleToHead(
       `
@@ -73,5 +77,6 @@ function loadDynamicPortalLayoutStylesStyles(css: string) {
       }
     )
     ;(styleElement as any).onecxOriginalCss = css
+    markElement(styleElement, dataDynamicPortalLayoutStylesKey)
   }
 }

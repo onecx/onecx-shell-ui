@@ -42,6 +42,6 @@ export class ErrorPageComponent {
     const pageLocation = getLocation()
     const reloadBaseUrl = Location.joinWithSlash(pageLocation.origin, pageLocation.deploymentPath)
     const reloadHref = Location.joinWithSlash(reloadBaseUrl, this.requestedApplicationPath)
-    window.location.href = reloadHref
+    globalThis.location.href = reloadHref
   }
 }

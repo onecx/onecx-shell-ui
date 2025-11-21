@@ -4,6 +4,7 @@ import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
   findStyleDataWrapper,
   getStyleDataOrIntermediateStyleData,
+  markElement,
   removeStyleDataRecursive,
   wrapWithDiv
 } from './style-data.utils'
@@ -19,6 +20,7 @@ function overwriteAppendChild(polyfillMode: string | undefined) {
   const originalAppendChild = document.body.appendChild
   document.body.appendChild = function (newChild: Node): any {
     let childToAppend = newChild
+    markElement(newChild, 'overwriteAppendChild')
     if (newChild.nodeType === Node.ELEMENT_NODE && newChild instanceof HTMLElement) {
       const onecxTriggerElement = getOnecxTriggerElement()
       const triggerElementStyleData = onecxTriggerElement

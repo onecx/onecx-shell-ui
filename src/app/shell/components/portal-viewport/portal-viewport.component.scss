@@ -16,7 +16,8 @@
     max-width: 20rem;
     background-color: var(--menu-bg-color);
     box-shadow: 1px 1px 0 0 var(--divider-color, #0003);
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     flex-grow: 0;
     flex-shrink: 0;
     display: flex;

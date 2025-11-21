@@ -1,7 +1,6 @@
 declare global {
-  interface Window {
-    onecxTriggerElement: EventTarget | null
-  }
+  // eslint-disable-next-line no-var
+  var onecxTriggerElement: EventTarget | null
 }
 
 /**
@@ -32,9 +31,8 @@ export function initializeOnecxTriggerElementListener() {
  * @returns The current OneCX trigger element or a fallback element. Returns null if no suitable element is found.
  */
 export function getOnecxTriggerElement() {
-  if (window.onecxTriggerElement !== null) {
-    //NOSONAR
-    return window.onecxTriggerElement //NOSONAR
+  if (globalThis.onecxTriggerElement !== null) {
+    return globalThis.onecxTriggerElement
   }
 
   console.warn('OneCX Trigger Element is null, will fallback to app trigger element as content source.')
@@ -53,5 +51,5 @@ export function getOnecxTriggerElement() {
 }
 
 function updateOnecxTriggerElement(target: EventTarget | null) {
-  window.onecxTriggerElement = target
+  globalThis.onecxTriggerElement = target
 }

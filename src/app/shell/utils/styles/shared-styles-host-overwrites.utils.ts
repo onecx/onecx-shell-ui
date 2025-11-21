@@ -1,3 +1,4 @@
+import { DynamicAppId } from '@onecx/angular-webcomponents'
 import { getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
 
 export const MARKED_FOR_WRAPPING = 'markedForWrapping'
@@ -12,16 +13,14 @@ export function ensureAngularComponentStylesContainStyleId() {
   ): HTMLElement {
     const el = document.createElement(tagName, options)
     const sharedStylesHost = context['this']
-    // // TODO: export DynamicAppId
-    // // const dynamicAppId = sharedStylesHost.appId as DynamicAppId
-    if (!sharedStylesHost || !sharedStylesHost.appId) {
+    if (!sharedStylesHost?.appId) {
       console.warn('Expected to overwrite SharedStyleHost createElement method, but no appId found on context.')
       return el
     }
     const dynamicAppId = sharedStylesHost.appId
-    if (!('appElementName' in dynamicAppId)) {
+    if (!(dynamicAppId instanceof DynamicAppId)) {
       console.warn(
-        'Expected to overwrite SharedStyleHost createElement method, but appId is missing appElementName property.'
+        'Expected to overwrite SharedStyleHost createElement method, but appId is not instance of DynamicAppId.'
       )
       return el
     }

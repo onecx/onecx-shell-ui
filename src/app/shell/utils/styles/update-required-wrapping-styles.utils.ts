@@ -11,6 +11,8 @@ import { MARKED_FOR_WRAPPING } from './shared-styles-host-overwrites.utils'
  *
  * Affects only styles that:
  * - have attribute MARKED_FOR_WRAPPING defined
+ * - are not already wrapped by scope or supports rules
+ * - are not already wrapped by nghost attributes
  * @param mutationList - list of mutations to process
  */
 export function updateRequiredWrappingStyles(mutationList: MutationRecord[]) {

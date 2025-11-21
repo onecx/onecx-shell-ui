@@ -17,8 +17,8 @@ export function ensureAngularComponentStylesContainStyleId() {
       console.warn('Expected to overwrite SharedStyleHost createElement method, but no appId found on context.')
       return el
     }
-    const dynamicAppId = sharedStylesHost.appId
-    if (!(dynamicAppId instanceof DynamicAppId)) {
+    const dynamicAppId = sharedStylesHost.appId as DynamicAppId
+    if (!dynamicAppId.appElementName) {
       console.warn(
         'Expected to overwrite SharedStyleHost createElement method, but appId is not instance of DynamicAppId.'
       )

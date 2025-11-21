@@ -407,7 +407,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply groupClasses of type string to container div', async () => {
         const groupClassesString = 'test-group-class another-class'
-        const expectedClasses = ['test-group-class', 'another-class']
+        const expectedClasses = ['flex', 'justify-content-between', 'test-group-class', 'another-class']
 
         componentRef.setInput('groupClasses', groupClassesString)
 
@@ -418,17 +418,18 @@ describe('SlotGroupComponent', () => {
 
       it('should apply groupClasses of type string array to container div', async () => {
         const groupClassesArray = ['test-group-class', 'another-class']
+        const expectedClasses = ['flex', 'justify-content-between', 'test-group-class', 'another-class']
 
         componentRef.setInput('groupClasses', groupClassesArray)
 
         const containerSlotClasses = await slotGroupHarness.getContainerGroupClasses()
 
-        expect(containerSlotClasses).toEqual(groupClassesArray)
+        expect(containerSlotClasses).toEqual(expectedClasses)
       })
 
       it('should apply groupClasses of type Set to container div', async () => {
         const groupClassesSet = new Set(['test-group-class', 'another-class'])
-        const expectedClasses = ['test-group-class', 'another-class']
+        const expectedClasses = ['flex', 'justify-content-between', 'test-group-class', 'another-class']
 
         componentRef.setInput('groupClasses', groupClassesSet)
 
@@ -439,7 +440,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply groupClasses of type object to container div', async () => {
         const groupClassesObject = { 'test-group-class': true, 'another-class': false, 'third-class': true }
-        const expectedClasses = ['test-group-class', 'third-class']
+        const expectedClasses = ['flex', 'justify-content-between', 'test-group-class', 'third-class']
 
         componentRef.setInput('groupClasses', groupClassesObject)
 

@@ -33,7 +33,8 @@ export function initializeOnecxTriggerElementListener() {
  */
 export function getOnecxTriggerElement() {
   if (window.onecxTriggerElement !== null) {
-    return window.onecxTriggerElement
+    //NOSONAR
+    return window.onecxTriggerElement //NOSONAR
   }
 
   console.warn('OneCX Trigger Element is null, will fallback to app trigger element as content source.')

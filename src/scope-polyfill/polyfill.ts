@@ -122,7 +122,7 @@ function originalCssBasedDeconstructScopeRule(
   const originalCss = (styleElement as any).onecxOriginalCss as string
 
   // Construct new style element with available selector and original css with :root replaced with & and unwrappable rules extracted from supports rule to the top of the style sheet
-  const actualCss = originalCss.replace(/:root/g, '&')
+  const actualCss = originalCss.replace(/(:root|html)\b/g, '&')
   const newStyleElement = document.createElement('style')
   const unwrappableRulesContent = Array.from(supportsRule.cssRules)
     .filter(isUnwrappableRule)

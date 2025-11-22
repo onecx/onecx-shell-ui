@@ -8,6 +8,7 @@ import {
   addStyleToHead,
   replaceRootWithScope
 } from '@onecx/angular-utils'
+import { markElement } from './style-data.utils'
 
 export async function fetchShellStyles(http: HttpClient) {
   return await firstValueFrom(http.request('get', `./shell-styles.css`, { responseType: 'text' }))
@@ -15,7 +16,7 @@ export async function fetchShellStyles(http: HttpClient) {
 
 export function loadShellStyles(css: string) {
   if (isCssScopeRuleSupported()) {
-    addStyleToHead(
+    const styleElement = addStyleToHead(
       `
       @scope([${dataStyleIdAttribute}="${shellScopeId}"]) to ([${dataStyleIsolationAttribute}]) {
           ${replaceRootWithScope(css)}
@@ -25,6 +26,7 @@ export function loadShellStyles(css: string) {
         shellStylesStyles: ''
       }
     )
+    markElement(styleElement, 'shellStylesStyles')
   } else {
     const styleElement = addStyleToHead(
       `
@@ -37,5 +39,6 @@ export function loadShellStyles(css: string) {
       }
     )
     ;(styleElement as any).onecxOriginalCss = css
+    markElement(styleElement, 'shellStylesStyles')
   }
 }

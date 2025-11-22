@@ -20,6 +20,24 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
   ]
 })
 
+// Replace createElement only in @angular/platform-browser SharedStylesHost
+const modifyAngularCorePlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return module.resource && module.resource.includes('@angular/platform-browser')
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          "this\\.doc\\.createElement\\(\\'style\\'",
+          "this.doc.createElementFromSharedStylesHost({'this': this, 'arguments': Array.from(arguments)},'style'"
+        )
+      ]
+    }
+  ]
+})
+
 module.exports = async (config) => {
   const fromModuleFederation = await withModuleFederation({
     ...moduleFederationConfig
@@ -30,7 +48,7 @@ module.exports = async (config) => {
 
   return {
     ...config,
-    plugins: [...(config.plugins || []), modifyPrimeNgPlugin],
+    plugins: [...(config.plugins || []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
     module: {
       ...config.module,
       parser: {

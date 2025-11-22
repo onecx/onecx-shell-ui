@@ -1,12 +1,11 @@
-<div *ngIf="versionInfo$ | async as version" class="w-full text-right" aria-label="Version Information" role="note">
-  <span aria-label="Workspace" pTooltip="Workspace" tooltipPosition="top" tooltipEvent="hover" role="note">
-    {{ version.workspaceName }}
-  </span>
-  <span aria-label="Shell" pTooltip="Shell" tooltipPosition="top" tooltipEvent="hover" role="note">
-    {{ version.shellInfo }}
-  </span>
+<div
+  *ngIf="versionInfo$ | async as version"
+  class="w-full text-right"
+  [attr.aria-label]="'Version Information'"
+  role="note"
+>
+  <span [attr.aria-label]="'Workspace'" [attr.title]="'Workspace'" role="note"> {{ version.workspaceName }} </span>
+  <span [attr.aria-label]="'Shell'" [attr.title]="'Shell'" role="note"> {{ version.shellInfo }} </span>
   <span aria-hidden="true">{{ version.separator }}</span>
-  <span aria-label="Microfrontend" pTooltip="Microfrontend" tooltipPosition="top" tooltipEvent="hover" role="note">
-    {{ version.mfeInfo }}
-  </span>
+  <span [attr.aria-label]="'Microfrontend'" [attr.title]="'Microfrontend'" role="note"> {{ version.mfeInfo }} </span>
 </div>

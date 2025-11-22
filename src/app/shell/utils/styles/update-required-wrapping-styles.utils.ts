@@ -4,7 +4,7 @@ import {
   isCssScopeRuleSupported,
   replaceRootAndHtmlWithScope
 } from '@onecx/angular-utils'
-import { MARKED_FOR_WRAPPING } from './shared-styles-host-overwrites.utils'
+import { MARKED_FOR_WRAPPING, MARKED_AS_WRAPPED } from './shared-styles-host-overwrites.utils'
 
 /**
  * Updates styles that require wrapping added to the document head.
@@ -22,22 +22,18 @@ export function updateRequiredWrappingStyles(mutationList: MutationRecord[]) {
 
   newStyleNodesRequiringWrapping.forEach((node) => {
     if (!node.textContent) {
+      markAsWrapped(node)
       return
     }
 
     const styleElement = node as HTMLStyleElement
     const markedForWrapping = styleElement.dataset[MARKED_FOR_WRAPPING]
     if (!markedForWrapping) {
+      markAsWrapped(node)
       return
     }
 
     replaceAndWrapStyle(styleElement, markedForWrapping)
-  })
-
-  newStyleNodesRequiringWrapping.forEach((node) => {
-    const styleElement = node as HTMLStyleElement
-    // Remove the attribute after wrapping
-    delete styleElement.dataset[MARKED_FOR_WRAPPING]
   })
 }
 
@@ -60,6 +56,20 @@ function doesStyleRequireWrapping(node: Node): boolean {
 }
 
 /**
+ * Deletes the MARKED_FOR_WRAPPING attribute from the style element and adds MARKED_AS_WRAPPED attribute.
+ * @param styleElement - style element to mark
+ */
+function markAsWrapped(styleElement: Node) {
+  if (styleElement.nodeName !== 'STYLE') {
+    return
+  }
+
+  const styleEl = styleElement as HTMLStyleElement
+  delete styleEl.dataset[MARKED_FOR_WRAPPING]
+  styleEl.dataset[MARKED_AS_WRAPPED] = ''
+}
+
+/**
  * Replaces and wraps style content with scope rule.
  * @param styleElement - style element to replace
  * @param styleId - style id to use for wrapping
@@ -67,6 +77,7 @@ function doesStyleRequireWrapping(node: Node): boolean {
  */
 function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
   if (!styleElement.textContent || isStyleWrapped(styleElement, styleId)) {
+    markAsWrapped(styleElement)
     return
   }
 
@@ -89,6 +100,7 @@ function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
   }
 
   copyDataset(styleElement.dataset, newStyleElement.dataset)
+  markAsWrapped(newStyleElement)
 
   styleElement.replaceWith(newStyleElement)
 }
@@ -98,6 +110,7 @@ function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
  *
  * Style is considered wrapped if:
  * - it contains Angular component styles ([_nghost] attribute)
+ * - it is marked as wrapped via MARKED_AS_WRAPPED attribute
  * - it contains scope rule for the given styleId
  * - it contains supports rule for the given styleId (in case scope rules are not supported)
  * @param styleElement
@@ -105,7 +118,7 @@ function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
  * @returns {boolean} whether style is already wrapped
  */
 function isStyleWrapped(styleElement: HTMLStyleElement, styleId: string): boolean {
-  if (styleElement.textContent?.includes('[_nghost')) {
+  if (styleElement.textContent?.includes('[_nghost') || styleElement.dataset[MARKED_AS_WRAPPED] !== undefined) {
     return true
   }
   if (isCssScopeRuleSupported()) {

@@ -13,8 +13,8 @@
 .onecx-body {
   display: flex;
   flex-direction: column;
-  height: 100%;
   position: relative;
+  flex-grow: 1;
 }
 
 // Important for allowing MFEs to grow and fill the available space

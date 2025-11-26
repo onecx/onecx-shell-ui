@@ -9,3 +9,4 @@ jobs:
     secrets: inherit
     with:
       helmEventTargetRepository: onecx/onecx-shell
+      helmEventTargetBranch: 2.x

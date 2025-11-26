@@ -1,26 +1,29 @@
-<div class="flex justify-content-between" [ngStyle]="containerStyles()" [ngClass]="groupClasses()">
+<div class="flex justify-content-between" [ngClass]="computedSlotGroupClasses()" [ngStyle]="slotGroupStyles()">
   <ocx-slot
+    class="flex align-items-center"
     [name]="name() + '.start'"
-    [ngStyle]="computedSlotStyles()"
-    [ngClass]="slotClasses()"
+    [ngStyle]="slotStyles()"
+    [ngClass]="computedSlotClasses()"
     [slotStyles]="rcWrapperStyles()"
     [slotClasses]="rcWrapperClasses()"
     [inputs]="slotInputsStart()"
     [outputs]="slotOutputs()"
   ></ocx-slot>
   <ocx-slot
+    class="flex align-items-center flex-grow-1"
     [name]="name() + '.center'"
-    [ngStyle]="computedSlotStyles()"
-    [ngClass]="slotClasses()"
-    [slotStyles]="rcWrapperStyles()"
+    [ngStyle]="slotStyles()"
+    [ngClass]="computedSlotClasses()"
     [slotClasses]="rcWrapperClasses()"
+    [slotStyles]="rcWrapperStyles()"
     [inputs]="slotInputsCenter()"
     [outputs]="slotOutputs()"
   ></ocx-slot>
   <ocx-slot
+    class="flex align-items-center"
     [name]="name() + '.end'"
-    [ngStyle]="computedSlotStyles()"
-    [ngClass]="slotClasses()"
+    [ngStyle]="slotStyles()"
+    [ngClass]="computedSlotClasses()"
     [slotStyles]="rcWrapperStyles()"
     [slotClasses]="rcWrapperClasses()"
     [inputs]="slotInputsEnd()"

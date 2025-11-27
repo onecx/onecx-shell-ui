@@ -46,7 +46,7 @@
   },
   "overrides": {
     "@module-federation/dts-plugin": {
-      "koa": "^2.16.2"
+      "koa": "^2.16.3"
     }
   }
 }

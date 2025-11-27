@@ -48,7 +48,7 @@
   },
   "overrides": {
     "@module-federation/dts-plugin": {
-      "koa": "^2.16.2"
+      "koa": "^2.16.3"
     },
     "esbuild": "^0.25.11",
     "vite": "^6.3.6",

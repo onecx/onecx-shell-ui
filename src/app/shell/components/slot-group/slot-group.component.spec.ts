@@ -10,6 +10,7 @@ import { By } from '@angular/platform-browser'
 import { ResizedEventsPublisher, ResizedEventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
 import { DivHarness } from '@onecx/angular-testing'
 import { SLOT_SERVICE, SlotComponent, SlotService } from '@onecx/angular-remote-components'
+import { of } from 'rxjs'
 
 class ResizeObserverMock {
   constructor(private readonly callback: ResizeObserverCallback) {}
@@ -115,6 +116,27 @@ describe('SlotGroupComponent', () => {
     expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
     expect(arg.payload.slotGroupName).toBe('test-slot')
     expect(arg.payload.slotGroupDetails).toEqual({ width: 140, height: 70 })
+  }))
+
+  it('should publish SLOT_GROUP_RESIZED when requestedEventsChanged$ emits for this slot group', fakeAsync(() => {
+    // Simulate initial size
+    resizeObserverMock.trigger(200, 100)
+
+    tick(110) // Wait for debounce
+
+    resizeEventsPublisher.publish.mockClear()
+    ;(component as any)['requestedEventsChanged$'] = of({
+      payload: { type: ResizedEventType.SLOT_GROUP_RESIZED, name: 'test-slot' }
+    })
+    component.ngOnInit() // Re-initialize to set up subscription
+
+    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
+
+    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
+
+    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
+    expect(arg.payload.slotGroupName).toBe('test-slot')
+    expect(arg.payload.slotGroupDetails).toEqual({ width: 200, height: 100 })
   }))
 
   it('should disconnect ResizeObserver and complete subject on destroy', () => {

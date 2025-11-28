@@ -33,6 +33,10 @@ class EventsPublisherMock {
   publish = jest.fn()
 }
 
+function sortClasses(classes: string[]): string[] {
+  return [...classes].sort((a, b) => a.localeCompare(b))
+}
+
 describe('SlotGroupComponent', () => {
   let component: SlotGroupComponent
   let fixture: ComponentFixture<SlotGroupComponent>
@@ -431,7 +435,7 @@ describe('SlotGroupComponent', () => {
         expect(component.slotGroupClasses()).toBe('')
       })
 
-      it('should apply slotGroupClasses of type string to container div', async () => {
+      it('should apply slotGroupClasses of type string to the slot-group host element', async () => {
         const slotGroupClassesString = 'test-group-class another-class'
         const expectedClasses = [
           'flex',
@@ -446,11 +450,10 @@ describe('SlotGroupComponent', () => {
         fixture.detectChanges()
 
         const containerSlotClasses = await slotGroupHarness.getContainerGroupClasses()
-
-        expect(containerSlotClasses).toEqual(expectedClasses)
+        expect(sortClasses(containerSlotClasses)).toEqual(sortClasses(expectedClasses))
       })
 
-      it('should apply slotGroupClasses of type string array to container div', async () => {
+      it('should apply slotGroupClasses of type string array to the slot-group host element', async () => {
         const slotGroupClassesArray = ['test-group-class', 'another-class']
         const expectedClasses = [
           'flex',
@@ -465,11 +468,10 @@ describe('SlotGroupComponent', () => {
         fixture.detectChanges()
 
         const containerSlotClasses = await slotGroupHarness.getContainerGroupClasses()
-
-        expect(containerSlotClasses).toEqual(expectedClasses)
+        expect(sortClasses(containerSlotClasses)).toEqual(sortClasses(expectedClasses))
       })
 
-      it('should apply slotGroupClasses of type Set to container div', async () => {
+      it('should apply slotGroupClasses of type Set to the slot-group host element', async () => {
         const slotGroupClassesSet = new Set(['test-group-class', 'another-class'])
         const expectedClasses = [
           'flex',
@@ -484,11 +486,10 @@ describe('SlotGroupComponent', () => {
         fixture.detectChanges()
 
         const containerSlotClasses = await slotGroupHarness.getContainerGroupClasses()
-
-        expect(containerSlotClasses).toEqual(expectedClasses)
+        expect(sortClasses(containerSlotClasses)).toEqual(sortClasses(expectedClasses))
       })
 
-      it('should apply slotGroupClasses of type object to container div', async () => {
+      it('should apply slotGroupClasses of type object to the slot-group host element', async () => {
         const slotGroupClassesObject = { 'test-group-class': true, 'another-class': false, 'third-class': true }
         const expectedClasses = [
           'flex',
@@ -503,8 +504,7 @@ describe('SlotGroupComponent', () => {
         fixture.detectChanges()
 
         const containerSlotClasses = await slotGroupHarness.getContainerGroupClasses()
-
-        expect(containerSlotClasses).toEqual(expectedClasses)
+        expect(sortClasses(containerSlotClasses)).toEqual(sortClasses(expectedClasses))
       })
     })
 

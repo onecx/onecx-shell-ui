@@ -12,7 +12,9 @@ export type NgClassInputType = string | string[] | Set<string> | { [key: string]
   templateUrl: './slot-group.component.html',
   imports: [AngularRemoteComponentsModule, CommonModule],
   host: {
-    '[attr.name]': 'name()'
+    '[attr.name]': 'name()',
+    '[class]': '"flex justify-content-between " + computedSlotGroupClasses()',
+    '[style]': 'slotGroupStyles()'
   },
   standalone: true
 })

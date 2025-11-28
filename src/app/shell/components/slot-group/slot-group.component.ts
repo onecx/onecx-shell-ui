@@ -8,7 +8,7 @@ import {
   RequestedEventsChangedEvent,
   ResizedEventType
 } from '@onecx/integration-interface'
-import { BehaviorSubject, debounceTime, filter } from 'rxjs'
+import { BehaviorSubject, debounceTime, filter, Subscription } from 'rxjs'
 
 type SlotClassType = string | string[] | Set<string> | { [key: string]: any }
 
@@ -90,10 +90,12 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
     }
   })
 
+  private subscriptions: Subscription[] = []
+
   private resizeObserver: ResizeObserver | undefined
   private readonly componentSize$ = new BehaviorSubject<{ width: number; height: number }>({
-    width: 0,
-    height: 0
+    width: -1,
+    height: -1
   })
   private readonly resizeDebounceTimeMs = 100
 
@@ -110,6 +112,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe())
     this.resizeObserver?.disconnect()
     this.componentSize$.complete()
   }
@@ -137,7 +140,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
     this.resizeObserver.observe(this.elementRef.nativeElement)
 
-    this.requestedEventsChanged$.subscribe((event) => {
+    const requestedEventsChangedSub = this.requestedEventsChanged$.subscribe((event) => {
       if (event.payload.type === ResizedEventType.SLOT_GROUP_RESIZED && event.payload.name === this.name()) {
         const { width, height } = this.componentSize$.getValue()
         const slotGroupResizedEvent: SlotGroupResizedEvent = {
@@ -150,5 +153,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
         this.resizedEventsPublisher.publish(slotGroupResizedEvent)
       }
     })
+
+    this.subscriptions.push(requestedEventsChangedSub)
   }
 }

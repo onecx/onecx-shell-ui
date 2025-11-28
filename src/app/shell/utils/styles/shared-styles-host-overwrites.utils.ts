@@ -2,6 +2,7 @@ import { DynamicAppId } from '@onecx/angular-webcomponents'
 import { getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
 
 export const MARKED_FOR_WRAPPING = 'markedForWrapping'
+export const MARKED_AS_WRAPPED = 'markedAsWrapped'
 
 // When creating style elements via Renderer from Angular Core, make sure to include the style id data in the style elements so when appending to the head we don't lose context of the current App
 export function ensureAngularComponentStylesContainStyleId() {

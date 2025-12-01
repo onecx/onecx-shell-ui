@@ -7,9 +7,10 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
 import { SlotGroupHarness } from './slot-group.harness'
 import { By } from '@angular/platform-browser'
-import { EventsPublisher, EventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
+import { ResizedEventsPublisher, ResizedEventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
 import { DivHarness } from '@onecx/angular-testing'
 import { SLOT_SERVICE, SlotComponent, SlotService } from '@onecx/angular-remote-components'
+import { of } from 'rxjs'
 
 class ResizeObserverMock {
   constructor(private readonly callback: ResizeObserverCallback) {}
@@ -29,7 +30,7 @@ class ResizeObserverMock {
 }
 globalThis.ResizeObserver = ResizeObserverMock
 
-class EventsPublisherMock {
+class ResizeEventsPublisherMock {
   publish = jest.fn()
 }
 
@@ -44,7 +45,7 @@ describe('SlotGroupComponent', () => {
   let slotGroupHarness: SlotGroupHarness
   let slotServiceMock: SlotServiceMock
 
-  let eventsPublisher: EventsPublisherMock
+  let resizeEventsPublisher: ResizeEventsPublisherMock
   let resizeObserverMock: ResizeObserverMock
 
   beforeEach(async () => {
@@ -57,7 +58,7 @@ describe('SlotGroupComponent', () => {
           provide: SlotService,
           useClass: SlotServiceMock
         },
-        { provide: EventsPublisher, useClass: EventsPublisherMock }
+        { provide: ResizedEventsPublisher, useClass: ResizeEventsPublisherMock }
       ]
     }).compileComponents()
   })
@@ -71,9 +72,9 @@ describe('SlotGroupComponent', () => {
     fixture.detectChanges()
 
     // Spy on the eventsPublisher instance that was created by the component
-    const componentEventsPublisher = (component as any).eventsPublisher
+    const componentEventsPublisher = (component as any).resizedEventsPublisher
     jest.spyOn(componentEventsPublisher, 'publish')
-    eventsPublisher = componentEventsPublisher
+    resizeEventsPublisher = componentEventsPublisher
 
     resizeObserverMock = (component as any).resizeObserver as ResizeObserverMock
 
@@ -95,24 +96,47 @@ describe('SlotGroupComponent', () => {
   })
 
   it('should debounce resize events and publish SLOT_GROUP_RESIZED once', fakeAsync(() => {
+    resizeEventsPublisher.publish.mockClear()
+
     // Simulate multiple rapid size changes
     resizeObserverMock.trigger(100, 50)
     resizeObserverMock.trigger(120, 60)
     resizeObserverMock.trigger(140, 70)
 
     // Nothing yet because of debounce (100ms in component)
-    expect(eventsPublisher.publish).not.toHaveBeenCalled()
+    expect(resizeEventsPublisher.publish).not.toHaveBeenCalled()
 
     // Advance time by slightly more than debounce
     tick(110)
 
-    expect(eventsPublisher.publish).toHaveBeenCalledTimes(1)
+    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
 
-    const arg = eventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
+    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
 
-    expect(arg.type).toBe(EventType.SLOT_GROUP_RESIZED)
-    expect(arg.payload.slotName).toBe('test-slot')
-    expect(arg.payload.slotDetails).toEqual({ width: 140, height: 70 })
+    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
+    expect(arg.payload.slotGroupName).toBe('test-slot')
+    expect(arg.payload.slotGroupDetails).toEqual({ width: 140, height: 70 })
+  }))
+
+  it('should publish SLOT_GROUP_RESIZED when requestedEventsChanged$ emits for this slot group', fakeAsync(() => {
+    // Simulate initial size
+    resizeObserverMock.trigger(200, 100)
+
+    tick(110) // Wait for debounce
+
+    resizeEventsPublisher.publish.mockClear()
+    ;(component as any)['requestedEventsChanged$'] = of({
+      payload: { type: ResizedEventType.SLOT_GROUP_RESIZED, name: 'test-slot' }
+    })
+    component.ngOnInit() // Re-initialize to set up subscription
+
+    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
+
+    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
+
+    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
+    expect(arg.payload.slotGroupName).toBe('test-slot')
+    expect(arg.payload.slotGroupDetails).toEqual({ width: 200, height: 100 })
   }))
 
   it('should disconnect ResizeObserver and complete subject on destroy', () => {
@@ -124,7 +148,8 @@ describe('SlotGroupComponent', () => {
   })
 
   it('does not throw if resizeObserver is undefined on destroy (covers optional chain false branch)', () => {
-    (component as any).resizeObserver = undefined
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
+    ;(component as any).resizeObserver = undefined
     expect(() => fixture.destroy()).not.toThrow()
   })
 

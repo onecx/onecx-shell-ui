@@ -1,8 +1,14 @@
 import { CommonModule } from '@angular/common'
 import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
-import { EventsPublisher, EventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
-import { debounceTime, Subject } from 'rxjs'
+import {
+  ResizedEventsPublisher,
+  SlotGroupResizedEvent,
+  ResizedEventsTopic,
+  RequestedEventsChangedEvent,
+  ResizedEventType
+} from '@onecx/integration-interface'
+import { BehaviorSubject, debounceTime, filter, Subscription } from 'rxjs'
 import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 
 export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
@@ -88,11 +94,20 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
     }
   })
 
+  private readonly subscriptions: Subscription[] = []
+
   private resizeObserver: ResizeObserver | undefined
-  private readonly resizeSubject = new Subject<{ width: number; height: number }>()
+  private readonly componentSize$ = new BehaviorSubject<{ width: number; height: number }>({
+    width: -1,
+    height: -1
+  })
   private readonly resizeDebounceTimeMs = 100
 
-  private readonly eventsPublisher = new EventsPublisher()
+  private readonly resizedEventsPublisher = new ResizedEventsPublisher()
+  private readonly resizedEventsTopic = new ResizedEventsTopic()
+  private readonly requestedEventsChanged$ = this.resizedEventsTopic.pipe(
+    filter((event): event is RequestedEventsChangedEvent => event.type === ResizedEventType.REQUESTED_EVENTS_CHANGED)
+  )
 
   private readonly elementRef = inject(ElementRef)
 
@@ -101,8 +116,10 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.resizedEventsTopic.destroy()
+    this.subscriptions.forEach((sub) => sub.unsubscribe())
     this.resizeObserver?.disconnect()
-    this.resizeSubject.complete()
+    this.componentSize$.complete()
   }
 
   private observeSlotSizeChanges() {
@@ -111,21 +128,37 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
       if (entry) {
         const width = entry.contentRect.width
         const height = entry.contentRect.height
-        this.resizeSubject.next({ width, height })
+        this.componentSize$.next({ width, height })
       }
     })
 
-    this.resizeSubject.pipe(debounceTime(this.resizeDebounceTimeMs)).subscribe(({ width, height }) => {
+    this.componentSize$.pipe(debounceTime(this.resizeDebounceTimeMs)).subscribe(({ width, height }) => {
       const slotGroupResizedEvent: SlotGroupResizedEvent = {
-        type: EventType.SLOT_GROUP_RESIZED,
+        type: ResizedEventType.SLOT_GROUP_RESIZED,
         payload: {
-          slotName: this.name(),
-          slotDetails: { width, height }
+          slotGroupName: this.name(),
+          slotGroupDetails: { width, height }
         }
       }
-      this.eventsPublisher.publish(slotGroupResizedEvent)
+      this.resizedEventsPublisher.publish(slotGroupResizedEvent)
     })
 
     this.resizeObserver.observe(this.elementRef.nativeElement)
+
+    const requestedEventsChangedSub = this.requestedEventsChanged$.subscribe((event) => {
+      if (event.payload.type === ResizedEventType.SLOT_GROUP_RESIZED && event.payload.name === this.name()) {
+        const { width, height } = this.componentSize$.getValue()
+        const slotGroupResizedEvent: SlotGroupResizedEvent = {
+          type: ResizedEventType.SLOT_GROUP_RESIZED,
+          payload: {
+            slotGroupName: this.name(),
+            slotGroupDetails: { width, height }
+          }
+        }
+        this.resizedEventsPublisher.publish(slotGroupResizedEvent)
+      }
+    })
+
+    this.subscriptions.push(requestedEventsChangedSub)
   }
 }

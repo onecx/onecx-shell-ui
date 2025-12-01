@@ -3,15 +3,18 @@ import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import { EventsPublisher, EventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
 import { debounceTime, Subject } from 'rxjs'
+import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 
-type SlotClassType = string | string[] | Set<string> | { [key: string]: any }
+export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
 
 @Component({
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
   imports: [AngularRemoteComponentsModule, CommonModule],
   host: {
-    '[attr.name]': 'name()'
+    '[attr.name]': 'name()',
+    '[class]': '"flex justify-content-between " + computedSlotGroupClasses()',
+    '[style]': 'slotGroupStyles()'
   },
   standalone: true
 })
@@ -22,47 +25,48 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   slotStyles = input<{ [key: string]: any }>({})
 
-  slotClasses = input<SlotClassType>('')
+  slotClasses = input<NgClassInputType>('')
 
   slotInputs = input<Record<string, unknown>>({})
 
   slotOutputs = input<Record<string, EventEmitter<any>>>({})
 
-  groupStyles = input<{ [key: string]: any }>({})
+  slotGroupStyles = input<{ [key: string]: any }>({})
 
-  groupClasses = input<SlotClassType>('')
+  slotGroupClasses = input<NgClassInputType>('')
 
   rcWrapperStyles = input<{ [key: string]: any }>({})
 
-  rcWrapperClasses = input<SlotClassType>('')
+  rcWrapperClasses = input<NgClassInputType>('')
 
-  // slot-group container styles
-  containerStyles = computed(() => {
-    const direction = this.direction()
-    const defaultStyles: { [key: string]: any } = {
-      'flex-direction': direction
+  // Compute slot-group classes with direction
+  computedSlotGroupClasses = computed(() => {
+    const directionClasses = {
+      row: 'flex-row w-full',
+      'row-reverse': 'flex-row-reverse w-full',
+      column: 'flex-column h-full',
+      'column-reverse': 'flex-column-reverse h-full'
     }
 
-    if (direction === 'row' || direction === 'row-reverse') {
-      defaultStyles['width'] = '100%'
-    } else if (direction === 'column' || direction === 'column-reverse') {
-      defaultStyles['height'] = '100%'
-    }
+    const baseClasses = directionClasses[this.direction()]
+    const customClasses = normalizeClassesToString(this.slotGroupClasses())
 
-    return {
-      ...defaultStyles,
-      ...this.groupStyles()
-    }
+    return `${baseClasses} ${customClasses}`.trim()
   })
 
-  // slot styles applied to each slot inside the slot-group
-  computedSlotStyles = computed(() => {
-    return {
-      display: 'flex',
-      'flex-direction': this.direction(),
-      'align-items': 'center',
-      ...this.slotStyles()
+  // Compute slot classes with direction
+  computedSlotClasses = computed(() => {
+    const directionClasses = {
+      row: 'flex-row',
+      'row-reverse': 'flex-row-reverse',
+      column: 'flex-column',
+      'column-reverse': 'flex-column-reverse'
     }
+
+    const baseClasses = directionClasses[this.direction()]
+    const customClasses = normalizeClassesToString(this.slotClasses())
+
+    return `${baseClasses} ${customClasses}`.trim()
   })
 
   // we need to control one input of the slots individually later

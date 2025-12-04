@@ -55,17 +55,17 @@ import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 
 async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const { fetchShellStyles, loadShellStyles } = await import('./shell/utils/styles/shell-styles.utils')
+  const [, { fetchShellStyles, loadShellStyles }] = await Promise.all([
+    appStateService.isAuthenticated$.isInitialized,
+    import('./shell/utils/styles/shell-styles.utils')])
   const css = await fetchShellStyles(http)
   loadShellStyles(css)
 }
 
 async function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const { fetchPortalLayoutStyles, loadPortalLayoutStyles } = await import(
+  const [, { fetchPortalLayoutStyles, loadPortalLayoutStyles }] = await Promise.all([appStateService.isAuthenticated$.isInitialized, import(
     './shell/utils/styles/legacy-style.utils'
-  )
+  )])
   const css = await fetchPortalLayoutStyles(http)
   loadPortalLayoutStyles(css)
 }
@@ -230,7 +230,7 @@ globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
   if (checkIfReactRouterInitialization(data, url)) {
     const _url = _constructCurrentURL()
     // Use current URL (instead of undefined) but keep data from react-router
-  replaceState.bind(globalThis.history)(data, '', _url)
+    replaceState.bind(globalThis.history)(data, '', _url)
     preventLocationPropagation = true
   }
 
@@ -342,7 +342,7 @@ export async function shareMfContainer() {
 @NgModule({
   declarations: [
     AppComponent,
-    
+
   ],
   imports: [
     BrowserModule,
@@ -362,7 +362,7 @@ export async function shareMfContainer() {
         useClass: MultiLanguageMissingTranslationHandler
       }
     }),
-    
+
     PortalViewportComponent,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent
@@ -437,4 +437,4 @@ export async function shareMfContainer() {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

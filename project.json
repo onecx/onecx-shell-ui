@@ -108,6 +108,9 @@
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
+        },
+        "local-env": {
+          "baseHref": "/onecx-shell/"
         }
       },
       "defaultConfiguration": "production"
@@ -120,6 +123,13 @@
         },
         "development": {
           "buildTarget": "onecx-shell-ui:build:development"
+        },
+        "local-env": {
+          "buildTarget": "onecx-shell-ui:build:local-env",
+          "host": "0.0.0.0",
+          "disableHostCheck": true,
+          "publicHost": "http://localhost:4300/onecx-shell/",
+          "port": 4300
         }
       },
       "defaultConfiguration": "development",

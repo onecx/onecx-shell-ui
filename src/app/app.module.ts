@@ -16,7 +16,7 @@ import {
   ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
-import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
+import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import { createTranslateLoader, MultiLanguageMissingTranslationHandler, provideTranslationPathFromMeta, SKIP_STYLE_SCOPING } from '@onecx/angular-utils'
@@ -45,7 +45,6 @@ import { initializationErrorHandler } from './shell/utils/initialization-error-h
 
 import { CommonModule } from '@angular/common'
 import { providePrimeNG } from 'primeng/config'
-import { TooltipModule } from 'primeng/tooltip'
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
@@ -363,8 +362,7 @@ export async function shareMfContainer() {
         useClass: MultiLanguageMissingTranslationHandler
       }
     }),
-    AngularRemoteComponentsModule,
-    TooltipModule,
+    
     PortalViewportComponent,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent

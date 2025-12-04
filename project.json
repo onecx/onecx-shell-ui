@@ -107,10 +107,11 @@
           "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
-          "namedChunks": true
+          "namedChunks": true,
         },
         "local-env": {
-          "baseHref": "/onecx-shell/"
+          "baseHref": "/onecx-shell/",
+          "outputHashing": "all"
         }
       },
       "defaultConfiguration": "production"

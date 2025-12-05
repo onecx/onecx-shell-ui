@@ -26,6 +26,7 @@
     "browser": "npx browserslist",
     "prepare": "husky || true",
     "start": "nx serve --configuration=development --proxy-config=proxy.conf.js",
+    "start:local-env": "nx serve --configuration=local-env --proxy-config=proxy.local-env.conf.js",
     "test": "nx test",
     "test:ci": "nx test --no-color --watch=false --browsers=ChromeHeadless --coverage",
     "sonar": "npx sonar-scanner",

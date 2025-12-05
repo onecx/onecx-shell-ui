@@ -3,9 +3,13 @@ import { Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
+import { CommonModule } from '@angular/common'
+import { RouterModule } from '@angular/router'
+import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, TranslateModule],
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>

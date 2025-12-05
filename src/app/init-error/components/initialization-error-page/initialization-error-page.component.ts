@@ -1,6 +1,8 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
+import { CommonModule } from '@angular/common'
+import { TranslateModule } from '@ngx-translate/core'
 
 import { EventsPublisher } from '@onecx/integration-interface'
 
@@ -14,7 +16,8 @@ interface InitializationError {
 }
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
   templateUrl: './initialization-error-page.component.html'
 })
 export class InitializationErrorPageComponent {

@@ -1,11 +1,13 @@
 import { Component } from '@angular/core'
-import { Location } from '@angular/common'
+import { Location, CommonModule } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
+import { TranslateModule } from '@ngx-translate/core'
 
 import { getLocation } from '@onecx/accelerator'
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>

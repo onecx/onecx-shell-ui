@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.lang$.subscribe((lang) => {
+      document.documentElement.lang = lang;
       this.translateService.use(lang)
     })
     merge(
@@ -29,6 +30,8 @@ export class AppComponent implements OnInit {
       this.translateService.onDefaultLangChange
     )
       .pipe(mergeMap(() => this.translateService.get('SHELL')))
-      .subscribe((res) => this.config.setTranslation(res))
+      .subscribe((res) => {
+        this.config.setTranslation(res)
+      })
   }
 }

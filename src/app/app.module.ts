@@ -50,7 +50,6 @@ import { appRoutes } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
-// Home and Welcome components moved to a lazy-loaded submodule
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 

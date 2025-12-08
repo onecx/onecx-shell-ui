@@ -16,8 +16,6 @@ import { PermissionsTopic } from '@onecx/integration-interface'
 import { appRoutes } from 'src/app/app.routes'
 import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
 
-import { HomeComponent } from '../components/home/home.component'
-import { PageNotFoundComponent } from '../components/not-found-page.component'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
 import { updateStylesForMfeChange } from '@onecx/angular-utils'
 import { HttpClient } from '@angular/common/http'
@@ -25,7 +23,7 @@ import { PermissionsCacheService } from './permissions-cache.service'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
-  component: PageNotFoundComponent,
+  loadChildren: () => import('src/app/not-found/not-found.module').then((m) => m.NotFoundModule),
   title: 'OneCX Error'
 }
 
@@ -52,7 +50,7 @@ export class RoutesService {
       .subscribe(this.showContent$)
   }
 
-  async init(routes: BffGeneratedRoute[]): Promise<unknown> {
+  async init(routes: BffGeneratedRoute[]): Promise<void> {
     routes.sort(this.sortRoutes)
     const generatedRoutes = await Promise.all(routes.map((r) => this.convertToRoute(r)))
     if (!(await this.containsRouteForWorkspace(routes))) {
@@ -61,7 +59,6 @@ export class RoutesService {
     }
     this.router.resetConfig([...appRoutes, ...generatedRoutes, DEFAULT_CATCH_ALL_ROUTE])
     console.log('🧭 Adding Workspace routes:\n' + this.listRoutes(routes))
-    return Promise.resolve()
   }
 
   private listRoutes(routes: BffGeneratedRoute[]): string {
@@ -116,11 +113,12 @@ export class RoutesService {
 
   private async updateAppState(r: BffGeneratedRoute, joinedBaseUrl: string): Promise<boolean> {
     const currentGlobalLoading = await firstValueFrom(this.appStateService.globalLoading$.asObservable())
-    const currentMfeInfo = !this.isFirstLoad
-      ? await firstValueFrom(this.appStateService.currentMfe$.asObservable())
-      : undefined
+    let currentMfeInfo: { remoteBaseUrl?: string } | undefined
+    if (!this.isFirstLoad) {
+      currentMfeInfo = await firstValueFrom(this.appStateService.currentMfe$.asObservable())
+    }
 
-    if (this.isFirstLoad || currentMfeInfo?.remoteBaseUrl !== r.url) {
+  if (this.isFirstLoad || (currentMfeInfo?.remoteBaseUrl ?? undefined) !== r.url) {
       this.isFirstLoad = false
       if (!currentGlobalLoading) {
         this.showContent$.next(false)
@@ -220,7 +218,7 @@ export class RoutesService {
   private async containsRouteForWorkspace(routes: BffGeneratedRoute[]): Promise<boolean> {
     const baseUrl = (await firstValueFrom(this.appStateService.currentWorkspace$.asObservable())).baseUrl
     const routeUrl = await this.toRouteUrl(baseUrl)
-    return routes.find((r) => r.baseUrl === routeUrl) !== undefined
+    return routes.some((r) => r.baseUrl === routeUrl)
   }
 
   private async createFallbackRoute(): Promise<Route> {
@@ -233,7 +231,7 @@ export class RoutesService {
     if (!currentWorkspace.homePage) {
       return {
         ...route,
-        component: HomeComponent
+        loadChildren: () => import('src/app/home/home.module').then((m) => m.HomeModule)
       }
     }
     return {

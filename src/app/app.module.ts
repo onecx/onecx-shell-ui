@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
-import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
 import {
   APP_CONFIG,
@@ -17,10 +16,10 @@ import {
   ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
-import { AngularRemoteComponentsModule, SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
+import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
-import { createTranslateLoader, provideTranslationPathFromMeta, SKIP_STYLE_SCOPING } from '@onecx/angular-utils'
+import { createTranslateLoader, MultiLanguageMissingTranslationHandler, provideTranslationPathFromMeta, SKIP_STYLE_SCOPING } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
 import {
@@ -40,52 +39,39 @@ import {
 } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
 
-import { HomeComponent } from './shell/components/home/home.component'
-import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
-import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
 import { CommonModule } from '@angular/common'
 import { providePrimeNG } from 'primeng/config'
-import { SkeletonModule } from 'primeng/skeleton'
-import { ToastModule } from 'primeng/toast'
-import { TooltipModule } from 'primeng/tooltip'
-import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
-import { ErrorPageComponent } from './shell/components/error-page.component'
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
-import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
-import { dynamicContentInitializer } from './shell/utils/styles/dynamic-content-initializer.utils'
-import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
-import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
-import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 
-async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const css = await fetchShellStyles(http)
-  loadShellStyles(css)
-}
-
-async function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const css = await fetchPortalLayoutStyles(http)
-  loadPortalLayoutStyles(css)
-}
-
-async function scopePolyfillInitializer(configService: ConfigurationService) {
+async function styleInitializer(configService: ConfigurationService, http: HttpClient) {
   const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
   if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
+    const { applyPrecisionPolyfill } = await import('src/scope-polyfill/polyfill')
     applyPrecisionPolyfill()
   } else {
+    const { applyPerformancePolyfill } = await import('src/scope-polyfill/polyfill')
     applyPerformancePolyfill()
   }
+
+  await Promise.all([
+    import('./shell/utils/styles/shell-styles.utils').then(async ({ fetchShellStyles, loadShellStyles }) => {
+      const css = await fetchShellStyles(http)
+      loadShellStyles(css)
+    }),
+    import('./shell/utils/styles/legacy-style.utils').then(async ({ fetchPortalLayoutStyles, loadPortalLayoutStyles }) => {
+      const css = await fetchPortalLayoutStyles(http)
+      loadPortalLayoutStyles(css)
+    })])
 }
 
 function publishCurrentWorkspace(
@@ -113,6 +99,7 @@ export async function workspaceConfigInitializer(
   router: Router
 ) {
   await appStateService.isAuthenticated$.isInitialized
+
   const loadWorkspaceConfigResponse = await firstValueFrom(
     workspaceConfigBffService
       .loadWorkspaceConfig({
@@ -120,9 +107,7 @@ export async function workspaceConfigInitializer(
       })
       .pipe(
         retry({ delay: 500, count: 3 }),
-        catchError((error) => {
-          return initializationErrorHandler(error, router)
-        })
+        catchError((error) => initializationErrorHandler(error, router))
       )
   )
 
@@ -192,8 +177,8 @@ export function configurationServiceInitializer(configurationService: Configurat
 
 let isFirst = true
 let isInitialPageLoad = true
-const pushState = window.history.pushState
-window.history.pushState = (data: any, unused: string, url?: string) => {
+const pushState = globalThis.history.pushState
+globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
   if (data && 'isRouterSync' in data) {
     delete data.isRouterSync
@@ -202,7 +187,7 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
     console.warn('Navigation ID is -1, indicating a potential invalid microfrontend initialization.')
     return
   }
-  pushState.bind(window.history)(data, unused, url)
+  pushState.bind(globalThis.history)(data, unused, url)
   if (!isRouterSync) {
     new CurrentLocationPublisher().publish({
       url,
@@ -223,8 +208,8 @@ window.history.pushState = (data: any, unused: string, url?: string) => {
   isInitialPageLoad = false
 }
 
-const replaceState = window.history.replaceState
-window.history.replaceState = (data: any, unused: string, url?: string) => {
+const replaceState = globalThis.history.replaceState
+globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
   let preventLocationPropagation = false
   if (data && 'isRouterSync' in data) {
@@ -238,7 +223,7 @@ window.history.replaceState = (data: any, unused: string, url?: string) => {
   if (checkIfReactRouterInitialization(data, url)) {
     const _url = _constructCurrentURL()
     // Use current URL (instead of undefined) but keep data from react-router
-    replaceState.bind(window.history)(data, '', _url)
+    replaceState.bind(globalThis.history)(data, '', _url)
     preventLocationPropagation = true
   }
 
@@ -301,13 +286,13 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
       )}${location.search}${location.hash}`
       if (routerUrl !== lastUrl) {
         lastUrl = routerUrl
-        if (!isFirstRoute) {
+        if (isFirstRoute) {
+          isFirstRoute = false
+        } else {
           router.navigateByUrl(routerUrl, {
             replaceUrl: true,
             state: { isRouterSync: true }
           })
-        } else {
-          isFirstRoute = false
         }
       }
     })
@@ -327,11 +312,11 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   console.log(`🎨 Applying theme: ${theme.name}`)
   await themeService.currentTheme$.publish(theme)
   if (theme.properties) {
-    Object.values(theme.properties).forEach((group) => {
+    for (const group of Object.values(theme.properties)) {
       for (const [key, value] of Object.entries(group)) {
         document.documentElement.style.setProperty(`--${key}`, value)
       }
-    })
+    }
   }
 }
 
@@ -350,11 +335,7 @@ export async function shareMfContainer() {
 @NgModule({
   declarations: [
     AppComponent,
-    PageNotFoundComponent,
-    ErrorPageComponent,
-    HomeComponent,
-    WelcomeMessageComponent,
-    InitializationErrorPageComponent
+
   ],
   imports: [
     BrowserModule,
@@ -371,19 +352,26 @@ export async function shareMfContainer() {
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
-        useClass: AngularAcceleratorMissingTranslationHandler
+        useClass: MultiLanguageMissingTranslationHandler
       }
     }),
-    AngularAcceleratorModule,
-    AngularRemoteComponentsModule,
-    TooltipModule,
-    ToastModule,
-    SkeletonModule,
+
     PortalViewportComponent,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent
   ],
   providers: [
+    provideAppInitializer(() => {
+      return workspaceConfigInitializer(
+        inject(WorkspaceConfigBffService),
+        inject(RoutesService),
+        inject(ThemeService),
+        inject(AppStateService),
+        inject(RemoteComponentsService),
+        inject(ParametersService),
+        inject(Router)
+      )
+    }),
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideHttpClient(withInterceptorsFromDi()),
@@ -399,24 +387,14 @@ export async function shareMfContainer() {
       permissionProxyInitializer(inject(PermissionProxyService))
     }),
     provideAppInitializer(() => {
-      return workspaceConfigInitializer(
-        inject(WorkspaceConfigBffService),
-        inject(RoutesService),
-        inject(ThemeService),
-        inject(AppStateService),
-        inject(RemoteComponentsService),
-        inject(ParametersService),
-        inject(Router)
-      )
-    }),
-    provideAppInitializer(() => {
-      return scopePolyfillInitializer(inject(ConfigurationService))
-    }),
-    provideAppInitializer(() => {
       return configurationServiceInitializer(inject(ConfigurationService))
     }),
     provideAppInitializer(() => {
-      return dynamicContentInitializer(inject(ConfigurationService))
+      // Load dynamic content initializer lazily to avoid static import
+      const configService = inject(ConfigurationService)
+      return import('./shell/utils/styles/dynamic-content-initializer.utils').then(({ dynamicContentInitializer }) =>
+        dynamicContentInitializer(configService)
+      )
     }),
     provideAppInitializer(() => {
       return userProfileInitializer(
@@ -430,20 +408,20 @@ export async function shareMfContainer() {
       return slotInitializer(inject(SLOT_SERVICE))
     }),
     provideAppInitializer(() => {
-      return portalLayoutStylesInitializer(inject(AppStateService), inject(HttpClient))
+      return styleInitializer(inject(ConfigurationService), inject(HttpClient))
     }),
     provideAppInitializer(() => {
       return shareMfContainer()
     }),
     provideAppInitializer(() => {
-      return shellStylesInitializer(inject(AppStateService), inject(HttpClient))
-    }),
-    provideAppInitializer(() => {
-      return styleChangesListenerInitializer()
+      // Lazily initialize style changes listener
+      return import('./shell/utils/styles/style-changes-listener.utils').then(({ styleChangesListenerInitializer }) =>
+        styleChangesListenerInitializer()
+      )
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

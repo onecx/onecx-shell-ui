@@ -53,23 +53,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 
-async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  const [, { fetchShellStyles, loadShellStyles }] = await Promise.all([
-    appStateService.isAuthenticated$.isInitialized,
-    import('./shell/utils/styles/shell-styles.utils')])
-  const css = await fetchShellStyles(http)
-  loadShellStyles(css)
-}
-
-async function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  const [, { fetchPortalLayoutStyles, loadPortalLayoutStyles }] = await Promise.all([appStateService.isAuthenticated$.isInitialized, import(
-    './shell/utils/styles/legacy-style.utils'
-  )])
-  const css = await fetchPortalLayoutStyles(http)
-  loadPortalLayoutStyles(css)
-}
-
-async function scopePolyfillInitializer(configService: ConfigurationService) {
+async function styleInitializer(configService: ConfigurationService, http: HttpClient) {
   const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
   if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
     const { applyPrecisionPolyfill } = await import('src/scope-polyfill/polyfill')
@@ -78,6 +62,16 @@ async function scopePolyfillInitializer(configService: ConfigurationService) {
     const { applyPerformancePolyfill } = await import('src/scope-polyfill/polyfill')
     applyPerformancePolyfill()
   }
+
+  await Promise.all([
+    import('./shell/utils/styles/shell-styles.utils').then(async ({ fetchShellStyles, loadShellStyles }) => {
+      const css = await fetchShellStyles(http)
+      loadShellStyles(css)
+    }),
+    import('./shell/utils/styles/legacy-style.utils').then(async ({ fetchPortalLayoutStyles, loadPortalLayoutStyles }) => {
+      const css = await fetchPortalLayoutStyles(http)
+      loadPortalLayoutStyles(css)
+    })])
 }
 
 function publishCurrentWorkspace(
@@ -393,9 +387,6 @@ export async function shareMfContainer() {
       permissionProxyInitializer(inject(PermissionProxyService))
     }),
     provideAppInitializer(() => {
-      return scopePolyfillInitializer(inject(ConfigurationService))
-    }),
-    provideAppInitializer(() => {
       return configurationServiceInitializer(inject(ConfigurationService))
     }),
     provideAppInitializer(() => {
@@ -417,13 +408,10 @@ export async function shareMfContainer() {
       return slotInitializer(inject(SLOT_SERVICE))
     }),
     provideAppInitializer(() => {
-      return portalLayoutStylesInitializer(inject(AppStateService), inject(HttpClient))
+      return styleInitializer(inject(ConfigurationService), inject(HttpClient))
     }),
     provideAppInitializer(() => {
       return shareMfContainer()
-    }),
-    provideAppInitializer(() => {
-      return shellStylesInitializer(inject(AppStateService), inject(HttpClient))
     }),
     provideAppInitializer(() => {
       // Lazily initialize style changes listener

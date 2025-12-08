@@ -1,1 +1,1 @@
-* xref:documentation:onecx-shell-ui:index.adoc[User Interface]
+** xref:documentation:onecx-shell-ui:index.adoc[User Interface]

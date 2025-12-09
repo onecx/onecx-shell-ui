@@ -1,17 +1,26 @@
 import { CommonModule } from '@angular/common'
 import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
-import { EventsPublisher, EventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
-import { debounceTime, Subject } from 'rxjs'
+import {
+  ResizedEventsPublisher,
+  SlotGroupResizedEvent,
+  ResizedEventsTopic,
+  RequestedEventsChangedEvent,
+  ResizedEventType
+} from '@onecx/integration-interface'
+import { BehaviorSubject, debounceTime, filter, Subscription } from 'rxjs'
+import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 
-type SlotClassType = string | string[] | Set<string> | { [key: string]: any }
+export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
 
 @Component({
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
   imports: [AngularRemoteComponentsModule, CommonModule],
   host: {
-    '[attr.name]': 'name()'
+    '[attr.name]': 'name()',
+    '[class]': '"flex justify-content-between " + computedSlotGroupClasses()',
+    '[style]': 'slotGroupStyles()'
   },
   standalone: true
 })
@@ -22,47 +31,48 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   slotStyles = input<{ [key: string]: any }>({})
 
-  slotClasses = input<SlotClassType>('')
+  slotClasses = input<NgClassInputType>('')
 
   slotInputs = input<Record<string, unknown>>({})
 
   slotOutputs = input<Record<string, EventEmitter<any>>>({})
 
-  groupStyles = input<{ [key: string]: any }>({})
+  slotGroupStyles = input<{ [key: string]: any }>({})
 
-  groupClasses = input<SlotClassType>('')
+  slotGroupClasses = input<NgClassInputType>('')
 
   rcWrapperStyles = input<{ [key: string]: any }>({})
 
-  rcWrapperClasses = input<SlotClassType>('')
+  rcWrapperClasses = input<NgClassInputType>('')
 
-  // slot-group container styles
-  containerStyles = computed(() => {
-    const direction = this.direction()
-    const defaultStyles: { [key: string]: any } = {
-      'flex-direction': direction
+  // Compute slot-group classes with direction
+  computedSlotGroupClasses = computed(() => {
+    const directionClasses = {
+      row: 'flex-row w-full',
+      'row-reverse': 'flex-row-reverse w-full',
+      column: 'flex-column h-full',
+      'column-reverse': 'flex-column-reverse h-full'
     }
 
-    if (direction === 'row' || direction === 'row-reverse') {
-      defaultStyles['width'] = '100%'
-    } else if (direction === 'column' || direction === 'column-reverse') {
-      defaultStyles['height'] = '100%'
-    }
+    const baseClasses = directionClasses[this.direction()]
+    const customClasses = normalizeClassesToString(this.slotGroupClasses())
 
-    return {
-      ...defaultStyles,
-      ...this.groupStyles()
-    }
+    return `${baseClasses} ${customClasses}`.trim()
   })
 
-  // slot styles applied to each slot inside the slot-group
-  computedSlotStyles = computed(() => {
-    return {
-      display: 'flex',
-      'flex-direction': this.direction(),
-      'align-items': 'center',
-      ...this.slotStyles()
+  // Compute slot classes with direction
+  computedSlotClasses = computed(() => {
+    const directionClasses = {
+      row: 'flex-row',
+      'row-reverse': 'flex-row-reverse',
+      column: 'flex-column',
+      'column-reverse': 'flex-column-reverse'
     }
+
+    const baseClasses = directionClasses[this.direction()]
+    const customClasses = normalizeClassesToString(this.slotClasses())
+
+    return `${baseClasses} ${customClasses}`.trim()
   })
 
   // we need to control one input of the slots individually later
@@ -84,11 +94,20 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
     }
   })
 
+  private readonly subscriptions: Subscription[] = []
+
   private resizeObserver: ResizeObserver | undefined
-  private readonly resizeSubject = new Subject<{ width: number; height: number }>()
+  private readonly componentSize$ = new BehaviorSubject<{ width: number; height: number }>({
+    width: -1,
+    height: -1
+  })
   private readonly resizeDebounceTimeMs = 100
 
-  private readonly eventsPublisher = new EventsPublisher()
+  private readonly resizedEventsPublisher = new ResizedEventsPublisher()
+  private readonly resizedEventsTopic = new ResizedEventsTopic()
+  private readonly requestedEventsChanged$ = this.resizedEventsTopic.pipe(
+    filter((event): event is RequestedEventsChangedEvent => event.type === ResizedEventType.REQUESTED_EVENTS_CHANGED)
+  )
 
   private readonly elementRef = inject(ElementRef)
 
@@ -97,8 +116,10 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.resizedEventsTopic.destroy()
+    this.subscriptions.forEach((sub) => sub.unsubscribe())
     this.resizeObserver?.disconnect()
-    this.resizeSubject.complete()
+    this.componentSize$.complete()
   }
 
   private observeSlotSizeChanges() {
@@ -107,21 +128,37 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
       if (entry) {
         const width = entry.contentRect.width
         const height = entry.contentRect.height
-        this.resizeSubject.next({ width, height })
+        this.componentSize$.next({ width, height })
       }
     })
 
-    this.resizeSubject.pipe(debounceTime(this.resizeDebounceTimeMs)).subscribe(({ width, height }) => {
+    this.componentSize$.pipe(debounceTime(this.resizeDebounceTimeMs)).subscribe(({ width, height }) => {
       const slotGroupResizedEvent: SlotGroupResizedEvent = {
-        type: EventType.SLOT_GROUP_RESIZED,
+        type: ResizedEventType.SLOT_GROUP_RESIZED,
         payload: {
-          slotName: this.name(),
-          slotDetails: { width, height }
+          slotGroupName: this.name(),
+          slotGroupDetails: { width, height }
         }
       }
-      this.eventsPublisher.publish(slotGroupResizedEvent)
+      this.resizedEventsPublisher.publish(slotGroupResizedEvent)
     })
 
     this.resizeObserver.observe(this.elementRef.nativeElement)
+
+    const requestedEventsChangedSub = this.requestedEventsChanged$.subscribe((event) => {
+      if (event.payload.type === ResizedEventType.SLOT_GROUP_RESIZED && event.payload.name === this.name()) {
+        const { width, height } = this.componentSize$.getValue()
+        const slotGroupResizedEvent: SlotGroupResizedEvent = {
+          type: ResizedEventType.SLOT_GROUP_RESIZED,
+          payload: {
+            slotGroupName: this.name(),
+            slotGroupDetails: { width, height }
+          }
+        }
+        this.resizedEventsPublisher.publish(slotGroupResizedEvent)
+      }
+    })
+
+    this.subscriptions.push(requestedEventsChangedSub)
   }
 }

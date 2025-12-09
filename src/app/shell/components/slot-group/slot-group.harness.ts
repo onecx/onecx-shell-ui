@@ -51,28 +51,29 @@ export class SlotGroupHarness extends ContentContainerComponentHarness {
   }
 
   /**
-   * Gets specific CSS property values from the slot group's main container.
+   * Gets specific CSS property values from the slot group's host element.
    * @param properties Array of CSS property names to retrieve.
    * @returns Promise that resolves to an object mapping property names to their CSS values.
    */
   async getContainerStyles(properties: string[]): Promise<Record<string, string>> {
-    const container = await this.getDivContainer()
-    const element = await container.host()
+    const host = await this.host()
     const result: Record<string, string> = {}
 
     for (const property of properties) {
-      result[property] = await element.getCssValue(property)
+      result[property] = await host.getCssValue(property)
     }
     return result
   }
 
   /**
-   * Gets the CSS classes from the slot group's main container.
+   * Gets the CSS classes from the slot group's host element.
    * @returns Promise that resolves to an array of CSS class names.
    */
   async getContainerGroupClasses(): Promise<string[]> {
-    const container = await this.getDivContainer()
-    return await container.getClassList()
+    const host = await this.host()
+    const classAttr = await host.getAttribute('class')
+    console.log('Container class attribute:', classAttr)
+    return classAttr ? classAttr.split(' ') : []
   }
 
   /**

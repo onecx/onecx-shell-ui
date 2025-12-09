@@ -1,19 +1,17 @@
 import { Route } from '@angular/router'
 
-import { InitializationErrorPageComponent } from './shell/components/initialization-error-page/initialization-error-page.component'
-import { ErrorPageComponent } from './shell/components/error-page.component'
+// Initialization error page is lazy-loaded via InitErrorModule
 
 export const appRoutes: Route[] = [
   {
     path: 'portal-initialization-error-page',
     data: { message: '' },
-    component: InitializationErrorPageComponent,
+    loadChildren: () => import('src/app/init-error/init-error.module').then((m) => m.InitErrorModule),
     title: 'Initialization Error'
   },
   {
     path: 'remote-loading-error-page',
-    data: { requestedApplicationPath: '' },
-    component: ErrorPageComponent,
+    loadChildren: () => import('src/app/error/error.module').then((m) => m.ErrorModule),
     title: 'Error'
   }
 ]

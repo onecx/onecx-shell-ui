@@ -26,8 +26,9 @@ describe('InitializationErrorPageComponent', () => {
     } as any
 
     TestBed.configureTestingModule({
-      declarations: [InitializationErrorPageComponent],
+      declarations: [],
       imports: [
+        InitializationErrorPageComponent,
         TooltipModule,
         TranslateTestingModule.withTranslations({
           en: require('../../../../assets/i18n/en.json')

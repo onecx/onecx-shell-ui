@@ -19,7 +19,12 @@ import {
 import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
-import { createTranslateLoader, MultiLanguageMissingTranslationHandler, provideTranslationPathFromMeta, SKIP_STYLE_SCOPING } from '@onecx/angular-utils'
+import {
+  createTranslateLoader,
+  MultiLanguageMissingTranslationHandler,
+  provideTranslationPathFromMeta,
+  SKIP_STYLE_SCOPING
+} from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
 import {
@@ -53,7 +58,11 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 
-async function styleInitializer(configService: ConfigurationService, http: HttpClient) {
+async function styleInitializer(
+  configService: ConfigurationService,
+  http: HttpClient,
+  appStateService: AppStateService
+) {
   const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
   if (mode === POLYFILL_SCOPE_MODE.PRECISION) {
     const { applyPrecisionPolyfill } = await import('src/scope-polyfill/polyfill')
@@ -64,14 +73,21 @@ async function styleInitializer(configService: ConfigurationService, http: HttpC
   }
 
   await Promise.all([
-    import('./shell/utils/styles/shell-styles.utils').then(async ({ fetchShellStyles, loadShellStyles }) => {
+    Promise.all([
+      import('./shell/utils/styles/shell-styles.utils'),
+      appStateService.isAuthenticated$.isInitialized
+    ]).then(async ([{ fetchShellStyles, loadShellStyles }, _]) => {
       const css = await fetchShellStyles(http)
       loadShellStyles(css)
     }),
-    import('./shell/utils/styles/legacy-style.utils').then(async ({ fetchPortalLayoutStyles, loadPortalLayoutStyles }) => {
+    Promise.all([
+      import('./shell/utils/styles/legacy-style.utils'),
+      appStateService.isAuthenticated$.isInitialized
+    ]).then(async ([{ fetchPortalLayoutStyles, loadPortalLayoutStyles }, _]) => {
       const css = await fetchPortalLayoutStyles(http)
       loadPortalLayoutStyles(css)
-    })])
+    })
+  ])
 }
 
 function publishCurrentWorkspace(
@@ -333,10 +349,7 @@ export async function shareMfContainer() {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -408,7 +421,7 @@ export async function shareMfContainer() {
       return slotInitializer(inject(SLOT_SERVICE))
     }),
     provideAppInitializer(() => {
-      return styleInitializer(inject(ConfigurationService), inject(HttpClient))
+      return styleInitializer(inject(ConfigurationService), inject(HttpClient), inject(AppStateService))
     }),
     provideAppInitializer(() => {
       return shareMfContainer()
@@ -424,4 +437,4 @@ export async function shareMfContainer() {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

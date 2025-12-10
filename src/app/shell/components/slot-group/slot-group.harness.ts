@@ -1,5 +1,4 @@
 import { BaseHarnessFilters, ContentContainerComponentHarness, HarnessPredicate } from '@angular/cdk/testing'
-import { DivHarness } from '@onecx/angular-testing'
 import { SlotHarness } from '@onecx/angular-remote-components/testing'
 
 export interface SlotGroupHarnessFilters extends BaseHarnessFilters {
@@ -40,14 +39,6 @@ export class SlotGroupHarness extends ContentContainerComponentHarness {
     }
 
     return null
-  }
-
-  /**
-   * Gets the main div container of the slot group.
-   * @returns Promise that resolves to the main div container.
-   */
-  async getDivContainer(): Promise<DivHarness> {
-    return await this.locatorFor(DivHarness)()
   }
 
   /**
@@ -127,124 +118,5 @@ export class SlotGroupHarness extends ContentContainerComponentHarness {
       }
     }
     return null
-  }
-
-  /**
-   * Checks if a specific slot position has any content.
-   * @param position The slot position to check ('start', 'center', or 'end').
-   * @returns Promise that resolves to true if the slot has content, false otherwise.
-   */
-  async slotHasContent(position: 'start' | 'center' | 'end'): Promise<boolean> {
-    let slot: SlotHarness | null = null
-
-    switch (position) {
-      case 'start':
-        slot = await this.getStartSlot()
-        break
-      case 'center':
-        slot = await this.getCenterSlot()
-        break
-      case 'end':
-        slot = await this.getEndSlot()
-        break
-    }
-
-    if (!slot) return false
-    return await slot.hasContent()
-  }
-
-  /**
-   * Gets all div containers from all slots (start, center, and end).
-   * @returns Promise that resolves to an array of all div containers from all slots.
-   */
-  async getAllSlotDivContainers(): Promise<DivHarness[]> {
-    const startSlotDivs = await this.getStartSlotDivContainers()
-    const centerSlotDivs = await this.getCenterSlotDivContainers()
-    const endSlotDivs = await this.getEndSlotDivContainers()
-    return [...startSlotDivs, ...centerSlotDivs, ...endSlotDivs]
-  }
-
-  /**
-   * Gets all div containers from the start slot.
-   * @returns Promise that resolves to an array of div containers from the start slot.
-   */
-  async getStartSlotDivContainers(): Promise<DivHarness[]> {
-    const slot = await this.getStartSlot()
-    return slot ? slot.getSlotDivContainers() : []
-  }
-
-  /**
-   * Gets all div containers from the center slot.
-   * @returns Promise that resolves to an array of div containers from the center slot.
-   */
-  async getCenterSlotDivContainers(): Promise<DivHarness[]> {
-    const slot = await this.getCenterSlot()
-    return slot ? slot.getSlotDivContainers() : []
-  }
-
-  /**
-   * Gets all div containers from the end slot.
-   * @returns Promise that resolves to an array of div containers from the end slot.
-   */
-  async getEndSlotDivContainers(): Promise<DivHarness[]> {
-    const slot = await this.getEndSlot()
-    return slot ? slot.getSlotDivContainers() : []
-  }
-
-  /**
-   * Gets multiple CSS property values from all div containers in the start slot.
-   * @param properties Array of CSS property names to retrieve.
-   * @returns Promise that resolves to an array of style objects, one for each container in the start slot.
-   */
-  async getStartSlotStyles(properties: string[]): Promise<Record<string, string>[]> {
-    const slot = await this.getStartSlot()
-    return slot ? slot.getAllSlotStylesForProperties(properties) : []
-  }
-
-  /**
-   * Gets multiple CSS property values from all div containers in the center slot.
-   * @param properties Array of CSS property names to retrieve.
-   * @returns Promise that resolves to an array of style objects, one for each container in the center slot.
-   */
-  async getCenterSlotStyles(properties: string[]): Promise<Record<string, string>[]> {
-    const slot = await this.getCenterSlot()
-    return slot ? slot.getAllSlotStylesForProperties(properties) : []
-  }
-
-  /**
-   * Gets multiple CSS property values from all div containers in the end slot.
-   * @param properties Array of CSS property names to retrieve.
-   * @returns Promise that resolves to an array of style objects, one for each container in the end slot.
-   */
-  async getEndSlotStyles(properties: string[]): Promise<Record<string, string>[]> {
-    const slot = await this.getEndSlot()
-    return slot ? slot.getAllSlotStylesForProperties(properties) : []
-  }
-
-  /**
-   * Gets CSS classes from all div containers in the start slot.
-   * @returns Promise that resolves to a two-dimensional array where each inner array contains the CSS classes for one container.
-   */
-  async getStartSlotClasses(): Promise<string[][]> {
-    const slot = await this.getStartSlot()
-    return slot ? slot.getAllSlotClasses() : []
-  }
-
-  /**
-   * Gets CSS classes from all div containers in the center slot.
-   * @returns Promise that resolves to a two-dimensional array where each inner array contains the CSS classes for one container.
-   */
-  async getCenterSlotClasses(): Promise<string[][]> {
-    const slot = await this.getCenterSlot()
-    return slot ? slot.getAllSlotClasses() : []
-  }
-
-  /**
-   * Gets CSS classes from all div containers in the end slot.
-   * @returns Promise that resolves to a two-dimensional array where each inner array contains the CSS classes for one container.
-   */
-  async getEndSlotClasses(): Promise<string[][]> {
-    const slot = await this.getEndSlot()
-    return slot ? slot.getAllSlotClasses() : []
   }
 }

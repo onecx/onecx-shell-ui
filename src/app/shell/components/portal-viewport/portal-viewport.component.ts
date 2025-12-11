@@ -4,12 +4,8 @@ import { HttpClient } from '@angular/common/http'
 import { Component, EventEmitter, inject, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { TranslateModule } from '@ngx-translate/core'
-import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
-import { AngularRemoteComponentsModule, SlotService } from '@onecx/angular-remote-components'
-import { PrimeNG } from 'primeng/config'
-import { ToastModule } from 'primeng/toast'
+import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import { filter, first, from, mergeMap, Observable, of } from 'rxjs'
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
 import { RoutesService } from '../../services/routes.service'
@@ -21,10 +17,7 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
   standalone: true,
   imports: [
     CommonModule,
-    TranslateModule,
-    AngularAcceleratorModule,
     AngularRemoteComponentsModule,
-    ToastModule,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent,
     RouterModule,
@@ -45,14 +38,12 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
 })
 @UntilDestroy()
 export class PortalViewportComponent implements OnInit {
-  private readonly primengConfig = inject(PrimeNG)
   private readonly appStateService = inject(AppStateService)
   private readonly userService = inject(UserService)
   themeService = inject(ThemeService)
   private readonly httpClient = inject(HttpClient)
   routesService = inject(RoutesService)
   workspaceConfigBffService = inject(WorkspaceConfigBffService)
-  private readonly slotService = inject(SlotService)
 
   menuButtonTitle = ''
 
@@ -62,9 +53,7 @@ export class PortalViewportComponent implements OnInit {
   ripple = true
   globalErrMsg: string | undefined
   verticalMenuSlotName = 'onecx-shell-vertical-menu'
-  isVerticalMenuComponentDefined$: Observable<boolean>
   footerSlotName = 'onecx-shell-footer'
-  isFooterComponentDefined$: Observable<boolean>
 
   public currentTheme$: Observable<Theme>
   public logoLoadingEmitter = new EventEmitter<boolean>()
@@ -121,9 +110,6 @@ export class PortalViewportComponent implements OnInit {
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
     })
-
-    this.isVerticalMenuComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.verticalMenuSlotName)
-    this.isFooterComponentDefined$ = this.slotService.isSomeComponentDefinedForSlot(this.footerSlotName)
   }
 
   private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
@@ -135,8 +121,6 @@ export class PortalViewportComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.primengConfig.ripple.set(true)
-
     this.appStateService.globalError$
       .pipe(untilDestroyed(this))
       .pipe(filter((i) => i !== undefined))

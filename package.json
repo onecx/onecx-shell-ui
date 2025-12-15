@@ -11,7 +11,6 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
-    "prebuild": "node ./create-dummies.js && bash ./build-preloaders-parallel.sh",
     "build": "nx run build --verbose --skip-nx-cache",
     "build:18": "rm -rf pre_loaders/angular-18/.nx && (cd ./pre_loaders/angular-18 && npm run build) && npm run build",
     "build:19": "rm -rf pre_loaders/angular-19/.nx && (cd ./pre_loaders/angular-19 && npm run build) && npm run build",
@@ -47,6 +46,8 @@
     "reportPath": "reports"
   },
   "dependencies": {
+    "@angular-architects/module-federation": "18.0.6",
+    "@angular-architects/module-federation-tools": "18.0.6",
     "@angular/animations": "^19.2.15",
     "@angular/common": "^19.2.15",
     "@angular/compiler": "^19.2.15",

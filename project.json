@@ -80,14 +80,7 @@
         "scripts": [],
         "customWebpackConfig": {
           "path": "./webpack.config.js"
-        },
-        "allowedCommonJsDependencies": [
-          "@onecx/integration-interface",
-          "@onecx/accelerator",
-          "@module-federation/enhanced/runtime",
-          "ts-semaphore",
-          "@angular-architects/module-federation"
-        ]
+        }
       },
       "configurations": {
         "production": {
@@ -114,7 +107,7 @@
           "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
-          "namedChunks": true,
+          "namedChunks": true
         },
         "local-env": {
           "baseHref": "/onecx-shell/",

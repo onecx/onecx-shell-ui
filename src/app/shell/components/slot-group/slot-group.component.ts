@@ -41,10 +41,6 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
 
   slotGroupClasses = input<NgClassInputType>('')
 
-  rcWrapperStyles = input<{ [key: string]: any }>({})
-
-  rcWrapperClasses = input<NgClassInputType>('')
-
   // Compute slot-group classes with direction
   computedSlotGroupClasses = computed(() => {
     const directionClasses = {

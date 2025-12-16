@@ -4,47 +4,56 @@ declare global {
   }
 }
 
+const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
+
 export interface Preloader {
+  name: string
   relativeRemoteEntryUrl: string
-  windowKey: string
-  exposedModule: string
+  remoteName: string
+  moduleId: string
 }
 
 export const angular18Preloader: Preloader = {
+  name: 'angular-18',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
-  windowKey: 'angular-18',
-  exposedModule: './Angular18Loader'
+  remoteName: magicChar + 'onecx-angular-18-loader',
+  moduleId: magicChar + 'onecx-angular-18-loader/Angular18Loader'
 }
 
 export const angular19Preloader: Preloader = {
+  name: 'angular-19',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
-  windowKey: 'angular-19',
-  exposedModule: './Angular19Loader'
+  remoteName: magicChar + 'onecx-angular-19-loader',
+  moduleId: magicChar + 'onecx-angular-19-loader/Angular19Loader'
 }
 
 export const angular20Preloader: Preloader = {
+  name: 'angular-20',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
-  windowKey: 'angular-20',
-  exposedModule: './Angular20Loader'
+  remoteName: magicChar + 'onecx-angular-20-loader',
+  moduleId: magicChar + 'onecx-angular-20-loader/Angular20Loader'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {
-  const moduleFederation = await import('@angular-architects/module-federation')
-  return moduleFederation.loadRemoteModule({
-    type: 'module',
-    remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-    exposedModule: preloader.exposedModule
-  })
+  const moduleFederation = await import('@module-federation/enhanced/runtime')
+  moduleFederation.registerRemotes([
+    {
+      type: 'module',
+      entry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
+      name: preloader.remoteName
+    }
+  ])
+  await moduleFederation.loadRemote(preloader.moduleId)
 }
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   return new Promise((resolve) => {
-    if (window['onecxPreloaders'][preloader.windowKey]) {
+    if (window['onecxPreloaders'][preloader.name]) {
       resolve(true)
       return
     }
     const ensureIntevalId = setInterval(() => {
-      if (window['onecxPreloaders'][preloader.windowKey]) {
+      if (window['onecxPreloaders'][preloader.name]) {
         clearInterval(ensureIntevalId)
         resolve(true)
       }

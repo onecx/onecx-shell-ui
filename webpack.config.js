@@ -55,7 +55,6 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
     }
   ]
 })
-
 // Replace createElement only in @angular/platform-browser SharedStylesHost
 const modifyAngularCorePlugin = new ModifySourcePlugin({
   rules: [

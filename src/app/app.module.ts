@@ -27,14 +27,7 @@ import {
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import {
-  CurrentLocationPublisher,
-  EventsPublisher,
-  EventsTopic,
-  NavigatedEventPayload,
-  Theme,
-  UserProfile
-} from '@onecx/integration-interface'
+import { CurrentLocationPublisher, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
@@ -191,8 +184,6 @@ export function configurationServiceInitializer(configurationService: Configurat
   configurationService.init()
 }
 
-let isFirst = true
-let isInitialPageLoad = true
 const pushState = globalThis.history.pushState
 globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
@@ -210,18 +201,6 @@ globalThis.history.pushState = (data: any, unused: string, url?: string) => {
       isFirst: false
     })
   }
-  new EventsPublisher().publish({
-    type: 'navigated',
-    payload: {
-      url,
-      isFirst
-    } satisfies NavigatedEventPayload
-  })
-
-  if (!isInitialPageLoad) {
-    isFirst = false
-  }
-  isInitialPageLoad = false
 }
 
 const replaceState = globalThis.history.replaceState
@@ -251,18 +230,6 @@ globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
       isFirst: false
     })
   }
-  new EventsPublisher().publish({
-    type: 'navigated',
-    payload: {
-      url,
-      isFirst: isFirst
-    } satisfies NavigatedEventPayload
-  })
-
-  if (!isInitialPageLoad) {
-    isFirst = false
-  }
-  isInitialPageLoad = false
 }
 
 /**

@@ -17,7 +17,7 @@ import { appRoutes } from 'src/app/app.routes'
 import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
 
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
-import { updateStylesForMfeChange } from '@onecx/angular-utils'
+import { updateStylesForMfeChange } from '@onecx/angular-utils/style'
 import { HttpClient } from '@angular/common/http'
 import { PermissionsCacheService } from './permissions-cache.service'
 
@@ -118,7 +118,7 @@ export class RoutesService {
       currentMfeInfo = await firstValueFrom(this.appStateService.currentMfe$.asObservable())
     }
 
-  if (this.isFirstLoad || (currentMfeInfo?.remoteBaseUrl ?? undefined) !== r.url) {
+    if (this.isFirstLoad || (currentMfeInfo?.remoteBaseUrl ?? undefined) !== r.url) {
       this.isFirstLoad = false
       if (!currentGlobalLoading) {
         this.showContent$.next(false)

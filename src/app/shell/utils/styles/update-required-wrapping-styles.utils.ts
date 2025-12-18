@@ -1,9 +1,5 @@
-import {
-  dataStyleIdAttribute,
-  dataStyleIsolationAttribute,
-  isCssScopeRuleSupported,
-  replaceRootAndHtmlWithScope
-} from '@onecx/angular-utils'
+import { dataStyleIdAttribute, dataStyleIsolationAttribute, isCssScopeRuleSupported } from '@onecx/angular-utils'
+import { replaceRootAndHtmlWithScope } from '@onecx/angular-utils/style'
 import { MARKED_FOR_WRAPPING, MARKED_AS_WRAPPED } from './shared-styles-host-overwrites.utils'
 
 /**

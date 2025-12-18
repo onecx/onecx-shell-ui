@@ -6,10 +6,9 @@ import {
   dataStyleIsolationAttribute,
   dataPortalLayoutStylesKey,
   dataDynamicPortalLayoutStylesKey,
-  isCssScopeRuleSupported,
-  addStyleToHead,
-  replaceRootWithScope
+  isCssScopeRuleSupported
 } from '@onecx/angular-utils'
+import { addStyleToHead, replaceRootWithScope } from '@onecx/angular-utils/style'
 import { markElement } from './style-data.utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {

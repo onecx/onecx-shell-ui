@@ -63,6 +63,7 @@
     "@onecx/accelerator": "^7.0.0-rc.13",
     "@onecx/angular-accelerator": "^7.0.0-rc.13",
     "@onecx/angular-auth": "^7.0.0-rc.13",
+    "@onecx/shell-auth": "^7.0.0-rc.13",
     "@onecx/angular-integration-interface": "^7.0.0-rc.13",
     "@onecx/angular-remote-components": "^7.0.0-rc.13",
     "@onecx/angular-utils": "^7.0.0-rc.13",

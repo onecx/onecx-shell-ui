@@ -2,15 +2,19 @@
 openapi: 3.0.3
 info:
   title: onecx-shell-bff
-  description: Backend-For-Frontend (BFF) service for OneCX Shell. This API provides base configuration information for frontends.
+  description: This API provides endpoints to load essential data like workspace configurations for the shell
   version: 1.0.0
-  contact:
-    email: tkit_dev@1000kit.org
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: http://onecx-shell-bff:8080/
+tags:
+  - name: workspaceConfig
+    description: Retrieve Workspace Configurations
+  - name: parameter
+    description: Retrieve Parameters
+  - name: userProfile
+    description: Retrieve the User Profile
+  - name: permission
+    description: Retrieve Permissions
 paths:
   /workspaceConfig:
     post:
@@ -19,7 +23,7 @@ paths:
           workspaceConfig:
             - read
       tags:
-        - "WorkspaceConfig"
+        - workspaceConfig
       description: Load all data needed by startup of OneCX UI (components, routes, slots, theme, workspace)
       operationId: loadWorkspaceConfig
       requestBody:
@@ -30,7 +34,7 @@ paths:
               $ref: '#/components/schemas/LoadWorkspaceConfigRequest'
       responses:
         '200':
-          description: OK
+          description: Workspace configuration retrieved successfully
           content:
             application/json:
               schema:
@@ -42,7 +46,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
-          description: 'Not Found'
+          description: Workspace configuration not found
   /workspaceConfig/themes/{name}/favicon:
     get:
       x-onecx:
@@ -50,8 +54,8 @@ paths:
           workspaceConfig:
             - read
       tags:
-        - "WorkspaceConfig"
-      description: Load favicon by theme name
+        - workspaceConfig
+      description: Get favicon of a theme by its name
       operationId: getThemeFaviconByName
       parameters:
         - name: name
@@ -61,7 +65,7 @@ paths:
             type: string
       responses:
         200:
-          description: OK
+          description: Favicon retrieved successfully
           content:
             image/x-icon:
               schema:
@@ -70,7 +74,7 @@ paths:
                 type: string
                 format: binary
         404:
-          description: Not found
+          description: Favicon not found
 
   /workspaceConfig/themes/{name}/logo:
     get:
@@ -79,8 +83,8 @@ paths:
           workspaceConfig:
             - read
       tags:
-        - "WorkspaceConfig"
-      description: Load logo by theme name
+        - workspaceConfig
+      description: Get the logo of a theme by its name
       operationId: getThemeLogoByName
       parameters:
         - name: name
@@ -88,9 +92,15 @@ paths:
           required: true
           schema:
             type: string
+        - name: small
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         200:
-          description: OK
+          description: Logo retrieved successfully
           content:
             image/*:
               schema:
@@ -99,7 +109,98 @@ paths:
                 type: string
                 format: binary
         404:
-          description: Not found
+          description: Logo not found
+  /workspaceConfig/themes/{name}/images/{refType}:
+    get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - workspaceConfig
+      description: Get an image of a theme by its reference name (theme name) and reference type
+      operationId: getThemeImageByNameAndRefType
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: refType
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Image retrieved successfully
+          content:
+            image/*:
+              schema:
+                minimum: 1
+                maximum: 110000
+                type: string
+                format: binary
+        404:
+          description: Image not found
+  /workspaceConfig/themes/{name}/images/availableTypes:
+    get:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - workspaceConfig
+      description: Get available image types
+      operationId: getAvailableImageTypes
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Available image types retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableImageTypes'
+  /icons/{refId}:
+    post:
+      x-onecx:
+        permissions:
+          workspaceConfig:
+            - read
+      tags:
+        - icon
+      description: Retrieve icons by list of names and refId
+      parameters:
+        - name: refId
+          in: path
+          required: true
+          schema:
+            type: string
+      operationId: findIconsByNamesAndRefId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IconCriteria'
+      responses:
+        "200":
+          description: Icons retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IconListResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
   /parameters:
     post:
       x-onecx:
@@ -109,6 +210,7 @@ paths:
       tags:
         - parameter
       operationId: getParameters
+      description: Get all available parameters of the requested products
       requestBody:
         required: true
         content:
@@ -117,7 +219,7 @@ paths:
               $ref: '#/components/schemas/GetParametersRequest'
       responses:
         '200':
-          description: OK
+          description: Parameters retrieved successfully
           content:
             application/json:
               schema:
@@ -137,9 +239,10 @@ paths:
       tags:
         - userProfile
       operationId: getUserProfile
+      description: Get the user profile of the requesting user
       responses:
         '200':
-          description: OK
+          description: User profile retrieved successfully
           content:
             application/json:
               schema:
@@ -151,8 +254,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
-          description: 'Not Found'
-
+          description: User profile not found
   /permissions:
     post:
       x-onecx:
@@ -162,6 +264,7 @@ paths:
       tags:
         - permission
       operationId: getPermissions
+      description: Get all permissions for a specific application by its id and product name
       requestBody:
         required: true
         content:
@@ -170,7 +273,7 @@ paths:
               $ref: '#/components/schemas/GetPermissionsRequest'
       responses:
         '200':
-          description: OK
+          description: Permissions retrieved successfully
           content:
             application/json:
               schema:
@@ -182,9 +285,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
-          description: 'Not Found'
+          description: Permissions not found
 components:
   schemas:
+    IconCriteria:
+      type: object
+      required:
+        - names
+      properties:
+        names:
+          minItems: 1
+          type: array
+          items:
+            type: string
+    IconListResponse:
+      type: object
+      properties:
+        icons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Icon'
+    Icon:
+      type: object
+      required:
+        - name
+        - body
+        - type
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        body:
+          type: string
+        parent:
+          type: string
+    AvailableImageTypes:
+      type: object
+      properties:
+        types:
+          type: array
+          items:
+            type: string
     GetParametersRequest:
       type: object
       required:
@@ -307,6 +449,10 @@ components:
           type: string
         homePage:
           type: string
+        logoUrl:
+          type: string
+        smallLogoUrl:
+          type: string
     Theme:
       required:
       - name
@@ -326,6 +472,8 @@ components:
           type: string
         logoUrl:
           type: string
+        smallLogoUrl:
+          type: string
         faviconUrl:
           type: string
         previewImageUrl:
@@ -334,6 +482,22 @@ components:
           type: string
         properties:
           type: string
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThemeOverride'
+    ThemeOverride:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/OverrideType'
+        value:
+          type: string
+    OverrideType:
+      type: string
+      enum:
+        - PRIMENG
+        - CSS
     Route:
       type: object
       required:

@@ -19,7 +19,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { GetUserProfileResponse } from '../model/getUserProfileResponse';
+import { IconCriteria } from '../model/iconCriteria';
+// @ts-ignore
+import { IconListResponse } from '../model/iconListResponse';
 // @ts-ignore
 import { ProblemDetailResponse } from '../model/problemDetailResponse';
 
@@ -32,7 +34,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'any'
 })
-export class UserProfileBffService {
+export class IconBffService {
 
     protected basePath = 'http://onecx-shell-bff:8080';
     public defaultHeaders = new HttpHeaders();
@@ -94,14 +96,22 @@ export class UserProfileBffService {
     }
 
     /**
-     * Get the user profile of the requesting user
+     * Retrieve icons by list of names and refId
+     * @param refId 
+     * @param iconCriteria 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getUserProfile(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetUserProfileResponse>;
-    public getUserProfile(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetUserProfileResponse>>;
-    public getUserProfile(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetUserProfileResponse>>;
-    public getUserProfile(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<IconListResponse>;
+    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<IconListResponse>>;
+    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<IconListResponse>>;
+    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+        if (refId === null || refId === undefined) {
+            throw new Error('Required parameter refId was null or undefined when calling findIconsByNamesAndRefId.');
+        }
+        if (iconCriteria === null || iconCriteria === undefined) {
+            throw new Error('Required parameter iconCriteria was null or undefined when calling findIconsByNamesAndRefId.');
+        }
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -123,6 +133,15 @@ export class UserProfileBffService {
         }
 
 
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -134,10 +153,11 @@ export class UserProfileBffService {
             }
         }
 
-        let localVarPath = `/userProfile`;
-        return this.httpClient.request<GetUserProfileResponse>('get', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/icons/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        return this.httpClient.request<IconListResponse>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                body: iconCriteria,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
@@ -146,5 +166,4 @@ export class UserProfileBffService {
             }
         );
     }
-
 }

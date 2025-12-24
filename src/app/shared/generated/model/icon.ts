@@ -11,8 +11,10 @@
  */
 
 
-export interface LocaleAndTimeSettings { 
-    locale?: string;
-    timezone?: string;
+export interface Icon { 
+    name: string;
+    type: string;
+    body: string;
+    parent?: string;
 }
 

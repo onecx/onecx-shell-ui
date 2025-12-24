@@ -11,8 +11,8 @@
  */
 
 
-export interface LocaleAndTimeSettings { 
-    locale?: string;
-    timezone?: string;
+export enum OverrideType {
+    PRIMENG = 'PRIMENG',
+    CSS = 'CSS'
 }
 

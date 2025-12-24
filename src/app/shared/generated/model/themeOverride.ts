@@ -9,10 +9,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { OverrideType } from './overrideType';
 
 
-export interface LocaleAndTimeSettings { 
-    locale?: string;
-    timezone?: string;
+export interface ThemeOverride { 
+    type?: OverrideType;
+    value?: string;
 }
+
+
 

@@ -4,14 +4,15 @@ import { HttpClient } from '@angular/common/http'
 import { Component, EventEmitter, inject, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { AppStateService, ImageService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
+import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
-import { filter, first, from, map, mergeMap, Observable, of, forkJoin } from 'rxjs'
+import { filter, first, from, mergeMap, Observable, of } from 'rxjs'
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
 import { RoutesService } from '../../services/routes.service'
 import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from '../error-component/global-error.component'
 import { SlotGroupComponent } from '../slot-group/slot-group.component'
+import { readBlobAsDataURL } from '../../utils/common.utils'
 
 @Component({
   standalone: true,
@@ -40,7 +41,6 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
 export class PortalViewportComponent implements OnInit {
   private readonly appStateService = inject(AppStateService)
   private readonly userService = inject(UserService)
-  private readonly imageService = inject(ImageService)
   themeService = inject(ThemeService)
   private readonly httpClient = inject(HttpClient)
   routesService = inject(RoutesService)
@@ -91,7 +91,7 @@ export class PortalViewportComponent implements OnInit {
               : (this.workspaceConfigBffService?.getThemeFaviconByName(theme.name ?? '') ?? of())
           ).pipe(
             filter((blob) => !!blob),
-            mergeMap((blob) => from(this.readBlobAsDataURL(blob)))
+            mergeMap((blob) => from(readBlobAsDataURL(blob)))
           )
         })
       )
@@ -111,53 +111,6 @@ export class PortalViewportComponent implements OnInit {
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
     })
-    this.getAvailableImages();
-  }
-
-  private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
-    return new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.onload = (e) => resolve(e.target?.result ?? null)
-      reader.readAsDataURL(blob)
-    })
-  }
-
-  private getImageUrl(themeName: string, type: string) {
-    return this.workspaceConfigBffService.getThemeImageByNameAndRefType(themeName, type).pipe(
-      filter(blob => !!blob),
-      mergeMap(blob => from(this.readBlobAsDataURL(blob))),
-      map(url => ({ type, url }))
-    );
-  }
-
-  private getAvailableImages() {
-    this.currentTheme$.pipe(
-      first(),
-      map(theme => theme.name || null),
-      filter((themeName): themeName is string => !!themeName),
-      mergeMap(themeName =>
-        this.workspaceConfigBffService.getAvailableImageTypes(themeName).pipe(
-          first(),
-          filter(res => !!res?.types?.length),
-          mergeMap(res => {
-            const availableTypes = res.types || [];
-            const imageObservables = availableTypes.map(availableTypes => this.getImageUrl(themeName, availableTypes));
-            return forkJoin(imageObservables);
-          }),
-          map(results => {
-            const urls: { [key: string]: string } = {};
-            results.forEach(({ type, url }) => {
-              if (typeof url === 'string' && url) {
-                urls[type] = url;
-              }
-            });
-            return urls;
-          })
-        )
-      )
-    ).subscribe(urls => {
-      this.imageService.imageTopic.publish({ images: { ...urls } });
-    });
   }
 
   ngOnInit() {

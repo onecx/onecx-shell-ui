@@ -58,6 +58,8 @@
     "@angular/platform-browser": "^19.2.17",
     "@angular/platform-browser-dynamic": "^19.2.17",
     "@angular/router": "^19.2.17",
+    "@module-federation/enhanced": "^0.20.0",
+    "@module-federation/runtime-core": "^0.20.0",
     "@ngx-translate/core": "^16.0.4",
     "@nx/angular": "20.8.2",
     "@onecx/accelerator": "^7.0.0-rc.13",
@@ -124,13 +126,11 @@
     "sonar-scanner": "^3.1.0",
     "ts-node": "10.9.2",
     "typescript": "~5.8.3",
-    "webpack": "5.98.0"
+    "webpack": "5.98.0",
+    "webpack-cli": "^6.0.1"
   },
   "overrides": {
-    "braces": "^3.0.3",
-    "micromatch": "^4.0.8",
-    "sane": "^4.1.1",
-    "jest-haste-map": "^29.7.0",
-    "koa": "^2.16.2"
+    "@rspack/core": "1.1.5",
+    "webpack": "5.98.0"
   }
 }

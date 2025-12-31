@@ -12,7 +12,6 @@ import { RoutesService } from '../../services/routes.service'
 import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from '../error-component/global-error.component'
 import { SlotGroupComponent } from '../slot-group/slot-group.component'
-import { readBlobAsDataURL } from '../../utils/common.utils'
 
 @Component({
   standalone: true,
@@ -91,7 +90,7 @@ export class PortalViewportComponent implements OnInit {
               : (this.workspaceConfigBffService?.getThemeFaviconByName(theme.name ?? '') ?? of())
           ).pipe(
             filter((blob) => !!blob),
-            mergeMap((blob) => from(readBlobAsDataURL(blob)))
+            mergeMap((blob) => from(this.readBlobAsDataURL(blob)))
           )
         })
       )
@@ -110,6 +109,14 @@ export class PortalViewportComponent implements OnInit {
     this.currentTheme$ = this.themeService.currentTheme$.asObservable()
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
+    })
+  }
+
+  private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result ?? null)
+      reader.readAsDataURL(blob)
     })
   }
 

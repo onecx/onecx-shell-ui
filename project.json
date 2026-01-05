@@ -7,117 +7,17 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/angular:webpack-browser",
+      "executor": "@nx/vite:build",
       "dependsOn": ["^build"],
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/onecx-shell-ui",
-        "index": "./src/index.html",
-        "main": "./src/main.ts",
-        "polyfills": ["zone.js"],
-        "tsConfig": "./tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
-        "assets": [
-          "src/favicon.ico",
-          "./src/assets",
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-18/node_modules/@onecx/portal-integration-angular/assets/",
-            "output": "/onecx-portal-lib/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/angular-accelerator/assets/",
-            "output": "/onecx-angular-accelerator/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/angular-utils/assets/",
-            "output": "/onecx-angular-utils/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/shell-core/assets/",
-            "output": "/onecx-shell-core/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-18/dist/onecx-angular-18-loader",
-            "output": "/pre_loaders/onecx-angular-18-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-19/dist/onecx-angular-19-loader",
-            "output": "/pre_loaders/onecx-angular-19-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-20/dist/onecx-angular-20-loader",
-            "output": "/pre_loaders/onecx-angular-20-loader"
-          }
-        ],
-        "styles": [
-          {
-            "input": "./src/splash.scss",
-            "inject": true
-          },
-          {
-            "input": "./src/global-styles.scss",
-            "bundleName": "global-styles",
-            "inject": true
-          },
-          {
-            "input": "./src/shell-styles.scss",
-            "bundleName": "shell-styles",
-            "inject": false
-          },
-          {
-            "input": "./src/portal-layout-styles.scss",
-            "bundleName": "portal-layout-styles",
-            "inject": false
-          }
-        ],
-        "scripts": [],
-        "customWebpackConfig": {
-          "path": "./webpack.config.js"
-        }
-      },
-      "configurations": {
-        "production": {
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "1mb",
-              "maximumError": "5mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "2kb",
-              "maximumError": "4kb"
-            }
-          ],
-          "outputHashing": "all",
-          "customWebpackConfig": {
-            "path": "./webpack.config.js"
-          }
-        },
-        "development": {
-          "buildOptimizer": false,
-          "optimization": false,
-          "vendorChunk": true,
-          "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true
-        },
-        "local-env": {
-          "baseHref": "/onecx-shell/",
-          "outputHashing": "all"
-        }
-      },
-      "defaultConfiguration": "production"
+        "configFile": "vite.config.ts"
+      }
     },
     "serve": {
-      "executor": "@nx/angular:dev-server",
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
       "configurations": {
         "production": {
           "buildTarget": "onecx-shell-ui:build:production"
@@ -126,25 +26,17 @@
           "buildTarget": "onecx-shell-ui:build:development"
         },
         "local-env": {
-          "buildTarget": "onecx-shell-ui:build:local-env",
-          "host": "0.0.0.0",
-          "disableHostCheck": true,
-          "publicHost": "http://localhost:4300/onecx-shell/",
-          "port": 4300
+          "buildTarget": "onecx-shell-ui:build:local-env"
         }
       },
-      "defaultConfiguration": "development",
       "options": {
-        "hmr": false,
-        "port": 4300,
         "proxyConfig": "proxy.conf.js"
       }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "onecx-shell-ui:build",
-        "customWebpackConfig": "./webpack.config.js"
+        "buildTarget": "onecx-shell-ui:build"
       }
     },
     "lint": {

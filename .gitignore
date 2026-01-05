@@ -37,6 +37,9 @@ typings
 *.sh
 !build-preloaders-parallel.sh
 !copy-preloaders.sh
+!setup-local-env.sh
+coverage
+tmp-local-env-assets
 
 # System Files
 .DS_Store

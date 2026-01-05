@@ -59,6 +59,6 @@ export class ImageRepositoryService {
     }
 
     private constructImagePath(themeName: string, type: string): string {           
-        return `/workspaceConfig/themes/${themeName}/images/${type}`;   
+        return `/shell-bff/workspaceConfig/themes/${themeName}/images/${type}`;   
     }
 }

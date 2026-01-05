@@ -50,8 +50,8 @@ describe('ImageRepositoryService', () => {
     const imagePaths = await firstValueFrom(imageTopicMock.asObservable());
 
     expect(Object.keys(imagePaths.images)).toEqual(expectedKeys);
-    expect(imagePaths.images['logo']).toBe(`/workspaceConfig/themes/${THEME_CONFIG.name}/images/logo`);
-    expect(imagePaths.images['previewIcon']).toBe(`/workspaceConfig/themes/${THEME_CONFIG.name}/images/previewIcon`);
+    expect(imagePaths.images['logo']).toBe(`/shell-bff/workspaceConfig/themes/${THEME_CONFIG.name}/images/logo`);
+    expect(imagePaths.images['previewIcon']).toBe(`/shell-bff/workspaceConfig/themes/${THEME_CONFIG.name}/images/previewIcon`);
   });
 
   describe('error scenarios', () => {

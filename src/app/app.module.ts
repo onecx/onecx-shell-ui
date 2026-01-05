@@ -50,6 +50,7 @@ import { GlobalErrorComponent } from './shell/components/error-component/global-
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
+import { ImageRepositoryService } from './shell/services/image-repository.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -182,6 +183,10 @@ export function permissionProxyInitializer(permissionProxyService: PermissionPro
 
 export function configurationServiceInitializer(configurationService: ConfigurationService) {
   configurationService.init()
+}
+  
+export function imageRepositoryServiceInitializer(imageRepositoryService: ImageRepositoryService) {
+  imageRepositoryService.init()
 }
 
 const pushState = globalThis.history.pushState
@@ -398,6 +403,9 @@ export async function shareMfContainer() {
       return import('./shell/utils/styles/style-changes-listener.utils').then(({ styleChangesListenerInitializer }) =>
         styleChangesListenerInitializer()
       )
+    }),
+    provideAppInitializer(() => {
+      return imageRepositoryServiceInitializer(inject(ImageRepositoryService))
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' }

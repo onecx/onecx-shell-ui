@@ -23,14 +23,26 @@
     "@angular/platform-server": "^20.3.15",
     "@angular/router": "^20.3.15",
     "@angular/service-worker": "^20.3.15",
-    "@nx/angular": "21.6.5",
+    "@ngx-translate/core": "^17.0.0",
+    "@nx/angular": "22.0.2",
+    "@onecx/accelerator": "^7.0.0-rc.22",
+    "@onecx/angular-accelerator": "^7.0.0-rc.22",
+    "@onecx/angular-auth": "^7.0.0-rc.22",
+    "@onecx/angular-integration-interface": "^7.0.0-rc.22",
+    "@onecx/angular-remote-components": "^7.0.0-rc.22",
+    "@onecx/angular-utils": "^7.0.0-rc.22",
+    "@onecx/angular-webcomponents": "^7.0.0-rc.22",
+    "@onecx/integration-interface": "^7.0.0-rc.22",
+    "@onecx/ngrx-accelerator": "^7.0.0-rc.22",
+    "@onecx/ngrx-integration-interface": "^7.0.0-rc.22",
+    "primeng": "^20.4.0",
     "rxjs": "~7.8.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.13",
     "@angular/compiler-cli": "^20.3.15",
     "modify-source-webpack-plugin": "^4.1.0",
-    "nx": "21.6.5",
+    "nx": "22.0.2",
     "webpack": "5.101.2"
   },
   "overrides": {

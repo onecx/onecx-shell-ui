@@ -33,7 +33,7 @@
             "input": "./node_modules/@onecx/shell-core/assets/",
             "output": "/onecx-shell-core/assets/"
           }
-        ]      
+        ]
       },
       "configurations": {
         "production": {

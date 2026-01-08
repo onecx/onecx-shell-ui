@@ -33,13 +33,7 @@ describe('Preloader Utils', () => {
     it('should load a remote module using module federation with location origin', async () => {
       const dom = document
       jest.spyOn(dom, 'getElementsByTagName').mockReturnValue([undefined as any] as any)
-      Object.defineProperty(window, 'location', {
-        value: {
-          origin: 'http://localhost/baseOrigin/',
-          href: 'http://localhost/baseOrigin/admin'
-        },
-        writable: true
-      })
+      location.href = 'http://localhost/baseOrigin/admin'
       const mockPreloader = {
         relativeRemoteEntryUrl: 'mock/remoteEntry.js',
         windowKey: 'mock-key',

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import { PrimeNG } from 'primeng/config'
 import { merge, mergeMap } from 'rxjs'
@@ -13,15 +13,13 @@ import { UserService } from '@onecx/angular-integration-interface'
 export class AppComponent implements OnInit {
   title = 'shell'
 
-  constructor(
-    private readonly translateService: TranslateService,
-    private readonly config: PrimeNG,
-    private readonly userService: UserService
-  ) {}
+  private readonly translateService: TranslateService = inject(TranslateService)
+  private readonly config: PrimeNG = inject(PrimeNG)
+  private readonly userService: UserService = inject(UserService)
 
   ngOnInit(): void {
     this.userService.lang$.subscribe((lang) => {
-      document.documentElement.lang = lang;
+      document.documentElement.lang = lang
       this.translateService.use(lang)
     })
     merge(

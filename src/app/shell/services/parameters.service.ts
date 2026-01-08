@@ -93,7 +93,7 @@ export class ParametersService {
     items.forEach((item) => {
       if (!this.hasValidCache(cache, item.productName ?? '', item.appId ?? '')) {
         request.products[item.productName ?? ''] ??= []
-        if(!request.products[item.productName ?? ''].includes(item.appId ?? '')){
+        if (!request.products[item.productName ?? ''].includes(item.appId ?? '')) {
           request.products[item.productName ?? ''].push(item.appId ?? '')
         }
       }

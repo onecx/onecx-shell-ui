@@ -287,7 +287,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupStyles of type object to container div', async () => {
         const slotGroupStylesObject = { color: 'blue', padding: '15px' }
-        const expectedStyles = { color: 'blue', padding: '15px' }
+        const expectedStyles = { color: 'rgb(0, 0, 255)', padding: '15px' }
 
         componentRef.setInput('slotGroupStyles', slotGroupStylesObject)
 

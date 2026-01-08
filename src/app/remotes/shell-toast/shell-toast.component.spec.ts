@@ -3,7 +3,6 @@ import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
-import { TranslateTestingModule } from 'ngx-translate-testing'
 import { ReplaySubject, firstValueFrom } from 'rxjs'
 
 import { ConfigurationService } from '@onecx/angular-integration-interface'
@@ -13,6 +12,7 @@ import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-u
 import { MessageService } from 'primeng/api'
 import { ToastModule } from 'primeng/toast'
 import { OneCXShellToastComponent } from './shell-toast.component'
+import { provideTranslateTestingService } from '@onecx/angular-testing'
 
 function setUp() {
   const fixture = TestBed.createComponent(OneCXShellToastComponent)
@@ -43,23 +43,18 @@ describe('OneCXShellExtensionsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [
-        TranslateTestingModule.withTranslations({
-          de: require('./../../../assets/i18n/de.json'),
-          en: require('./../../../assets/i18n/en.json')
-        }).withDefaultLanguage('en'),
-        NoopAnimationsModule
-      ],
+      imports: [NoopAnimationsModule],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: REMOTE_COMPONENT_CONFIG, useValue: rcConfig },
-        MessageService
+        MessageService,
+        provideTranslateTestingService({})
       ]
     })
       .overrideComponent(OneCXShellToastComponent, {
         set: {
-          imports: [TranslateTestingModule, CommonModule, ToastModule],
+          imports: [CommonModule, ToastModule],
           providers: [
             providePortalMessageServiceMock(),
             { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) },

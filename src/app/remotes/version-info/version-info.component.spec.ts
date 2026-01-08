@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
-import { TranslateTestingModule } from 'ngx-translate-testing'
 import { ReplaySubject, firstValueFrom } from 'rxjs'
 
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
@@ -18,6 +17,7 @@ import { CONFIG_KEY } from '@onecx/angular-integration-interface'
 
 import { OneCXVersionInfoComponent, Version } from './version-info.component'
 import { Workspace } from '@onecx/integration-interface'
+import { provideTranslateTestingService } from '@onecx/angular-testing'
 
 describe('OneCXVersionInfoComponent', () => {
   const rcConfig = new ReplaySubject<RemoteComponentConfig>(1)
@@ -44,24 +44,19 @@ describe('OneCXVersionInfoComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [
-        TranslateTestingModule.withTranslations({
-          de: require('./../../../assets/i18n/de.json'),
-          en: require('./../../../assets/i18n/en.json')
-        }).withDefaultLanguage('en'),
-        NoopAnimationsModule
-      ],
+      imports: [NoopAnimationsModule],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         provideAppStateServiceMock(),
         provideConfigurationServiceMock(),
+        provideTranslateTestingService({}),
         { provide: REMOTE_COMPONENT_CONFIG, useValue: rcConfig }
       ]
     })
       .overrideComponent(OneCXVersionInfoComponent, {
         set: {
-          imports: [TranslateTestingModule, CommonModule]
+          imports: [CommonModule]
         }
       })
       .compileComponents()

@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common'
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',
   styleUrls: ['./global-error.component.scss'],
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule]
 })
 export class GlobalErrorComponent {
   private readonly router = inject(Router)

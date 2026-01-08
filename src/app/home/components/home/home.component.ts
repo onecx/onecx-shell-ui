@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { map, Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -16,7 +16,9 @@ import { Workspace } from '@onecx/integration-interface'
 export class HomeComponent {
   workspace$: Observable<Workspace | undefined>
 
-  constructor(private readonly appStateService: AppStateService) {
+  private readonly appStateService: AppStateService = inject(AppStateService)
+
+  constructor() {
     this.workspace$ = this.appStateService.currentWorkspace$.pipe(map((currentWorkspace) => currentWorkspace))
   }
 }

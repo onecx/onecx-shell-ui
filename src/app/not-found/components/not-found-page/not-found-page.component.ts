@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -32,7 +32,9 @@ import { TranslateModule } from '@ngx-translate/core'
 export class PageNotFoundComponent {
   workspace$: Observable<Workspace>
 
-  constructor(private readonly appStateService: AppStateService) {
+  private readonly appStateService: AppStateService = inject(AppStateService)
+
+  constructor() {
     this.appStateService.currentMfe$.publish({
       appId: '',
       baseHref: '/',

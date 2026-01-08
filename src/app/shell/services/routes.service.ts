@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { Location } from '@angular/common'
 import { LoadRemoteModuleOptions, loadRemoteModule } from '@angular-architects/module-federation'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
@@ -33,16 +33,16 @@ export class RoutesService {
   private isFirstLoad = true
   showContent$ = new BehaviorSubject<boolean>(true)
 
-  constructor(
-    private readonly router: Router,
-    private readonly appStateService: AppStateService,
-    private readonly portalMessageService: PortalMessageService,
-    private readonly configurationService: ConfigurationService,
-    private readonly permissionsCacheService: PermissionsCacheService,
-    private readonly permissionsService: PermissionBffService,
-    private readonly httpClient: HttpClient
-  ) {
-    router.events
+  private readonly router: Router = inject(Router)
+  private readonly appStateService: AppStateService = inject(AppStateService)
+  private readonly portalMessageService: PortalMessageService = inject(PortalMessageService)
+  private readonly configurationService: ConfigurationService = inject(ConfigurationService)
+  private readonly permissionsCacheService: PermissionsCacheService = inject(PermissionsCacheService)
+  private readonly permissionsService: PermissionBffService = inject(PermissionBffService)
+  private readonly httpClient: HttpClient = inject(HttpClient)
+
+  constructor() {
+    this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd || e instanceof NavigationSkipped),
         map(() => true)

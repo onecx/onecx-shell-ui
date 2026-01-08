@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { PermissionsRpcTopic } from '@onecx/integration-interface'
 import { catchError, filter, map, mergeMap, of, retry } from 'rxjs'
 import { PermissionBffService } from 'src/app/shared/generated'
@@ -8,10 +8,8 @@ import { PermissionsCacheService } from './permissions-cache.service'
 export class PermissionProxyService {
   private readonly permissionsTopic$ = new PermissionsRpcTopic()
 
-  constructor(
-    private readonly permissionsService: PermissionBffService,
-    private readonly permissionsCacheService: PermissionsCacheService
-  ) {}
+  private readonly permissionsService: PermissionBffService = inject(PermissionBffService)
+  private readonly permissionsCacheService: PermissionsCacheService = inject(PermissionsCacheService)
 
   async init(): Promise<unknown> {
     this.permissionsTopic$

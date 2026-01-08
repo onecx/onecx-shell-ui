@@ -50,9 +50,16 @@ export default defineConfig(({ command, mode }) => {
       }),
       // Required to read path mappings from tsconfig.json
       nxViteTsPaths(),
+      // Required to copy static assets not located in public folder
       viteStaticCopy({
         targets: [...assets]
-      })
+      }),
+      {
+        name: 'html-transform',
+        transformIndexHtml(html) {
+          return html.replace('<base href="/" />', '<base href="/onecx-shell/" />')
+        }
+      }
     ],
     build: {
       target: ['es2020'],

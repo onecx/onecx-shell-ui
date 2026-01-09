@@ -1,7 +1,6 @@
 // Imports for portal layout styles crucial variables and styles.
 // Not importing theme default variables! Those are imported via 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss' on App initialization
 
-// fake change
 // Portal layout styles depend on primeflex and primeicons
 @import 'primeflex/primeflex';
 @import 'primeicons/primeicons';

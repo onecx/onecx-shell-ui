@@ -11,6 +11,8 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
+    "prebuild": "node ./create-dummies.js && bash ./build-preloaders-parallel.sh",
+    "prebuild:local-env": "node ./create-dummies.js && bash ./build-preloaders-parallel.sh",
     "build": "nx build",
     "build:local-env": "nx build --configuration=local-env --mode=local-env",
     "build:18": "rm -rf pre_loaders/angular-18/.nx && (cd ./pre_loaders/angular-18 && npm run build) && npm run build",

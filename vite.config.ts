@@ -5,6 +5,22 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { Target, viteStaticCopy } from 'vite-plugin-static-copy'
 import path from 'path'
 
+/**
+ * This file configures Vite for the OneCX Shell UI application.
+ *
+ * It sets up:
+ * - Angular support via the analogjs plugin.
+ * - Module Federation
+ * - Path mappings from tsconfig.json using Nx plugin.
+ * - Static asset copying.
+ * - Custom build and server configurations.
+ *
+ *  It operates in 2 modes:
+ * - Default mode for production builds and standard development.
+ * - "local-env" mode for local environment development with specific asset handling and proxy settings.
+ * @see https://vitejs.dev/config/
+ */
+
 const pckg = require('./package.json')
 
 const moduleFederationPlugin = () =>
@@ -47,6 +63,7 @@ const moduleFederationPlugin = () =>
   })
 
 export default defineConfig(({ command, mode }) => {
+  // list of assets not located in public folder to be copied to dist folder
   const assets: Target[] = [
     { src: './node_modules/@onecx/angular-utils/assets/**/*', dest: 'onecx-angular-utils/assets' },
     { src: './node_modules/@onecx/angular-accelerator/assets/**/*', dest: 'onecx-angular-accelerator/assets' },
@@ -60,7 +77,9 @@ export default defineConfig(({ command, mode }) => {
     }
   ]
 
-  // copy all font portal-layout-styles and shell-styles including fonts
+  // list of additional assets for local-env mode
+  // these are prepared by setup-local-env.sh script
+  // and copied from tmp-local-env-assets folder on serve command
   const localEnvAssets: Target[] = [
     // preloaders
     {
@@ -86,22 +105,24 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     plugins: [
-      // Required to process Angular files
+      // Angular support
       angular({
         inlineStylesExtension: 'scss'
       }),
-      // Required to read path mappings from tsconfig.json
+      // Path mappings from tsconfig.json using Nx plugin
       nxViteTsPaths(),
-      // Required to copy static assets not located in public folder
+      // Static asset copying
       viteStaticCopy({
         targets: [...assets]
       }),
+      // Custom HTML base href transform
       {
         name: 'html-transform',
         transformIndexHtml(html) {
           return html.replace('<base href="/" />', '<base href="/onecx-shell/" />')
         }
       },
+      // Module Federation
       moduleFederationPlugin()
     ],
     build: {
@@ -112,12 +133,13 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         input: {
           main: 'index.html',
+          // Include CSS files as separate entry points
           'portal-layout-styles': path.resolve(__dirname, 'src/portal-layout-styles.scss'),
           'shell-styles': path.resolve(__dirname, 'src/shell-styles.scss')
         },
         output: {
+          // Place CSS assets in /assets directory
           assetFileNames: (assetInfo) => {
-            // Place CSS assets in /assets
             if (assetInfo.names.some((name) => name.endsWith('.css'))) {
               return '[name][extname]'
             }
@@ -127,6 +149,7 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     server: {
+      // Development server configuration for local-env mode
       ...(mode === 'local-env'
         ? {
             host: '0.0.0.0',

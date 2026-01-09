@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# This script builds the onecx-shell-ui project for the local environment
+# and prepares the necessary assets in a temporary directory.
+# It performs the following steps:
+# 1. Cleans previous build artifacts.
+# 2. Executes the build command for the local environment.
+# 3. Prepares the local environment assets by copying relevant files
+#    to a temporary directory.
+
+# This script is required to correctly build and copy assets for the local environment.
+
 # clean previous build artifacts
 echo "Cleaning previous build artifacts..." && \
 rm -rf dist node_modules/.vite .nx && \

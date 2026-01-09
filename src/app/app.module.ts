@@ -22,7 +22,8 @@ import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import {
   createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
-  provideTranslationPathFromMeta,
+  // provideTranslationPathFromMeta,
+  TRANSLATION_PATH,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
@@ -308,7 +309,7 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
-declare const __webpack_share_scopes__: any
+declare const __FEDERATION__: any
 
 declare global {
   interface Window {
@@ -317,7 +318,7 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
+  window.onecxWebpackContainer = __FEDERATION__.__SHARE__['onecx-shell-ui'] // NOSONAR
 }
 
 @NgModule({
@@ -366,7 +367,11 @@ export async function shareMfContainer() {
       provide: SKIP_STYLE_SCOPING,
       useValue: true
     },
-    provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
+    // provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
+    {
+      provide: TRANSLATION_PATH,
+      useValue: ['assets/i18n/']
+    },
     { provide: APP_CONFIG, useValue: environment },
     provideAppInitializer(() => {
       permissionProxyInitializer(inject(PermissionProxyService))

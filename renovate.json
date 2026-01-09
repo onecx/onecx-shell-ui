@@ -14,13 +14,7 @@
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": [
-        "/^@angular\\//",
-        "/^@angular-devkit\\//",
-        "!/^@nx\\//",
-        "!/^@onecx\\//",
-        "!nx"
-      ]
+      "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
@@ -30,13 +24,7 @@
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": [
-        "/^@angular\\//",
-        "/^@angular-devkit\\//",
-        "!/^@nx\\//",
-        "!/^@onecx\\//",
-        "!nx"
-      ]
+      "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
@@ -46,13 +34,7 @@
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": [
-        "/^@angular\\//",
-        "/^@angular-devkit\\//",
-        "!/^@nx\\//",
-        "!/^@onecx\\//",
-        "!nx"
-      ]
+      "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
@@ -62,13 +44,7 @@
       "prPriority": 10,
       "schedule": ["before 6am every weekday"],
       "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": [
-        "/^@angular\\//",
-        "/^@angular-devkit\\//",
-        "!/^@nx\\//",
-        "!/^@onecx\\//",
-        "!nx"
-      ]
+      "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
       "matchFileNames": ["package.json"],
@@ -202,94 +178,46 @@
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": ["/^@primeng\\//", "/^primeng$/"]
     },
-    {
-      "matchFileNames": ["package.json"],
-      "groupName": "Root Angular Architects Module Federation",
-      "matchPackageNames": [
-        "@angular-architects/module-federation",
-        "@angular-architects/module-federation-tools"
-      ],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "root-module-federation",
-      "prPriority": 5,
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-18/package.json"],
-      "groupName": "Angular 18 Module Federation",
-      "matchPackageNames": [
-        "@angular-architects/module-federation",
-        "@angular-architects/module-federation-tools"
-      ],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-18-module-federation",
-      "prPriority": 5,
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-19/package.json"],
-      "groupName": "Angular 19 Module Federation",
-      "matchPackageNames": [
-        "@angular-architects/module-federation",
-        "@angular-architects/module-federation-tools"
-      ],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-19-module-federation",
-      "prPriority": 5,
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-20/package.json"],
-      "groupName": "Angular 20 Module Federation",
-      "matchPackageNames": [
-        "@angular-architects/module-federation",
-        "@angular-architects/module-federation-tools"
-      ],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-20-module-federation",
-      "prPriority": 5,
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "matchFileNames": ["package.json"],
-      "groupName": "Root Webpack",
-      "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "root-webpack",
-      "prPriority": 3,
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-18/package.json"],
-      "groupName": "Angular 18 Webpack",
-      "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-18-webpack",
-      "prPriority": 3,
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-19/package.json"],
-      "groupName": "Angular 19 Webpack",
-      "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-19-webpack",
-      "prPriority": 3,
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
-    },
-    {
-      "matchFileNames": ["pre_loaders/angular-20/package.json"],
-      "groupName": "Angular 20 Webpack",
-      "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
-      "matchDepTypes": ["dependencies", "devDependencies"],
-      "groupSlug": "angular-20-webpack",
-      "prPriority": 3,
-      "matchUpdateTypes": ["minor", "patch"],
-      "enabled": false
-    },
+    // {
+    //   "matchFileNames": ["package.json"],
+    //   "groupName": "Root Webpack",
+    //   "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
+    //   "matchDepTypes": ["dependencies", "devDependencies"],
+    //   "groupSlug": "root-webpack",
+    //   "prPriority": 3,
+    //   "matchUpdateTypes": ["minor", "patch"],
+    //   "enabled": false
+    // },
+    // {
+    //   "matchFileNames": ["pre_loaders/angular-18/package.json"],
+    //   "groupName": "Angular 18 Webpack",
+    //   "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
+    //   "matchDepTypes": ["dependencies", "devDependencies"],
+    //   "groupSlug": "angular-18-webpack",
+    //   "prPriority": 3,
+    //   "matchUpdateTypes": ["minor", "patch"],
+    //   "enabled": false
+    // },
+    // {
+    //   "matchFileNames": ["pre_loaders/angular-19/package.json"],
+    //   "groupName": "Angular 19 Webpack",
+    //   "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
+    //   "matchDepTypes": ["dependencies", "devDependencies"],
+    //   "groupSlug": "angular-19-webpack",
+    //   "prPriority": 3,
+    //   "matchUpdateTypes": ["minor", "patch"],
+    //   "enabled": false
+    // },
+    // {
+    //   "matchFileNames": ["pre_loaders/angular-20/package.json"],
+    //   "groupName": "Angular 20 Webpack",
+    //   "matchPackageNames": ["webpack", "modify-source-webpack-plugin"],
+    //   "matchDepTypes": ["dependencies", "devDependencies"],
+    //   "groupSlug": "angular-20-webpack",
+    //   "prPriority": 3,
+    //   "matchUpdateTypes": ["minor", "patch"],
+    //   "enabled": false
+    // },
     {
       "matchFileNames": ["package.json"],
       "matchDepTypes": ["devDependencies"],
@@ -302,8 +230,8 @@
       "labels": ["dependencies", "automerge"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": [
-        "!webpack",
-        "!modify-source-webpack-plugin",
+        // "!webpack",
+        // "!modify-source-webpack-plugin",
         "!/^@nx\\//",
         "!/^nx$/",
         "!/^@onecx\\//",

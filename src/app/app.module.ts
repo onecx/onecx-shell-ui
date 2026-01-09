@@ -23,6 +23,7 @@ import {
   createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
   // provideTranslationPathFromMeta,
+  TRANSLATION_PATH,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'

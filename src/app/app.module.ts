@@ -22,7 +22,7 @@ import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 import {
   createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
-  provideTranslationPathFromMeta,
+  // provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
@@ -361,7 +361,11 @@ export async function shareMfContainer() {
       provide: SKIP_STYLE_SCOPING,
       useValue: true
     },
-    provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
+    // provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
+    {
+      provide: TRANSLATION_PATH,
+      useValue: ['assets/i18n/']
+    },
     { provide: APP_CONFIG, useValue: environment },
     provideAppInitializer(() => {
       permissionProxyInitializer(inject(PermissionProxyService))

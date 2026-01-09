@@ -1,15 +1,52 @@
 import { defineConfig } from 'vite'
 import angular from '@analogjs/vite-plugin-angular'
+import { federation } from '@module-federation/vite'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { Target, viteStaticCopy } from 'vite-plugin-static-copy'
 import path from 'path'
 
-// Issue: Translations not working
-// Issue: Styles not being able to be fetched
-// Issue: Module federation disabled
+const pckg = require('./package.json')
+
+const moduleFederationPlugin = () =>
+  federation({
+    name: 'onecx-shell-ui',
+    exposes: {
+      './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts',
+      './OneCXShellToastComponent': 'src/app/remotes/shell-toast/shell-toast.component.main.ts'
+    },
+    shared: {
+      // requiredVersion "auto" not supported
+      '@angular/core': { requiredVersion: pckg['dependencies']['@angular/core'] },
+      '@angular/common': { requiredVersion: pckg['dependencies']['@angular/common'] },
+      '@angular/common/http': {
+        requiredVersion: pckg['dependencies']['@angular/common/http']
+      },
+      '@angular/elements': { requiredVersion: pckg['dependencies']['@angular/elements'] },
+      '@angular/forms': { requiredVersion: pckg['dependencies']['@angular/forms'] },
+      '@angular/platform-browser': {
+        requiredVersion: pckg['dependencies']['@angular/platform-browser']
+      },
+      '@angular/router': { requiredVersion: pckg['dependencies']['depName'] },
+      '@ngx-translate/core': { requiredVersion: pckg['dependencies']['depName'] },
+      primeng: { requiredVersion: pckg['dependencies']['depName'] },
+      rxjs: { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/accelerator': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/angular-accelerator': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/angular-auth': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/angular-integration-interface': {
+        requiredVersion: pckg['dependencies']['depName']
+      },
+      '@onecx/angular-remote-components': {
+        requiredVersion: pckg['dependencies']['depName']
+      },
+      '@onecx/angular-utils': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/angular-webcomponents': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/integration-interface': { requiredVersion: pckg['dependencies']['depName'] },
+      '@onecx/portal-layout-styles': { requiredVersion: pckg['dependencies']['depName'] }
+    }
+  })
 
 export default defineConfig(({ command, mode }) => {
-  console.log('mode', mode)
   const assets: Target[] = [
     { src: './node_modules/@onecx/angular-utils/assets/**/*', dest: 'onecx-angular-utils/assets' },
     { src: './node_modules/@onecx/angular-accelerator/assets/**/*', dest: 'onecx-angular-accelerator/assets' },
@@ -25,6 +62,11 @@ export default defineConfig(({ command, mode }) => {
 
   // copy all font portal-layout-styles and shell-styles including fonts
   const localEnvAssets: Target[] = [
+    // preloaders
+    {
+      src: './tmp-local-env-assets/pre_loaders/**/*',
+      dest: 'pre_loaders'
+    },
     {
       src: './tmp-local-env-assets/portal-layout-styles.css',
       dest: ''
@@ -40,7 +82,7 @@ export default defineConfig(({ command, mode }) => {
     }
   ]
 
-  assets.push(...(mode === 'local-env' ? localEnvAssets : []))
+  assets.push(...(mode === 'local-env' && command === 'serve' ? localEnvAssets : []))
 
   return {
     plugins: [
@@ -59,10 +101,13 @@ export default defineConfig(({ command, mode }) => {
         transformIndexHtml(html) {
           return html.replace('<base href="/" />', '<base href="/onecx-shell/" />')
         }
-      }
+      },
+      moduleFederationPlugin()
     ],
     build: {
-      target: ['es2020'],
+      // required for module federation top-level await but does not support all browsers (https://caniuse.com/?search=top+level+await)
+      // could be replaced with vite-plugin-top-level-await to support more browsers
+      target: 'esnext',
       outDir: 'dist/onecx-shell-ui',
       rollupOptions: {
         input: {

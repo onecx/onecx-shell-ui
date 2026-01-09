@@ -26,6 +26,7 @@ const pckg = require('./package.json')
 const moduleFederationPlugin = () =>
   federation({
     name: 'onecx-shell-ui',
+    filename: 'remoteEntry.js',
     exposes: {
       './OneCXVersionInfoComponent': 'src/app/remotes/version-info/version-info.component.main.ts',
       './OneCXShellToastComponent': 'src/app/remotes/shell-toast/shell-toast.component.main.ts'

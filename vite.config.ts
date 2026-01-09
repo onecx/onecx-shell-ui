@@ -94,7 +94,6 @@ export default defineConfig(({ command, mode }) => {
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/onecx-shell\/shell-bff/, '')
-                // Optionally add logLevel: 'debug'
               }
             }
           }

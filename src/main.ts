@@ -2,13 +2,9 @@ console.log('Loading dependencies and global styles...')
 // Polyfill zone.js for Angular's change detection mechanism
 import 'zone.js'
 // Global styles
-import './splash.scss'
+// NOTE: On development mode, these styles are inlined into index.html by Vite
+// but its done later than in production build, so the variables might not be available from the start
 import './global-styles.scss'
-// Pre-processed styles for correct processing of exposed style sheets
-// Put any style sheets that are requires to be pre-processed here
-import 'primeicons/primeicons.css'
-// import './portal-layout-styles.scss?inline'
-// import './shell-styles.scss?inline'
 
 // import {
 //   angular18Preloader,

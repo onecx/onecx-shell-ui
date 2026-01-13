@@ -332,6 +332,7 @@ export async function shareMfContainer() {
     AppLoadingSpinnerComponent
   ],
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     provideAppInitializer(() => {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),
@@ -350,7 +351,6 @@ export async function shareMfContainer() {
     }),
     provideThemeConfig(),
     provideTokenInterceptor(),
-    provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
     providePrimeNG(),
     {

@@ -34,6 +34,10 @@
       "PARAMS": "Parameter"
     }
   },
+  "ABOUT_SHELL_PAGE": {
+    "TITLE": "ABOUT SHELL",
+    "ANGULAR_VERSIONS_SUPPORTED": "Angular Versions Supported by Shell"
+  },
   "OCX_HEADER": {
     "HEADER_LEFT": "Header left",
     "HEADER_CENTER": "Header center",

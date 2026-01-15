@@ -2,6 +2,8 @@ const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
 const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
 
+const angular20Scope = 'angular-20'
+
 const webpackConfig = {
   ...withModuleFederationPlugin({
     name: 'onecx-shell-ui',
@@ -10,30 +12,31 @@ const webpackConfig = {
       './OneCXShellToastComponent': 'src/app/remotes/shell-toast/shell-toast.component.main.ts'
     },
     shared: share({
-      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },
+      '@angular/core': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
       '@angular/common': {
         requiredVersion: 'auto',
-        includeSecondaries: { skip: ['@angular/common/http/testing'] }
+        includeSecondaries: { skip: ['@angular/common/http/testing'] },
+        shareScope: angular20Scope 
       },
-      '@angular/common/http': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular/elements': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
-      '@angular-architects/module-federation-tools': { requiredVersion: 'auto', includeSecondaries: true },
-      '@ngx-translate/core': { requiredVersion: 'auto' },
-      '@ngx-translate/http-loader': { requiredVersion: 'auto' },
-      primeng: { requiredVersion: 'auto', includeSecondaries: true },
-      rxjs: { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-accelerator': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-auth': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
-      '@onecx/portal-layout-styles': { requiredVersion: 'auto', includeSecondaries: true }
+      '@angular/common/http': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@angular/elements': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@angular/router': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@angular-architects/module-federation-tools': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@ngx-translate/core': { requiredVersion: 'auto', shareScope: angular20Scope },
+      '@ngx-translate/http-loader': { requiredVersion: 'auto', shareScope: angular20Scope },
+      primeng: { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      rxjs: { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-accelerator': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-auth': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope },
+      '@onecx/portal-layout-styles': { requiredVersion: 'auto', includeSecondaries: true, shareScope: angular20Scope }
     })
   })
 }

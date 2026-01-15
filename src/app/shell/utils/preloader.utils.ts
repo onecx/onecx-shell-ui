@@ -30,11 +30,16 @@ export const angular20Preloader: Preloader = {
 
 export async function loadPreloaderModule(preloader: Preloader) {
   const moduleFederation = await import('@angular-architects/module-federation')
-  return moduleFederation.loadRemoteModule({
-    type: 'module',
-    remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-    exposedModule: preloader.exposedModule
-  })
+  return moduleFederation
+    .loadRemoteModule({
+      type: 'module',
+      remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
+      exposedModule: preloader.exposedModule
+    })
+    .catch(() => {
+      console.warn(`Could not load preloader: ${preloader.windowKey}. Application might not work as expected.`)
+      window['onecxPreloaders'][preloader.windowKey] = true
+    })
 }
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {

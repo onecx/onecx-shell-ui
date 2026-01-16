@@ -73,6 +73,8 @@
     "@onecx/integration-interface": "^7.0.2",
     "@onecx/portal-layout-styles": "^5.52.1",
     "@primeng/themes": "^20.3.0",
+    "@module-federation/enhanced": "^0.10.0",
+    "@module-federation/runtime-core": "^0.10.0",
     "keycloak-js": "^25.0.6",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",

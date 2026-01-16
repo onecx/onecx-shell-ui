@@ -5,41 +5,49 @@ declare global {
 }
 
 export interface Preloader {
+  name: string
   relativeRemoteEntryUrl: string
   windowKey: string
   exposedModule: string
 }
 
+const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
+
 export const angular18Preloader: Preloader = {
+  name: magicChar + 'angular-18-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
   windowKey: 'angular-18',
-  exposedModule: './Angular18Loader'
+  exposedModule: 'Angular18Loader'
 }
 
 export const angular19Preloader: Preloader = {
+  name: magicChar + 'angular-19-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
   windowKey: 'angular-19',
-  exposedModule: './Angular19Loader'
+  exposedModule: 'Angular19Loader'
 }
 
 export const angular20Preloader: Preloader = {
+  name: magicChar + 'angular-20-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
   windowKey: 'angular-20',
-  exposedModule: './Angular20Loader'
+  exposedModule: 'Angular20Loader'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {
-  const moduleFederation = await import('@angular-architects/module-federation')
-  return moduleFederation
-    .loadRemoteModule({
+  const moduleFederation = await import('@module-federation/enhanced/runtime')
+  moduleFederation.registerRemotes([
+    {
       type: 'module',
-      remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-      exposedModule: preloader.exposedModule
-    })
-    .catch(() => {
-      console.warn(`Could not load preloader: ${preloader.windowKey}. Application might not work as expected.`)
-      window['onecxPreloaders'][preloader.windowKey] = true
-    })
+      entry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
+      name: preloader.name
+    }
+  ])
+  await moduleFederation.loadRemote(preloader.name + '/' + preloader.exposedModule).catch((e) => {
+    console.warn(`Could not load preloader: ${preloader.windowKey}. Application might not work as expected.`)
+    console.error(e)
+    window['onecxPreloaders'][preloader.windowKey] = true
+  })
 }
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {

@@ -1,5 +1,5 @@
 {
-  "name": "onecx-angular-20-loader",
+  "name": "z_onecx-angular-20-loader",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "ocx-angular-20-loader",
@@ -15,7 +15,7 @@
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",
         "customWebpackConfig": {
-          "path": "./webpack.config.js"
+          "path": "./webpack.config.ts"
         },
         "assets": [
           {
@@ -46,7 +46,7 @@
           ],
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.js"
+            "path": "./webpack.config.ts"
           }
         },
         "development": {

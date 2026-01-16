@@ -11,25 +11,23 @@ export interface Preloader {
   exposedModule: string
 }
 
-const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
-
 export const angular18Preloader: Preloader = {
-  name: magicChar + 'angular-18-preloader',
+  name: 'angular-18-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
   windowKey: 'angular-18',
   exposedModule: 'Angular18Loader'
 }
 
 export const angular19Preloader: Preloader = {
-  name: magicChar + 'angular-19-preloader',
+  name: 'angular-19-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
   windowKey: 'angular-19',
   exposedModule: 'Angular19Loader'
 }
 
 export const angular20Preloader: Preloader = {
-  name: magicChar + 'angular-20-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  name: 'angular-20-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.mjs',
   windowKey: 'angular-20',
   exposedModule: 'Angular20Loader'
 }

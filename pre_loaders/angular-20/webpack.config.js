@@ -29,7 +29,7 @@ const webpackConfig = {
     exposes: {
       ['./Angular20Loader']: 'src/main.ts'
     },
-    shared: shareAll({ requiredVersion: 'auto', includeSecondaries: true, shareScope: 'angular-20' }, undefined, './')
+    shared: shareAll({ requiredVersion: 'auto', includeSecondaries: true }, undefined, './')
   })
 }
 

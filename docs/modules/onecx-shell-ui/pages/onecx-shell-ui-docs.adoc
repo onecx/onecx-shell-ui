@@ -271,3 +271,54 @@ To enable toast messages by using the `OneCXShellToastComponent`, it must be con
 3. The component will automatically subscribe to the `PortalMessageService` message stream
 
 Once configured in the extensions slot, any micro frontend can send messages through the `PortalMessageService`, and they will be displayed as toast notifications to the user.
+
+[#shell-version-information]
+=== Shell Version Information
+
+Overview of supported package versions in the shell across all environments.
+
+==== Primary Method: About Page
+
+The recommended way to check shell version information is through the **About page** in the Shell UI.
+The page will display version information for all supported versions.
+
+==== Alternative Method: Browser DevTools
+
+You can also use the browser's Developer Tools to access version information:
+
+. Open your browser's Developer Tools
+. Navigate to the Console tab
+. Execute the following command:
++
+[source,bash]
+----
+window['onecxWebpackContainer']
+----
+. Expand `default` and `angular-core`
+
+This will display a list of all Angular versions, that the shell is supporting, looking similar to the image below:
+
+image::shell_version_entries.png[]
+
+==== Angular - Libs Version Compatibility
+
+The following table outlines the compatibility between OneCX library versions and their corresponding Angular framework versions:
+
+[cols="1,1", width="50%"]
+|===
+|OneCX Libs |Angular
+
+|v5
+|18
+
+|v6
+|19
+
+|v7
+|20
+|===
+
+For further details on version compatibility, refer to the following resources:
+
+* xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc#user-service[OneCX Compatibility Documentation]
+* xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]

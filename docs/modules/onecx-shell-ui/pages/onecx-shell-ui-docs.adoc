@@ -280,6 +280,7 @@ Overview of supported package versions in the shell across all environments.
 ==== Primary Method: About Page
 
 The recommended way to check shell version information is through the **About page** in the Shell UI.
+It can be accessed by navigating to the route `/onecx-shell/about-shell` in your local application.
 The page will display version information for all supported versions.
 
 ==== Alternative Method: Browser DevTools

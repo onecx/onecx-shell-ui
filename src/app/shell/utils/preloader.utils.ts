@@ -9,27 +9,31 @@ export interface Preloader {
   relativeRemoteEntryUrl: string
   windowKey: string
   exposedModule: string
+  shareScope: string
 }
 
 export const angular18Preloader: Preloader = {
   name: 'angular-18-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
   windowKey: 'angular-18',
-  exposedModule: 'Angular18Loader'
+  exposedModule: 'Angular18Loader',
+  shareScope: 'default'
 }
 
 export const angular19Preloader: Preloader = {
   name: 'angular-19-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
   windowKey: 'angular-19',
-  exposedModule: 'Angular19Loader'
+  exposedModule: 'Angular19Loader',
+  shareScope: 'default'
 }
 
 export const angular20Preloader: Preloader = {
   name: 'angular-20-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.mjs',
   windowKey: 'angular-20',
-  exposedModule: 'Angular20Loader'
+  exposedModule: 'Angular20Loader',
+  shareScope: 'angular_20'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {
@@ -38,7 +42,8 @@ export async function loadPreloaderModule(preloader: Preloader) {
     {
       type: 'module',
       entry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-      name: preloader.name
+      name: preloader.name,
+      shareScope: preloader.shareScope
     }
   ])
   await moduleFederation.loadRemote(preloader.name + '/' + preloader.exposedModule).catch((e) => {

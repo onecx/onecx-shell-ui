@@ -79,7 +79,7 @@
         ],
         "scripts": [],
         "customWebpackConfig": {
-          "path": "./webpack.config.ts"
+          "path": "./webpack.config.js"
         }
       },
       "configurations": {
@@ -98,7 +98,7 @@
           ],
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.ts"
+            "path": "./webpack.config.js"
           }
         },
         "development": {

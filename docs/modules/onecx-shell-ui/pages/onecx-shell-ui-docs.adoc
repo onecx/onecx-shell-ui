@@ -303,7 +303,7 @@ window['onecxWebpackContainer']
 ----
 . Expand `default` and `angular-core`
 
-This will display a list of all Angular versions that the shell is supporting. The displayed versions represent the maximum supported versions for each major Angular version - any version less than or equal to the shown version (within the same major) is supported.
+This will display a list of all Angular versions that the shell is supporting. The displayed versions represent the maximum supported versions for each major Angular version - **any version less than or equal to the shown version (within the same major) is supported**.
 
 image::shell_version_entries.png[]
 
@@ -325,9 +325,13 @@ The following table outlines the compatibility between OneCX library versions an
 |20
 |===
 
-NOTE: The versions listed in the table above represent the maximum supported versions for each major version. Any OneCX library version less than or equal to the listed version (within the same major) is supported. For example, if v5 supports Angular 18, then v5.0.0, v5.1.0, v5.2.0, etc. are all supported with Angular 18.
+The major Angular version in the application determines which OneCX library version should be used. 
+
+The versions listed in the table above represent the **maximum supported versions for each major version**. Any OneCX library version less than or equal to the listed version (within the same major) is compatible. For example, if the application uses Angular 18, any OneCX library version from v5.0.0 up to the maximum supported v5.x.x version can be used. 
+
+NOTE: While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
 
 For further details on version compatibility, refer to the following resources:
 
-* xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc#user-service[OneCX Compatibility Documentation]
+* xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
 * xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]

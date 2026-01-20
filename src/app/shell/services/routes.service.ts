@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core'
 import { Location } from '@angular/common'
+import { LoadRemoteModuleOptions, loadRemoteModule } from '@angular-architects/module-federation'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
-import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
-import { types } from '@module-federation/runtime-core/.'
 
 import { getLocation } from '@onecx/accelerator'
 import {
@@ -91,9 +90,8 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        registerRemotes([this.toLoadRemoteEntryOptions(r)])
+        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r))
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
-        const m = await loadRemote<any>(r.productName + '/' + r.appId + '/' + exposedModule)
         console.log(`Load remote module ${exposedModule} finished.`)
         if (r.technology === Technologies.Angular) {
           return m[exposedModule]
@@ -179,20 +177,20 @@ export class RoutesService {
     throw err
   }
 
-  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): types.Remote {
+  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): LoadRemoteModuleOptions {
     const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
     if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
       return {
         type: 'module',
-        entry: r.remoteEntryUrl,
-        name: r.productName + '/' + r.appId
+        remoteEntry: r.remoteEntryUrl,
+        exposedModule: './' + exposedModule
       }
     }
     return {
       type: 'script',
-      alias: r.remoteName ?? '', // TODO: check
-      entry: r.remoteEntryUrl,
-      name: './' + exposedModule
+      remoteName: r.remoteName ?? '',
+      remoteEntry: r.remoteEntryUrl,
+      exposedModule: './' + exposedModule
     }
   }
 

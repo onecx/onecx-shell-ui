@@ -21,6 +21,7 @@ const webpackConfig = {
       '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
       '@angular-architects/module-federation-tools': { requiredVersion: 'auto', includeSecondaries: true },
       '@ngx-translate/core': { requiredVersion: 'auto' },
+      '@ngx-translate/http-loader': { requiredVersion: 'auto' },
       primeng: { requiredVersion: 'auto', includeSecondaries: true },
       rxjs: { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },

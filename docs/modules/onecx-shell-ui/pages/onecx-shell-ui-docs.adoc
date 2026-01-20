@@ -325,11 +325,7 @@ The following table outlines the compatibility between OneCX library versions an
 |20
 |===
 
-The major Angular version in the application determines which OneCX library version should be used. 
-
-The versions listed in the table above represent the **maximum supported versions for each major version**. Any OneCX library version less than or equal to the listed version (within the same major) is compatible. For example, if the application uses Angular 18, any OneCX library version from v5.0.0 up to the maximum supported v5.x.x version can be used. 
-
-NOTE: While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
+NOTE: The major Angular version in the application determines which OneCX library version should be used. While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
 
 For further details on version compatibility, refer to the following resources:
 

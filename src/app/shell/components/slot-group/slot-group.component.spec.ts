@@ -105,15 +105,13 @@ describe('SlotGroupComponent', () => {
       permissions: Promise.resolve(['test-permission'])
     }
 
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.start')
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.center')
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.end')
+    slotServiceMock.assignComponents({
+      'test-slot.start': [testComponentConfig],
+      'test-slot.center': [testComponentConfig],
+      'test-slot.end': [testComponentConfig]
+    })
 
     slotGroupHarness = await TestbedHarnessEnvironment.harnessForFixture(fixture, SlotGroupHarness)
-  })
-
-  afterEach(() => {
-    slotServiceMock.clearAssignments()
   })
 
   it('should observe the native element on init', () => {

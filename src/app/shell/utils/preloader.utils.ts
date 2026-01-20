@@ -38,6 +38,19 @@ export const angular20Preloader: Preloader = {
 
 export async function loadPreloaderModule(preloader: Preloader) {
   const moduleFederation = await import('@module-federation/enhanced/runtime')
+  // const urlWithoutFileName = preloader.relativeRemoteEntryUrl.replace(/\/[^/]*$/, '')
+  // const url = `${urlWithoutFileName}/mf-manifest.json`
+  // const data = await fetch(url).catch(() => {
+  //   console.warn(
+  //     `Could not fetch manifest for preloader: ${preloader.windowKey}. Application might not work as expected.`
+  //   )
+  //   return undefined
+  // })
+  // let shareScope = undefined
+  // try {
+  //   const manifest = data ? await data.json() : undefined
+  //   shareScope = getShareScope(manifest)
+  // } catch (e) {}
   moduleFederation.registerRemotes([
     {
       type: 'module',
@@ -67,6 +80,22 @@ export function ensurePreloaderModuleLoaded(preloader: Preloader) {
     }, 50)
   })
 }
+
+// export function getShareScope(manifest: any): string {
+//   const angularCore = manifest.shared.find((s: any) => s.name === '@angular/core')
+//   if (!angularCore) {
+//     console.warn('Could not determine Angular version from manifest. Using default share scope.')
+//     return 'default'
+//   }
+
+//   const version = angularCore.version.split('.')[0]
+//   if (!version || version === '18' || version === '19') {
+//     console.warn('Using default share scope for Angular version:', version)
+//     return 'default'
+//   }
+
+//   return `angular_${version}`
+// }
 
 export function getLocation() {
   const baseHref = document.getElementsByTagName('base')[0]?.href ?? window.location.origin + '/'

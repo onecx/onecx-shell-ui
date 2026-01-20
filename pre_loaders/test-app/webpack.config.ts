@@ -53,6 +53,7 @@ export default async function (baseConfig: Configuration) {
 
   return {
     ...webpackConfig,
+    // output: { uniqueName: magicChar + 'onecx-angular-20-loader', publicPath: 'auto' },
     plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
     module: {
       ...webpackConfig.module,
@@ -61,5 +62,7 @@ export default async function (baseConfig: Configuration) {
         javascript: { ...webpackConfig.module.parser.javascript, importMeta: false }
       }
     }
+    // experiments: { ...webpackConfig.experiments, topLevelAwait: true },
+    // optimization: { runtimeChunk: false, splitChunks: false }
   }
 }

@@ -3,7 +3,7 @@ import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
-import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
 import {
@@ -20,8 +20,8 @@ import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import {
-  createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
+  OnecxTranslateLoader,
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
@@ -188,7 +188,7 @@ export function permissionProxyInitializer(permissionProxyService: PermissionPro
 export function configurationServiceInitializer(configurationService: ConfigurationService) {
   configurationService.init()
 }
-  
+
 export function imageRepositoryServiceInitializer(imageRepositoryService: ImageRepositoryService) {
   imageRepositoryService.init()
 }
@@ -331,25 +331,12 @@ export async function shareMfContainer() {
     BrowserAnimationsModule,
     CommonModule,
     RouterModule.forRoot(appRoutes),
-    TranslateModule.forRoot({
-      isolate: true,
-      defaultLanguage: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient]
-      },
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MultiLanguageMissingTranslationHandler
-      }
-    }),
-
     PortalViewportComponent,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent
   ],
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     provideAppInitializer(() => {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),
@@ -361,9 +348,13 @@ export async function shareMfContainer() {
         inject(Router)
       )
     }),
+    provideTranslateService({
+      defaultLanguage: 'en',
+      loader: provideTranslateLoader(OnecxTranslateLoader),
+      missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
+    }),
     provideThemeConfig(),
     provideTokenInterceptor(),
-    provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
     providePrimeNG(),
     {

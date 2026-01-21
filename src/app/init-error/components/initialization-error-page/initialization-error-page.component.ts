@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
 import { CommonModule } from '@angular/common'
@@ -24,7 +24,9 @@ export class InitializationErrorPageComponent {
   error$: Observable<InitializationError>
   public eventsPublisher$: EventsPublisher = new EventsPublisher()
 
-  constructor(private readonly route: ActivatedRoute) {
+  private readonly route: ActivatedRoute = inject(ActivatedRoute)
+
+  constructor() {
     this.error$ = this.route.fragment.pipe(
       map((fragment) => {
         const params = new URLSearchParams(fragment ?? '')

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Location, CommonModule } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
@@ -34,7 +34,9 @@ import { getLocation } from '@onecx/accelerator'
 export class ErrorPageComponent {
   requestedApplicationPath: string
 
-  constructor(private readonly route: ActivatedRoute) {
+  private readonly route: ActivatedRoute = inject(ActivatedRoute)
+
+  constructor() {
     this.requestedApplicationPath = this.route.snapshot.paramMap.get('requestedApplicationPath') ?? ''
   }
 

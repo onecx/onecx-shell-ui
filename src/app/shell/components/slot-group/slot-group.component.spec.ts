@@ -105,15 +105,13 @@ describe('SlotGroupComponent', () => {
       permissions: Promise.resolve(['test-permission'])
     }
 
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.start')
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.center')
-    slotServiceMock.assignComponentToSlot(testComponentConfig, 'test-slot.end')
+    slotServiceMock.assignComponents({
+      'test-slot.start': [testComponentConfig],
+      'test-slot.center': [testComponentConfig],
+      'test-slot.end': [testComponentConfig]
+    })
 
     slotGroupHarness = await TestbedHarnessEnvironment.harnessForFixture(fixture, SlotGroupHarness)
-  })
-
-  afterEach(() => {
-    slotServiceMock.clearAssignments()
   })
 
   it('should observe the native element on init', () => {
@@ -287,7 +285,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupStyles of type object to container div', async () => {
         const slotGroupStylesObject = { color: 'blue', padding: '15px' }
-        const expectedStyles = { color: 'blue', padding: '15px' }
+        const expectedStyles = { color: 'rgb(0, 0, 255)', padding: '15px' }
 
         componentRef.setInput('slotGroupStyles', slotGroupStylesObject)
 

@@ -25,9 +25,9 @@ export class AboutComponent implements OnInit {
     this.loadSupportedVersions()
   }
 
-  private async loadSupportedVersions(){
+  private loadSupportedVersions(){
     try {
-      Object.entries((window as any).onecxWebpackContainer?.default['@angular/core'] || {}).forEach(([version, data]: [string, any]) => {
+      Object.entries((globalThis as any).onecxWebpackContainer?.default['@angular/core'] || {}).forEach(([version, data]: [string, any]) => {
         if (data.from.startsWith(magicChar)) {
           this.supportedAngularVersions.push({
             name: "Angular " + version.substring(0, version.indexOf('.')),

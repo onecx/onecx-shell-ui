@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 describe('AboutComponent', () => {
     let fixture: ComponentFixture<AboutComponent>;
     let component: AboutComponent
-    
+
     const magicChar = String.fromCodePoint(0x10ffff)
 
 

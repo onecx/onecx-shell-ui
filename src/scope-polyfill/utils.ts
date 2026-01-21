@@ -412,7 +412,6 @@ function computeRootSelectorForElement(element: Element) {
   return selector
 }
 
-
 export function supportsConditionTextToScopeRuleText(conditionText: string) {
   // Removing braces from condition since its always wrapped with braces e.g., coditionText = (@scope(...))
   return conditionText.slice(1, -1)

@@ -108,7 +108,7 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
-  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}`)) {
+  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
     return;
   }
   

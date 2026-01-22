@@ -279,10 +279,16 @@ The shell supports a range of Angular versions across all environments. Supporte
 
 ==== Primary Method: About Page
 
-The recommended way to check shell version information is through the **About page** in the Shell UI.
-It can be accessed by navigating to the route `/onecx-shell/about-shell` in your local application. That means if your portal is accessible at `https://myDomain.com/portal/admin` the URL for the About page would be `https://myDomain.com/portal/onecx-shell/about-shell`.
+The preferred method to check shell version information is through the **About page** in the Shell UI.
+The About page can be accessed by appending `/onecx-shell/about-shell` to your application's base URL:
 
-The page will display version information for all supported versions.
+`<application-base-url>/onecx-shell/about-shell`
+
+**Examples:**
+* Base URL: `https://myDomain.com/` → About page: `https://myDomain.com/onecx-shell/about-shell`
+* Base URL: `https://myDomain.com/admin/portal/` → About page: `https://myDomain.com/admin/portal/onecx-shell/about-shell`
+
+The About page displays comprehensive version information for all supported packages and can be accessed in any environment to verify deployed versions.
 
 [NOTE]
 ====

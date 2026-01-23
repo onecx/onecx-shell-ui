@@ -1,10 +1,10 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
-import { TranslateTestingModule } from 'ngx-translate-testing'
 
 import { InitializationErrorPageComponent } from './initialization-error-page.component'
 import { TooltipModule } from 'primeng/tooltip'
+import { provideTranslateTestingService } from '@onecx/angular-testing'
 
 describe('InitializationErrorPageComponent', () => {
   let component: InitializationErrorPageComponent
@@ -27,14 +27,8 @@ describe('InitializationErrorPageComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [
-        InitializationErrorPageComponent,
-        TooltipModule,
-        TranslateTestingModule.withTranslations({
-          en: require('../../../../assets/i18n/en.json')
-        }).withDefaultLanguage('en')
-      ],
-      providers: [{ provide: ActivatedRoute, useValue: route }]
+      imports: [InitializationErrorPageComponent, TooltipModule],
+      providers: [{ provide: ActivatedRoute, useValue: route }, provideTranslateTestingService({})]
     }).compileComponents()
 
     fixture = TestBed.createComponent(InitializationErrorPageComponent)

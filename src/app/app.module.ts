@@ -21,7 +21,7 @@ import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import {
   MultiLanguageMissingTranslationHandler,
-  OnecxTranslateLoader,
+  AsyncTranslateLoader,
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
@@ -32,6 +32,8 @@ import { CurrentLocationPublisher, EventsTopic, Theme, UserProfile } from '@onec
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
+  OverrideType,
+  ThemeOverride,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -51,6 +53,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
+import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -122,13 +125,36 @@ export async function workspaceConfigInitializer(
   )
 
   if (loadWorkspaceConfigResponse) {
+    // loadWorkspaceConfigResponse.theme.overrides = [
+    //   {
+    //     type: OverrideType.CSS,
+    //     value: '{"topbar":{"topbar-item-text-color":" #ffffff","topbar-bg-color":"#0000ff"}}'
+    //   },
+    //   {
+    //     type: OverrideType.PRIMENG,
+    //     value: '{"general":{"primary-color":"#ffffff"},"sidebar":{"menu-text-color":"#ffffff","menu-bg-color":" #fdfeff"}}'
+    //   }
+    // ]
+
     const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
       string,
       Record<string, string>
     >
+
+    const parsedOverrides: any = []
+    if (loadWorkspaceConfigResponse.theme.overrides && loadWorkspaceConfigResponse.theme.overrides.length > 0) {
+      loadWorkspaceConfigResponse.theme.overrides.forEach((element: ThemeOverride) => {
+        if (element.value) {
+          const override = { ...element, value: JSON.parse(element.value) as Record<string, Record<string, string>> }
+          parsedOverrides.push(override)
+        }
+      })
+    }
+
     const themeWithParsedProperties = {
       ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties
+      properties: parsedProperties,
+      overrides: parsedOverrides
     }
 
     await Promise.all([
@@ -136,7 +162,7 @@ export async function workspaceConfigInitializer(
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      apply(themeService, themeWithParsedProperties),
+      applyThemeVariables(themeService, themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish({
         components: loadWorkspaceConfigResponse.components,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
@@ -296,7 +322,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
+export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
   console.log(`🎨 Applying theme: ${theme.name}`)
   await themeService.currentTheme$.publish(theme)
   if (theme.properties) {
@@ -305,6 +331,25 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
         document.documentElement.style.setProperty(`--${key}`, value)
       }
     }
+  }
+  if (theme.overrides && theme.overrides.length > 0) {
+    let el = document.getElementById('css_overrides') as HTMLStyleElement | null
+    if (!el) {
+      el = document.createElement('style')
+      el.id = 'css_overrides'
+      el.dataset[MARKED_AS_WRAPPED] = ''
+      document.head.appendChild(el)
+    }
+    theme.overrides.forEach((override) => {
+      if (override.value && override.type === OverrideType.CSS) {
+        for (const group of Object.values(override.value)) {
+          for (const [key, value] of Object.entries(group)) {
+            document.documentElement.style.setProperty(`--${key}`, value)
+            el.textContent += `\n:root { --${key}: ${value}; }`
+          }
+        }
+      }
+    })
   }
 }
 
@@ -346,7 +391,7 @@ export async function shareMfContainer() {
     }),
     provideTranslateService({
       defaultLanguage: 'en',
-      loader: provideTranslateLoader(OnecxTranslateLoader),
+      loader: provideTranslateLoader(AsyncTranslateLoader),
       missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
     }),
     provideThemeConfig(),

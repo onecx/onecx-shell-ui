@@ -5,7 +5,7 @@ import { ReplaySubject } from 'rxjs'
 import { bootstrapRemoteComponent } from '@onecx/angular-webcomponents'
 import {
   MultiLanguageMissingTranslationHandler,
-  OnecxTranslateLoader,
+  AsyncTranslateLoader,
   provideTranslationPathFromMeta,
   REMOTE_COMPONENT_CONFIG,
   RemoteComponentConfig
@@ -19,7 +19,7 @@ bootstrapRemoteComponent(OneCXShellToastComponent, 'ocx-shell-toast-component', 
   { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<RemoteComponentConfig>(1) },
   provideTranslateService({
     defaultLanguage: 'en',
-    loader: provideTranslateLoader(OnecxTranslateLoader),
+    loader: provideTranslateLoader(AsyncTranslateLoader),
     missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
   }),
   provideHttpClient(withInterceptorsFromDi()),

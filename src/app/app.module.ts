@@ -21,7 +21,7 @@ import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import {
   MultiLanguageMissingTranslationHandler,
-  AsyncTranslateLoader,
+  OnecxTranslateLoader,
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
@@ -391,7 +391,7 @@ export async function shareMfContainer() {
     }),
     provideTranslateService({
       defaultLanguage: 'en',
-      loader: provideTranslateLoader(AsyncTranslateLoader),
+      loader: provideTranslateLoader(OnecxTranslateLoader),
       missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
     }),
     provideThemeConfig(),

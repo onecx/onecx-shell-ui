@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
 import { CommonModule } from '@angular/common'
@@ -20,7 +20,7 @@ interface InitializationError {
   imports: [CommonModule, TranslateModule],
   templateUrl: './initialization-error-page.component.html'
 })
-export class InitializationErrorPageComponent {
+export class InitializationErrorPageComponent implements OnDestroy {
   error$: Observable<InitializationError>
   public eventsTopic: EventsTopic = new EventsTopic()
 
@@ -40,6 +40,10 @@ export class InitializationErrorPageComponent {
         }
       })
     )
+  }
+
+  ngOnDestroy(): void {
+    this.eventsTopic.destroy()
   }
 
   public onLogout(): void {

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core'
+import { inject, Injectable, OnDestroy } from '@angular/core'
 import {
   ApplicationParameters,
   ParametersTopic,
@@ -13,7 +13,7 @@ import { GetParametersRequest, GetParametersResponse, Parameter, ParameterBffSer
 type Cache = { parameters: (ApplicationParameters & { expirationDate: number })[] }
 
 @Injectable({ providedIn: 'root' })
-export class ParametersService {
+export class ParametersService implements OnDestroy {
   private readonly appStateService = inject(AppStateService)
   private readonly remoteComponentsService = inject(RemoteComponentsService)
   private readonly parameterBffService = inject(ParameterBffService)
@@ -24,6 +24,10 @@ export class ParametersService {
   initialize() {
     //Not awaited on purpose
     this.init()
+  }
+
+  ngOnDestroy() {
+    this.parametersTopic.destroy()
   }
 
   private async init() {

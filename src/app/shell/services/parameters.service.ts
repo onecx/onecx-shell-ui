@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core'
 import {
   ApplicationParameters,
-  ParametersPublisher,
+  ParametersTopic,
   Parameters,
   RemoteComponent,
   Route
@@ -19,7 +19,7 @@ export class ParametersService {
   private readonly parameterBffService = inject(ParameterBffService)
   private readonly cacheItemName = 'onecx-parameters-cache'
   private readonly cacheExpirationTimeMs = 3600 * 1000 // 1 hour
-  private readonly parametersPublisher = new ParametersPublisher()
+  private readonly parametersTopic = new ParametersTopic()
 
   initialize() {
     //Not awaited on purpose
@@ -39,7 +39,7 @@ export class ParametersService {
       this.updateCache(parameters, cache)
       localStorage.setItem(this.cacheItemName, JSON.stringify(cache))
     }
-    this.parametersPublisher.publish(cache)
+    this.parametersTopic.publish(cache)
   }
 
   private async buildGetParametersRequest(

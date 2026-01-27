@@ -16,7 +16,7 @@ describe('ParametersService', () => {
   let appStateServiceMock: AppStateServiceMock
   let remoteComponentsServiceMock: RemoteComponentsServiceMock
   let parameterBffService: ParameterBffService
-  let parametersPublisherMock: FakeTopic<ParametersTopicPayload>
+  let parametersTopicMock: FakeTopic<ParametersTopicPayload>
 
   function publishWorkspace(workspace: Partial<Workspace>) {
     return appStateServiceMock.currentWorkspace$.publish({
@@ -38,9 +38,9 @@ describe('ParametersService', () => {
         { provide: ParameterBffService, useValue: { getParameters: jest.fn() } }
       ]
     })
-    parametersPublisherMock = new FakeTopic<ParametersTopicPayload>()
+    parametersTopicMock = new FakeTopic<ParametersTopicPayload>()
     parametersService = TestBed.inject(ParametersService)
-    ;(parametersService as any).parametersPublisher = parametersPublisherMock
+    ;(parametersService as any).parametersTopic = parametersTopicMock
 
     appStateServiceMock = TestBed.inject(AppStateServiceMock)
     remoteComponentsServiceMock = TestBed.inject(RemoteComponentsServiceMock)
@@ -64,7 +64,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).not.toHaveBeenCalled()
     expect(publishedParameters).toEqual(cache)
@@ -130,7 +130,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).toHaveBeenCalledWith({
       products: {
@@ -193,7 +193,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).not.toHaveBeenCalled()
     expect(publishedParameters).toEqual({ parameters: [] })
@@ -211,7 +211,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).not.toHaveBeenCalled()
     expect(publishedParameters.parameters).toEqual([])
@@ -229,7 +229,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).not.toHaveBeenCalled()
     expect(publishedParameters.parameters).toEqual([])
@@ -248,7 +248,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(parameterBffService.getParameters).not.toHaveBeenCalled()
     expect(publishedParameters).toEqual(cache)
@@ -267,7 +267,7 @@ describe('ParametersService', () => {
 
     parametersService.initialize()
 
-    const publishedParameters = await firstValueFrom(parametersPublisherMock.asObservable())
+    const publishedParameters = await firstValueFrom(parametersTopicMock.asObservable())
 
     expect(publishedParameters).toEqual(cache)
   })

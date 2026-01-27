@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 
-import { EventsPublisher } from '@onecx/integration-interface'
+import { EventsTopic } from '@onecx/integration-interface'
 
 interface InitializationError {
   message: string
@@ -22,7 +22,7 @@ interface InitializationError {
 })
 export class InitializationErrorPageComponent {
   error$: Observable<InitializationError>
-  public eventsPublisher$: EventsPublisher = new EventsPublisher()
+  public eventsTopic: EventsTopic = new EventsTopic()
 
   private readonly route: ActivatedRoute = inject(ActivatedRoute)
 
@@ -43,6 +43,6 @@ export class InitializationErrorPageComponent {
   }
 
   public onLogout(): void {
-    this.eventsPublisher$.publish({ type: 'authentication#logoutButtonClicked' })
+    this.eventsTopic.publish({ type: 'authentication#logoutButtonClicked' })
   }
 }

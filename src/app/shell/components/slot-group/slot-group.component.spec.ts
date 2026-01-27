@@ -31,17 +31,17 @@ jest.mock('@onecx/integration-interface', () => {
   const actual = jest.requireActual('@onecx/integration-interface')
   const fakeTopic = jest.requireActual('@onecx/accelerator').FakeTopic
 
+  class ResizedEventsPublisherMock {
+    publish = jest.fn()
+  }
   return {
     ...actual,
-    ResizedEventsTopic: fakeTopic
+    ResizedEventsTopic: fakeTopic,
+    ResizedEventsPublisher: ResizedEventsPublisherMock
   }
 })
 
-import {
-  ResizedEventType,
-  Technologies,
-  TopicResizedEventType
-} from '@onecx/integration-interface'
+import { ResizedEventType, Technologies, TopicResizedEventType } from '@onecx/integration-interface'
 import { FakeTopic } from '@onecx/accelerator'
 
 function sortClasses(classes: string[]): string[] {
@@ -112,7 +112,7 @@ describe('SlotGroupComponent', () => {
   })
 
   it('should debounce resize events and publish SLOT_GROUP_RESIZED once', fakeAsync(() => {
-    const spy = spyOn(resizedEventsTopic, 'publish')
+    const spy = jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate multiple rapid size changes
     resizeObserverMock.trigger(100, 50)
     resizeObserverMock.trigger(120, 60)
@@ -124,19 +124,17 @@ describe('SlotGroupComponent', () => {
     // Advance time by slightly more than debounce
     tick(110)
 
-    expect(spy).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        type: ResizedEventType.SLOT_GROUP_RESIZED,
-        payload: {
-          slotGroupName: 'test-slot',
-          slotGroupDetails: { width: 140, height: 70 }
-        }
-      })
-    )
+    expect(spy).toHaveBeenCalledWith({
+      type: ResizedEventType.SLOT_GROUP_RESIZED,
+      payload: {
+        slotGroupName: 'test-slot',
+        slotGroupDetails: { width: 140, height: 70 }
+      }
+    })
   }))
 
   it('should publish SLOT_GROUP_RESIZED when requestedEventsChanged$ emits for this slot group', fakeAsync(() => {
-    spyOn(resizedEventsTopic, 'publish').and.callThrough()
+    jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate initial size
     resizeObserverMock.trigger(200, 100)
 

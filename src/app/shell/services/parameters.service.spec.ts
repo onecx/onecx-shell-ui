@@ -51,6 +51,12 @@ describe('ParametersService', () => {
     expect(parametersService).toBeTruthy()
   })
 
+  it('should cleanup on destroy', () => {
+    const destroySpy = jest.spyOn(parametersTopicMock, 'destroy')
+    parametersService.ngOnDestroy()
+    expect(destroySpy).toHaveBeenCalled()
+  })
+
   it('should not call service if there are no apps in workspace', async () => {
     const cache = { parameters: [] }
     const parameters: GetParametersResponse = { products: {} }

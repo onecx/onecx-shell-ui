@@ -33,7 +33,6 @@ import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   OverrideType,
-  ThemeOverride,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -125,36 +124,14 @@ export async function workspaceConfigInitializer(
   )
 
   if (loadWorkspaceConfigResponse) {
-    // loadWorkspaceConfigResponse.theme.overrides = [
-    //   {
-    //     type: OverrideType.CSS,
-    //     value: '{"topbar":{"topbar-item-text-color":" #ffffff","topbar-bg-color":"#0000ff"}}'
-    //   },
-    //   {
-    //     type: OverrideType.PRIMENG,
-    //     value: '{"general":{"primary-color":"#ffffff"},"sidebar":{"menu-text-color":"#ffffff","menu-bg-color":" #fdfeff"}}'
-    //   }
-    // ]
-
     const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
       string,
       Record<string, string>
     >
 
-    const parsedOverrides: any = []
-    if (loadWorkspaceConfigResponse.theme.overrides && loadWorkspaceConfigResponse.theme.overrides.length > 0) {
-      loadWorkspaceConfigResponse.theme.overrides.forEach((element: ThemeOverride) => {
-        if (element.value) {
-          const override = { ...element, value: JSON.parse(element.value) as Record<string, Record<string, string>> }
-          parsedOverrides.push(override)
-        }
-      })
-    }
-
     const themeWithParsedProperties = {
       ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties,
-      overrides: parsedOverrides
+      properties: parsedProperties
     }
 
     await Promise.all([
@@ -333,23 +310,17 @@ export async function applyThemeVariables(themeService: ThemeService, theme: The
     }
   }
   if (theme.overrides && theme.overrides.length > 0) {
-    let el = document.getElementById('css_overrides') as HTMLStyleElement | null
-    if (!el) {
-      el = document.createElement('style')
-      el.id = 'css_overrides'
-      el.dataset[MARKED_AS_WRAPPED] = ''
-      document.head.appendChild(el)
-    }
-    theme.overrides.forEach((override) => {
-      if (override.value && override.type === OverrideType.CSS) {
-        for (const group of Object.values(override.value)) {
-          for (const [key, value] of Object.entries(group)) {
-            document.documentElement.style.setProperty(`--${key}`, value)
-            el.textContent += `\n:root { --${key}: ${value}; }`
-          }
+    theme.overrides
+      .filter((ov) => ov.type === OverrideType.CSS)
+      .forEach((override) => {
+        if (override.value) {
+          const el = document.createElement('style')
+          el.dataset['cssOverrides'] = ''
+          el.dataset[MARKED_AS_WRAPPED] = ''
+          el.append(override.value)
+          document.head.appendChild(el)
         }
-      }
-    })
+      })
   }
 }
 

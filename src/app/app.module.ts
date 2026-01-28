@@ -27,7 +27,7 @@ import {
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import { CurrentLocationPublisher, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
@@ -192,6 +192,8 @@ export function imageRepositoryServiceInitializer(imageRepositoryService: ImageR
   imageRepositoryService.init()
 }
 
+const currentLocationTopic = new CurrentLocationTopic()
+
 const pushState = globalThis.history.pushState
 globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
@@ -204,7 +206,7 @@ globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   }
   pushState.bind(globalThis.history)(data, unused, url)
   if (!isRouterSync) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
@@ -233,7 +235,7 @@ globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
   if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url) // NOSONAR
 
   if (!isRouterSync && !preventLocationPropagation) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
@@ -267,7 +269,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     let lastUrl = ''
     let isFirstRoute = true
     const url = _constructCurrentURL()
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: true
     })

@@ -285,6 +285,7 @@ The About page can be accessed by appending `/onecx-shell/about-shell` to your a
 `<application-base-url>/onecx-shell/about-shell`
 
 **Examples:**
+
 * Base URL: `https://myDomain.com/admin` → About page: `https://myDomain.com/onecx-shell/about-shell`
 * Base URL: `https://myDomain.com/portal/admin` → About page: `https://myDomain.com/portal/onecx-shell/about-shell`
 

@@ -18,6 +18,7 @@ import {
 } from '@onecx/angular-integration-interface'
 import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
+import { VisibleKeyboardFocusDirective } from './shell/directives/visible-keyboard-focus.directive'
 
 import {
   MultiLanguageMissingTranslationHandler,
@@ -331,7 +332,8 @@ export async function shareMfContainer() {
     RouterModule.forRoot(appRoutes),
     PortalViewportComponent,
     GlobalErrorComponent,
-    AppLoadingSpinnerComponent
+    AppLoadingSpinnerComponent,
+    VisibleKeyboardFocusDirective
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

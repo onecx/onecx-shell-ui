@@ -13,6 +13,9 @@ $mobileBreakpoint: 991px !default;
 :root {
   --mobile-break-point: #{$mobileBreakpoint};
   font-size: var(--font-size, var(--font-size-default));
+  --ocx-focus-ring-width: 2px;
+  --ocx-focus-ring-color: black;
+  --ocx-focus-background-color: rgba(120, 120, 120, 0.5);
 }
 
 body {
@@ -35,4 +38,11 @@ body {
   overflow: unset;
   max-height: unset !important;
   margin-bottom: 1rem !important;
+}
+
+.ocx-focus-host:is(:focus, :focus-within) {
+  outline: none !important;
+  box-shadow: inset 0 0 0 var(--ocx-focus-ring-width) var(--ocx-focus-ring-color) !important;
+  background-color: var(--ocx-focus-background-color) !important;
+  box-sizing: border-box !important;
 }

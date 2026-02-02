@@ -35,6 +35,8 @@ const parametersServiceMock = {
   get: jest.fn().mockResolvedValue(undefined)
 }
 
+const focusableSelectorKey = CONFIG_KEY.KEYBOARD_FOCUSABLE_SELECTOR
+
 describe('VisibleKeyboardFocusDirective', () => {
   let fixture: ComponentFixture<TestHostComponent>
   let document: Document
@@ -50,7 +52,7 @@ describe('VisibleKeyboardFocusDirective', () => {
 
     const cfg = TestBed.inject(ConfigurationService)
     jest.spyOn(cfg, 'getConfig').mockResolvedValue({
-      [CONFIG_KEY.ONECX_KEYBOARD_FOCUSABLE_SELECTOR]: ['.p-multiselect']
+      [focusableSelectorKey]: ['.p-multiselect']
     } as any)
 
     fixture = TestBed.createComponent(TestHostComponent)

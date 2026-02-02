@@ -11,48 +11,50 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
   private activeHost: HTMLElement | null = null
   private keyboardMode = false
 
-  private unlistenKeydown!: () => void
-  private unlistenPointerDown!: () => void
-  private unlistenFocusIn!: () => void
-  private unlistenFocusOut!: () => void
+  private focusableSelectorKey = CONFIG_KEY.KEYBOARD_FOCUSABLE_SELECTOR
+
+  private listeners: Array<() => void> = [];
 
   private renderer = inject(Renderer2)
   private document = inject(DOCUMENT)
   private configurationService = inject(ConfigurationService)
   private parametersService = inject(ParametersService)
 
+  private defaultSelectors = [
+    '[role="listbox"]',
+    '.p-multiselect',
+    '.p-checkbox',
+    '.p-radiobutton',
+    '.p-inputswitch',
+    '.p-dropdown',
+    '.p-treeselect',
+    '.p-cascadeselect'
+  ]
   private focusableSelector = ''
-  private defaultSelectors: string[] = []
+
 
   async ngAfterViewInit() {
-    this.defaultSelectors = await this.configurationService
-      .getConfig()
-      .then((cfg) => (cfg?.[CONFIG_KEY.ONECX_KEYBOARD_FOCUSABLE_SELECTOR] ?? []) as string[])
-
     try {
-      this.parametersService
-        .get(CONFIG_KEY.ONECX_KEYBOARD_FOCUSABLE_SELECTOR, this.defaultSelectors, 'onecx-shell', 'onecx-shell-ui')
-        .then((value: string[] | undefined) => {
-          const set = new Set<string>([...(value ?? []), ...(this.defaultSelectors ?? [])])
-          this.focusableSelector = [...set].join(',') ?? ''
-        })
+      const paramValues = await this.parametersService.get(this.focusableSelectorKey, this.configurationService.getProperty(this.focusableSelectorKey), 'onecx-shell', 'onecx-shell-ui') as unknown as string[];
+      const set = new Set<string>([...(paramValues ?? []), ...(this.defaultSelectors ?? [])])
+      this.focusableSelector = [...set].join(',') ?? ''
     } catch (e) {
       this.focusableSelector = this.defaultSelectors.join(',') ?? ''
     }
 
-    this.unlistenKeydown = this.renderer.listen(this.document, 'keydown', (e: KeyboardEvent) => {
+    this.listeners.push(this.renderer.listen(this.document, 'keydown', (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         this.keyboardMode = true
       }
-    })
+    }))
 
-    this.unlistenPointerDown = this.renderer.listen(this.document, 'pointerdown', () => {
+    this.listeners.push(this.renderer.listen(this.document, 'pointerdown', () => {
       this.keyboardMode = false
-    })
+    }))
 
-    this.unlistenFocusIn = this.renderer.listen(this.document, 'focusin', this.onFocusIn)
+    this.listeners.push(this.renderer.listen(this.document, 'focusin', this.onFocusIn))
 
-    this.unlistenFocusOut = this.renderer.listen(this.document, 'focusout', this.onFocusOut)
+    this.listeners.push(this.renderer.listen(this.document, 'focusout', this.onFocusOut))
   }
 
   private onFocusIn = (event: FocusEvent) => {
@@ -88,9 +90,6 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.unlistenFocusIn?.()
-    this.unlistenFocusOut?.()
-    this.unlistenKeydown?.()
-    this.unlistenPointerDown?.()
+    this.listeners.forEach(unlisten => unlisten());
   }
 }

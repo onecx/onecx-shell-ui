@@ -338,3 +338,86 @@ For further details on version compatibility, refer to the following resources:
 
 * xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
 * xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]
+
+[#keyboard-focus-directive]
+=== Keyboard Focus Directive
+
+The `ocxShellVisibleKeyboardFocus` directive visually highlights the currently focused interactive element, making keyboard focus obvious. This is particularly useful for accessibility testing and for users who navigate with the keyboard.
+
+The directive is attached to the shell portal viewport to enable focus visibility across the UI:
+
+.Example
+[source,html]
+----
+<ocx-shell-portal-viewport ocxShellVisibleKeyboardFocus></ocx-shell-portal-viewport>
+----
+
+==== Default Styling and Customization
+
+Focus styles are defined in `src/global-styles.scss` for the class `ocx-focus-host`:
+
+.Base focus styles
+[source,scss]
+----
+.ocx-focus-host:is(:focus, :focus-within) {
+  outline: none !important;
+  box-shadow: inset 0 0 0 var(--ocx-focus-ring-width) var(--ocx-focus-ring-color) !important;
+  background-color: var(--ocx-focus-background-color) !important;
+  box-sizing: border-box !important;
+}
+----
+
+[NOTE]
+====
+In some cases, PrimeNG components may override focus styles. You need to add the following Wrapper rule in the mfe or remote component’s global styles.
+
+.Wrapper rule
+[source,scss]
+----
+.ocx-focus-host:is(:focus, :focus-within) > div {
+  outline: none !important;
+  box-shadow: inset 0 0 0 var(--ocx-focus-ring-width) var(--ocx-focus-ring-color) !important;
+  background-color: var(--ocx-focus-background-color) !important;
+  box-sizing: border-box !important;
+}
+----
+====
+
+==== Configuring Focusable Selectors (Parameters UI)
+
+The directive determines the “focus host” using a set of CSS selectors. It merges a configurable parameter with built-in defaults. This lets you add project-specific widgets or containers that should receive the visible focus ring.
+
+===== Steps
+
+. Go to the OneCX Parameters UI
+. Add a new parameter with key `KEYBOARD_FOCUSABLE_SELECTOR`
+. Set **App** to `onecx-shell` and **UI/Product** to `onecx-shell-ui`
+. Provide an array of selector strings
+
++
+.Value format
+[source,json]
+----
+["[role=\"listbox\"]", ".p-multiselect"]
+----
+
+.Default selectors included by the shell
+
+[NOTE]
+====
+The shell already includes a set of default focusable selectors.
+
+[source,css]
+----
+[role="listbox"],
+.p-multiselect,
+.p-checkbox,
+.p-radiobutton,
+.p-inputswitch,
+.p-dropdown,
+.p-treeselect,
+.p-cascadeselect
+----
+====
+
+The directive merges your parameter values with the defaults, then uses `Element.closest()` to find the focus host for the current focused element and applies `ocx-focus-host` while in keyboard mode.

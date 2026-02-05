@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, ElementRef, ViewChild } from '@angular/core'
+import { AfterContentInit, Component, ElementRef, inject, ViewChild } from '@angular/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { dataMfeElementKey } from '@onecx/angular-utils'
 import { firstValueFrom } from 'rxjs'
@@ -12,7 +12,7 @@ export class WebcomponentLoaderComponent implements AfterContentInit {
   @ViewChild('wrapper', { read: ElementRef, static: true })
   wrapper?: ElementRef
 
-  constructor(private readonly appStateService: AppStateService) {}
+  private readonly appStateService = inject(AppStateService)
 
   async ngAfterContentInit() {
     const currentMfe = await firstValueFrom(this.appStateService.currentMfe$.asObservable())

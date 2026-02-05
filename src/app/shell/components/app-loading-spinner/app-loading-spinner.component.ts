@@ -6,6 +6,6 @@ import { CommonModule } from '@angular/common'
   selector: 'ocx-shell-loading-spinner',
   templateUrl: 'app-loading-spinner.component.html',
   styleUrl: 'app-loading-spinner.component.scss',
-  imports: [CommonModule],
+  imports: [CommonModule]
 })
 export class AppLoadingSpinnerComponent {}

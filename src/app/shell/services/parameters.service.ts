@@ -1,7 +1,7 @@
-import { inject, Injectable } from '@angular/core'
+import { inject, Injectable, OnDestroy } from '@angular/core'
 import {
   ApplicationParameters,
-  ParametersPublisher,
+  ParametersTopic,
   Parameters,
   RemoteComponent,
   Route
@@ -13,17 +13,21 @@ import { GetParametersRequest, GetParametersResponse, Parameter, ParameterBffSer
 type Cache = { parameters: (ApplicationParameters & { expirationDate: number })[] }
 
 @Injectable({ providedIn: 'root' })
-export class ParametersService {
+export class ParametersService implements OnDestroy {
   private readonly appStateService = inject(AppStateService)
   private readonly remoteComponentsService = inject(RemoteComponentsService)
   private readonly parameterBffService = inject(ParameterBffService)
   private readonly cacheItemName = 'onecx-parameters-cache'
   private readonly cacheExpirationTimeMs = 3600 * 1000 // 1 hour
-  private readonly parametersPublisher = new ParametersPublisher()
+  private readonly parametersTopic = new ParametersTopic()
 
   initialize() {
     //Not awaited on purpose
     this.init()
+  }
+
+  ngOnDestroy() {
+    this.parametersTopic.destroy()
   }
 
   private async init() {
@@ -39,7 +43,7 @@ export class ParametersService {
       this.updateCache(parameters, cache)
       localStorage.setItem(this.cacheItemName, JSON.stringify(cache))
     }
-    this.parametersPublisher.publish(cache)
+    this.parametersTopic.publish(cache)
   }
 
   private async buildGetParametersRequest(
@@ -93,7 +97,7 @@ export class ParametersService {
     items.forEach((item) => {
       if (!this.hasValidCache(cache, item.productName ?? '', item.appId ?? '')) {
         request.products[item.productName ?? ''] ??= []
-        if(!request.products[item.productName ?? ''].includes(item.appId ?? '')){
+        if (!request.products[item.productName ?? ''].includes(item.appId ?? '')) {
           request.products[item.productName ?? ''].push(item.appId ?? '')
         }
       }

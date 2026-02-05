@@ -11,12 +11,5 @@ const teo = {
 globalThis.ngJest = {
   testEnvironmentOptions: teo
 }
-
-// deprecated
-import 'jest-preset-angular/setup-jest'
-
-/*
-import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone/index.mjs'
-
-setupZoneTestEnv(teo)
-*/
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
+setupZoneTestEnv()

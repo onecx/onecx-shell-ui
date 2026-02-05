@@ -1,0 +1,53 @@
+[#keyboard-focus-directive]
+=== Keyboard Focus Directive
+
+The Shell provides built-in keyboard focus visibility to highlight the currently focused interactive element when navigating with the keyboard. This is particularly useful for accessibility testing and for users who navigate with the keyboard.
+
+
+==== Configuring Focusable Selectors (Parameters UI)
+
+Configure this only when the Shell’s default selectors are insufficient. The directive determines the "focus host" on active element using a set of CSS selectors. It merges a configurable parameter with built-in defaults. This lets you add project-specific widgets or containers that should receive the visible focus ring.
+
+. Go to the OneCX Parameters UI
+. Add a new parameter with key `KEYBOARD_FOCUSABLE_SELECTOR`
+. Set **App** to `onecx-shell` and **UI/Product** to `onecx-shell-ui`
+. Provide an array of selector strings
+
++
+.Value format
+[source,json]
+----
+["[role=\"listbox\"]", ".p-multiselect"]
+----
+
+[NOTE]
+====
+The Shell already includes a set of default focusable selectors.
+
+[source,css]
+----
+[role="listbox"],
+.p-multiselect,
+.p-checkbox,
+.p-radiobutton,
+.p-inputswitch,
+.p-dropdown,
+.p-treeselect,
+.p-cascadeselect
+----
+====
+
+
+==== Focus Styles Not Visible in any MFE or Remote Component
+
+If the focus styles are not visible in any MFE or remote component during keyboard navigation, add the following CSS rule to the global styles of that MFE or remote component.
+
+[source,scss]
+----
+.ocx-focus-host:is(:focus, :focus-within) > div {
+  outline: none !important;
+  box-shadow: inset 0 0 0 var(--ocx-focus-ring-width) var(--ocx-focus-ring-color) !important;
+  background-color: var(--ocx-focus-background-color) !important;
+  box-sizing: border-box !important;
+}
+----

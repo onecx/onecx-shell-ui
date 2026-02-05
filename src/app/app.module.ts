@@ -51,6 +51,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
+import { ShellIconLoaderService } from './shell/services/icon-loader.services'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -401,7 +402,10 @@ export async function shareMfContainer() {
       return imageRepositoryServiceInitializer(inject(ImageRepositoryService))
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' }
+    { provide: BASE_PATH, useValue: './shell-bff' },
+        provideAppInitializer(() => {
+      return inject(ShellIconLoaderService).init()
+    }),
   ],
   bootstrap: [AppComponent]
 })

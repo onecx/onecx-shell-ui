@@ -6,7 +6,7 @@ The Shell provides built-in keyboard focus visibility to highlight the currently
 
 ==== Configuring Focusable Selectors (Parameters UI)
 
-Configure this only when the Shell’s default selectors are insufficient. The directive determines the "focus host" on active element using a set of CSS selectors:  Focusable selectors determine the focus host for the active element using a set of CSS selectors. It merges a configurable parameter with built-in defaults. This lets you add project-specific widgets or containers that should receive the visible focus ring.
+Configure this only when the Shell’s default selectors are insufficient. The directive determines the "focus host" on active element using a set of CSS selectors. It merges a configurable parameter with built-in defaults. This lets you add project-specific widgets or containers that should receive the visible focus ring.
 
 . Go to the OneCX Parameters UI
 . Add a new parameter with key `KEYBOARD_FOCUSABLE_SELECTOR`
@@ -19,8 +19,6 @@ Configure this only when the Shell’s default selectors are insufficient. The d
 ----
 ["[role=\"listbox\"]", ".p-multiselect"]
 ----
-
-.Default selectors included by the shell
 
 [NOTE]
 ====

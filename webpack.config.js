@@ -27,6 +27,7 @@ const webpackConfig = {
       '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-accelerator': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-auth': { requiredVersion: 'auto', includeSecondaries: true },
+      '@onecx/shell-auth': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
       '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },

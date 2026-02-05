@@ -5,7 +5,7 @@ import { IconBffService } from 'src/app/shared/generated'
 import { IconService, ThemeService } from '@onecx/angular-integration-interface'
 
 jest.mock('@onecx/integration-interface', () => ({
-  generateClassName: (name: string, classType: string) => `${name}-${classType}`,
+  generateClassName: (name: string, classType: string) => `${name}-${classType}`
 }))
 
 describe('ShellIconLoaderService', () => {
@@ -17,7 +17,7 @@ describe('ShellIconLoaderService', () => {
       publish: (msg: any) => subject.next(msg),
       pipe: (...ops: any[]) => (subject as any).pipe(...ops),
       subscribe: (fn: any) => subject.subscribe(fn),
-      _subject: subject,
+      _subject: subject
     } as any
   }
 
@@ -27,9 +27,7 @@ describe('ShellIconLoaderService', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-
     ;(window as any).onecxIcons = {}
-
     ;(globalThis as any).btoa = (str: string) => Buffer.from(str, 'binary').toString('base64')
 
     iconLoaderTopic = createIconLoaderTopic()
@@ -37,7 +35,7 @@ describe('ShellIconLoaderService', () => {
     mockBff = {
       findIconsByNamesAndRefId: jest.fn((refId: string, { names }: { names: string[] }) =>
         of({ icons: names.map((n) => ({ name: n, body: '<path />' })) })
-      ),
+      )
     }
 
     TestBed.configureTestingModule({
@@ -45,8 +43,8 @@ describe('ShellIconLoaderService', () => {
         ShellIconLoaderService,
         { provide: IconService, useValue: { iconLoaderTopic } },
         { provide: IconBffService, useValue: mockBff },
-        { provide: ThemeService, useValue: { currentTheme$: theme$ } },
-      ],
+        { provide: ThemeService, useValue: { currentTheme$: theme$ } }
+      ]
     })
 
     service = TestBed.inject(ShellIconLoaderService)
@@ -76,14 +74,12 @@ describe('ShellIconLoaderService', () => {
   })
 
   it('should recordRequestedType creates and adds types without duplicates', () => {
-    ;(service as any).recordRequestedType('a', 'svg')
+    (service as any).recordRequestedType('a', 'svg')
     let types = (service as any).requestedTypes.get('a')
     expect(types?.has('svg')).toBe(true)
-
     ;(service as any).recordRequestedType('a', 'background')
     types = (service as any).requestedTypes.get('a')
     expect(types?.has('background')).toBe(true)
-
     ;(service as any).recordRequestedType('a', 'svg')
     expect((service as any).requestedTypes.get('a')?.size).toBe(2)
   })
@@ -91,7 +87,6 @@ describe('ShellIconLoaderService', () => {
   it('should not call backend when there are no missing icons', async () => {
     service.init()
     theme$.next({ name: 'default' })
-
     ;(window as any).onecxIcons['a'] = { name: 'a' }
     iconLoaderTopic.publish({ type: 'IconRequested', name: 'a', classType: 'svg' })
 
@@ -104,7 +99,6 @@ describe('ShellIconLoaderService', () => {
   it('should store null when backend returns no icon', async () => {
     service.init()
     theme$.next({ name: 'default' })
-
     ;(window as any).onecxIcons['missing'] = undefined
     mockBff.findIconsByNamesAndRefId.mockImplementation(() => of({ icons: [] }))
 
@@ -125,7 +119,6 @@ describe('ShellIconLoaderService', () => {
   it('should clear requestedTypes after processing', async () => {
     service.init()
     theme$.next({ name: 'default' })
-
     ;(window as any).onecxIcons['a'] = undefined
     mockBff.findIconsByNamesAndRefId.mockImplementation(() => of({ icons: [{ name: 'a', body: '<path />' }] }))
 

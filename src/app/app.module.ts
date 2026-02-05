@@ -403,9 +403,9 @@ export async function shareMfContainer() {
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
-        provideAppInitializer(() => {
+    provideAppInitializer(() => {
       return inject(ShellIconLoaderService).init()
-    }),
+    })
   ],
   bootstrap: [AppComponent]
 })

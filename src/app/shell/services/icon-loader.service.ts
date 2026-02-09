@@ -83,7 +83,7 @@ export class ShellIconLoaderService {
     document.head.appendChild(style)
   }
 
-  private getBackgroundBeforeCss(className: string, encoded: string): string | null {
+  private getBackgroundBeforeCss(className: string, encoded: string): string{
     return `.${className}{
                     display:inline-flex;
                 }
@@ -96,7 +96,7 @@ export class ShellIconLoaderService {
             }`
   }
 
-  private getBackgroundCss(className: string, encoded: string): string | null {
+  private getBackgroundCss(className: string, encoded: string): string{
     return `.${className}{
                     display:inline-block;
                     width:1em;
@@ -105,7 +105,7 @@ export class ShellIconLoaderService {
                 }`
   }
 
-  private getSvgCss(className: string, encoded: string): string | null {
+  private getSvgCss(className: string, encoded: string): string{
     return `.${className}{
                     display:inline-block;
                     width:1em;

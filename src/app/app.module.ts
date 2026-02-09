@@ -51,7 +51,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
-import { ShellIconLoaderService } from './shell/services/icon-loader.services'
+import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -188,6 +188,10 @@ export function configurationServiceInitializer(configurationService: Configurat
 
 export function imageRepositoryServiceInitializer(imageRepositoryService: ImageRepositoryService) {
   imageRepositoryService.init()
+}
+
+export function shellIconLoaderServiceInitializer(shellIconLoaderService: ShellIconLoaderService) {
+  shellIconLoaderService.init()
 }
 
 const currentLocationTopic = new CurrentLocationTopic()
@@ -404,7 +408,7 @@ export async function shareMfContainer() {
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
     provideAppInitializer(() => {
-      return inject(ShellIconLoaderService).init()
+      return shellIconLoaderServiceInitializer(inject(ShellIconLoaderService))
     })
   ],
   bootstrap: [AppComponent]

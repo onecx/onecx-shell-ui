@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { debounceTime, filter, firstValueFrom, tap } from 'rxjs'
+import { debounceTime, filter, firstValueFrom } from 'rxjs'
 import { generateClassName, IconRequested, IconCache } from '@onecx/integration-interface'
 import { IconService as IconServiceInterface, ThemeService } from '@onecx/angular-integration-interface'
 import { IconBffService } from 'src/app/shared/generated'
@@ -7,83 +7,91 @@ import { IconBffService } from 'src/app/shared/generated'
 @Injectable({ providedIn: 'root' })
 export class ShellIconLoaderService {
   private themeRefPromise?: Promise<string | undefined>;
-  private themeRefId?: string
 
   private readonly iconService = inject(IconServiceInterface)
   private readonly iconBffService = inject(IconBffService)
   private readonly themeService = inject(ThemeService)
 
-  private requestedTypes = new Map<string, Set<'svg' | 'background' | 'background-before'>>()
-
-
   init(): void {
-    this.themeRefPromise = firstValueFrom(this.themeService.currentTheme$).then((t) => (this.themeRefId = t?.name))
+    this.themeRefPromise = firstValueFrom(this.themeService.currentTheme$)
+      .then((t) => t?.name)
+      .catch((err) => {
+        console.error('Error fetching current theme during initialization:', err)
+        return undefined
+      })
 
     this.iconService.iconTopic
       .pipe(
         filter((m): m is IconRequested => m.type === 'IconRequested'),
-        tap((m) => this.recordRequestedType(m.name, m.classType)),
         debounceTime(100)
       )
       .subscribe(() => this.loadIcons())
   }
 
   private async loadIcons() {
-    await this.themeRefPromise;
-    if (!this.themeRefId) return
 
     const missingIcons = Object.entries(window.onecxIcons)
       .filter(([, v]) => v === undefined)
       .map(([name]) => name)
 
-    if (missingIcons.length > 0) {
-      await this.loadMissingIcons(missingIcons, this.themeRefId)
-    }
+    if (missingIcons.length === 0) return;
 
-    this.requestedTypes.forEach((types, name) => {
-      const icon = window.onecxIcons[name]
-      if (icon?.body) {
-        types.forEach((t) => this.injectCss(name, t, icon.body))
-      }
-      this.requestedTypes.delete(name)
-    })
+    await this.loadMissingIcons(missingIcons)
     this.iconService.iconTopic.publish({ type: 'IconsReceived' })
   }
 
-  private async loadMissingIcons(missingIcons: string[], refId: string): Promise<void> {
-    const res = await firstValueFrom(this.iconBffService.findIconsByNamesAndRefId(refId, { names: missingIcons }))
+  private async loadMissingIcons(missingIcons: string[]): Promise<void> {
+    let res: { icons?: IconCache[] } | undefined
+    try {
+      const refId = await this.themeRefPromise;
+      if (!refId) throw new Error('No theme reference ID available for icon request')
+      res = await firstValueFrom(this.iconBffService.findIconsByNamesAndRefId(refId, { names: missingIcons }))
+    } catch (err) {
+      console.error('Error loading missing icons:', err)
+    }
 
     const iconMap = new Map<string, IconCache>()
     res?.icons?.forEach((i) => iconMap.set(i.name, i))
 
+    const style = this.ensureGlobalStyle();
     missingIcons.forEach((name) => {
       const icon = iconMap.get(name) ?? null
       window.onecxIcons[name] = icon
+      if (icon?.body) {
+        this.injectCss(name, icon.body, style)
+      }
     })
   }
 
-  private injectCss(iconName: string, classType: 'svg' | 'background' | 'background-before', svgBody: string): void {
-    const className = generateClassName(iconName, classType)
-    if (document.getElementById(className)) return
-
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${svgBody}</svg>`
-    const encoded = btoa(svg)
-
-    const style = document.createElement('style')
-    style.id = className
-
-    if (classType === 'svg') {
-      style.textContent = this.getSvgCss(className, encoded)
-    } else if (classType === 'background') {
-      style.textContent = this.getBackgroundCss(className, encoded)
-    } else {
-      style.textContent = this.getBackgroundBeforeCss(className, encoded)
+  private ensureGlobalStyle(): HTMLStyleElement {
+    const styleId = 'onecx-icons-css';
+    let style = document.getElementById(styleId) as HTMLStyleElement;
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
     }
-
-    document.head.appendChild(style)
+    return style;
   }
 
-  private getBackgroundBeforeCss(className: string, encoded: string): string{
+
+  private injectCss(iconName: string, svgBody: string, style: HTMLStyleElement): void {
+    const svgClass = generateClassName(iconName, 'svg');
+    const bgClass = generateClassName(iconName, 'background');
+    const beforeClass = generateClassName(iconName, 'background-before');
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${svgBody}</svg>`;
+    const encoded = btoa(svg);
+
+    style.textContent += `
+    ${this.getSvgCss(svgClass, encoded)}
+    ${this.getBackgroundCss(bgClass, encoded)}
+    ${this.getBackgroundBeforeCss(beforeClass, encoded)}
+  `;
+  }
+
+
+  private getBackgroundBeforeCss(className: string, encoded: string): string {
     return `.${className}{
                     display:inline-flex;
                 }
@@ -96,7 +104,7 @@ export class ShellIconLoaderService {
             }`
   }
 
-  private getBackgroundCss(className: string, encoded: string): string{
+  private getBackgroundCss(className: string, encoded: string): string {
     return `.${className}{
                     display:inline-block;
                     width:1em;
@@ -105,7 +113,7 @@ export class ShellIconLoaderService {
                 }`
   }
 
-  private getSvgCss(className: string, encoded: string): string{
+  private getSvgCss(className: string, encoded: string): string {
     return `.${className}{
                     display:inline-block;
                     width:1em;
@@ -115,9 +123,5 @@ export class ShellIconLoaderService {
                     -webkit-mask:var(--onecx-icon) no-repeat center/contain;
                     background-color:currentColor;
                 }`
-  }
-
-  private recordRequestedType(name: string, type: IconRequested['classType']) {
-    this.requestedTypes.get(name)?.add(type) ?? this.requestedTypes.set(name, new Set([type]))
   }
 }

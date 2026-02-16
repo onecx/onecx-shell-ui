@@ -48,8 +48,6 @@
     "reportPath": "reports"
   },
   "dependencies": {
-    "@angular-architects/module-federation": "20.0.0",
-    "@angular-architects/module-federation-tools": "20.0.0",
     "@angular-devkit/architect": "^0.2100.5",
     "@angular/animations": "^20.3.16",
     "@angular/common": "^20.3.16",

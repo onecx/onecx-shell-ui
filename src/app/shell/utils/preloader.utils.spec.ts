@@ -33,9 +33,7 @@ describe('Preloader Utils', () => {
           shareScope: mockPreloader.shareScope
         }
       ])
-      expect(moduleFederation.loadRemote).toHaveBeenCalledWith(
-        `${mockPreloader.name}/${mockPreloader.exposedModule}`
-      )
+      expect(moduleFederation.loadRemote).toHaveBeenCalledWith(`${mockPreloader.name}/${mockPreloader.exposedModule}`)
     })
 
     it('should load a remote module using module federation with location origin', async () => {
@@ -60,9 +58,7 @@ describe('Preloader Utils', () => {
           shareScope: mockPreloader.shareScope
         }
       ])
-      expect(moduleFederation.loadRemote).toHaveBeenCalledWith(
-        `${mockPreloader.name}/${mockPreloader.exposedModule}`
-      )
+      expect(moduleFederation.loadRemote).toHaveBeenCalledWith(`${mockPreloader.name}/${mockPreloader.exposedModule}`)
     })
   })
 

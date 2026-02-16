@@ -44,7 +44,7 @@ import { initializationErrorHandler } from './shell/utils/initialization-error-h
 import { CommonModule } from '@angular/common'
 import { providePrimeNG } from 'primeng/config'
 import { AppComponent } from './app.component'
-import { appRoutes } from './app.routes'
+import { appRoutes, internalShellRoute } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
@@ -108,6 +108,10 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
+  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
+    return;
+  }
+  
   await appStateService.isAuthenticated$.isInitialized
 
   const loadWorkspaceConfigResponse = await firstValueFrom(

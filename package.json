@@ -60,6 +60,8 @@
     "@angular/platform-browser": "^20.3.16",
     "@angular/platform-browser-dynamic": "^20.3.16",
     "@angular/router": "^20.3.16",
+    "@module-federation/enhanced": "^2.0.1",
+    "@module-federation/runtime-core": "^2.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@nx/angular": "22.0.2",

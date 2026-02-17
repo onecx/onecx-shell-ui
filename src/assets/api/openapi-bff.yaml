@@ -536,6 +536,8 @@ components:
           type: string
         displayName:
           type: string
+        shareScope:
+          type: string
         endpoints:
           type: array
           items:
@@ -581,6 +583,8 @@ components:
         remoteName:
           type: string
         elementName:
+          type: string
+        shareScope:
           type: string
         technology:
           $ref: '#/components/schemas/Technologies'

@@ -1,8 +1,7 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
 
 const config: ModuleFederationConfig = {
-  // TODO: Think of a better way to name the remote
-  name: 'z_onecx-angular-19-loader',
+  name: 'onecx-angular-19-loader',
   exposes: {
     ['./Angular19Loader']: 'src/main.ts'
   },

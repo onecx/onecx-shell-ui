@@ -28,6 +28,6 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "z_onecx-angular-19-loader",
+  "defaultProject": "onecx-angular-19-loader",
   "useInferencePlugins": false
 }

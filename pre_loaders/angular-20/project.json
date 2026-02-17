@@ -1,5 +1,5 @@
 {
-  "name": "z_onecx-angular-20-loader",
+  "name": "onecx-angular-20-loader",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "ocx-angular-20-loader",
@@ -10,7 +10,7 @@
       "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/z_onecx-angular-20-loader",
+        "outputPath": "dist/onecx-angular-20-loader",
         "index": "./src/index.html",
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",

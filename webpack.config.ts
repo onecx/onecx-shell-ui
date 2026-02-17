@@ -47,7 +47,7 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
 
 export default async function (baseConfig: Configuration) {
   const withMf = await withModuleFederation(config, {
-    shareScope: 'angular_20'
+    shareScope: 'default' // TODO: switch to angular_21 after shell upgrade
   })
   const webpackConfig = withMf(baseConfig)
 

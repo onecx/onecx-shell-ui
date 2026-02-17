@@ -53,7 +53,7 @@ export async function loadPreloaderModule(preloader: Preloader) {
   })
 }
 
-// TODO: Clarify where this should be used
+// TODO: Clarify where this should be used --> move to angular-remote-components and utilize in routes.service, slots
 // export function getShareScope(manifest: any): string {
 //   const angularCore = manifest.shared.find((s: any) => s.name === '@angular/core')
 //   if (!angularCore) {

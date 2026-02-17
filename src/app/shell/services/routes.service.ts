@@ -180,18 +180,20 @@ export class RoutesService {
   }
 
   private toLoadRemoteEntryOptions(r: BffGeneratedRoute): types.Remote {
+    // TODO: Check if r contains share scope, if not, load manifest and determin share scope using getShareScope function
+    // Same applies to remote component loading in libs
     const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
     if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
       return {
         type: 'module',
         entry: r.remoteEntryUrl,
         name: r.productName + '/' + r.appId
-        // TODO: Clarify if this is needed exposedModule: './' + exposedModule
       }
     }
+    // TODO: Check if this works
     return {
       type: 'script',
-      alias: r.remoteName ?? '', // TODO: Check
+      alias: r.remoteName ?? '',
       entry: r.remoteEntryUrl,
       name: './' + exposedModule
     }

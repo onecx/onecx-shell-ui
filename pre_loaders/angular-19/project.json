@@ -15,7 +15,7 @@
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",
         "customWebpackConfig": {
-          "path": "./webpack.config.js"
+          "path": "./webpack.config.ts"
         },
         "assets": [
           {
@@ -51,7 +51,7 @@
           ],
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.js"
+            "path": "./webpack.config.ts"
           }
         },
         "development": {

@@ -1,9 +1,8 @@
-
 /**
  * @jest-environment jsdom
  */
 import { TestBed } from '@angular/core/testing'
-import { FakeTopic } from '@onecx/accelerator'
+import { ensureProperty, FakeTopic } from '@onecx/accelerator'
 import { of, throwError } from 'rxjs'
 import { ShellIconLoaderService } from './icon-loader.service'
 import { IconService, ThemeService } from '@onecx/angular-integration-interface'
@@ -32,22 +31,22 @@ describe('ShellIconLoaderService', () => {
         {
           provide: IconService,
           useValue: {
-            iconTopic: FakeTopic.create(),
-          },
+            iconTopic: FakeTopic.create()
+          }
         },
         {
           provide: ThemeService,
           useValue: {
-            currentTheme$: FakeTopic.create(),
-          },
+            currentTheme$: FakeTopic.create()
+          }
         },
         {
           provide: IconBffService,
           useValue: {
-            findIconsByNamesAndRefId: jest.fn(),
-          },
-        },
-      ],
+            findIconsByNamesAndRefId: jest.fn()
+          }
+        }
+      ]
     })
 
     service = TestBed.inject(ShellIconLoaderService)
@@ -55,12 +54,11 @@ describe('ShellIconLoaderService', () => {
     themeService = TestBed.inject(ThemeService)
     iconBffService = TestBed.inject(IconBffService)
     iconTopic = iconService.iconTopic as any
-
-    ;(window as any).onecxIcons = {}
+    ;(globalThis as any).onecxIcons = {}
     document.head.innerHTML = ''
 
     if (!(global as any).btoa) {
-      (global as any).btoa = (str: string) => Buffer.from(str, 'binary').toString('base64')
+      ;(global as any).btoa = (str: string) => Buffer.from(str, 'binary').toString('base64')
     }
   })
 
@@ -69,12 +67,23 @@ describe('ShellIconLoaderService', () => {
     jest.clearAllMocks()
   })
 
+  it('should handle themeService error during init', async () => {
+    const themeService = TestBed.inject(ThemeService)
+    jest.spyOn(console, 'error').mockImplementation()
+    ;(themeService as any).currentTheme$ = throwError(() => new Error('boom'))
+
+    service.init()
+
+    await expect((service as any).themeRefPromise).resolves.toBeUndefined()
+    expect(console.error).toHaveBeenCalledWith('Error fetching current theme during initialization:', expect.any(Error))
+  })
 
   it('should call loadIcons after IconRequested with debounce', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
     const loadSpy = jest.spyOn<any, any>(service as any, 'loadIcons').mockResolvedValue(undefined)
-    window.onecxIcons['home'] = undefined
+
+    ensureProperty(globalThis, ['onecxIcons', 'home'], undefined)
 
     iconTopic.publish({ type: 'IconRequested', name: 'home', classType: 'svg' })
 
@@ -83,24 +92,19 @@ describe('ShellIconLoaderService', () => {
     expect(loadSpy).toHaveBeenCalled()
   })
 
-
   it('should fetch missing icons, inject CSS, and publish IconsReceived', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
-
-    window.onecxIcons['home'] = undefined
-
+    ensureProperty(globalThis, ['onecxIcons', 'home'], undefined)
     const icon: IconCache = { name: 'home', body: '<path />' } as any
-    const bffSpy = jest
-      .spyOn(iconBffService, 'findIconsByNamesAndRefId')
-      .mockReturnValue(of({ icons: [icon] }) as any)
+    const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(of({ icons: [icon] }) as any)
 
     const publishSpy = jest.spyOn(iconTopic, 'publish')
 
     await (service as any).loadIcons()
 
     expect(bffSpy).toHaveBeenCalledWith('dark', { names: ['home'] })
-    expect(window.onecxIcons['home']).toEqual(icon)
+    expect(globalThis.onecxIcons!['home']).toEqual(icon)
 
     const style = document.getElementById('onecx-icons-css') as HTMLStyleElement
     expect(style).toBeTruthy()
@@ -115,7 +119,7 @@ describe('ShellIconLoaderService', () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
 
-    window.onecxIcons = {}
+    globalThis.onecxIcons = {}
 
     const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId')
     const publishSpy = jest.spyOn(iconTopic, 'publish')
@@ -126,19 +130,18 @@ describe('ShellIconLoaderService', () => {
     expect(publishSpy).not.toHaveBeenCalledWith({ type: 'IconsReceived' })
   })
 
-
   it('should set icons to null and skip BFF when theme is missing', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish(undefined)
 
-    window.onecxIcons['home'] = undefined
+    ensureProperty(globalThis, ['onecxIcons', 'home'], undefined)
 
     const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId')
 
     await (service as any).loadMissingIcons(['home'])
 
     expect(bffSpy).not.toHaveBeenCalled()
-    expect(window.onecxIcons['home']).toBeNull()
+    expect(globalThis.onecxIcons!['home']).toBeNull()
 
     const style = document.getElementById('onecx-icons-css') as HTMLStyleElement
     expect(style).toBeTruthy()
@@ -149,45 +152,37 @@ describe('ShellIconLoaderService', () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
 
-    jest
-      .spyOn(iconBffService, 'findIconsByNamesAndRefId')
-      .mockReturnValue(of({ icons: [] }) as any)
+    jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(of({ icons: [] }) as any)
 
     await (service as any).loadMissingIcons(['missing'])
 
-    expect(window.onecxIcons['missing']).toBeNull()
+    expect(globalThis.onecxIcons!['missing']).toBeNull()
   })
 
   it('should set null when BFF returns undefined response', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
 
-    jest
-      .spyOn(iconBffService, 'findIconsByNamesAndRefId')
-      .mockReturnValue(of(undefined as any))
+    jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(of(undefined as any))
 
     await (service as any).loadMissingIcons(['home'])
 
-    expect(window.onecxIcons['home']).toBeNull()
+    expect(globalThis.onecxIcons!['home']).toBeNull()
   })
 
   it('should handle BFF errors by logging and setting null', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
 
-    jest
-      .spyOn(iconBffService, 'findIconsByNamesAndRefId')
-      .mockReturnValue(throwError(() => new Error('BFF fail')))
+    jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(throwError(() => new Error('BFF fail')))
 
     const errorSpy = jest.spyOn(console, 'error').mockImplementation()
 
     await (service as any).loadMissingIcons(['home'])
 
     expect(errorSpy).toHaveBeenCalled()
-    expect(window.onecxIcons['home']).toBeNull()
+    expect(globalThis.onecxIcons!['home']).toBeNull()
   })
-  
-
 
   it('should create a singleton style element', () => {
     const ensure = (service as any).ensureGlobalStyle.bind(service)

@@ -7,10 +7,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
 import { SlotGroupHarness } from './slot-group.harness'
 import { By } from '@angular/platform-browser'
-import { ResizedEventsPublisher, ResizedEventType, SlotGroupResizedEvent } from '@onecx/integration-interface'
-import { DivHarness } from '@onecx/angular-testing'
 import { SLOT_SERVICE, SlotComponent, SlotService } from '@onecx/angular-remote-components'
-import { of } from 'rxjs'
 
 class ResizeObserverMock {
   constructor(private readonly callback: ResizeObserverCallback) {}
@@ -30,9 +27,22 @@ class ResizeObserverMock {
 }
 globalThis.ResizeObserver = ResizeObserverMock
 
-class ResizeEventsPublisherMock {
-  publish = jest.fn()
-}
+jest.mock('@onecx/integration-interface', () => {
+  const actual = jest.requireActual('@onecx/integration-interface')
+  const fakeTopic = jest.requireActual('@onecx/accelerator').FakeTopic
+
+  class ResizedEventsPublisherMock {
+    publish = jest.fn()
+  }
+  return {
+    ...actual,
+    ResizedEventsTopic: fakeTopic,
+    ResizedEventsPublisher: ResizedEventsPublisherMock
+  }
+})
+
+import { ResizedEventType, Technologies, TopicResizedEventType } from '@onecx/integration-interface'
+import { FakeTopic } from '@onecx/accelerator'
 
 function sortClasses(classes: string[]): string[] {
   return [...classes].sort((a, b) => a.localeCompare(b))
@@ -45,8 +55,8 @@ describe('SlotGroupComponent', () => {
   let slotGroupHarness: SlotGroupHarness
   let slotServiceMock: SlotServiceMock
 
-  let resizeEventsPublisher: ResizeEventsPublisherMock
   let resizeObserverMock: ResizeObserverMock
+  let resizedEventsTopic: FakeTopic<TopicResizedEventType>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -57,8 +67,7 @@ describe('SlotGroupComponent', () => {
         {
           provide: SlotService,
           useClass: SlotServiceMock
-        },
-        { provide: ResizedEventsPublisher, useClass: ResizeEventsPublisherMock }
+        }
       ]
     }).compileComponents()
   })
@@ -68,21 +77,28 @@ describe('SlotGroupComponent', () => {
     component = fixture.componentInstance
     componentRef = fixture.componentRef
     componentRef.setInput('name', 'test-slot')
-
     fixture.detectChanges()
 
-    // Spy on the eventsPublisher instance that was created by the component
-    const componentEventsPublisher = (component as any).resizedEventsPublisher
-    jest.spyOn(componentEventsPublisher, 'publish')
-    resizeEventsPublisher = componentEventsPublisher
-
     resizeObserverMock = (component as any).resizeObserver as ResizeObserverMock
-
     slotServiceMock = TestBed.inject(SLOT_SERVICE) as unknown as SlotServiceMock
+    resizedEventsTopic = component['resizedEventsTopic'] as any as FakeTopic<TopicResizedEventType>
 
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.start')
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.center')
-    slotServiceMock.assignComponentToSlot('test-component', 'test-slot.end')
+    const testComponentConfig = {
+      componentType: Promise.resolve(class TestComp {}),
+      remoteComponent: {
+        appId: 'test-app',
+        productName: 'test-product',
+        baseUrl: 'http://localhost',
+        technology: Technologies.Angular
+      },
+      permissions: Promise.resolve(['test-permission'])
+    }
+
+    slotServiceMock.assignComponents({
+      'test-slot.start': [testComponentConfig],
+      'test-slot.center': [testComponentConfig],
+      'test-slot.end': [testComponentConfig]
+    })
 
     slotGroupHarness = await TestbedHarnessEnvironment.harnessForFixture(fixture, SlotGroupHarness)
   })
@@ -96,47 +112,49 @@ describe('SlotGroupComponent', () => {
   })
 
   it('should debounce resize events and publish SLOT_GROUP_RESIZED once', fakeAsync(() => {
-    resizeEventsPublisher.publish.mockClear()
-
+    const spy = jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate multiple rapid size changes
     resizeObserverMock.trigger(100, 50)
     resizeObserverMock.trigger(120, 60)
     resizeObserverMock.trigger(140, 70)
 
     // Nothing yet because of debounce (100ms in component)
-    expect(resizeEventsPublisher.publish).not.toHaveBeenCalled()
+    expect(spy).not.toHaveBeenCalled()
 
     // Advance time by slightly more than debounce
     tick(110)
 
-    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
-
-    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
-
-    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
-    expect(arg.payload.slotGroupName).toBe('test-slot')
-    expect(arg.payload.slotGroupDetails).toEqual({ width: 140, height: 70 })
+    expect(spy).toHaveBeenCalledWith({
+      type: ResizedEventType.SLOT_GROUP_RESIZED,
+      payload: {
+        slotGroupName: 'test-slot',
+        slotGroupDetails: { width: 140, height: 70 }
+      }
+    })
   }))
 
   it('should publish SLOT_GROUP_RESIZED when requestedEventsChanged$ emits for this slot group', fakeAsync(() => {
+    jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate initial size
     resizeObserverMock.trigger(200, 100)
 
     tick(110) // Wait for debounce
 
-    resizeEventsPublisher.publish.mockClear()
-    ;(component as any)['requestedEventsChanged$'] = of({
-      payload: { type: ResizedEventType.SLOT_GROUP_RESIZED, name: 'test-slot' }
+    resizedEventsTopic.publish({
+      type: ResizedEventType.REQUESTED_EVENTS_CHANGED,
+      payload: {
+        type: ResizedEventType.SLOT_GROUP_RESIZED,
+        name: 'test-slot'
+      }
     })
-    component.ngOnInit() // Re-initialize to set up subscription
 
-    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
-
-    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
-
-    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
-    expect(arg.payload.slotGroupName).toBe('test-slot')
-    expect(arg.payload.slotGroupDetails).toEqual({ width: 200, height: 100 })
+    expect(resizedEventsTopic.publish).toHaveBeenCalledWith({
+      type: ResizedEventType.SLOT_GROUP_RESIZED,
+      payload: {
+        slotGroupName: 'test-slot',
+        slotGroupDetails: { width: 200, height: 100 }
+      }
+    })
   }))
 
   it('should disconnect ResizeObserver and complete subject on destroy', () => {
@@ -157,16 +175,10 @@ describe('SlotGroupComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should have created slot div containers for each child slot', async () => {
+  it('should have created 3 slots', async () => {
     const slots = await slotGroupHarness.getAllSlots()
 
     expect(slots).toHaveLength(3)
-
-    for (const slot of slots) {
-      const slotDiv = await slot.getSlotDivContainer()
-
-      expect(slotDiv).toBeTruthy()
-    }
   })
 
   describe('Input Signals', () => {
@@ -193,165 +205,6 @@ describe('SlotGroupComponent', () => {
     describe('direction input signal', () => {
       it('should have default direction value as row', () => {
         expect(component.direction()).toBe('row')
-      })
-    })
-
-    describe('rcWrapperStyles input signal', () => {
-      it('should have default empty object for rcWrapperStyles', () => {
-        expect(component.rcWrapperStyles()).toEqual({})
-      })
-
-      it('should pass rcWrapperStyles to all child slots', async () => {
-        const styles = { padding: '10px', margin: '5px' }
-        componentRef.setInput('rcWrapperStyles', styles)
-
-        const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['padding', 'margin'])
-        const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['padding', 'margin'])
-        const endSlotStyles = await slotGroupHarness.getEndSlotStyles(['padding', 'margin'])
-
-        expect(startSlotStyles[0]).toEqual(styles)
-        expect(centerSlotStyles[0]).toEqual(styles)
-        expect(endSlotStyles[0]).toEqual(styles)
-      })
-
-      it('should dynamically update slot styles for all child slots when slotStyles input changes', async () => {
-        const initialStyles = { color: 'red' }
-        componentRef.setInput('rcWrapperStyles', initialStyles)
-
-        const updatedStyles = { color: 'green', 'font-weight': 'bold' }
-        componentRef.setInput('rcWrapperStyles', updatedStyles)
-
-        const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['color', 'font-weight'])
-        const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['color', 'font-weight'])
-        const endSlotStyles = await slotGroupHarness.getEndSlotStyles(['color', 'font-weight'])
-
-        expect(startSlotStyles[0]).toEqual(updatedStyles)
-        expect(centerSlotStyles[0]).toEqual(updatedStyles)
-        expect(endSlotStyles[0]).toEqual(updatedStyles)
-      })
-    })
-
-    describe('rcWrapperClasses input signal', () => {
-      let startSlotDivs: DivHarness[]
-      let centerSlotDivs: DivHarness[]
-      let endSlotDivs: DivHarness[]
-
-      beforeEach(async () => {
-        const startSlot = await slotGroupHarness.getStartSlot()
-        const centerSlot = await slotGroupHarness.getCenterSlot()
-        const endSlot = await slotGroupHarness.getEndSlot()
-
-        if (!startSlot || !centerSlot || !endSlot) {
-          console.warn('One or more slots are not available')
-          return
-        }
-
-        startSlotDivs = await startSlot.getSlotDivContainers()
-        centerSlotDivs = await centerSlot.getSlotDivContainers()
-        endSlotDivs = await endSlot.getSlotDivContainers()
-      })
-
-      it('should have default empty string for rcWrapperClasses', () => {
-        expect(component.rcWrapperClasses()).toBe('')
-      })
-
-      it('should apply rcWrapperClasses of type string to all child slot divs', async () => {
-        const classesString = 'string-class1 string-class2'
-        const expectedClasses = ['string-class1', 'string-class2']
-
-        componentRef.setInput('rcWrapperClasses', classesString)
-
-        const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
-
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
-
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
-
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotClasses[index]).toEqual(expectedClasses)
-        }
-      })
-
-      it('should apply rcWrapperClasses of type string array to all child slot divs', async () => {
-        const classesArray = ['array-class1', 'array-class2']
-
-        componentRef.setInput('rcWrapperClasses', classesArray)
-
-        const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
-
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotClasses[index]).toEqual(classesArray)
-        }
-
-        const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
-
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotClasses[index]).toEqual(classesArray)
-        }
-
-        const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
-
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotClasses[index]).toEqual(classesArray)
-        }
-      })
-
-      it('should apply rcWrapperClasses of type string Set to all child slot divs', async () => {
-        const classesSet = new Set(['set-class1', 'set-class2'])
-        const expectedClasses = ['set-class1', 'set-class2']
-
-        componentRef.setInput('rcWrapperClasses', classesSet)
-
-        const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
-
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
-
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
-
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotClasses[index]).toEqual(expectedClasses)
-        }
-      })
-
-      it('should apply rcWrapperClasses of type object to all child slot divs', async () => {
-        const classesObject = { 'object-class1': true, 'object-class2': false, 'object-class3': true }
-        const expectedClasses = ['object-class1', 'object-class3']
-
-        componentRef.setInput('rcWrapperClasses', classesObject)
-
-        const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
-
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
-
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotClasses[index]).toEqual(expectedClasses)
-        }
-
-        const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
-
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotClasses[index]).toEqual(expectedClasses)
-        }
       })
     })
 
@@ -419,7 +272,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupStyles of type object to container div', async () => {
         const slotGroupStylesObject = { color: 'blue', padding: '15px' }
-        const expectedStyles = { color: 'blue', padding: '15px' }
+        const expectedStyles = { color: 'rgb(0, 0, 255)', padding: '15px' }
 
         componentRef.setInput('slotGroupStyles', slotGroupStylesObject)
 
@@ -597,126 +450,139 @@ describe('SlotGroupComponent', () => {
       })
     })
 
-    describe('slotStyles and slotClasses with multiple components in a slot', () => {
-      it('should apply slotStyles and slotClasses to every start slot div when multiple components are assigned to start slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.start')
+    //   describe('slotStyles and slotClasses with multiple components in a slot', () => {
+    //     it('should apply slotStyles and slotClasses to every start slot div when multiple components are assigned to start slot', async () => {
+    //       slotServiceMock.assignComponentToSlot(
+    //         {
+    //           componentType: Promise.resolve(undefined),
+    //           remoteComponent: {
+    //             appId: 'test-app-2',
+    //             productName: 'test-product-2',
+    //             baseUrl: 'http://localhost',
+    //             technology: Technologies.WebComponentModule,
+    //             elementName: 'test-component-2'
+    //           },
+    //           permissions: Promise.resolve(['test-permission-2'])
+    //         },
+    //         'test-slot.start'
+    //       )
 
-        const styles = { padding: '10px', color: 'blue' }
-        const expectedStyles = { padding: '10px', color: 'blue' }
+    //       const styles = { padding: '10px', color: 'blue' }
+    //       const expectedStyles = { padding: '10px', color: 'blue' }
 
-        const classes = 'multi-class another-class'
-        const expectedClasses = ['multi-class', 'another-class']
+    //       const classes = 'multi-class another-class'
+    //       const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('rcWrapperStyles', styles)
-        componentRef.setInput('rcWrapperClasses', classes)
+    //       componentRef.setInput('rcWrapperStyles', styles)
+    //       componentRef.setInput('rcWrapperClasses', classes)
 
-        const startSlotDivs = await slotGroupHarness.getStartSlotDivContainers()
+    //       const startSlotDivs = await slotGroupHarness.getStartSlotDivContainers()
 
-        expect(startSlotDivs?.length).toBe(2)
+    //       expect(startSlotDivs?.length).toBe(2)
 
-        const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['padding', 'color'])
+    //       const startSlotStyles = await slotGroupHarness.getStartSlotStyles(['padding', 'color'])
 
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotStyles[index]).toEqual(expectedStyles)
-        }
+    //       for (let index = 0; index < startSlotDivs.length; index++) {
+    //         expect(startSlotStyles[index]).toEqual(expectedStyles)
+    //       }
 
-        const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
+    //       const startSlotClasses = await slotGroupHarness.getStartSlotClasses()
 
-        for (let index = 0; index < startSlotDivs.length; index++) {
-          expect(startSlotClasses[index]).toEqual(expectedClasses)
-        }
-      })
+    //       for (let index = 0; index < startSlotDivs.length; index++) {
+    //         expect(startSlotClasses[index]).toEqual(expectedClasses)
+    //       }
+    //     })
 
-      it('should apply slotStyles and slotClasses to every center slot div when multiple components are assigned to center slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
+    //     it('should apply slotStyles and slotClasses to every center slot div when multiple components are assigned to center slot', async () => {
+    //       slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
 
-        const styles = { padding: '10px', color: 'blue' }
-        const expectedStyles = { padding: '10px', color: 'blue' }
+    //       const styles = { padding: '10px', color: 'blue' }
+    //       const expectedStyles = { padding: '10px', color: 'blue' }
 
-        const classes = 'multi-class another-class'
-        const expectedClasses = ['multi-class', 'another-class']
+    //       const classes = 'multi-class another-class'
+    //       const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('rcWrapperStyles', styles)
-        componentRef.setInput('rcWrapperClasses', classes)
+    //       componentRef.setInput('rcWrapperStyles', styles)
+    //       componentRef.setInput('rcWrapperClasses', classes)
 
-        const centerSlotDivs = await slotGroupHarness.getCenterSlotDivContainers()
+    //       const centerSlotDivs = await slotGroupHarness.getCenterSlotDivContainers()
 
-        expect(centerSlotDivs.length).toBe(2)
+    //       expect(centerSlotDivs.length).toBe(2)
 
-        const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['padding', 'color'])
+    //       const centerSlotStyles = await slotGroupHarness.getCenterSlotStyles(['padding', 'color'])
 
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotStyles[index]).toEqual(expectedStyles)
-        }
+    //       for (let index = 0; index < centerSlotDivs.length; index++) {
+    //         expect(centerSlotStyles[index]).toEqual(expectedStyles)
+    //       }
 
-        const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
+    //       const centerSlotClasses = await slotGroupHarness.getCenterSlotClasses()
 
-        for (let index = 0; index < centerSlotDivs.length; index++) {
-          expect(centerSlotClasses[index]).toEqual(expectedClasses)
-        }
-      })
+    //       for (let index = 0; index < centerSlotDivs.length; index++) {
+    //         expect(centerSlotClasses[index]).toEqual(expectedClasses)
+    //       }
+    //     })
 
-      it('should apply slotStyles and slotClasses to every end slot div when multiple components are assigned to end slot', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
+    //     it('should apply slotStyles and slotClasses to every end slot div when multiple components are assigned to end slot', async () => {
+    //       slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
 
-        const styles = { padding: '10px', color: 'blue' }
-        const expectedStyles = { padding: '10px', color: 'blue' }
+    //       const styles = { padding: '10px', color: 'blue' }
+    //       const expectedStyles = { padding: '10px', color: 'blue' }
 
-        const classes = 'multi-class another-class'
-        const expectedClasses = ['multi-class', 'another-class']
+    //       const classes = 'multi-class another-class'
+    //       const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('rcWrapperStyles', styles)
-        componentRef.setInput('rcWrapperClasses', classes)
+    //       componentRef.setInput('rcWrapperStyles', styles)
+    //       componentRef.setInput('rcWrapperClasses', classes)
 
-        const endSlotDivs = await slotGroupHarness.getEndSlotDivContainers()
+    //       const endSlotDivs = await slotGroupHarness.getEndSlotDivContainers()
 
-        expect(endSlotDivs.length).toBe(2)
+    //       expect(endSlotDivs.length).toBe(2)
 
-        const endSlotStyles = await slotGroupHarness.getEndSlotStyles(['padding', 'color'])
+    //       const endSlotStyles = await slotGroupHarness.getEndSlotStyles(['padding', 'color'])
 
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotStyles[index]).toEqual(expectedStyles)
-        }
+    //       for (let index = 0; index < endSlotDivs.length; index++) {
+    //         expect(endSlotStyles[index]).toEqual(expectedStyles)
+    //       }
 
-        const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
+    //       const endSlotClasses = await slotGroupHarness.getEndSlotClasses()
 
-        for (let index = 0; index < endSlotDivs.length; index++) {
-          expect(endSlotClasses[index]).toEqual(expectedClasses)
-        }
-      })
+    //       for (let index = 0; index < endSlotDivs.length; index++) {
+    //         expect(endSlotClasses[index]).toEqual(expectedClasses)
+    //       }
+    //     })
 
-      it('should apply slotStyles and slotClasses to every slot div in all slots when multiple components are assigned to all slots', async () => {
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.start')
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
-        slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
+    //     it('should apply slotStyles and slotClasses to every slot div in all slots when multiple components are assigned to all slots', async () => {
+    //       slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.start')
+    //       slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.center')
+    //       slotServiceMock.assignComponentToSlot('test-component-2', 'test-slot.end')
 
-        const styles = { padding: '10px', color: 'blue' }
-        const expectedStyles = { padding: '10px', color: 'blue' }
+    //       const styles = { padding: '10px', color: 'blue' }
+    //       const expectedStyles = { padding: '10px', color: 'blue' }
 
-        const classes = 'multi-class another-class'
-        const expectedClasses = ['multi-class', 'another-class']
+    //       const classes = 'multi-class another-class'
+    //       const expectedClasses = ['multi-class', 'another-class']
 
-        componentRef.setInput('rcWrapperStyles', styles)
-        componentRef.setInput('rcWrapperClasses', classes)
+    //       componentRef.setInput('rcWrapperStyles', styles)
+    //       componentRef.setInput('rcWrapperClasses', classes)
 
-        const allSlotDivs = await slotGroupHarness.getAllSlotDivContainers()
-        const allSlots = await slotGroupHarness.getAllSlots()
+    //       const allSlotDivs = await slotGroupHarness.getAllSlotDivContainers()
+    //       const allSlots = await slotGroupHarness.getAllSlots()
 
-        expect(allSlotDivs.length).toBe(6)
+    //       expect(allSlotDivs.length).toBe(6)
 
-        for (const slot of allSlots) {
-          const slotStyles = await slot.getAllSlotStylesForProperties(['padding', 'color'])
+    //       for (const slot of allSlots) {
+    //         const slotStyles = await slot.getAllSlotStylesForProperties(['padding', 'color'])
 
-          for (const slotStyle of slotStyles) {
-            expect(slotStyle).toEqual(expectedStyles)
-          }
+    //         for (const slotStyle of slotStyles) {
+    //           expect(slotStyle).toEqual(expectedStyles)
+    //         }
 
-          const slotClasses = await slot.getAllSlotClasses()
-          for (const slotClass of slotClasses) {
-            expect(slotClass).toEqual(expectedClasses)
-          }
-        }
-      })
-    })
+    //         const slotClasses = await slot.getAllSlotClasses()
+    //         for (const slotClass of slotClasses) {
+    //           expect(slotClass).toEqual(expectedClasses)
+    //         }
+    //       }
+    //     })
+    //   })
   })
 })

@@ -18,14 +18,6 @@ app:
     microfrontend:
       enabled: true
       specs:
-        version-info:
-          exposedModule: "./OneCXVersionInfoComponent"
-          description: "Display version information of shell and current application"
-          type: COMPONENT
-          technology: WEBCOMPONENTMODULE
-          remoteName: onecx-shell
-          tagName: ocx-version-info-component
-          deprecated: true
         shell-toast:
           exposedModule: "./OneCXShellToastComponent"
           description: "Display shell toast notifications"

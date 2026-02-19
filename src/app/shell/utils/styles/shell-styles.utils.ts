@@ -4,10 +4,9 @@ import {
   dataStyleIdAttribute,
   dataStyleIsolationAttribute,
   isCssScopeRuleSupported,
-  shellScopeId,
-  addStyleToHead,
-  replaceRootWithScope
+  shellScopeId
 } from '@onecx/angular-utils'
+import { addStyleToHead, replaceRootWithScope } from '@onecx/angular-utils/style'
 import { markElement } from './style-data.utils'
 
 export async function fetchShellStyles(http: HttpClient) {

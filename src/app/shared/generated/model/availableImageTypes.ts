@@ -11,8 +11,7 @@
  */
 
 
-export interface LocaleAndTimeSettings { 
-    locale?: string;
-    timezone?: string;
+export interface AvailableImageTypes { 
+    types?: Array<string>;
 }
 

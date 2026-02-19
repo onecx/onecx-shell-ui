@@ -3,7 +3,7 @@ import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
-import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
 import {
@@ -20,21 +20,14 @@ import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
 import { catchError, filter, firstValueFrom, retry } from 'rxjs'
 
 import {
-  createTranslateLoader,
   MultiLanguageMissingTranslationHandler,
+  OnecxTranslateLoader,
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import {
-  CurrentLocationPublisher,
-  EventsPublisher,
-  EventsTopic,
-  NavigatedEventPayload,
-  Theme,
-  UserProfile
-} from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
@@ -57,6 +50,7 @@ import { GlobalErrorComponent } from './shell/components/error-component/global-
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
+import { ImageRepositoryService } from './shell/services/image-repository.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -191,8 +185,12 @@ export function configurationServiceInitializer(configurationService: Configurat
   configurationService.init()
 }
 
-let isFirst = true
-let isInitialPageLoad = true
+export function imageRepositoryServiceInitializer(imageRepositoryService: ImageRepositoryService) {
+  imageRepositoryService.init()
+}
+
+const currentLocationTopic = new CurrentLocationTopic()
+
 const pushState = globalThis.history.pushState
 globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
@@ -205,23 +203,11 @@ globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   }
   pushState.bind(globalThis.history)(data, unused, url)
   if (!isRouterSync) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
   }
-  new EventsPublisher().publish({
-    type: 'navigated',
-    payload: {
-      url,
-      isFirst
-    } satisfies NavigatedEventPayload
-  })
-
-  if (!isInitialPageLoad) {
-    isFirst = false
-  }
-  isInitialPageLoad = false
 }
 
 const replaceState = globalThis.history.replaceState
@@ -246,23 +232,11 @@ globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
   if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url) // NOSONAR
 
   if (!isRouterSync && !preventLocationPropagation) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
   }
-  new EventsPublisher().publish({
-    type: 'navigated',
-    payload: {
-      url,
-      isFirst: isFirst
-    } satisfies NavigatedEventPayload
-  })
-
-  if (!isInitialPageLoad) {
-    isFirst = false
-  }
-  isInitialPageLoad = false
 }
 
 /**
@@ -292,7 +266,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     let lastUrl = ''
     let isFirstRoute = true
     const url = _constructCurrentURL()
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: true
     })
@@ -355,25 +329,12 @@ export async function shareMfContainer() {
     BrowserAnimationsModule,
     CommonModule,
     RouterModule.forRoot(appRoutes),
-    TranslateModule.forRoot({
-      isolate: true,
-      defaultLanguage: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient]
-      },
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MultiLanguageMissingTranslationHandler
-      }
-    }),
-
     PortalViewportComponent,
     GlobalErrorComponent,
     AppLoadingSpinnerComponent
   ],
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     provideAppInitializer(() => {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),
@@ -385,9 +346,13 @@ export async function shareMfContainer() {
         inject(Router)
       )
     }),
+    provideTranslateService({
+      defaultLanguage: 'en',
+      loader: provideTranslateLoader(OnecxTranslateLoader),
+      missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
+    }),
     provideThemeConfig(),
     provideTokenInterceptor(),
-    provideHttpClient(withInterceptorsFromDi()),
     provideAuthService(),
     providePrimeNG(),
     {
@@ -431,6 +396,9 @@ export async function shareMfContainer() {
       return import('./shell/utils/styles/style-changes-listener.utils').then(({ styleChangesListenerInitializer }) =>
         styleChangesListenerInitializer()
       )
+    }),
+    provideAppInitializer(() => {
+      return imageRepositoryServiceInitializer(inject(ImageRepositoryService))
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' }

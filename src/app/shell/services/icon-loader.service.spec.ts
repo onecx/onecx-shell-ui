@@ -54,11 +54,11 @@ describe('ShellIconLoaderService', () => {
     themeService = TestBed.inject(ThemeService)
     iconBffService = TestBed.inject(IconBffService)
     iconTopic = iconService.iconTopic as any
-    ;(globalThis as any).onecxIcons = {}
+    ensureProperty(globalThis, ['onecxIcons'], {})
     document.head.innerHTML = ''
 
-    if (!(global as any).btoa) {
-      ;(global as any).btoa = (str: string) => Buffer.from(str, 'binary').toString('base64')
+    if ((global as any).btoa) {
+      ensureProperty(globalThis, ['btoa'], (str : string) => Buffer.from(str, 'binary').toString('base64'));
     }
   })
 

@@ -57,7 +57,7 @@ describe('ShellIconLoaderService', () => {
     ensureProperty(globalThis, ['onecxIcons'], {})
     document.head.innerHTML = ''
 
-    if ((global as any).btoa) {
+    if (!globalThis.btoa) {
       ensureProperty(globalThis, ['btoa'], (str : string) => Buffer.from(str, 'binary').toString('base64'));
     }
   })

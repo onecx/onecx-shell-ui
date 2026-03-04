@@ -115,16 +115,13 @@ describe('ShellIconLoaderService', () => {
     expect(publishSpy).toHaveBeenCalledWith({ type: 'IconsReceived' })
   })
 
-  it('should handle undefined globalThis.onecxIcons', async () => {
+  it('should not break if onecxIcons is undefined', async () => {
     delete globalThis.onecxIcons;
+
     service.init();
     (themeService as any).currentTheme$.publish({ name: 'dark' });
 
-    const loadSpy = jest.spyOn<any, any>(service as any, 'loadIcons').mockResolvedValue(undefined);
-
-    await (service as any).loadIcons();
-
-    expect(loadSpy).toHaveBeenCalled();
+    await expect((service as any).loadIcons()).resolves.toBeUndefined();
   });
 
   it('should do nothing when there are no missing icons', async () => {

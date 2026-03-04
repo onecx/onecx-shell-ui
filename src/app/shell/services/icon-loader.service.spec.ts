@@ -58,7 +58,7 @@ describe('ShellIconLoaderService', () => {
     document.head.innerHTML = ''
 
     if (!globalThis.btoa) {
-      ensureProperty(globalThis, ['btoa'], (str : string) => Buffer.from(str, 'binary').toString('base64'));
+      ensureProperty(globalThis, ['btoa'], (str: string) => Buffer.from(str, 'binary').toString('base64'))
     }
   })
 
@@ -114,6 +114,18 @@ describe('ShellIconLoaderService', () => {
 
     expect(publishSpy).toHaveBeenCalledWith({ type: 'IconsReceived' })
   })
+
+  it('should handle undefined globalThis.onecxIcons', async () => {
+    delete globalThis.onecxIcons;
+    service.init();
+    (themeService as any).currentTheme$.publish({ name: 'dark' });
+
+    const loadSpy = jest.spyOn<any, any>(service as any, 'loadIcons').mockResolvedValue(undefined);
+
+    await (service as any).loadIcons();
+
+    expect(loadSpy).toHaveBeenCalled();
+  });
 
   it('should do nothing when there are no missing icons', async () => {
     service.init()

@@ -30,7 +30,7 @@ export class ShellIconLoaderService {
   }
 
   private async loadIcons() {
-    const missingIcons = Object.entries(globalThis.onecxIcons!)
+    const missingIcons = Object.entries(globalThis.onecxIcons ?? {})
       .filter(([, v]) => v === undefined)
       .map(([name]) => name)
 

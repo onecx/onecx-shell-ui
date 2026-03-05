@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { debounceTime, filter, firstValueFrom } from 'rxjs'
+import { debounceTime, filter, firstValueFrom, mergeMap } from 'rxjs'
 import { generateClassName, IconRequested, IconCache } from '@onecx/integration-interface'
 import { IconService as IconServiceInterface, ThemeService } from '@onecx/angular-integration-interface'
 import { IconBffService } from 'src/app/shared/generated'
@@ -24,20 +24,23 @@ export class ShellIconLoaderService {
     this.iconService.iconTopic
       .pipe(
         filter((m): m is IconRequested => m.type === 'IconRequested'),
-        debounceTime(100)
+        debounceTime(100),
+        mergeMap(() => this.loadIcons())
       )
-      .subscribe(() => this.loadIcons())
+      .subscribe()
   }
 
   private async loadIcons() {
-    const missingIcons = Object.entries(globalThis.onecxIcons ?? {})
+    ensureProperty(globalThis, ['onecxIcons'], {})
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const missingIcons = Object.entries(globalThis.onecxIcons!)
       .filter(([, v]) => v === undefined)
       .map(([name]) => name)
 
     if (missingIcons.length === 0) return
 
     await this.loadMissingIcons(missingIcons)
-    this.iconService.iconTopic.publish({ type: 'IconsReceived' })
+    await this.iconService.iconTopic.publish({ type: 'IconsReceived' })
   }
 
   private async loadMissingIcons(missingIcons: string[]): Promise<void> {
@@ -75,21 +78,18 @@ export class ShellIconLoaderService {
   }
 
   private injectCss(iconName: string, svgBody: string, style: HTMLStyleElement): void {
-    const svgClass = generateClassName(iconName, 'svg')
-    const bgClass = generateClassName(iconName, 'background')
-    const beforeClass = generateClassName(iconName, 'background-before')
-
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${svgBody}</svg>`
     const encoded = btoa(svg)
 
     style.textContent += `
-    ${this.getSvgCss(svgClass, encoded)}
-    ${this.getBackgroundCss(bgClass, encoded)}
-    ${this.getBackgroundBeforeCss(beforeClass, encoded)}
+    ${this.getSvgCss(iconName, encoded)}
+    ${this.getBackgroundCss(iconName, encoded)}
+    ${this.getBackgroundBeforeCss(iconName, encoded)}
   `
   }
 
-  private getBackgroundBeforeCss(className: string, encoded: string): string {
+  private getBackgroundBeforeCss(iconName: string, encoded: string): string {
+    const className = generateClassName(iconName, 'background-before')
     return `.${className}{
                     display:inline-flex;
                 }
@@ -102,7 +102,8 @@ export class ShellIconLoaderService {
             }`
   }
 
-  private getBackgroundCss(className: string, encoded: string): string {
+  private getBackgroundCss(iconName: string, encoded: string): string {
+    const className = generateClassName(iconName, 'background')
     return `.${className}{
                     display:inline-block;
                     width:1em;
@@ -111,7 +112,8 @@ export class ShellIconLoaderService {
                 }`
   }
 
-  private getSvgCss(className: string, encoded: string): string {
+  private getSvgCss(iconName: string, encoded: string): string {
+    const className = generateClassName(iconName, 'svg')
     return `.${className}{
                     display:inline-block;
                     width:1em;

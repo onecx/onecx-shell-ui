@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { bufferTime, debounceTime, filter, firstValueFrom, map, mergeMap, tap } from 'rxjs'
+import { bufferTime, filter, firstValueFrom, map, mergeMap } from 'rxjs'
 import { generateClassName, IconRequested, IconCache } from '@onecx/integration-interface'
 import { IconService as IconServiceInterface, ThemeService } from '@onecx/angular-integration-interface'
 import { IconBffService } from 'src/app/shared/generated'
@@ -40,7 +40,7 @@ export class ShellIconLoaderService {
 
     ensureProperty(globalThis, ['onecxIcons'], {})
     const missingIcons = iconNames.filter((name : string) => globalThis.onecxIcons![name] === undefined);
-    
+
     if (missingIcons.length === 0) return
 
     await this.loadMissingIcons(missingIcons)

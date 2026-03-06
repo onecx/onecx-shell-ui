@@ -79,7 +79,7 @@
         ],
         "scripts": [],
         "customWebpackConfig": {
-          "path": "./webpack.config.js"
+          "path": "./webpack.config.ts"
         }
       },
       "configurations": {
@@ -98,7 +98,7 @@
           ],
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.js"
+            "path": "./webpack.config.ts"
           }
         },
         "development": {
@@ -144,7 +144,7 @@
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
         "buildTarget": "onecx-shell-ui:build",
-        "customWebpackConfig": "./webpack.config.js"
+        "customWebpackConfig": "./webpack.config.ts"
       }
     },
     "lint": {

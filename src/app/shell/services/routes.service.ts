@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core'
 import { Location } from '@angular/common'
-import { LoadRemoteModuleOptions, loadRemoteModule } from '@angular-architects/module-federation'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
+import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
+import { types } from '@module-federation/runtime-core/.'
 
 import { getLocation } from '@onecx/accelerator'
 import {
@@ -90,9 +91,13 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r))
+        const remoteEntryOptions = await this.toLoadRemoteEntryOptions(r)
+        registerRemotes([remoteEntryOptions])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
+        const m = await loadRemote<any>(remoteEntryOptions.name + '/' + exposedModule)
+
         console.log(`Load remote module ${exposedModule} finished.`)
+
         if (r.technology === Technologies.Angular) {
           return m[exposedModule]
         } else {
@@ -177,21 +182,28 @@ export class RoutesService {
     throw err
   }
 
-  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): LoadRemoteModuleOptions {
-    const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
-    if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
-      return {
-        type: 'module',
-        remoteEntry: r.remoteEntryUrl,
-        exposedModule: './' + exposedModule
-      }
+  private async toLoadRemoteEntryOptions(r: BffGeneratedRoute): Promise<types.Remote> {
+    let shareScope = 'default'
+    if (r.shareScope) {
+      shareScope = r.shareScope
+    } else {
+      const manifestUrl = Location.joinWithSlash(r.baseUrl, 'mf-manifest.json')
+      shareScope = await this.getShareScope(manifestUrl)
     }
+    // TODO: Check if this works for script type (Angular 12 or below)
     return {
-      type: 'script',
-      remoteName: r.remoteName ?? '',
-      remoteEntry: r.remoteEntryUrl,
-      exposedModule: './' + exposedModule
+      type: this.getRemoteType(r),
+      entry: r.remoteEntryUrl,
+      name: r.productName + '|' + r.appId,
+      shareScope
     }
+  }
+
+  private getRemoteType(r: BffGeneratedRoute): 'module' | 'script' {
+    if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
+      return 'module'
+    }
+    return 'script'
   }
 
   private async toRouteUrl(url: string | undefined) {
@@ -242,5 +254,10 @@ export class RoutesService {
 
   private createHomePageUrl(baseUrl: string, homePage: string) {
     return this.toRouteUrl(Location.joinWithSlash(baseUrl, homePage))
+  }
+
+  // TODO: Use function from libs instead of mock implementation
+  private async getShareScope(url: string): Promise<string> {
+    return 'MOCK_SHARE_SCOPE'
   }
 }

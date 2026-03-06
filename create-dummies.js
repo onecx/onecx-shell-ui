@@ -3,7 +3,12 @@ const path = require('path')
 
 const EXPORTS_BLACKLIST = ['.', './package.json']
 
-const DEPENDENCY_BLACKLIST = ['@nx/angular']
+const DEPENDENCY_BLACKLIST = [
+  '@nx/angular',
+  '@module-federation/enhanced',
+  '@module-federation/runtime-core',
+  '@module-federation/dts-plugin'
+]
 
 const FULL_PACKAGE_BLACKLIST = [
   '@angular/common/locales/global/*',

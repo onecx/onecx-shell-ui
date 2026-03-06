@@ -27,8 +27,8 @@ export interface Route {
     remoteName?: string;
     elementName?: string;
     displayName: string;
-    shareScope?: string;
     endpoints?: Array<UIEndpoint>;
+    shareScope?: string;
 }
 
 

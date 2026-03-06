@@ -22,8 +22,8 @@ export interface RemoteComponent {
     exposedModule: string;
     remoteName?: string;
     elementName?: string;
-    shareScope?: string;
     technology?: Technologies;
+    shareScope?: string;
 }
 
 

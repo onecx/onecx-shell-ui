@@ -91,10 +91,13 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        registerRemotes([this.toLoadRemoteEntryOptions(r)])
+        const remoteEntryOptions = this.toLoadRemoteEntryOptions(r)
+        registerRemotes([remoteEntryOptions])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
-        const m = await loadRemote<any>(r.productName + '/' + r.appId + '/' + exposedModule)
+        const m = await loadRemote<any>(remoteEntryOptions.name + '/' + exposedModule)
+
         console.log(`Load remote module ${exposedModule} finished.`)
+
         if (r.technology === Technologies.Angular) {
           return m[exposedModule]
         } else {
@@ -182,21 +185,21 @@ export class RoutesService {
   private toLoadRemoteEntryOptions(r: BffGeneratedRoute): types.Remote {
     // TODO: Check if r contains share scope, if not, load manifest and determin share scope using getShareScope function
     // Same applies to remote component loading in libs
-    const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
-    if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
-      return {
-        type: 'module',
-        entry: r.remoteEntryUrl,
-        name: r.productName + '/' + r.appId
-      }
-    }
-    // TODO: Check if this works
+    // TODO: Check if this works for script type (Angular 12 or below)
     return {
-      type: 'script',
-      alias: r.remoteName ?? '',
+      type: this.getRemoteType(r),
       entry: r.remoteEntryUrl,
-      name: './' + exposedModule
+      name: r.productName + '|' + r.appId,
+      // TODO: Use generated shareScope, do this everywhere
+      shareScope: 'default'
     }
+  }
+
+  private getRemoteType(r: BffGeneratedRoute): 'module' | 'script' {
+    if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
+      return 'module'
+    }
+    return 'script'
   }
 
   private async toRouteUrl(url: string | undefined) {

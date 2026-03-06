@@ -53,23 +53,6 @@ export async function loadPreloaderModule(preloader: Preloader) {
   })
 }
 
-// TODO: Clarify where this should be used --> move to angular-remote-components and utilize in routes.service, slots
-// export function getShareScope(manifest: any): string {
-//   const angularCore = manifest.shared.find((s: any) => s.name === '@angular/core')
-//   if (!angularCore) {
-//     console.warn('Could not determine Angular version from manifest. Using default share scope.')
-//     return 'default'
-//   }
-
-//   const version = angularCore.version.split('.')[0]
-//   if (!version || version === '18' || version === '19') {
-//     console.warn('Using default share scope for Angular version:', version)
-//     return 'default'
-//   }
-
-//   return `angular_${version}`
-// }
-
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {
   return new Promise((resolve) => {
     if (window['onecxPreloaders'][preloader.windowKey]) {

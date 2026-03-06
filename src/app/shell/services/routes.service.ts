@@ -91,7 +91,7 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        const remoteEntryOptions = this.toLoadRemoteEntryOptions(r)
+        const remoteEntryOptions = await this.toLoadRemoteEntryOptions(r)
         registerRemotes([remoteEntryOptions])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
         const m = await loadRemote<any>(remoteEntryOptions.name + '/' + exposedModule)
@@ -182,16 +182,20 @@ export class RoutesService {
     throw err
   }
 
-  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): types.Remote {
-    // TODO: Check if r contains share scope, if not, load manifest and determin share scope using getShareScope function
-    // Same applies to remote component loading in libs
+  private async toLoadRemoteEntryOptions(r: BffGeneratedRoute): Promise<types.Remote> {
+    let shareScope = 'default'
+    if (r.shareScope) {
+      shareScope = r.shareScope
+    } else {
+      const manifestUrl = Location.joinWithSlash(r.baseUrl, 'mf-manifest.json')
+      shareScope = await this.getShareScope(manifestUrl)
+    }
     // TODO: Check if this works for script type (Angular 12 or below)
     return {
       type: this.getRemoteType(r),
       entry: r.remoteEntryUrl,
       name: r.productName + '|' + r.appId,
-      // TODO: Use generated shareScope, do this everywhere
-      shareScope: 'default'
+      shareScope
     }
   }
 
@@ -250,5 +254,10 @@ export class RoutesService {
 
   private createHomePageUrl(baseUrl: string, homePage: string) {
     return this.toRouteUrl(Location.joinWithSlash(baseUrl, homePage))
+  }
+
+  // TODO: Use function from libs instead of mock implementation
+  private async getShareScope(url: string): Promise<string> {
+    return 'MOCK_SHARE_SCOPE'
   }
 }

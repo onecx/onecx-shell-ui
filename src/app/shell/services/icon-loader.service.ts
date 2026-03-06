@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core'
-import { debounceTime, filter, firstValueFrom, mergeMap } from 'rxjs'
+import { bufferTime, debounceTime, filter, firstValueFrom, map, mergeMap, tap } from 'rxjs'
 import { generateClassName, IconRequested, IconCache } from '@onecx/integration-interface'
 import { IconService as IconServiceInterface, ThemeService } from '@onecx/angular-integration-interface'
 import { IconBffService } from 'src/app/shared/generated'
@@ -24,19 +24,23 @@ export class ShellIconLoaderService {
     this.iconService.iconTopic
       .pipe(
         filter((m): m is IconRequested => m.type === 'IconRequested'),
-        debounceTime(100),
-        mergeMap(() => this.loadIcons())
+        bufferTime(100),
+        filter((icons) => icons.length > 0),
+        map((messages) => messages.map((m) => m.name)),
+        mergeMap((iconNames : string[])=> this.loadIcons(iconNames))
       )
       .subscribe()
   }
 
-  private async loadIcons() {
-    ensureProperty(globalThis, ['onecxIcons'], {})
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const missingIcons = Object.entries(globalThis.onecxIcons!)
-      .filter(([, v]) => v === undefined)
-      .map(([name]) => name)
+  private async loadIcons(iconNames : string[]) {
 
+    // todo : On updating the libs to v8 - uncomment the code at line 38-39 and remove the code at line 41-42.
+    // const g = ensureProperty(globalThis, ['onecxIcons'], {})
+    // const missingIcons = iconNames.filter((name : string) => g.onecxIcons[name] === undefined);
+
+    ensureProperty(globalThis, ['onecxIcons'], {})
+    const missingIcons = iconNames.filter((name : string) => globalThis.onecxIcons![name] === undefined);
+    
     if (missingIcons.length === 0) return
 
     await this.loadMissingIcons(missingIcons)

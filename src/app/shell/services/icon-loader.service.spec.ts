@@ -95,22 +95,23 @@ describe('ShellIconLoaderService', () => {
   it('should fetch missing icons, inject CSS, and publish IconsReceived', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
-    ensureProperty(globalThis, ['onecxIcons', 'home'], undefined)
-    const icon: IconCache = { name: 'home', body: '<path />' } as any
+    const iconName = 'home';
+    ensureProperty(globalThis, ['onecxIcons', iconName], undefined)
+    const icon: IconCache = { name: iconName, body: '<path />' } as any
     const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(of({ icons: [icon] }) as any)
 
     const publishSpy = jest.spyOn(iconTopic, 'publish')
 
-    await (service as any).loadIcons()
+    await (service as any).loadIcons([iconName])
 
-    expect(bffSpy).toHaveBeenCalledWith('dark', { names: ['home'] })
-    expect(globalThis.onecxIcons!['home']).toEqual(icon)
+    expect(bffSpy).toHaveBeenCalledWith('dark', { names: [iconName] })
+    expect(globalThis.onecxIcons![iconName]).toEqual(icon)
 
     const style = document.getElementById('onecx-icons-css') as HTMLStyleElement
     expect(style).toBeTruthy()
-    expect(style.textContent).toContain('onecx-theme-icon-svg-home')
-    expect(style.textContent).toContain('onecx-theme-icon-background-home')
-    expect(style.textContent).toContain('onecx-theme-icon-background-before-home')
+    expect(style.textContent).toContain(`onecx-theme-icon-svg-${iconName}`)
+    expect(style.textContent).toContain(`onecx-theme-icon-background-${iconName}`)
+    expect(style.textContent).toContain(`onecx-theme-icon-background-before-${iconName}`)
 
     expect(publishSpy).toHaveBeenCalledWith({ type: 'IconsReceived' })
   })
@@ -121,7 +122,7 @@ describe('ShellIconLoaderService', () => {
     service.init();
     (themeService as any).currentTheme$.publish({ name: 'dark' });
 
-    await expect((service as any).loadIcons()).resolves.toBeUndefined();
+    await expect((service as any).loadIcons([])).resolves.toBeUndefined();
   });
 
   it('should do nothing when there are no missing icons', async () => {
@@ -133,7 +134,7 @@ describe('ShellIconLoaderService', () => {
     const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId')
     const publishSpy = jest.spyOn(iconTopic, 'publish')
 
-    await (service as any).loadIcons()
+    await (service as any).loadIcons([])
 
     expect(bffSpy).not.toHaveBeenCalled()
     expect(publishSpy).not.toHaveBeenCalledWith({ type: 'IconsReceived' })

@@ -91,4 +91,28 @@ describe('AboutComponent', () => {
         expect(component.supportedAngularVersions[1].version).toBe('19.2.17');
         expect(component.supportedAngularVersions[2].version).toBe('20.3.15');
     });
+
+    it('handles missing onecxWebpackContainer gracefully', () => {
+        fixture.detectChanges();
+
+        expect(component.supportedAngularVersions).toHaveLength(0);
+    });
+
+    it('handles error when accessing onecxWebpackContainer', () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+        Object.defineProperty(window, 'onecxWebpackContainer', {
+            get() {
+                throw new Error('Access error');
+            },
+            configurable: true
+        });
+
+        fixture.detectChanges();
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Error while accessing onecxWebpackContainer :',
+            expect.any(Error)
+        );
+        expect(component.supportedAngularVersions).toHaveLength(0);
+    });
 })

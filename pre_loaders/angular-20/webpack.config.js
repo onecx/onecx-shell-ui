@@ -73,6 +73,7 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
 
 module.exports = {
   ...webpackConfig,
+  devtool: 'source-map',
   plugins: [...plugins, modifyPrimeNgPlugin, modifyAngularCorePlugin],
   output: { uniqueName: magicChar + 'onecx-angular-20-loader', publicPath: 'auto' },
   experiments: { ...webpackConfig.experiments, topLevelAwait: true },

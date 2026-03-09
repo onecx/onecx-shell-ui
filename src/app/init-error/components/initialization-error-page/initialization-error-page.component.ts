@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 
-import { EventsPublisher } from '@onecx/integration-interface'
+import { EventsTopic } from '@onecx/integration-interface'
 
 interface InitializationError {
   message: string
@@ -20,9 +20,9 @@ interface InitializationError {
   imports: [CommonModule, TranslateModule],
   templateUrl: './initialization-error-page.component.html'
 })
-export class InitializationErrorPageComponent {
+export class InitializationErrorPageComponent implements OnDestroy {
   error$: Observable<InitializationError>
-  public eventsPublisher$: EventsPublisher = new EventsPublisher()
+  public eventsTopic: EventsTopic = new EventsTopic()
 
   private readonly route: ActivatedRoute = inject(ActivatedRoute)
 
@@ -42,7 +42,11 @@ export class InitializationErrorPageComponent {
     )
   }
 
+  ngOnDestroy(): void {
+    this.eventsTopic.destroy()
+  }
+
   public onLogout(): void {
-    this.eventsPublisher$.publish({ type: 'authentication#logoutButtonClicked' })
+    this.eventsTopic.publish({ type: 'authentication#logoutButtonClicked' })
   }
 }

@@ -27,7 +27,7 @@ import {
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import { CurrentLocationPublisher, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
@@ -51,6 +51,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
+import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -193,6 +194,12 @@ export function imageRepositoryServiceInitializer(imageRepositoryService: ImageR
   imageRepositoryService.init()
 }
 
+export function shellIconLoaderServiceInitializer(shellIconLoaderService: ShellIconLoaderService) {
+  shellIconLoaderService.init()
+}
+
+const currentLocationTopic = new CurrentLocationTopic()
+
 const pushState = globalThis.history.pushState
 globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   const isRouterSync = data?.isRouterSync
@@ -205,7 +212,7 @@ globalThis.history.pushState = (data: any, unused: string, url?: string) => {
   }
   pushState.bind(globalThis.history)(data, unused, url)
   if (!isRouterSync) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
@@ -234,7 +241,7 @@ globalThis.history.replaceState = (data: any, unused: string, url?: string) => {
   if (!preventLocationPropagation) replaceState.bind(window.history)(data, unused, url) // NOSONAR
 
   if (!isRouterSync && !preventLocationPropagation) {
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: false
     })
@@ -268,7 +275,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
     let lastUrl = ''
     let isFirstRoute = true
     const url = _constructCurrentURL()
-    new CurrentLocationPublisher().publish({
+    currentLocationTopic.publish({
       url,
       isFirst: true
     })
@@ -403,7 +410,10 @@ export async function shareMfContainer() {
       return imageRepositoryServiceInitializer(inject(ImageRepositoryService))
     }),
     { provide: SLOT_SERVICE, useExisting: SlotService },
-    { provide: BASE_PATH, useValue: './shell-bff' }
+    { provide: BASE_PATH, useValue: './shell-bff' },
+    provideAppInitializer(() => {
+      return shellIconLoaderServiceInitializer(inject(ShellIconLoaderService))
+    })
   ],
   bootstrap: [AppComponent]
 })

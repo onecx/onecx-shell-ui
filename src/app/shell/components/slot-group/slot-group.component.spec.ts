@@ -27,17 +27,13 @@ class ResizeObserverMock {
 }
 globalThis.ResizeObserver = ResizeObserverMock
 
-class ResizedEventsPublisherMock {
-  publish = jest.fn()
-}
-
 jest.mock('@onecx/integration-interface', () => {
   const actual = jest.requireActual('@onecx/integration-interface')
   const fakeTopic = jest.requireActual('@onecx/accelerator').FakeTopic
+
   class ResizedEventsPublisherMock {
     publish = jest.fn()
   }
-
   return {
     ...actual,
     ResizedEventsTopic: fakeTopic,
@@ -45,12 +41,7 @@ jest.mock('@onecx/integration-interface', () => {
   }
 })
 
-import {
-  ResizedEventType,
-  SlotGroupResizedEvent,
-  Technologies,
-  TopicResizedEventType
-} from '@onecx/integration-interface'
+import { ResizedEventType, Technologies, TopicResizedEventType } from '@onecx/integration-interface'
 import { FakeTopic } from '@onecx/accelerator'
 
 function sortClasses(classes: string[]): string[] {
@@ -64,7 +55,6 @@ describe('SlotGroupComponent', () => {
   let slotGroupHarness: SlotGroupHarness
   let slotServiceMock: SlotServiceMock
 
-  let resizeEventsPublisher: ResizedEventsPublisherMock
   let resizeObserverMock: ResizeObserverMock
   let resizedEventsTopic: FakeTopic<TopicResizedEventType>
 
@@ -87,7 +77,6 @@ describe('SlotGroupComponent', () => {
     component = fixture.componentInstance
     componentRef = fixture.componentRef
     componentRef.setInput('name', 'test-slot')
-    resizeEventsPublisher = component['resizedEventsPublisher'] as any as ResizedEventsPublisherMock
     fixture.detectChanges()
 
     resizeObserverMock = (component as any).resizeObserver as ResizeObserverMock
@@ -123,35 +112,33 @@ describe('SlotGroupComponent', () => {
   })
 
   it('should debounce resize events and publish SLOT_GROUP_RESIZED once', fakeAsync(() => {
-    resizeEventsPublisher.publish.mockClear()
-
+    const spy = jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate multiple rapid size changes
     resizeObserverMock.trigger(100, 50)
     resizeObserverMock.trigger(120, 60)
     resizeObserverMock.trigger(140, 70)
 
     // Nothing yet because of debounce (100ms in component)
-    expect(resizeEventsPublisher.publish).not.toHaveBeenCalled()
+    expect(spy).not.toHaveBeenCalled()
 
     // Advance time by slightly more than debounce
     tick(110)
 
-    expect(resizeEventsPublisher.publish).toHaveBeenCalledTimes(1)
-
-    const arg = resizeEventsPublisher.publish.mock.calls[0][0] as SlotGroupResizedEvent
-
-    expect(arg.type).toBe(ResizedEventType.SLOT_GROUP_RESIZED)
-    expect(arg.payload.slotGroupName).toBe('test-slot')
-    expect(arg.payload.slotGroupDetails).toEqual({ width: 140, height: 70 })
+    expect(spy).toHaveBeenCalledWith({
+      type: ResizedEventType.SLOT_GROUP_RESIZED,
+      payload: {
+        slotGroupName: 'test-slot',
+        slotGroupDetails: { width: 140, height: 70 }
+      }
+    })
   }))
 
   it('should publish SLOT_GROUP_RESIZED when requestedEventsChanged$ emits for this slot group', fakeAsync(() => {
+    jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate initial size
     resizeObserverMock.trigger(200, 100)
 
     tick(110) // Wait for debounce
-
-    resizeEventsPublisher.publish.mockClear()
 
     resizedEventsTopic.publish({
       type: ResizedEventType.REQUESTED_EVENTS_CHANGED,
@@ -161,7 +148,7 @@ describe('SlotGroupComponent', () => {
       }
     })
 
-    expect(resizeEventsPublisher.publish).toHaveBeenCalledWith({
+    expect(resizedEventsTopic.publish).toHaveBeenCalledWith({
       type: ResizedEventType.SLOT_GROUP_RESIZED,
       payload: {
         slotGroupName: 'test-slot',

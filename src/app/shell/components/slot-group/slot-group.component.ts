@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common'
 import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import {
-  ResizedEventsPublisher,
-  SlotGroupResizedEvent,
   ResizedEventsTopic,
+  SlotGroupResizedEvent,
   RequestedEventsChangedEvent,
   ResizedEventType
 } from '@onecx/integration-interface'
@@ -99,7 +98,6 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   })
   private readonly resizeDebounceTimeMs = 100
 
-  private readonly resizedEventsPublisher = new ResizedEventsPublisher()
   private readonly resizedEventsTopic = new ResizedEventsTopic()
   private readonly requestedEventsChanged$ = this.resizedEventsTopic.pipe(
     filter((event): event is RequestedEventsChangedEvent => event.type === ResizedEventType.REQUESTED_EVENTS_CHANGED)
@@ -136,7 +134,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
           slotGroupDetails: { width, height }
         }
       }
-      this.resizedEventsPublisher.publish(slotGroupResizedEvent)
+      this.resizedEventsTopic.publish(slotGroupResizedEvent)
     })
 
     this.resizeObserver.observe(this.elementRef.nativeElement)
@@ -151,7 +149,7 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
             slotGroupDetails: { width, height }
           }
         }
-        this.resizedEventsPublisher.publish(slotGroupResizedEvent)
+        this.resizedEventsTopic.publish(slotGroupResizedEvent)
       }
     })
 

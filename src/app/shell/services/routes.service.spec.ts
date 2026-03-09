@@ -35,6 +35,7 @@ describe('RoutesService', () => {
     }
 
     const errorRouteCount = 3;
+    const aboutRouteCount = 1;
     const welcomeRouteCount = 1;
 
     beforeEach(async () => {
@@ -66,7 +67,7 @@ describe('RoutesService', () => {
         it('creates default routes when no routes are provided', async () => {
             await routerService.init([])
             expect(router.config).toBeDefined()
-            expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount)
+            expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount + aboutRouteCount);
             expect(router.config.find(r => r.path === '**')).toBeDefined()
             expect(router.config.find(r => r.path === 'portal-initialization-error-page')).toBeDefined()
             expect(router.config.find(r => r.path === 'remote-loading-error-page')).toBeDefined()
@@ -102,7 +103,7 @@ describe('RoutesService', () => {
                     "endpoints": []
                 }];
             await routerService.init(testRoutes);
-            expect(router.config.length).toBe(testRoutes.length + errorRouteCount + welcomeRouteCount);
+            expect(router.config.length).toBe(testRoutes.length + errorRouteCount + welcomeRouteCount + aboutRouteCount);
             const createdRoute = router.config.find(r => r.path === 'admin/welcome');
             expect(createdRoute).toBeDefined()
             expect(createdRoute?.loadChildren).toBeDefined()
@@ -132,7 +133,7 @@ describe('RoutesService', () => {
                     "endpoints": []
                 }];
             await routerService.init(testRoutes);
-            expect(router.config.length).toBe(testRoutes.length + errorRouteCount);
+            expect(router.config.length).toBe(testRoutes.length + errorRouteCount + aboutRouteCount);
         })
 
         it("redirects to welcome if configured in the workspace", async () => {
@@ -140,7 +141,7 @@ describe('RoutesService', () => {
             await appStateServiceMock.currentWorkspace$.publish({ baseUrl: '/', homePage } as any);
 
             await routerService.init([]);
-            expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount)
+            expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount + aboutRouteCount);
             const welcomeRoute = router.config.find(r => r.path === "");
             expect(welcomeRoute).toBeDefined();
             expect(welcomeRoute?.redirectTo).toBe(homePage);

@@ -75,7 +75,11 @@ module.exports = {
   ...webpackConfig,
   devtool: 'source-map',
   plugins: [...plugins, modifyPrimeNgPlugin, modifyAngularCorePlugin],
-  output: { uniqueName: magicChar + 'onecx-angular-18-loader', publicPath: 'auto' },
+  output: {
+    uniqueName: magicChar + 'onecx-angular-18-loader',
+    publicPath: 'auto',
+    devtoolNamespace: 'onecx-angular-18-loader'
+  },
   experiments: { ...webpackConfig.experiments, topLevelAwait: true },
   optimization: { runtimeChunk: false, splitChunks: false },
   module: { parser: { javascript: { importMeta: false } } }

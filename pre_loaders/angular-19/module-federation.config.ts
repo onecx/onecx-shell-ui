@@ -1,4 +1,6 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
+// TODO: Cherry pick getOneCXSharedRecommendations to accelerator v6
+import { getOneCXSharedRecommendations } from '@onecx/accelerator'
 
 const config: ModuleFederationConfig = {
   name: 'onecx-angular-19-loader',
@@ -6,19 +8,9 @@ const config: ModuleFederationConfig = {
     ['./Angular19Loader']: 'src/main.ts'
   },
   shared: (libraryName, sharedConfig) => {
-    if (
-      !libraryName.startsWith('@angular') &&
-      !libraryName.startsWith('@onecx') &&
-      !libraryName.startsWith('rxjs') &&
-      !libraryName.startsWith('primeng') &&
-      !libraryName.startsWith('@ngx-translate')
-    ) {
-      return false
-    }
-    sharedConfig.singleton = false
-    sharedConfig.strictVersion = false
-    sharedConfig.eager = false
-    return sharedConfig
+    const config = getOneCXSharedRecommendations(libraryName, sharedConfig)
+    // Add custom shared configurations to the config object if needed
+    return config
   }
 }
 

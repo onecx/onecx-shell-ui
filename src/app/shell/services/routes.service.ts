@@ -3,9 +3,9 @@ import { Location } from '@angular/common'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
-import { types } from '@module-federation/runtime-core/.'
 
 import { getLocation } from '@onecx/accelerator'
+import { toLoadRemoteEntryOptions } from '@onecx/angular-remote-components'
 import {
   AppStateService,
   CONFIG_KEY,
@@ -91,7 +91,7 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        const remoteEntryOptions = await this.toLoadRemoteEntryOptions(r)
+        const remoteEntryOptions = await toLoadRemoteEntryOptions(r)
         registerRemotes([remoteEntryOptions])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
         const m = await loadRemote<any>(remoteEntryOptions.name + '/' + exposedModule)
@@ -180,16 +180,6 @@ export class RoutesService {
 
     this.router.navigate(['remote-loading-error-page', routerParams])
     throw err
-  }
-
-  // TODO: Use function from libs instead of mock implementation
-  private async toLoadRemoteEntryOptions(r: BffGeneratedRoute): Promise<types.Remote> {
-    return {
-      type: 'module',
-      entry: 'MOCK',
-      name: 'MOCK',
-      shareScope: 'default'
-    }
   }
 
   private async toRouteUrl(url: string | undefined) {

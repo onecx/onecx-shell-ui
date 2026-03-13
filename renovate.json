@@ -47,6 +47,16 @@
       "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
+      "matchFileNames": ["pre_loaders/angular-21/package.json"],
+      "groupName": "Angular 21 Loader",
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "groupSlug": "angular-21-loader",
+      "prPriority": 10,
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
+    },
+    {
       "matchFileNames": ["package.json"],
       "groupName": "Root NX",
       "matchDepTypes": ["dependencies", "devDependencies"],

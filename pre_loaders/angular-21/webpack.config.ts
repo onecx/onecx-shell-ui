@@ -47,7 +47,7 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
 
 export default async function (baseConfig: Configuration) {
   const withMf = await withModuleFederation(config, {
-    shareScope: 'default'
+    shareScope: 'angular_21'
   })
   const webpackConfig = withMf(baseConfig)
 

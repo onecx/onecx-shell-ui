@@ -1,6 +1,7 @@
 import { Route } from '@angular/router'
 
 // Initialization error page is lazy-loaded via InitErrorModule
+export const internalShellRoute = 'onecx-shell';
 
 export const appRoutes: Route[] = [
   {
@@ -13,5 +14,10 @@ export const appRoutes: Route[] = [
     path: 'remote-loading-error-page',
     loadChildren: () => import('src/app/error/error.module').then((m) => m.ErrorModule),
     title: 'Error'
+  },
+  {
+    path: `${internalShellRoute}/about-shell`,
+    loadChildren: () => import('src/app/about/about.module').then((m) => m.AboutModule),
+    title: 'About'
   }
 ]

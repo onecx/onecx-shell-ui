@@ -41,7 +41,7 @@ export const angular21Preloader: Preloader = {
   relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/remoteEntry.js',
   windowKey: 'angular-21',
   exposedModule: 'Angular21Loader',
-  shareScope: 'default'
+  shareScope: 'angular_21'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {

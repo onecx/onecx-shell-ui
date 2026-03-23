@@ -22,11 +22,6 @@ const FULL_PACKAGE_BLACKLIST = [
   '@angular/router/upgrade',
   '@angular/localize/tools',
   'rxjs/internal/*',
-  'rxjs/webSocket',
-  'rxjs/fetch',
-  'rxjs/operators',
-  'rxjs/testing',
-  'rxjs/ajax',
   'primeng/resources/',
   'primeng/editor',
   '@onecx/angular-accelerator/testing',
@@ -75,21 +70,9 @@ async function generateImportsForSubpackages(dependency, folder) {
     let output = ''
     if ('exports' in packageContent) {
       for (const exportKey of Object.keys(packageContent.exports)) {
-        const exportEntry = packageContent.exports[exportKey]
+        if (EXPORTS_BLACKLIST.includes(exportKey)) continue
         const fullPackage = `${dependency}/${removeExportPrefix(exportKey)}`
-        if (
-          EXPORTS_BLACKLIST.includes(exportKey) ||
-          FULL_PACKAGE_BLACKLIST.includes(fullPackage) ||
-          exportKey.includes('*')
-        ) {
-          continue
-        }
-
-        if (exportEntry && exportEntry.types) {
-          const typePath = exportEntry.types.replace('./', '').replace('.d.ts', '')
-          output += `import("${dependency}/${typePath}");\n`
-          continue
-        }
+        if (FULL_PACKAGE_BLACKLIST.includes(fullPackage)) continue
         output += `import("${fullPackage}");\n`
       }
     }

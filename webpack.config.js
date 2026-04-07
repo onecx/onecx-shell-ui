@@ -77,6 +77,7 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
 
 module.exports = {
   ...webpackConfig,
+  devtool: 'source-map',
   plugins: [...plugins, modifyPrimeNgPlugin, modifyAngularCorePlugin],
   module: { parser: { javascript: { importMeta: false } } }
 }

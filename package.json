@@ -131,7 +131,6 @@
     "webpack": "5.105.2"
   },
   "overrides": {
-    "axios": "1.14.0",
     "braces": "^3.0.3",
     "micromatch": "^4.0.8",
     "sane": "^4.1.1",

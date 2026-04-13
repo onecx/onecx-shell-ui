@@ -58,8 +58,8 @@ function resolvePackageExports(rootDir: string) {
         defaultExport = mapping
       } else if (mapping && typeof mapping === 'object') {
         const m = mapping as Record<string, any>
-        types = m.types
-        defaultExport = m.default
+        types = m['types']
+        defaultExport = m['default']
       }
 
       if (types) {
@@ -104,6 +104,7 @@ const config: Config = {
           esModuleInterop: true,
           outDir: './dist/out-tsc',
           target: 'es2016',
+          module: 'esnext',
           types: ['jest', 'node'],
           paths: tsPaths
         },

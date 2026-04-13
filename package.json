@@ -47,6 +47,11 @@
   "jestSonar": {
     "reportPath": "reports"
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "esnext"
+    }
+  },
   "dependencies": {
     "@angular-architects/module-federation": "20.0.0",
     "@angular-architects/module-federation-tools": "20.0.0",

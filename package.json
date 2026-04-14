@@ -47,12 +47,6 @@
   "jestSonar": {
     "reportPath": "reports"
   },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "nodenext",
-      "moduleResolution": "nodenext"
-    }
-  },
   "dependencies": {
     "@angular-architects/module-federation": "20.0.0",
     "@angular-architects/module-federation-tools": "20.0.0",
@@ -141,8 +135,6 @@
     "micromatch": "^4.0.8",
     "sane": "^4.1.1",
     "jest-haste-map": "^29.7.0",
-    "koa": "^2.16.2",
-    "vite": "7.3.2",
-    "@noble/hashes": "^1.8.0"
+    "koa": "^2.16.2"
   }
 }

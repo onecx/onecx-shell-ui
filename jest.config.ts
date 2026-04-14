@@ -1,9 +1,6 @@
 import type { Config } from 'jest'
 import { readFileSync, existsSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import { join } from 'path'
 
 // list of patterns for which no transformation/transpiling should be made
 const ignoredModulePatterns: string = ['d3-.*', '(.*.mjs$)'].join('|')
@@ -75,7 +72,7 @@ function resolvePackageExports(rootDir: string) {
   return { tsPaths, moduleNameMapper }
 }
 
-const { tsPaths, moduleNameMapper: exportMapper } = resolvePackageExports(__dirname)
+const { tsPaths, moduleNameMapper: exportMapper } = resolvePackageExports(process.cwd())
 
 const config: Config = {
   displayName: 'onecx-shell-ui',

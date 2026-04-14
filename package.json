@@ -49,7 +49,8 @@
   },
   "ts-node": {
     "compilerOptions": {
-      "module": "esnext"
+      "module": "nodenext",
+      "moduleResolution": "nodenext"
     }
   },
   "dependencies": {

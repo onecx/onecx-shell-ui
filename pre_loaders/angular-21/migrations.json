@@ -2,14 +2,14 @@
   "migrations": [
     {
       "cli": "nx",
-      "version": "21.6.1-beta.2",
+      "version": "22.3.3-beta.2",
       "requires": {
-        "@angular/core": ">=20.3.0"
+        "@angular/core": ">=21.0.0"
       },
-      "description": "Update the @angular/cli package version to ~20.3.0.",
-      "factory": "./src/migrations/update-21-6-1/update-angular-cli",
+      "description": "Update the @angular/cli package version to ~21.0.0.",
+      "factory": "./src/migrations/update-22-3-3/update-angular-cli",
       "package": "@nx/angular",
-      "name": "update-angular-cli-version-20-3-0"
+      "name": "update-angular-cli-version-21-0-0"
     }
   ]
 }

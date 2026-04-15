@@ -1,5 +1,4 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
-// TODO: Cherry pick getOneCXSharedRecommendations to accelerator v6
 import { getOneCXSharedRecommendations } from '@onecx/accelerator'
 
 const config: ModuleFederationConfig = {

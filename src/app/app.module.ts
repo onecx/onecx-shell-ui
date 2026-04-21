@@ -109,10 +109,10 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
-  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
-    return;
+  if (getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
+    return
   }
-  
+
   await appStateService.isAuthenticated$.isInitialized
 
   const loadWorkspaceConfigResponse = await firstValueFrom(

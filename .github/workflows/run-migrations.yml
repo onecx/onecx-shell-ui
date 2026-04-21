@@ -12,7 +12,7 @@ jobs:
   run-migrations:
     if: |
       (github.event.action == 'labeled' && (contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required'))) ||
-      (github.event.action == 'synchronize' && github.event.pull_request.user.login == 'renovate[bot]' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
+      (github.event.action == 'synchronize' && github.actor == 'renovate[bot]' && github.event.pull_request.user.login == 'renovate[bot]' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
     runs-on: ubuntu-latest
     
     steps:
@@ -26,8 +26,14 @@ jobs:
       - name: Check if migration already completed
         id: check-migration
         run: |
-          # Check if the last commit was from migration workflow
-          last_commit_message=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[-1].messageHeadline')
+          # Check the last commit on the checked-out PR branch.
+          # Using git avoids GitHub API timing/race issues that can cause repeated reruns.
+          last_commit_message=$(git log -1 --pretty=%s)
+
+          echo "Github actor: $github.actor"
+          echo "Github event action: $github.event.action"
+          echo "Github event pull request user login: $github.event.pull_request.user.login"
+          echo "Last commit message: $last_commit_message"
           
           if [[ "$last_commit_message" == *"refactor: run package migrations per directory"* ]]; then
             echo "skip_migration=true" >> $GITHUB_OUTPUT
@@ -36,8 +42,6 @@ jobs:
             echo "skip_migration=false" >> $GITHUB_OUTPUT
             echo "✅ No recent migration commit, proceeding with migration"
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.CI_PAT }}
 
       - name: Setup Node.js
         if: steps.check-migration.outputs.skip_migration == 'false'
@@ -144,6 +148,9 @@ jobs:
                 cd "$dir" || { echo "❌ Failed to change to directory $dir"; continue; }
                 
                 echo "📂 Working directory: $(pwd)"
+
+                # Avoid accidentally executing/committing a stale Nx migrate plan file.
+                rm -f migrations.json
                 
                 # Install dependencies in this directory if package.json exists
                 if [[ -f "package.json" ]]; then
@@ -165,6 +172,9 @@ jobs:
                   echo "🔧 Found migrations.json in $dir - executing migration scripts..."
                   npx nx migrate --run-migrations || echo "❌ No migrations to run in $dir"
                   echo "✅ Migration scripts completed in $dir"
+
+                  # Nx migrate plan file should not be committed.
+                  rm -f migrations.json
                 else
                   echo "ℹ️ No migrations.json found in $dir"
                 fi
@@ -191,6 +201,9 @@ jobs:
         run: |
           git config --local user.email "29139614+renovate[bot]@users.noreply.github.com"
           git config --local user.name "renovate[bot]"
+
+          # Never commit Nx migrate plan files; if they exist and are tracked, delete them.
+          rm -f migrations.json pre_loaders/**/migrations.json || true
           
           if [[ -n "$(git status --porcelain)" ]]; then
             echo ""

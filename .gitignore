@@ -3,10 +3,6 @@
 # Ignore dummies
 **/dummy.ts
 
-# Nx migrate plan files (temporary, should never be committed)
-/migrations.json
-/pre_loaders/**/migrations.json
-
 # compiled output#
 dist
 tmp

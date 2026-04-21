@@ -148,9 +148,6 @@ jobs:
                 cd "$dir" || { echo "❌ Failed to change to directory $dir"; continue; }
                 
                 echo "📂 Working directory: $(pwd)"
-
-                # Avoid accidentally executing/committing a stale Nx migrate plan file.
-                rm -f migrations.json
                 
                 # Install dependencies in this directory if package.json exists
                 if [[ -f "package.json" ]]; then
@@ -173,7 +170,7 @@ jobs:
                   npx nx migrate --run-migrations || echo "❌ No migrations to run in $dir"
                   echo "✅ Migration scripts completed in $dir"
 
-                  # Nx migrate plan file should not be committed.
+                  # remove migrations after execution to prevent stale migration files triggering future runs
                   rm -f migrations.json
                 else
                   echo "ℹ️ No migrations.json found in $dir"
@@ -201,9 +198,6 @@ jobs:
         run: |
           git config --local user.email "29139614+renovate[bot]@users.noreply.github.com"
           git config --local user.name "renovate[bot]"
-
-          # Never commit Nx migrate plan files; if they exist and are tracked, delete them.
-          rm -f migrations.json pre_loaders/**/migrations.json || true
           
           if [[ -n "$(git status --porcelain)" ]]; then
             echo ""

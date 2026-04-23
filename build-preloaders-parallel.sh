@@ -51,7 +51,7 @@ cat $LOG21
 echo
 
 # Check if any build failed
-if [[ $STATUS1 -ne 0 || $STATUS2 -ne 0 || $STATUS3 -ne 0 ]]; then
+if [[ $STATUS1 -ne 0 || $STATUS2 -ne 0 || $STATUS3 -ne 0 || $STATUS4 -ne 0 ]]; then
   echo "One or more builds failed."
   exit 1
 else

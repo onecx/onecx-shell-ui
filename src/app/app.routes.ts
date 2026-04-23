@@ -1,7 +1,7 @@
 import { Route } from '@angular/router'
 
 // Initialization error page is lazy-loaded via InitErrorModule
-export const internalShellRoute = 'onecx-shell'
+export const internalShellRoute = 'onecx-shell';
 
 export const appRoutes: Route[] = [
   {

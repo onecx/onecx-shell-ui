@@ -30,6 +30,10 @@ body {
   }
 }
 
+html,body {
+  height: 100dvh;
+}
+
 // disable default settings of dialogs created by portal dialog service
 .buttonDialogScrollableContent {
   overflow: unset;

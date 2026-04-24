@@ -33,7 +33,13 @@
             "input": "./node_modules/@onecx/angular-utils/assets/",
             "output": "/onecx-angular-utils/assets/"
           }
-        ]
+        ],
+        "sourceMap": {
+          "scripts": true,
+          "styles": false,
+          "vendor": true,
+          "hidden": false
+        }
       },
       "configurations": {
         "production": {
@@ -49,6 +55,12 @@
               "maximumError": "4kb"
             }
           ],
+          "sourceMap": {
+            "scripts": true,
+            "styles": false,
+            "vendor": true,
+            "hidden": false
+          },
           "outputHashing": "all",
           "customWebpackConfig": {
             "path": "./webpack.config.ts"

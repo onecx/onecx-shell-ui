@@ -53,6 +53,7 @@ export default async function (baseConfig: Configuration) {
 
   return {
     ...webpackConfig,
+    devtool: 'source-map',
     plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
     module: {
       ...webpackConfig.module,

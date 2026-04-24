@@ -123,7 +123,7 @@ export class RoutesService {
       currentMfeInfo = await firstValueFrom(this.appStateService.currentMfe$.asObservable())
     }
 
-    if (this.isFirstLoad || (currentMfeInfo?.remoteBaseUrl ?? undefined) !== r.url) {
+    if (this.isFirstLoad || currentMfeInfo?.remoteBaseUrl !== r.url) {
       this.isFirstLoad = false
       if (!currentGlobalLoading) {
         this.showContent$.next(false)
@@ -191,7 +191,7 @@ export class RoutesService {
       url = url.slice(SHELL_BASE_HREF.length)
     }
 
-    if (url?.startsWith('/')) {
+    if (url.startsWith('/')) {
       url = url.substring(1)
     }
     if (url.endsWith('$')) {

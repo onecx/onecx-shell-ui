@@ -96,7 +96,8 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
-    displayName: loadWorkspaceConfigResponse.workspace.displayName
+    displayName: loadWorkspaceConfigResponse.workspace.displayName,
+    i18n: loadWorkspaceConfigResponse.workspace.i18n
   })
 }
 

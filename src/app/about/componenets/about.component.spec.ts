@@ -9,6 +9,7 @@ describe('AboutComponent', () => {
   const magicChar = String.fromCodePoint(0x10ffff)
 
   function mockWebpackContainer(entries: Record<string, any>) {
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(window as any).onecxWebpackContainer = {
       default: {
         ['@angular/core']: entries

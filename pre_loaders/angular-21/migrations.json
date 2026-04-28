@@ -1,0 +1,15 @@
+{
+  "migrations": [
+    {
+      "cli": "nx",
+      "version": "22.3.3-beta.2",
+      "requires": {
+        "@angular/core": ">=21.0.0"
+      },
+      "description": "Update the @angular/cli package version to ~21.0.0.",
+      "factory": "./src/migrations/update-22-3-3/update-angular-cli",
+      "package": "@nx/angular",
+      "name": "update-angular-cli-version-21-0-0"
+    }
+  ]
+}

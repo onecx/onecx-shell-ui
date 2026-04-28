@@ -19,9 +19,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { IconCriteria } from '../model/iconCriteria';
+import { GetTranslationsRequest } from '../model/getTranslationsRequest';
 // @ts-ignore
-import { IconListResponse } from '../model/iconListResponse';
+import { GetTranslationsResponse } from '../model/getTranslationsResponse';
 // @ts-ignore
 import { ProblemDetailResponse } from '../model/problemDetailResponse';
 
@@ -34,7 +34,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'any'
 })
-export class IconBffService {
+export class TranslationBffService {
 
     protected basePath = 'http://onecx-shell-bff:8080';
     public defaultHeaders = new HttpHeaders();
@@ -96,21 +96,17 @@ export class IconBffService {
     }
 
     /**
-     * Retrieve icons by list of names and refId
-     * @param refId 
-     * @param iconCriteria 
+     * Get translations for specified artifact, version and locale
+     * @param getTranslationsRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<IconListResponse>;
-    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<IconListResponse>>;
-    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<IconListResponse>>;
-    public findIconsByNamesAndRefId(refId: string, iconCriteria: IconCriteria, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        if (refId === null || refId === undefined) {
-            throw new Error('Required parameter refId was null or undefined when calling findIconsByNamesAndRefId.');
-        }
-        if (iconCriteria === null || iconCriteria === undefined) {
-            throw new Error('Required parameter iconCriteria was null or undefined when calling findIconsByNamesAndRefId.');
+    public getTranslations(getTranslationsRequest: GetTranslationsRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<GetTranslationsResponse>;
+    public getTranslations(getTranslationsRequest: GetTranslationsRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<GetTranslationsResponse>>;
+    public getTranslations(getTranslationsRequest: GetTranslationsRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<GetTranslationsResponse>>;
+    public getTranslations(getTranslationsRequest: GetTranslationsRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+        if (getTranslationsRequest === null || getTranslationsRequest === undefined) {
+            throw new Error('Required parameter getTranslationsRequest was null or undefined when calling getTranslations.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -153,11 +149,11 @@ export class IconBffService {
             }
         }
 
-        let localVarPath = `/icons/${this.configuration.encodeParam({name: "refId", value: refId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
-        return this.httpClient.request<IconListResponse>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/translations`;
+        return this.httpClient.request<GetTranslationsResponse>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: iconCriteria,
+                body: getTranslationsRequest,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

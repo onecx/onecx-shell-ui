@@ -1,10 +1,11 @@
 import { inject, Injectable } from '@angular/core'
 import { Location } from '@angular/common'
-import { LoadRemoteModuleOptions, loadRemoteModule } from '@angular-architects/module-federation'
 import { NavigationEnd, NavigationSkipped, Route, Router } from '@angular/router'
 import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
+import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
 
 import { getLocation } from '@onecx/accelerator'
+import { toLoadRemoteEntryOptions } from '@onecx/angular-remote-components'
 import {
   AppStateService,
   CONFIG_KEY,
@@ -90,9 +91,13 @@ export class RoutesService {
     try {
       try {
         await this.updateAppEnvironment(r, joinedBaseUrl)
-        const m = await loadRemoteModule(this.toLoadRemoteEntryOptions(r))
+        const remoteEntryOptions = await toLoadRemoteEntryOptions(r)
+        registerRemotes([remoteEntryOptions])
         const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
+        const m = await loadRemote<any>(remoteEntryOptions.name + '/' + exposedModule)
+
         console.log(`Load remote module ${exposedModule} finished.`)
+
         if (r.technology === Technologies.Angular) {
           return m[exposedModule]
         } else {
@@ -175,23 +180,6 @@ export class RoutesService {
 
     this.router.navigate(['remote-loading-error-page', routerParams])
     throw err
-  }
-
-  private toLoadRemoteEntryOptions(r: BffGeneratedRoute): LoadRemoteModuleOptions {
-    const exposedModule = r.exposedModule.startsWith('./') ? r.exposedModule.slice(2) : r.exposedModule
-    if (r.technology === Technologies.Angular || r.technology === Technologies.WebComponentModule) {
-      return {
-        type: 'module',
-        remoteEntry: r.remoteEntryUrl,
-        exposedModule: './' + exposedModule
-      }
-    }
-    return {
-      type: 'script',
-      remoteName: r.remoteName ?? '',
-      remoteEntry: r.remoteEntryUrl,
-      exposedModule: './' + exposedModule
-    }
   }
 
   private async toRouteUrl(url: string | undefined) {

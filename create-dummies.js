@@ -3,7 +3,12 @@ const path = require('path')
 
 const EXPORTS_BLACKLIST = ['.', './package.json']
 
-const DEPENDENCY_BLACKLIST = ['@nx/angular']
+const DEPENDENCY_BLACKLIST = [
+  '@nx/angular',
+  '@module-federation/enhanced',
+  '@module-federation/runtime-core',
+  '@module-federation/dts-plugin'
+]
 
 const FULL_PACKAGE_BLACKLIST = [
   '@angular/common/locales/global/*',
@@ -23,6 +28,23 @@ const FULL_PACKAGE_BLACKLIST = [
   '@onecx/angular-accelerator/migrations.json'
 ]
 
+const ANGULAR_21_BLACKLIST = [
+  '@angular/forms/signals',
+  '@angular/forms/signals/compat',
+  '@angular/localize/init',
+  '@angular/platform-server/init',
+  '@angular/platform-server/testing',
+  '@angular/service-worker/config',
+  'primeng/motion',
+  'primeng/types/motion',
+  'rxjs',
+  'rxjs/fetch',
+  'rxjs/operators',
+  'rxjs/testing',
+  'rxjs/webSocket',
+  'rxjs/ajax'
+]
+
 async function main() {
   try {
     const folders = await fs.readdir('./pre_loaders')
@@ -40,6 +62,7 @@ async function main() {
 
       for (const dependency of Object.keys(packageContent.dependencies)) {
         if (DEPENDENCY_BLACKLIST.includes(dependency)) continue
+        if (folder === 'angular-21' && ANGULAR_21_BLACKLIST.includes(dependency)) continue
         output += `import("${dependency}");\n`
         const subImports = await generateImportsForSubpackages(dependency, folder)
         output += subImports
@@ -68,6 +91,7 @@ async function generateImportsForSubpackages(dependency, folder) {
         if (EXPORTS_BLACKLIST.includes(exportKey)) continue
         const fullPackage = `${dependency}/${removeExportPrefix(exportKey)}`
         if (FULL_PACKAGE_BLACKLIST.includes(fullPackage)) continue
+        if (folder === 'angular-21' && ANGULAR_21_BLACKLIST.includes(fullPackage)) continue
         output += `import("${fullPackage}");\n`
       }
     }

@@ -1,69 +1,59 @@
-<div *ngIf="!globalErrMsg; else globalError" class="onecx-viewport-wrapper">
-  <ng-container *ngIf="themeService.currentTheme$ | async; else noTheme">
-    <!-- Header slot group -->
-    <header class="onecx-header" id="ocx_header">
-      <section [ngStyle]="{width: '100%'}" [attr.aria-label]="'Start'">
-        <ocx-shell-slot-group
-          name="onecx-shell-header"
-          direction="row"
-          [slotInputs]="slotHeaderInputs"
-          [slotOutputs]="slotHeaderOutputs"
-        ></ocx-shell-slot-group>
-      </section>
-    </header>
-
-    <!-- SubHeader slot group -->
-    <ocx-shell-slot-group class="onecx-subheader" name="onecx-shell-sub-header"></ocx-shell-slot-group>
-    <div class="onecx-body-wrapper">
-      <!-- BodyStart slot group -->
+@if (!globalErrMsg) {
+<div class="onecx-viewport-wrapper">
+  @if (themeService.currentTheme$ | async) {
+  <!-- Header slot group -->
+  <header class="onecx-header" id="ocx_header">
+    <section [ngStyle]="{width: '100%'}" [attr.aria-label]="'Start'">
       <ocx-shell-slot-group
-        class="onecx-body-start"
-        name="onecx-shell-body-start"
-        direction="column"
+        name="onecx-shell-header"
+        direction="row"
+        [slotInputs]="slotHeaderInputs"
+        [slotOutputs]="slotHeaderOutputs"
       ></ocx-shell-slot-group>
-      <div class="onecx-body-center">
-        <!-- BodyHeader slot group -->
-        <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
-        <div class="onecx-body">
-          <ng-container *ngIf="!routesService || (routesService.showContent$ | async); else appLoading">
-            <ng-content></ng-content>
-            <router-outlet></router-outlet>
-          </ng-container>
-        </div>
-        <!-- BodyFooter slot group -->
-        <ocx-shell-slot-group class="onecx-body-footer" name="onecx-shell-body-footer"></ocx-shell-slot-group>
+    </section>
+  </header>
+
+  <!-- SubHeader slot group -->
+  <ocx-shell-slot-group class="onecx-subheader" name="onecx-shell-sub-header"></ocx-shell-slot-group>
+  <div class="onecx-body-wrapper">
+    <!-- BodyStart slot group -->
+    <ocx-shell-slot-group
+      class="onecx-body-start"
+      name="onecx-shell-body-start"
+      direction="column"
+    ></ocx-shell-slot-group>
+    <div class="onecx-body-center">
+      <!-- BodyHeader slot group -->
+      <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
+      <div class="onecx-body">
+        @if (!routesService || (routesService.showContent$ | async)) {
+        <router-outlet></router-outlet>
+        } @else {
+        <ocx-shell-loading-spinner></ocx-shell-loading-spinner>
+        }
       </div>
-      <!-- BodyEnd slot group -->
-      <ocx-shell-slot-group
-        class="onecx-body-end"
-        name="onecx-shell-body-end"
-        direction="column"
-      ></ocx-shell-slot-group>
+      <!-- BodyFooter slot group -->
+      <ocx-shell-slot-group class="onecx-body-footer" name="onecx-shell-body-footer"></ocx-shell-slot-group>
     </div>
+    <!-- BodyEnd slot group -->
+    <ocx-shell-slot-group class="onecx-body-end" name="onecx-shell-body-end" direction="column"></ocx-shell-slot-group>
+  </div>
 
-    <!-- Footer slot group -->
-    <footer>
-      <ocx-shell-slot-group name="onecx-shell-footer"></ocx-shell-slot-group>
-    </footer>
-  </ng-container>
-</div>
-
-<ng-template #noTheme>
+  <!-- Footer slot group -->
+  <footer>
+    <ocx-shell-slot-group name="onecx-shell-footer"></ocx-shell-slot-group>
+  </footer>
+  } @else {
   <div class="onecx-no-theme-main">
     <div class="onecx-no-theme-content relative">
-      <ng-content></ng-content>
       <router-outlet></router-outlet>
     </div>
   </div>
-</ng-template>
-
-<ng-template #globalError>
-  <ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
-</ng-template>
-
-<ng-template #appLoading>
-  <ocx-shell-loading-spinner></ocx-shell-loading-spinner>
-</ng-template>
+  }
+</div>
+} @else {
+<ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
+}
 
 <!-- Extensions slot for adding custom functionality -->
 <ocx-slot class="extensions-slot" name="onecx-shell-extensions"></ocx-slot>

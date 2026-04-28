@@ -23,6 +23,7 @@ export interface RemoteComponent {
     remoteName?: string;
     elementName?: string;
     technology?: Technologies;
+    shareScope?: string;
 }
 
 

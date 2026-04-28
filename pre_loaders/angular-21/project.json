@@ -1,8 +1,8 @@
 {
-  "name": "onecx-angular-19-loader",
+  "name": "onecx-angular-21-loader",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "ocx-angular-19-loader",
+  "prefix": "ocx-angular-21-loader",
   "sourceRoot": "./src",
   "tags": [],
   "targets": {
@@ -10,7 +10,7 @@
       "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/onecx-angular-19-loader",
+        "outputPath": "dist/onecx-angular-21-loader",
         "index": "./src/index.html",
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",
@@ -27,19 +27,8 @@
             "glob": "**/*",
             "input": "./node_modules/@onecx/angular-utils/assets/",
             "output": "/onecx-angular-utils/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/shell-core/assets/",
-            "output": "/onecx-shell-core/assets/"
           }
-        ],
-        "sourceMap": {
-          "scripts": true,
-          "styles": false,
-          "vendor": true,
-          "hidden": false
-        }
+        ]
       },
       "configurations": {
         "production": {
@@ -55,12 +44,6 @@
               "maximumError": "4kb"
             }
           ],
-          "sourceMap": {
-            "scripts": true,
-            "styles": false,
-            "vendor": true,
-            "hidden": false
-          },
           "outputHashing": "all",
           "customWebpackConfig": {
             "path": "./webpack.config.ts"

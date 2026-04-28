@@ -10,7 +10,8 @@
     "build": "nx build"
   },
   "dependencies": {
-    "@angular-architects/module-federation": "^19.0.3",
+    "@module-federation/enhanced": "^2.0.1",
+    "@module-federation/runtime-core": "^2.0.1",
     "@angular/animations": "^19.2.21",
     "@angular/common": "^19.2.21",
     "@angular/compiler": "^19.2.21",
@@ -48,6 +49,7 @@
     "@module-federation/dts-plugin": {
       "koa": "^2.16.2"
     },
+    "@rspack/core": "1.3.8",
     "webpack": "5.105.0"
   }
 }

@@ -3,7 +3,6 @@ import { of } from 'rxjs'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NavigationEnd, NavigationSkipped, Router, provideRouter } from '@angular/router'
-import { loadRemoteModule } from '@angular-architects/module-federation'
 import { updateStylesForMfeChange } from '@onecx/angular-utils/style'
 import { getLocation } from '@onecx/accelerator'
 
@@ -15,10 +14,6 @@ import { AppStateServiceMock, provideAppStateServiceMock } from '@onecx/angular-
 import { PathMatch, PermissionBffService, Route, Technologies } from 'src/app/shared/generated'
 import { PermissionsCacheService } from './permissions-cache.service'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
-
-jest.mock('@angular-architects/module-federation', () => ({
-  loadRemoteModule: jest.fn()
-}))
 
 jest.mock('@onecx/angular-utils/style', () => ({
   updateStylesForMfeChange: jest.fn().mockResolvedValue(undefined)

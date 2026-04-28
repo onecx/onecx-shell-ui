@@ -244,34 +244,6 @@ Extensions are defined in the slot configuration and can be managed through the 
 
 Each extension component loaded into the `onecx-shell-extensions` slot receives standard slot inputs and can emit events back to the shell through the OneCX Topic event system.
 
-==== Shell Toast Remote Component
-
-The Shell Toast component provides a centralized, application-wide notification system for displaying messages across the OneCX Shell and all loaded micro frontends.
-
-===== Overview
-
-`OneCXShellToastComponent` is a standalone remote component that can be embedded as a web component. It integrates with the OneCX messaging infrastructure to display toast notifications using PrimeNG components.
-
-**Key Features:**
-
-* Centralized message handling for all micro frontends
-* PrimeNG Toast integration
-* Automatic subscription to portal-wide messages
-* Translation support for internationalization
-* Word-wrap styling for long messages
-
-===== Setup and Configuration
-
-To enable toast messages by using the `OneCXShellToastComponent`, it must be configured in the `onecx-shell-extensions` slot. This ensures that the toast container is available globally for all micro frontends.
-
-**Configuration Steps:**
-
-1. Register the `onecx-shell-extensions` slot in the slot configuration of your workspace
-2. Assign the `OneCXShellToastComponent` to the `onecx-shell-extensions` slot
-3. The component will automatically subscribe to the `PortalMessageService` message stream
-
-Once configured in the extensions slot, any micro frontend can send messages through the `PortalMessageService`, and they will be displayed as toast notifications to the user.
-
 [#shell-version-information]
 === Shell Version Information
 

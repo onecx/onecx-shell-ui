@@ -14,19 +14,6 @@ app:
         spec:
           kcConfig:
             clientId: 'onecx-shell-ui'
-    # Microfrontend
-    microfrontend:
-      enabled: true
-      specs:
-        shell-toast:
-          exposedModule: "./OneCXShellToastComponent"
-          shareScope: angular_21
-          description: "Display shell toast notifications"
-          type: COMPONENT
-          technology: WEBCOMPONENTMODULE
-          remoteName: onecx-shell
-          tagName: ocx-shell-toast-component
-          deprecated: true
     # Microservice
     microservice:
       spec:

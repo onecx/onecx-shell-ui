@@ -5,7 +5,6 @@ import { BehaviorSubject, filter, firstValueFrom, map } from 'rxjs'
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime'
 
 import { getLocation } from '@onecx/accelerator'
-import { toLoadRemoteEntryOptions } from '@onecx/angular-remote-components'
 import {
   AppStateService,
   CONFIG_KEY,
@@ -21,6 +20,7 @@ import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-l
 import { updateStylesForMfeChange } from '@onecx/angular-utils/style'
 import { HttpClient } from '@angular/common/http'
 import { PermissionsCacheService } from './permissions-cache.service'
+import { toLoadRemoteEntryOptions } from '@onecx/angular-utils'
 
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',

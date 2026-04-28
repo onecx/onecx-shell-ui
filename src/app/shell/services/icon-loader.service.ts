@@ -33,13 +33,8 @@ export class ShellIconLoaderService {
   }
 
   private async loadIcons(iconNames : string[]) {
-
-    // todo : On updating the libs to v8 - uncomment the code at line 38-39 and remove the code at line 41-42.
-    // const g = ensureProperty(globalThis, ['onecxIcons'], {})
-    // const missingIcons = iconNames.filter((name : string) => g.onecxIcons[name] === undefined);
-
-    ensureProperty(globalThis, ['onecxIcons'], {})
-    const missingIcons = iconNames.filter((name : string) => globalThis.onecxIcons![name] === undefined);
+    const g = ensureProperty(globalThis, ['onecxIcons'], {})
+    const missingIcons = iconNames.filter((name : string) => g.onecxIcons[name] === undefined);
 
     if (missingIcons.length === 0) return
 

@@ -224,7 +224,7 @@
     {
       "matchFileNames": ["package.json"],
       "groupName": "Root Angular Architects Module Federation",
-      "matchPackageNames": ["@angular-architects/module-federation", "@angular-architects/module-federation-tools"],
+      "matchPackageNames": ["@module-federation/runtime-core", "@module-federation/enhanced"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "root-module-federation",
       "prPriority": 5,
@@ -233,7 +233,7 @@
     {
       "matchFileNames": ["pre_loaders/angular-18/package.json"],
       "groupName": "Angular 18 Module Federation",
-      "matchPackageNames": ["@angular-architects/module-federation", "@angular-architects/module-federation-tools"],
+      "matchPackageNames": ["@module-federation/runtime-core", "@module-federation/enhanced"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-18-module-federation",
       "prPriority": 5,
@@ -242,7 +242,7 @@
     {
       "matchFileNames": ["pre_loaders/angular-19/package.json"],
       "groupName": "Angular 19 Module Federation",
-      "matchPackageNames": ["@angular-architects/module-federation", "@angular-architects/module-federation-tools"],
+      "matchPackageNames": ["@module-federation/runtime-core", "@module-federation/enhanced"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-19-module-federation",
       "prPriority": 5,
@@ -251,7 +251,7 @@
     {
       "matchFileNames": ["pre_loaders/angular-20/package.json"],
       "groupName": "Angular 20 Module Federation",
-      "matchPackageNames": ["@angular-architects/module-federation", "@angular-architects/module-federation-tools"],
+      "matchPackageNames": ["@module-federation/runtime-core", "@module-federation/enhanced"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-20-module-federation",
       "prPriority": 5,
@@ -260,7 +260,7 @@
     {
       "matchFileNames": ["pre_loaders/angular-21/package.json"],
       "groupName": "Angular 21 Module Federation",
-      "matchPackageNames": ["@angular-architects/module-federation", "@angular-architects/module-federation-tools"],
+      "matchPackageNames": ["@module-federation/runtime-core", "@module-federation/enhanced"],
       "matchDepTypes": ["dependencies", "devDependencies"],
       "groupSlug": "angular-21-module-federation",
       "prPriority": 5,

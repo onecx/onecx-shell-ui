@@ -26,7 +26,7 @@ import { ToastModule } from 'primeng/toast'
 @UntilDestroy()
 export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnInit {
   private readonly rcConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
-  private readonly primengConfig = inject(PrimeNG)
+  private readonly primengConfig: PrimeNG = inject(PrimeNG)
   private readonly messageService = inject(MessageService)
   private readonly portalMessageService = inject(PortalMessageService)
 

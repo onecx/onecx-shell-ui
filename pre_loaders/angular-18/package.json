@@ -26,6 +26,7 @@
     "@module-federation/runtime-core": "^2.0.1",
     "@ngx-translate/core": "^15.0.0",
     "@nx/angular": "20.8.4",
+    "@nx/module-federation": "20.8.4",
     "@onecx/accelerator": "^5.55.0",
     "@onecx/angular-accelerator": "^5.55.0",
     "@onecx/angular-auth": "^5.55.0",

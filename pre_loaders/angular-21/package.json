@@ -27,6 +27,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@nx/angular": "22.3.3",
+    "@nx/module-federation": "22.3.3",
     "@onecx/accelerator": "^8.0.0-rc.10",
     "@onecx/angular-accelerator": "^8.0.0-rc.10",
     "@onecx/angular-auth": "^8.0.0-rc.10",

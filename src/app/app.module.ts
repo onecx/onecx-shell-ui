@@ -1,11 +1,13 @@
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { inject, NgModule, provideAppInitializer } from '@angular/core'
+import { inject, NgModule, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
-import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
+import { provideTokenInterceptor } from '@onecx/angular-auth'
+import { provideAuthService } from '@onecx/shell-auth'
+
 import {
   APP_CONFIG,
   AppStateService,
@@ -343,6 +345,7 @@ export async function shareMfContainer() {
     AppLoadingSpinnerComponent
   ],
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptorsFromDi()),
     provideAppInitializer(() => {
       return workspaceConfigInitializer(

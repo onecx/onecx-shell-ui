@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing'
 import {
   AppStateServiceMock,
-  FakeTopic,
   provideAppStateServiceMock,
   provideRemoteComponentsServiceMock,
   RemoteComponentsServiceMock
@@ -10,6 +9,7 @@ import { ParametersTopicPayload, RemoteComponent, RemoteComponentsInfo, Workspac
 import { firstValueFrom, of } from 'rxjs'
 import { GetParametersResponse, Parameter, ParameterBffService } from 'src/app/shared/generated'
 import { ParametersService } from './parameters.service'
+import { FakeTopic } from '@onecx/accelerator'
 
 describe('ParametersService', () => {
   let parametersService: ParametersService

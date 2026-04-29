@@ -10,9 +10,16 @@ permissions:
 
 jobs:
   run-migrations:
+    # IMPORTANT: Do not push commits back to Renovate branches.
+    # Renovate will treat external commits as branch drift and recreate its branch,
+    # which can cause an infinite loop of "Renovate updates" <-> "CI force-pushes".
     if: |
-      (github.event.action == 'labeled' && (contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required'))) ||
-      (github.event.action == 'synchronize' && github.actor == 'renovate[bot]' && github.event.pull_request.user.login == 'renovate[bot]' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
+      !startsWith(github.event.pull_request.head.ref, 'renovate/') &&
+      github.event.pull_request.user.login != 'renovate[bot]' &&
+      (
+        (github.event.action == 'labeled' && (contains(github.event.label.name, 'nx-migration-required') || contains(github.event.label.name, 'onecx-migration-required'))) ||
+        (github.event.action == 'synchronize' && (contains(github.event.pull_request.labels.*.name, 'nx-migration-required') || contains(github.event.pull_request.labels.*.name, 'onecx-migration-required')))
+      )
     runs-on: ubuntu-latest
     
     steps:
@@ -30,9 +37,9 @@ jobs:
           # Using git avoids GitHub API timing/race issues that can cause repeated reruns.
           last_commit_message=$(git log -1 --pretty=%s)
 
-          echo "Github actor: $github.actor"
-          echo "Github event action: $github.event.action"
-          echo "Github event pull request user login: $github.event.pull_request.user.login"
+          echo "Github actor: ${{ github.actor }}"
+          echo "Github event action: ${{ github.event.action }}"
+          echo "Github event pull request user login: ${{ github.event.pull_request.user.login }}"
           echo "Last commit message: $last_commit_message"
           
           if [[ "$last_commit_message" == *"refactor: run package migrations per directory"* ]]; then

@@ -30,7 +30,7 @@ export const angular19Preloader: Preloader = {
 
 export const angular20Preloader: Preloader = {
   name: 'angular-20-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.mjs',
   windowKey: 'angular-20',
   exposedModule: 'Angular20Loader',
   shareScope: 'default'
@@ -38,7 +38,7 @@ export const angular20Preloader: Preloader = {
 
 export const angular21Preloader: Preloader = {
   name: 'angular-21-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/remoteEntry.js',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/remoteEntry.mjs',
   windowKey: 'angular-21',
   exposedModule: 'Angular21Loader',
   shareScope: 'angular_21'

@@ -5,6 +5,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NavigationEnd, NavigationSkipped, Router, provideRouter } from '@angular/router'
 import { updateStylesForMfeChange } from '@onecx/angular-utils/style'
 import { getLocation } from '@onecx/accelerator'
+import { loadRemote } from '@module-federation/enhanced/runtime'
 
 import { DEFAULT_CATCH_ALL_ROUTE, RoutesService } from './routes.service'
 
@@ -14,6 +15,12 @@ import { AppStateServiceMock, provideAppStateServiceMock } from '@onecx/angular-
 import { PathMatch, PermissionBffService, Route, Technologies } from 'src/app/shared/generated'
 import { PermissionsCacheService } from './permissions-cache.service'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
+import { appRoutes } from 'src/app/app.routes'
+
+jest.mock('@module-federation/enhanced/runtime', () => ({
+  loadRemote: jest.fn(),
+  registerRemotes: jest.fn()
+}))
 
 jest.mock('@onecx/angular-utils/style', () => ({
   updateStylesForMfeChange: jest.fn().mockResolvedValue(undefined)
@@ -30,7 +37,7 @@ describe('RoutesService', () => {
 
   let appStateServiceMock: AppStateServiceMock
 
-  const loadRemoteModuleMock = loadRemoteModule as jest.MockedFunction<typeof loadRemoteModule>
+  const loadRemoteMock = loadRemote as jest.MockedFunction<typeof loadRemote>
   const updateStylesForMfeChangeMock = updateStylesForMfeChange as jest.MockedFunction<typeof updateStylesForMfeChange>
   const getLocationMock = getLocation as jest.MockedFunction<typeof getLocation>
 
@@ -50,9 +57,9 @@ describe('RoutesService', () => {
     getPermissions: jest.fn().mockReturnValue(of({ permissions: ['P_READ'] }))
   }
 
-  const errorRouteCount = 3
-  const aboutRouteCount = 1
-  const welcomeRouteCount = 1
+  const notFoundCount = 1
+  const appRouteCount = appRoutes.length
+  const fallbackRouteCount = 1
 
   const createBffRoute = (partial: Partial<Route> = {}): Route => ({
     url: '/mfe/welcome/',
@@ -92,7 +99,7 @@ describe('RoutesService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks()
-    loadRemoteModuleMock.mockResolvedValue({ OneCXWelcomeModule: { moduleName: 'MockWelcomeModule' } })
+    loadRemoteMock.mockResolvedValue({ OneCXWelcomeModule: { moduleName: 'MockWelcomeModule' } })
     ;(mockConfigurationService.getProperty as jest.Mock).mockResolvedValue('')
 
     await TestBed.configureTestingModule({
@@ -125,7 +132,7 @@ describe('RoutesService', () => {
     it('creates default routes when no routes are provided', async () => {
       await routerService.init([])
       expect(router.config).toBeDefined()
-      expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount)
+      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
       expect(router.config.find((r) => r.path === '**')).toBeDefined()
       expect(router.config.find((r) => r.path === 'portal-initialization-error-page')).toBeDefined()
       expect(router.config.find((r) => r.path === 'remote-loading-error-page')).toBeDefined()
@@ -134,12 +141,7 @@ describe('RoutesService', () => {
       expect(welcomeRoute).toBeDefined()
       expect(welcomeRoute?.redirectTo).toBeUndefined()
       expect(welcomeRoute?.loadChildren).toBeDefined()
-      //expect(welcomeRoute?.canActivateChild).toBeDefined() //Should be defined but fails in test -> bug?
       expect(welcomeRoute?.pathMatch).toBe(PathMatch.full)
-      //expect(welcomeRoute?.data).toBeDefined() //Should be defined but fails in test -> bug?
-      //expect((welcomeRoute?.data as any).breadcrumb).toBe('?')
-      //expect((welcomeRoute?.data as any).module).toBe('?')
-      //expect(welcomeRoute?.title).toBe('?')
       expect(welcomeRoute?.path).toBe('')
     })
 
@@ -162,7 +164,7 @@ describe('RoutesService', () => {
         }
       ]
       await routerService.init(testRoutes)
-      expect(router.config.length).toBe(testRoutes.length + errorRouteCount + welcomeRouteCount)
+      expect(router.config.length).toBe(testRoutes.length + notFoundCount + fallbackRouteCount + appRouteCount)
       const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
       expect(createdRoute).toBeDefined()
       expect(createdRoute?.loadChildren).toBeDefined()
@@ -193,7 +195,7 @@ describe('RoutesService', () => {
         }
       ]
       await routerService.init(testRoutes)
-      expect(router.config.length).toBe(testRoutes.length + errorRouteCount)
+      expect(router.config.length).toBe(testRoutes.length + notFoundCount + appRouteCount)
     })
 
     it('redirects to welcome if configured in the workspace', async () => {
@@ -201,7 +203,7 @@ describe('RoutesService', () => {
       await appStateServiceMock.currentWorkspace$.publish({ baseUrl: '/', homePage } as any)
 
       await routerService.init([])
-      expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount)
+      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
       const welcomeRoute = router.config.find((r) => r.path === '')
       expect(welcomeRoute).toBeDefined()
       expect(welcomeRoute?.redirectTo).toBe(homePage)
@@ -212,7 +214,7 @@ describe('RoutesService', () => {
       await routerService.init([])
 
       expect(router.config).toBeDefined()
-      expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount + aboutRouteCount)
+      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
       expect(router.config.find((r) => r.path === '**')).toBeDefined()
       expect(router.config.find((r) => r.path === 'portal-initialization-error-page')).toBeDefined()
       expect(router.config.find((r) => r.path === 'remote-loading-error-page')).toBeDefined()
@@ -232,7 +234,7 @@ describe('RoutesService', () => {
       const testRoute = createBffRoute({ technology: Technologies.Angular })
       await routerService.init([testRoute])
 
-      expect(router.config.length).toBe(1 + errorRouteCount + welcomeRouteCount + aboutRouteCount)
+      expect(router.config.length).toBe(1 + notFoundCount + fallbackRouteCount + appRouteCount)
       const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
       expect(createdRoute).toBeDefined()
       expect(createdRoute?.loadChildren).toBeDefined()
@@ -247,11 +249,7 @@ describe('RoutesService', () => {
 
       const loaded = await createdRoute?.loadChildren?.()
       expect(loaded).toBeDefined()
-      expect(loadRemoteModuleMock).toHaveBeenCalledWith({
-        type: 'module',
-        remoteEntry: testRoute.remoteEntryUrl,
-        exposedModule: './OneCXWelcomeModule'
-      })
+      expect(loadRemoteMock).toHaveBeenCalledWith('onecx-welcome|onecx-welcome-ui/OneCXWelcomeModule')
       expect(updateStylesForMfeChangeMock).toHaveBeenCalledWith(
         testRoute.productName,
         testRoute.appId,
@@ -271,14 +269,14 @@ describe('RoutesService', () => {
     it('does not provide a fallback welcome route when a matching workspace route exists', async () => {
       const testRoute = createBffRoute({ baseUrl: '' })
       await routerService.init([testRoute])
-      expect(router.config.length).toBe(1 + errorRouteCount + aboutRouteCount)
+      expect(router.config.length).toBe(1 + notFoundCount + appRouteCount)
     })
 
     it('redirects to home page if configured in the workspace', async () => {
       await appStateServiceMock.currentWorkspace$.publish({ baseUrl: '/', homePage: 'custom-welcome' } as any)
       await routerService.init([])
 
-      expect(router.config.length).toBe(errorRouteCount + welcomeRouteCount + aboutRouteCount)
+      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
       const welcomeRoute = router.config.find((r) => r.path === '')
       expect(welcomeRoute).toBeDefined()
       expect(welcomeRoute?.redirectTo).toBe('custom-welcome')
@@ -306,12 +304,7 @@ describe('RoutesService', () => {
       expect(prefRoute?.pathMatch).toBe(PathMatch.prefix)
 
       await prefRoute?.loadChildren?.()
-      expect(loadRemoteModuleMock).toHaveBeenCalledWith({
-        type: 'script',
-        remoteName: 'prefix-remote',
-        remoteEntry: prefixRoute.remoteEntryUrl,
-        exposedModule: './OneCXWelcomeModule'
-      })
+      expect(loadRemoteMock).toHaveBeenCalledWith('prod-2|app-2/OneCXWelcomeModule')
     })
 
     it('returns WebcomponentLoaderModule for non-angular routes', async () => {
@@ -354,7 +347,7 @@ describe('RoutesService', () => {
     it('handles remote loading errors', async () => {
       const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true)
       getLocationMock.mockReturnValue({ applicationPath: '/failing-app' } as any)
-      loadRemoteModuleMock.mockRejectedValue(new Error('boom'))
+      loadRemoteMock.mockRejectedValue(new Error('boom'))
       const testRoute = createBffRoute({ technology: Technologies.Angular })
 
       await routerService.init([testRoute])
@@ -402,25 +395,11 @@ describe('RoutesService', () => {
         technology: Technologies.Angular,
         exposedModule: 'OneCXWelcomeModule'
       })
-      loadRemoteModuleMock.mockResolvedValue({ OneCXWelcomeModule: { moduleName: 'NoDotModule' } })
+      loadRemoteMock.mockResolvedValue({ OneCXWelcomeModule: { moduleName: 'NoDotModule' } })
       await routerService.init([routeWithoutDot])
       const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
       const loaded = await createdRoute?.loadChildren?.()
       expect(loaded).toEqual({ moduleName: 'NoDotModule' })
-
-      const scriptOptions = serviceAsAny.toLoadRemoteEntryOptions(
-        createBffRoute({
-          technology: Technologies.WebComponentScript,
-          remoteName: undefined,
-          exposedModule: 'ScriptModule'
-        })
-      )
-      expect(scriptOptions).toEqual({
-        type: 'script',
-        remoteName: '',
-        remoteEntry: '/mfe/welcome/remoteEntry.js',
-        exposedModule: './ScriptModule'
-      })
 
       const secondRoute = createBffRoute({
         appId: 'onecx-second-ui',

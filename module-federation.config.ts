@@ -9,8 +9,6 @@ const config: ModuleFederationConfig = {
   shared: (libraryName, sharedConfig) => {
     const config = getOneCXSharedRecommendations(libraryName, sharedConfig)
     // Add custom shared configurations to the config object if needed
-    // TODO: Add angular_21 to ngx-translate packages
-    // TODO: Add angular_21 to all packages
     return config
   }
 }

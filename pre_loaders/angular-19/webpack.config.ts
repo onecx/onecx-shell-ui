@@ -78,7 +78,8 @@ export default async function (baseConfig: Configuration) {
     output: {
       uniqueName: magicChar + 'onecx-angular-19-loader',
       publicPath: 'auto',
-      devtoolNamespace: 'onecx-angular-19-loader'
+      devtoolNamespace: 'onecx-angular-19-loader',
+      ...webpackConfig.output
     },
     module: {
       ...webpackConfig.module,

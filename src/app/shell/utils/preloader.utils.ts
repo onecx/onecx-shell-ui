@@ -14,7 +14,7 @@ export interface Preloader {
 
 export const angular18Preloader: Preloader = {
   name: 'angular-18-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.mjs',
   windowKey: 'angular-18',
   exposedModule: 'Angular18Loader',
   shareScope: 'default'
@@ -22,7 +22,7 @@ export const angular18Preloader: Preloader = {
 
 export const angular19Preloader: Preloader = {
   name: 'angular-19-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.mjs',
   windowKey: 'angular-19',
   exposedModule: 'Angular19Loader',
   shareScope: 'default'

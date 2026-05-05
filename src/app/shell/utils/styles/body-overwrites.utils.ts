@@ -131,9 +131,12 @@ function overwriteAngularMaterialOverlayContainer(cdkNode: Node) {
         : null
       const childElementStyleData = getStyleDataOrIntermediateStyleData(newChild)
       const styleData = childElementStyleData ?? triggerElementStyleData ?? undefined
+
+      // Set style data on the cdk-overlay-container directly to have fresh value
       if (styleData) {
         appendStyleData(this as HTMLElement, styleData)
       }
+      // Remove style data from children
       removeStyleDataRecursive(newChild)
     }
     return originalAppendChild.call(this, newChild)

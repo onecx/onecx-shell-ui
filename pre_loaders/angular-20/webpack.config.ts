@@ -76,10 +76,10 @@ export default async function (baseConfig: Configuration) {
     devtool: 'source-map',
     plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
     output: {
+      ...webpackConfig.output,
       uniqueName: magicChar + 'onecx-angular-20-loader',
       publicPath: 'auto',
-      devtoolNamespace: 'onecx-angular-20-loader',
-      ...webpackConfig.output
+      devtoolNamespace: 'onecx-angular-20-loader'
     },
     module: {
       ...webpackConfig.module,

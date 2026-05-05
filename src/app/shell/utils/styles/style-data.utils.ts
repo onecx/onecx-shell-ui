@@ -96,8 +96,8 @@ export function findStyleDataWrapper(element: HTMLElement): HTMLElement | null {
  * Recursively removes style data from an element and its children.
  * @param element HTMLElement to remove style data from.
  */
-export function removeStyleDataRecursive(element: HTMLElement, removeFromCurrent = true): void {
-  if (element.dataset && removeFromCurrent) {
+export function removeStyleDataRecursive(element: HTMLElement): void {
+  if (element.dataset) {
     delete element.dataset[dataStyleIsolationKey]
     delete element.dataset[dataStyleIdKey]
     delete element.dataset[dataNoPortalLayoutStylesKey]

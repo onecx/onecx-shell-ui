@@ -5,6 +5,7 @@ const EXPORTS_BLACKLIST = ['.', './package.json']
 
 const DEPENDENCY_BLACKLIST = [
   '@nx/angular',
+  '@nx/module-federation',
   '@module-federation/enhanced',
   '@module-federation/runtime-core',
   '@module-federation/dts-plugin'

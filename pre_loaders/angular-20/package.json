@@ -43,6 +43,8 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.3.24",
     "@angular/compiler-cli": "^20.3.19",
+    "@swc-node/register": "^1.11.1",
+    "@swc/core": "^1.15.8",
     "modify-source-webpack-plugin": "^4.1.0",
     "nx": "22.6.5",
     "webpack": "5.105.0"

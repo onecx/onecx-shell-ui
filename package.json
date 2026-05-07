@@ -11,7 +11,7 @@
     "openapiOutput": "src/app/shared/generated"
   },
   "scripts": {
-    "prebuild": "node ./create-dummies.js && bash ./build-preloaders-parallel.sh",
+    "prebuild": "node ./create-dummies.js && bash ./build-preloaders.sh",
     "build": "nx build",
     "build:shell-only": "nx build",
     "build:18": "rm -rf pre_loaders/angular-18/.nx && node ./create-dummies.js && (cd ./pre_loaders/angular-18 && npm run build) && npm run build",

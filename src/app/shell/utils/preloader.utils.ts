@@ -14,7 +14,7 @@ export interface Preloader {
 
 export const angular18Preloader: Preloader = {
   name: 'angular-18-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.mjs',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/mf-manifest.json',
   windowKey: 'angular-18',
   exposedModule: 'Angular18Loader',
   shareScope: 'default'
@@ -22,7 +22,7 @@ export const angular18Preloader: Preloader = {
 
 export const angular19Preloader: Preloader = {
   name: 'angular-19-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.mjs',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/mf-manifest.json',
   windowKey: 'angular-19',
   exposedModule: 'Angular19Loader',
   shareScope: 'default'
@@ -30,7 +30,7 @@ export const angular19Preloader: Preloader = {
 
 export const angular20Preloader: Preloader = {
   name: 'angular-20-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.mjs',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/mf-manifest.json',
   windowKey: 'angular-20',
   exposedModule: 'Angular20Loader',
   shareScope: 'default'
@@ -38,7 +38,7 @@ export const angular20Preloader: Preloader = {
 
 export const angular21Preloader: Preloader = {
   name: 'angular-21-preloader',
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/remoteEntry.mjs',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/mf-manifest.json',
   windowKey: 'angular-21',
   exposedModule: 'Angular21Loader',
   shareScope: 'angular_21'

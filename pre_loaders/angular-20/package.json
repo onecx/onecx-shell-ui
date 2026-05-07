@@ -10,8 +10,6 @@
     "build": "nx build"
   },
   "dependencies": {
-    "@module-federation/enhanced": "^2.0.1",
-    "@module-federation/runtime-core": "^2.0.1",
     "@angular/animations": "^20.3.19",
     "@angular/common": "^20.3.19",
     "@angular/compiler": "^20.3.19",
@@ -24,6 +22,8 @@
     "@angular/platform-server": "^20.3.19",
     "@angular/router": "^20.3.19",
     "@angular/service-worker": "^20.3.19",
+    "@module-federation/enhanced": "^2.0.1",
+    "@module-federation/runtime-core": "^2.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@nx/angular": "22.6.5",
@@ -37,6 +37,11 @@
     "@onecx/integration-interface": "^7.7.1",
     "@onecx/ngrx-accelerator": "^7.7.1",
     "@onecx/ngrx-integration-interface": "^7.7.1",
+    "@ngrx/component": "^20.1.0",
+    "@ngrx/effects": "^20.1.0",
+    "@ngrx/router-store": "^20.1.0",
+    "@ngrx/store": "^20.1.0",
+    "@ngrx/store-devtools": "^20.1.0",
     "primeng": "^20.4.0",
     "rxjs": "~7.8.2"
   },

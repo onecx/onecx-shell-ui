@@ -214,7 +214,7 @@ describe('SlotGroupComponent', () => {
       })
 
       it('should pass computed inputs to respective child slots', async () => {
-        const inputs = { data: 'test' }
+        const inputs = { data: 'test', slotGroupName: 'test-slot' }
         componentRef.setInput('slotInputs', inputs)
 
         const slots = await slotGroupHarness.getAllSlots()
@@ -228,6 +228,19 @@ describe('SlotGroupComponent', () => {
           const slotComponentInstance = slotDebugElements[index].componentInstance as SlotComponent
           expect(slotComponentInstance.inputs).toEqual(inputs)
         }
+      })
+
+      it('should set the slotGroupName input correctly for all slots in a group', () => {
+          const SLOT_GROUP_NAME = 'slot-group-1'
+          componentRef.setInput('name', SLOT_GROUP_NAME)
+
+          const slotInputsStart = component.slotInputsStart()
+          const slotInputsCenter = component.slotInputsCenter()
+          const slotInputsEnd = component.slotInputsEnd()
+
+          expect(slotInputsStart.slotGroupName).toBe(SLOT_GROUP_NAME)
+          expect(slotInputsCenter.slotGroupName).toBe(SLOT_GROUP_NAME)
+          expect(slotInputsEnd.slotGroupName).toBe(SLOT_GROUP_NAME)
       })
     })
 

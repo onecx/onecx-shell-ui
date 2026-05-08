@@ -25,7 +25,7 @@ console.log("aS", additionalShared);
 
 
 const config: ModuleFederationConfig = {
-  name: 'z_onecx-angular-21-loader',
+  name: 'onecx-angular-21-loader',
   exposes: {
     ['./Angular21Loader']: 'src/main.ts'
   },

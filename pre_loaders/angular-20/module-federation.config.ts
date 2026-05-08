@@ -94,7 +94,7 @@ const additionalShared = allDependencies
  */
 
 const config: ModuleFederationConfig = {
-  name: 'onecx-angular-20-loader',
+  name: 'zzz_onecx-angular-20-loader',
   exposes: {
     ['./Angular20Loader']: 'src/main.ts'
   },

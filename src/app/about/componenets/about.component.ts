@@ -27,6 +27,7 @@ export class AboutComponent implements OnInit {
   }
 
   private loadSupportedVersions() {
+    // TODO: Fix about page
     const shellScopeMap = __FEDERATION__?.__INSTANCES__?.find((i) => i.name === 'onecx_shell_ui')?.shareScopeMap
     if (!shellScopeMap) {
       console.warn('onecx_shell_ui shareScopeMap not found. Supported Angular versions cannot be determined.')

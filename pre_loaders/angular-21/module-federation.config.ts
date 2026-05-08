@@ -94,7 +94,7 @@ const additionalShared = allDependencies
  */
 
 const config: ModuleFederationConfig = {
-  name: 'z_onecx-angular-21-loader',
+  name: 'zzz_onecx-angular-21-loader',
   exposes: {
     ['./Angular21Loader']: 'src/main.ts'
   },

@@ -2,7 +2,7 @@ import { ModuleFederationConfig } from '@nx/module-federation'
 import { getOneCXSharedRecommendations } from '@onecx/accelerator'
 
 const config: ModuleFederationConfig = {
-  name: 'onecx-angular-19-loader',
+  name: '􏿿onecx-angular-19-loader',
   exposes: {
     ['./Angular19Loader']: 'src/main.ts'
   },

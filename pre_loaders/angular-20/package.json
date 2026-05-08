@@ -10,6 +10,7 @@
     "build": "nx build"
   },
   "dependencies": {
+    "@angular-architects/module-federation": "20.0.0",
     "@angular/animations": "^20.3.19",
     "@angular/common": "^20.3.19",
     "@angular/compiler": "^20.3.19",

@@ -2,6 +2,13 @@ import { ModuleFederationConfig, SharedLibraryConfig } from '@nx/module-federati
 import { getOneCXSharedRecommendations } from '@onecx/accelerator'
 import * as path from 'path'
 
+/**
+ * ***************************************************************
+ * Generating additional shared dependencies from package.json
+ * Since Nx does not include dependencies from package.json in the project graph, we need to manually add them as shared dependencies in the module federation config. This is a temporary solution until Nx fixes this issue. Removing this without the fix will cause several packages to not be included in remoteEntry file.
+ * ***************************************************************
+ */
+
 import * as pkg from 'package.json'
 
 type SharedDependency = {
@@ -68,7 +75,6 @@ function generatePackages(pkg: Record<string, any>, dependency: string): Array<S
   return result
 }
 
-// nx since 22.2.4 is not generating project graph with dependencies from package.json, so we need to manually add them as shared dependencies in the module federation config until its fixed. Removing this without the fix will cause several packages to not be included in remoteEntry file
 const allDependencies: Array<SharedDependency> = Object.keys(pkg.dependencies).flatMap((d) => {
   return generatePackages(pkg, d)
 })
@@ -81,6 +87,12 @@ const additionalShared = allDependencies
   })
   .filter((config): config is { libraryName: string; sharedConfig: SharedLibraryConfig } => !!config.sharedConfig)
 
+/**
+ * ***************************************************************
+ * End of additional shared dependencies generation
+ * ***************************************************************
+ */
+
 const config: ModuleFederationConfig = {
   name: 'onecx-angular-20-loader',
   exposes: {
@@ -91,7 +103,7 @@ const config: ModuleFederationConfig = {
     // Add custom shared configurations to the config object if needed
     return config
   },
-  additionalShared: additionalShared
+  additionalShared: additionalShared // This will add the additional shared dependencies generated from package.json to the module federation config
 }
 
 export default config

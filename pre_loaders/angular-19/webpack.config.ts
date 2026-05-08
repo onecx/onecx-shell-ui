@@ -1,6 +1,7 @@
-const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
-const { withModuleFederationPlugin, shareAll } = require('@angular-architects/module-federation/webpack')
-const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
+import { Configuration } from 'webpack'
+import config from './module-federation.config'
+import { withModuleFederation } from '@nx/angular/module-federation'
+import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
 
 /**
  * When module federation loads a package it checks:
@@ -22,24 +23,14 @@ const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-
  */
 const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
 
-const webpackConfig = {
-  ...withModuleFederationPlugin({
-    name: magicChar + 'onecx-angular-19-loader',
-    filename: 'remoteEntry.js',
-    exposes: {
-      ['./Angular19Loader']: 'src/main.ts'
-    },
-    shared: shareAll({ requiredVersion: 'auto', includeSecondaries: true }, undefined, './')
-  })
-}
-
-const plugins = webpackConfig.plugins.filter((plugin) => !(plugin instanceof ModifyEntryPlugin))
-
 const modifyPrimeNgPlugin = new ModifySourcePlugin({
   rules: [
     {
       test: (module) => {
-        return module.resource && module.resource.includes('primeng')
+        if (module.resource) {
+          return module.resource.includes('primeng')
+        }
+        return false
       },
       operations: [
         new ReplaceOperation(
@@ -58,7 +49,10 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
   rules: [
     {
       test: (module) => {
-        return module.resource && module.resource.includes('@angular/platform-browser')
+        if (module.resource) {
+          return module.resource.includes('@angular/platform-browser')
+        }
+        return false
       },
       operations: [
         new ReplaceOperation(
@@ -71,16 +65,28 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
   ]
 })
 
-module.exports = {
-  ...webpackConfig,
-  devtool: 'source-map',
-  plugins: [...plugins, modifyPrimeNgPlugin, modifyAngularCorePlugin],
-  output: {
-    uniqueName: magicChar + 'onecx-angular-19-loader',
-    publicPath: 'auto',
-    devtoolNamespace: 'onecx-angular-19-loader'
-  },
-  experiments: { ...webpackConfig.experiments, topLevelAwait: true },
-  optimization: { runtimeChunk: false, splitChunks: false },
-  module: { parser: { javascript: { importMeta: false } } }
+export default async function (baseConfig: Configuration) {
+  const withMf = await withModuleFederation(config, {
+    shareScope: 'default'
+  })
+  const webpackConfig = withMf(baseConfig)
+
+  return {
+    ...webpackConfig,
+    devtool: 'source-map',
+    plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
+    output: {
+      ...webpackConfig.output,
+      uniqueName: magicChar + 'onecx-angular-19-loader',
+      publicPath: 'auto',
+      devtoolNamespace: 'onecx-angular-19-loader'
+    },
+    module: {
+      ...webpackConfig.module,
+      parser: {
+        ...webpackConfig.module.parser,
+        javascript: { ...webpackConfig.module.parser.javascript, importMeta: false }
+      }
+    }
+  }
 }

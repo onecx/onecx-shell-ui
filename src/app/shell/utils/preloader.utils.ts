@@ -5,41 +5,60 @@ declare global {
 }
 
 export interface Preloader {
+  name: string
   relativeRemoteEntryUrl: string
   windowKey: string
   exposedModule: string
+  shareScope: string
 }
 
 export const angular18Preloader: Preloader = {
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/remoteEntry.js',
+  name: 'angular-18-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-18-loader/mf-manifest.json',
   windowKey: 'angular-18',
-  exposedModule: './Angular18Loader'
+  exposedModule: 'Angular18Loader',
+  shareScope: 'default'
 }
 
 export const angular19Preloader: Preloader = {
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/remoteEntry.js',
+  name: 'angular-19-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-19-loader/mf-manifest.json',
   windowKey: 'angular-19',
-  exposedModule: './Angular19Loader'
+  exposedModule: 'Angular19Loader',
+  shareScope: 'default'
 }
 
 export const angular20Preloader: Preloader = {
-  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/remoteEntry.js',
+  name: 'angular-20-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-20-loader/mf-manifest.json',
   windowKey: 'angular-20',
-  exposedModule: './Angular20Loader'
+  exposedModule: 'Angular20Loader',
+  shareScope: 'default'
+}
+
+export const angular21Preloader: Preloader = {
+  name: 'angular-21-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-21-loader/mf-manifest.json',
+  windowKey: 'angular-21',
+  exposedModule: 'Angular21Loader',
+  shareScope: 'angular_21'
 }
 
 export async function loadPreloaderModule(preloader: Preloader) {
-  const moduleFederation = await import('@angular-architects/module-federation')
-  return moduleFederation
-    .loadRemoteModule({
+  const moduleFederation = await import('@module-federation/enhanced/runtime')
+  moduleFederation.registerRemotes([
+    {
       type: 'module',
-      remoteEntry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
-      exposedModule: preloader.exposedModule
-    })
-    .catch(() => {
-      console.warn(`Could not load preloader module: ${preloader.windowKey}. Applications might not work as expected.`)
-      window['onecxPreloaders'][preloader.windowKey] = true
-    })
+      entry: `${getLocation().deploymentPath}${preloader.relativeRemoteEntryUrl}`,
+      name: preloader.name,
+      shareScope: preloader.shareScope
+    }
+  ])
+  await moduleFederation.loadRemote(preloader.name + '/' + preloader.exposedModule).catch((e) => {
+    console.warn(`Could not load preloader: ${preloader.windowKey}. Application might not work as expected.`)
+    console.error(e)
+    window['onecxPreloaders'][preloader.windowKey] = true
+  })
 }
 
 export function ensurePreloaderModuleLoaded(preloader: Preloader) {

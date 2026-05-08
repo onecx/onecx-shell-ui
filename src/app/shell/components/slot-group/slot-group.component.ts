@@ -73,18 +73,21 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   // we need to control one input of the slots individually later
   slotInputsStart = computed(() => {
     return {
+      slotGroupName: this.name(),
       ...this.slotInputs()
     }
   })
 
   slotInputsCenter = computed(() => {
     return {
+      slotGroupName: this.name(),
       ...this.slotInputs()
     }
   })
 
   slotInputsEnd = computed(() => {
     return {
+      slotGroupName: this.name(),
       ...this.slotInputs()
     }
   })

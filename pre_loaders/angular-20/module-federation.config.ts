@@ -4,6 +4,11 @@ import * as path from 'path'
 
 import * as pkg from 'package.json'
 
+type SharedDependency = {
+  name: string
+  requiredVersion: string
+}
+
 const EXPORTS_BLACKLIST = ['.', './package.json']
 
 const DEPENDENCY_BLACKLIST = [
@@ -36,12 +41,14 @@ function removeExportPrefix(str: string) {
   return str.replace('./', '')
 }
 
-function generatePackages(pkg: Record<string, any>, dependency: string): string[] {
+function generatePackages(pkg: Record<string, any>, dependency: string): Array<SharedDependency> {
   if (DEPENDENCY_BLACKLIST.includes(dependency)) {
     return []
   }
 
-  const result = [dependency]
+  const requiredVersion = pkg['dependencies'][dependency]
+
+  const result = [{ name: dependency, requiredVersion: requiredVersion }]
   const dependencyPackagePath = path.join('node_modules', dependency, 'package.json')
   // read the package.json of the dependency and check if it has exports field, if it does, generate import statements for each export except the ones in the blacklist
   if (require('fs').existsSync(dependencyPackagePath)) {
@@ -53,7 +60,7 @@ function generatePackages(pkg: Record<string, any>, dependency: string): string[
         if (EXPORTS_BLACKLIST.includes(exportKey)) continue
         const fullPackage = `${dependency}/${removeExportPrefix(exportKey)}`
         if (FULL_PACKAGE_BLACKLIST.includes(fullPackage)) continue
-        result.push(fullPackage)
+        result.push({ name: fullPackage, requiredVersion: requiredVersion })
       }
     }
   }
@@ -62,14 +69,14 @@ function generatePackages(pkg: Record<string, any>, dependency: string): string[
 }
 
 // nx since 22.2.4 is not generating project graph with dependencies from package.json, so we need to manually add them as shared dependencies in the module federation config until its fixed. Removing this without the fix will cause several packages to not be included in remoteEntry file
-const allDependencies: Array<string> = Object.keys(pkg.dependencies).flatMap((d) => {
+const allDependencies: Array<SharedDependency> = Object.keys(pkg.dependencies).flatMap((d) => {
   return generatePackages(pkg, d)
 })
 const additionalShared = allDependencies
   .map((d) => {
     return {
-      libraryName: d,
-      sharedConfig: getOneCXSharedRecommendations(d, {})
+      libraryName: d.name,
+      sharedConfig: getOneCXSharedRecommendations(d.name, { requiredVersion: d.requiredVersion })
     }
   })
   .filter((config): config is { libraryName: string; sharedConfig: SharedLibraryConfig } => !!config.sharedConfig)

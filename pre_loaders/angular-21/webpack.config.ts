@@ -76,9 +76,9 @@ export default async function (baseConfig: Configuration) {
     plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
     output: {
       ...webpackConfig.output,
-      uniqueName: magicChar + 'onecx-angular-21-loader',
+      uniqueName: magicChar + 'z_onecx-angular-21-loader',
       publicPath: 'auto',
-      devtoolNamespace: 'onecx-angular-21-loader'
+      devtoolNamespace: 'z_onecx-angular-21-loader'
     },
     module: {
       ...webpackConfig.module,

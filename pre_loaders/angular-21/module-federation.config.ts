@@ -82,7 +82,7 @@ const additionalShared = allDependencies
   .filter((config): config is { libraryName: string; sharedConfig: SharedLibraryConfig } => !!config.sharedConfig)
 
 const config: ModuleFederationConfig = {
-  name: 'onecx-angular-21-loader',
+  name: 'z_onecx-angular-21-loader',
   exposes: {
     ['./Angular21Loader']: 'src/main.ts'
   },

@@ -28,7 +28,7 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "zzz_onecx-angular-20-loader",
+  "defaultProject": "􏿿onecx-angular-20-loader",
   "useInferencePlugins": false,
   "analytics": false
 }

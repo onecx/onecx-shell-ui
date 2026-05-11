@@ -98,7 +98,8 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
-    displayName: loadWorkspaceConfigResponse.workspace.displayName
+    displayName: loadWorkspaceConfigResponse.workspace.displayName,
+    i18n: loadWorkspaceConfigResponse.workspace.i18n
   })
 }
 
@@ -111,10 +112,10 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
-  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
-    return;
+  if (getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
+    return
   }
-  
+
   await appStateService.isAuthenticated$.isInitialized
 
   const loadWorkspaceConfigResponse = await firstValueFrom(

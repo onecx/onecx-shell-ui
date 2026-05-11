@@ -13,10 +13,6 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [
-    CommonModule,
-    TranslateModule,
-    AboutComponent,
-    RouterModule.forChild(routes)]
+  imports: [CommonModule, TranslateModule, AboutComponent, RouterModule.forChild(routes)]
 })
 export class AboutModule {}

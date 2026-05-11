@@ -1,6 +1,5 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
 import { getOneCXSharedRecommendations } from '@onecx/accelerator'
-// TODO: Mention this file in guide for app refactoring
 const config: ModuleFederationConfig = {
   name: 'onecx-shell-ui',
   exposes: {

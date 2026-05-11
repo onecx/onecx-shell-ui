@@ -94,7 +94,10 @@ const additionalShared = allDependencies
  */
 
 const config: ModuleFederationConfig = {
-  name: '􏿿onecx-angular-20-loader',
+  // 'zzz' prefix is used to prefer this remote over any other remote that might have the same package version in the shared dependencies.
+  // magicChar is not suitable for nx tools since angular 20 support since it normalizes to ASCII values.
+  // valid ASCII characters like '~' did not work as a prefix for some reason and were normalized to '_'
+  name: 'zzz_onecx-angular-20-loader',
   exposes: {
     ['./Angular20Loader']: 'src/main.ts'
   },

@@ -756,7 +756,7 @@ components:
           type: string
         version:
           type: string
-        translations:
+        url:
           type: string
     GetTranslationsResponse:
       type: object

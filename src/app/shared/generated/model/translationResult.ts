@@ -14,6 +14,6 @@
 export interface TranslationResult { 
     artifact: string;
     version?: string;
-    translations?: string;
+    url?: string;
 }
 

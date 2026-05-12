@@ -15,6 +15,8 @@ tags:
     description: Retrieve the User Profile
   - name: permission
     description: Retrieve Permissions
+  - name: translation
+    description: Retrieve Translations
 paths:
   /workspaceConfig:
     post:
@@ -286,6 +288,35 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
         '404':
           description: Permissions not found
+  /translations:
+    post:
+      x-onecx:
+        permissions:
+          translation:
+            - read
+      tags:
+        - translation
+      operationId: getTranslations
+      description: Get translations for specified artifact, version and locale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTranslationsRequest'
+      responses:
+        '200':
+          description: Translations retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTranslationsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
 components:
   schemas:
     IconCriteria:
@@ -540,6 +571,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UIEndpoint'
+        shareScope:
+          type: string
     UIEndpoint:
       type: object
       properties:
@@ -584,6 +617,8 @@ components:
           type: string
         technology:
           $ref: '#/components/schemas/Technologies'
+        shareScope:
+          type: string
     GetUserProfileResponse:
       type: object
       required:
@@ -685,6 +720,47 @@ components:
           type: array
           items:
             type: string
+    TranslationsContext:
+      type: object
+      required:
+        - artifact
+      properties:
+        artifact:
+          type: string
+        version:
+          type: string
+    GetTranslationsRequest:
+      type: object
+      required:
+        - locale
+        - context
+      properties:
+        locale:
+          type: string
+        context:
+          type: array
+          items:
+            $ref: '#/components/schemas/TranslationsContext'
+    TranslationResult:
+      type: object
+      required:
+        - artifact
+      properties:
+        artifact:
+          type: string
+        version:
+          type: string
+        translations:
+          type: string
+    GetTranslationsResponse:
+      type: object
+      required:
+        - translations
+      properties:
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/TranslationResult'
     ProblemDetailResponse:
       type: object
       properties:

@@ -111,10 +111,10 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
-  if(getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
-    return;
+  if (getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
+    return
   }
-  
+
   await appStateService.isAuthenticated$.isInitialized
 
   const loadWorkspaceConfigResponse = await firstValueFrom(
@@ -321,8 +321,6 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
   }
 }
 
-declare const __webpack_share_scopes__: any
-
 declare global {
   interface Window {
     onecxWebpackContainer: any
@@ -330,7 +328,8 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
+  // @deprecated Use __FEDERATION__ instead of globalThis.onecxWebpackContainer
+  window.onecxWebpackContainer = __FEDERATION__ // NOSONAR
 }
 
 @NgModule({

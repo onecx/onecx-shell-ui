@@ -27,7 +27,6 @@ export class AboutComponent implements OnInit {
   }
 
   private loadSupportedVersions() {
-    // TODO: Fix about page
     const shellScopeMap = __FEDERATION__?.__INSTANCES__?.find((i) => i.name === 'onecx_shell_ui')?.shareScopeMap
     if (!shellScopeMap) {
       console.warn('onecx_shell_ui shareScopeMap not found. Supported Angular versions cannot be determined.')
@@ -50,7 +49,11 @@ export class AboutComponent implements OnInit {
     })
   }
 
+  // We consider it a boundary if it's from one of our Angular builds or if it's from the shell UI and has at least one consumer
+  // The latter is needed when preloader is used by the shell UI and package is registered as if it was loaded by the shell
   private isAngularVersionBoundary(data: any): boolean {
-    return data.from.startsWith('onecx_angular_') || (data.from === 'onecx_shell_ui' && data.useIn.length > 0)
+    // regex to match both 'onecx-angular-18-loader' and 'onecx_angular_19_loader'
+    const angularLoaderRegex = /onecx[-_]angular[-_]\d+[-_]loader/i
+    return angularLoaderRegex.test(data.from) || (data.from === 'onecx_shell_ui' && data.useIn && data.useIn.length > 0)
   }
 }

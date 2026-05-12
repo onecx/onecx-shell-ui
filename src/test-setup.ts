@@ -13,3 +13,18 @@ globalThis.ngJest = {
 }
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
 setupZoneTestEnv()
+
+// Ensure Module Federation runtime global exists in unit tests.
+// In browser builds this is injected by the federation runtime.
+Object.defineProperty(globalThis, '__FEDERATION__', {
+  value: {
+    __INSTANCES__: [
+      {
+        name: 'onecx_shell_ui',
+        shareScopeMap: {}
+      }
+    ]
+  },
+  writable: true,
+  configurable: true
+})

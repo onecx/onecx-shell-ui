@@ -227,7 +227,7 @@ describe('SlotGroupComponent', () => {
 
         for (let index = 0; index < slots.length; index++) {
           const slotComponentInstance = slotDebugElements[index].componentInstance as SlotComponent
-          expect(slotComponentInstance.inputs()).toEqual(inputs)
+          expect(slotComponentInstance.inputs()).toEqual(expectedSlotIntputs)
         }
       })
 

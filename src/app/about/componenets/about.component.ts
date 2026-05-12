@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
+import { Federation } from '@module-federation/runtime-core'
 import { TranslateModule } from '@ngx-translate/core'
 
 interface AngularVersion {
@@ -27,7 +28,8 @@ export class AboutComponent implements OnInit {
   }
 
   private loadSupportedVersions() {
-    const shellScopeMap = __FEDERATION__?.__INSTANCES__?.find((i) => i.name === 'onecx_shell_ui')?.shareScopeMap
+    const federation = (globalThis as any).__FEDERATION__ as Federation
+    const shellScopeMap = federation?.__INSTANCES__?.find((i: any) => i.name === 'onecx_shell_ui')?.shareScopeMap
     if (!shellScopeMap) {
       console.warn('onecx_shell_ui shareScopeMap not found. Supported Angular versions cannot be determined.')
       return

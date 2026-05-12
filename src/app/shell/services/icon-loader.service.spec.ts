@@ -95,7 +95,7 @@ describe('ShellIconLoaderService', () => {
   it('should fetch missing icons, inject CSS, and publish IconsReceived', async () => {
     service.init()
     ;(themeService as any).currentTheme$.publish({ name: 'dark' })
-    const iconName = 'home';
+    const iconName = 'home'
     ensureProperty(globalThis, ['onecxIcons', iconName], undefined)
     const icon: IconCache = { name: iconName, body: '<path />' } as any
     const bffSpy = jest.spyOn(iconBffService, 'findIconsByNamesAndRefId').mockReturnValue(of({ icons: [icon] }) as any)
@@ -117,13 +117,13 @@ describe('ShellIconLoaderService', () => {
   })
 
   it('should not break if onecxIcons is undefined', async () => {
-    delete globalThis.onecxIcons;
+    delete globalThis.onecxIcons
 
-    service.init();
-    (themeService as any).currentTheme$.publish({ name: 'dark' });
+    service.init()
+    ;(themeService as any).currentTheme$.publish({ name: 'dark' })
 
-    await expect((service as any).loadIcons([])).resolves.toBeUndefined();
-  });
+    await expect((service as any).loadIcons([])).resolves.toBeUndefined()
+  })
 
   it('should do nothing when there are no missing icons', async () => {
     service.init()

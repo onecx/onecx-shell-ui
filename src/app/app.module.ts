@@ -34,6 +34,7 @@ import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/in
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
+  OverrideType,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -53,6 +54,7 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
+import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 
 async function styleInitializer(
@@ -98,7 +100,8 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
-    displayName: loadWorkspaceConfigResponse.workspace.displayName
+    displayName: loadWorkspaceConfigResponse.workspace.displayName,
+    i18n: loadWorkspaceConfigResponse.workspace.i18n
   })
 }
 
@@ -133,6 +136,7 @@ export async function workspaceConfigInitializer(
       string,
       Record<string, string>
     >
+
     const themeWithParsedProperties = {
       ...loadWorkspaceConfigResponse.theme,
       properties: parsedProperties
@@ -143,7 +147,7 @@ export async function workspaceConfigInitializer(
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      apply(themeService, themeWithParsedProperties),
+      applyThemeVariables(themeService, themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish({
         components: loadWorkspaceConfigResponse.components,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
@@ -309,7 +313,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
+export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
   console.log(`🎨 Applying theme: ${theme.name}`)
   await themeService.currentTheme$.publish(theme)
   if (theme.properties) {
@@ -318,6 +322,19 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
         document.documentElement.style.setProperty(`--${key}`, value)
       }
     }
+  }
+  if (theme.overrides && theme.overrides.length > 0) {
+    theme.overrides
+      .filter((ov) => ov.type === OverrideType.CSS)
+      .forEach((override) => {
+        if (override.value) {
+          const el = document.createElement('style')
+          el.dataset['cssOverrides'] = ''
+          el.dataset[MARKED_AS_WRAPPED] = ''
+          el.append(override.value)
+          document.head.appendChild(el)
+        }
+      })
   }
 }
 

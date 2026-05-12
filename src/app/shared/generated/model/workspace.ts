@@ -18,5 +18,6 @@ export interface Workspace {
     homePage?: string;
     logoUrl?: string;
     smallLogoUrl?: string;
+    i18n?: { [key: string]: { [key: string]: string; }; };
 }
 

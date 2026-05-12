@@ -27,14 +27,14 @@ export class ShellIconLoaderService {
         bufferTime(100),
         filter((icons) => icons.length > 0),
         map((messages) => messages.map((m) => m.name)),
-        mergeMap((iconNames : string[])=> this.loadIcons(iconNames))
+        mergeMap((iconNames: string[]) => this.loadIcons(iconNames))
       )
       .subscribe()
   }
 
-  private async loadIcons(iconNames : string[]) {
+  private async loadIcons(iconNames: string[]) {
     const g = ensureProperty(globalThis, ['onecxIcons'], {})
-    const missingIcons = iconNames.filter((name : string) => g.onecxIcons[name] === undefined);
+    const missingIcons = iconNames.filter((name: string) => g.onecxIcons[name] === undefined)
 
     if (missingIcons.length === 0) return
 

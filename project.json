@@ -54,6 +54,11 @@
             "glob": "**/*",
             "input": "./pre_loaders/angular-20/dist/onecx-angular-20-loader",
             "output": "/pre_loaders/onecx-angular-20-loader"
+          },
+          {
+            "glob": "**/*",
+            "input": "./pre_loaders/angular-21/dist/onecx-angular-21-loader",
+            "output": "/pre_loaders/onecx-angular-21-loader"
           }
         ],
         "styles": [
@@ -77,9 +82,15 @@
             "inject": false
           }
         ],
+        "sourceMap": {
+          "scripts": true,
+          "styles": false,
+          "vendor": true,
+          "hidden": false
+        },
         "scripts": [],
         "customWebpackConfig": {
-          "path": "./webpack.config.js"
+          "path": "./webpack.config.ts"
         }
       },
       "configurations": {
@@ -96,9 +107,15 @@
               "maximumError": "4kb"
             }
           ],
+          "sourceMap": {
+            "scripts": true,
+            "styles": false,
+            "vendor": true,
+            "hidden": false
+          },
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.js"
+            "path": "./webpack.config.ts"
           }
         },
         "development": {
@@ -144,7 +161,7 @@
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
         "buildTarget": "onecx-shell-ui:build",
-        "customWebpackConfig": "./webpack.config.js"
+        "customWebpackConfig": "./webpack.config.ts"
       }
     },
     "lint": {

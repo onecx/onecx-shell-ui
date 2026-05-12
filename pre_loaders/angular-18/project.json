@@ -1,5 +1,5 @@
 {
-  "name": "onecx-angular-18-loader",
+  "name": "􏿿onecx-angular-18-loader",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "ocx-angular-18-loader",
@@ -15,7 +15,7 @@
         "main": "./src/main.ts",
         "tsConfig": "./tsconfig.app.json",
         "customWebpackConfig": {
-          "path": "./webpack.config.js"
+          "path": "./webpack.config.ts"
         },
         "assets": [
           {
@@ -33,7 +33,13 @@
             "input": "./node_modules/@onecx/angular-utils/assets/",
             "output": "/onecx-angular-utils/assets/"
           }
-        ]
+        ],
+        "sourceMap": {
+          "scripts": true,
+          "styles": false,
+          "vendor": true,
+          "hidden": false
+        }
       },
       "configurations": {
         "production": {
@@ -49,9 +55,15 @@
               "maximumError": "4kb"
             }
           ],
+          "sourceMap": {
+            "scripts": true,
+            "styles": false,
+            "vendor": true,
+            "hidden": false
+          },
           "outputHashing": "all",
           "customWebpackConfig": {
-            "path": "./webpack.config.js"
+            "path": "./webpack.config.ts"
           }
         },
         "development": {

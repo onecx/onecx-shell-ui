@@ -35,7 +35,11 @@ describe('ImageRepositoryService', () => {
     themeService = TestBed.inject(ThemeService)
     workspaceConfigBffService = TestBed.inject(WorkspaceConfigBffService)
     imageTopicMock = new FakeTopic<{ images: { [key: string]: string } }>()
-    ;(service as any).imageRepositoryInterface.imageRepositoryTopic = imageTopicMock
+    Object.defineProperty((service as any).imageRepositoryInterface, 'imageRepositoryTopic', {
+      value: imageTopicMock,
+      writable: true,
+      configurable: true
+    })
     themeService.currentTheme$.publish(THEME_CONFIG)
   })
 

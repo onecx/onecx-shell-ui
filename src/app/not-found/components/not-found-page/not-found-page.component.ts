@@ -16,16 +16,17 @@ import { TranslateModule } from '@ngx-translate/core'
         <h1 class="md:text-xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
         <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
       </div>
-      <button
-        *ngIf="workspace$ | async as workspace"
-        class="w-max"
-        [routerLink]="[workspace.baseUrl]"
-        [ngStyle]="{ cursor: 'pointer' }"
-        [attr.aria-label]="'NOT_FOUND_PAGE.ACTION' | translate"
-        [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
-      >
-        {{ 'NOT_FOUND_PAGE.ACTION' | translate }}
-      </button>
+      @if (workspace$ | async; as workspace) {
+        <button
+          class="w-max"
+          [routerLink]="[workspace.baseUrl]"
+          [ngStyle]="{ cursor: 'pointer' }"
+          [attr.aria-label]="'NOT_FOUND_PAGE.ACTION' | translate"
+          [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
+        >
+          {{ 'NOT_FOUND_PAGE.ACTION' | translate }}
+        </button>
+      }
     </div>
   `
 })

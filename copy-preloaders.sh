@@ -5,6 +5,7 @@ PRELOADER_PATHS=(
   "./pre_loaders/angular-18/dist/onecx-angular-18-loader"
   "./pre_loaders/angular-19/dist/onecx-angular-19-loader"
   "./pre_loaders/angular-20/dist/onecx-angular-20-loader"
+  "./pre_loaders/angular-21/dist/onecx-angular-21-loader"
 )
 
 # Define destination base path

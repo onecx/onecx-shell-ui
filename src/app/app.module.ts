@@ -1,11 +1,13 @@
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { inject, NgModule, provideAppInitializer } from '@angular/core'
+import { inject, NgModule, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule } from '@angular/router'
 import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
-import { provideAuthService, provideTokenInterceptor } from '@onecx/angular-auth'
+import { provideTokenInterceptor } from '@onecx/angular-auth'
+import { provideAuthService } from '@onecx/shell-auth'
+
 import {
   APP_CONFIG,
   AppStateService,
@@ -33,6 +35,7 @@ import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/in
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
+  OverrideType,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -45,13 +48,14 @@ import { initializationErrorHandler } from './shell/utils/initialization-error-h
 import { CommonModule } from '@angular/common'
 import { providePrimeNG } from 'primeng/config'
 import { AppComponent } from './app.component'
-import { appRoutes } from './app.routes'
+import { appRoutes, internalShellRoute } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
 import { GlobalErrorComponent } from './shell/components/error-component/global-error.component'
 import { PortalViewportComponent } from './shell/components/portal-viewport/portal-viewport.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
+import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 
 async function styleInitializer(
@@ -97,7 +101,8 @@ function publishCurrentWorkspace(
     routes: loadWorkspaceConfigResponse.routes,
     homePage: loadWorkspaceConfigResponse.workspace.homePage,
     microfrontendRegistrations: [],
-    displayName: loadWorkspaceConfigResponse.workspace.displayName
+    displayName: loadWorkspaceConfigResponse.workspace.displayName,
+    i18n: loadWorkspaceConfigResponse.workspace.i18n
   })
 }
 
@@ -110,6 +115,10 @@ export async function workspaceConfigInitializer(
   parametersService: ParametersService,
   router: Router
 ) {
+  if (getLocation().applicationPath.startsWith(`/${internalShellRoute}/`)) {
+    return
+  }
+
   await appStateService.isAuthenticated$.isInitialized
 
   const loadWorkspaceConfigResponse = await firstValueFrom(
@@ -128,6 +137,7 @@ export async function workspaceConfigInitializer(
       string,
       Record<string, string>
     >
+
     const themeWithParsedProperties = {
       ...loadWorkspaceConfigResponse.theme,
       properties: parsedProperties
@@ -138,7 +148,7 @@ export async function workspaceConfigInitializer(
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      apply(themeService, themeWithParsedProperties),
+      applyThemeVariables(themeService, themeWithParsedProperties),
       remoteComponentsService.remoteComponents$.publish({
         components: loadWorkspaceConfigResponse.components,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
@@ -304,7 +314,7 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
+export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
   console.log(`🎨 Applying theme: ${theme.name}`)
   await themeService.currentTheme$.publish(theme)
   if (theme.properties) {
@@ -314,9 +324,20 @@ async function apply(themeService: ThemeService, theme: Theme): Promise<void> {
       }
     }
   }
+  if (theme.overrides && theme.overrides.length > 0) {
+    theme.overrides
+      .filter((ov) => ov.type === OverrideType.CSS)
+      .forEach((override) => {
+        if (override.value) {
+          const el = document.createElement('style')
+          el.dataset['cssOverrides'] = ''
+          el.dataset[MARKED_AS_WRAPPED] = ''
+          el.append(override.value)
+          document.head.appendChild(el)
+        }
+      })
+  }
 }
-
-declare const __webpack_share_scopes__: any
 
 declare global {
   interface Window {
@@ -325,7 +346,8 @@ declare global {
 }
 
 export async function shareMfContainer() {
-  window.onecxWebpackContainer = __webpack_share_scopes__ // NOSONAR
+  // @deprecated Use __FEDERATION__ instead of globalThis.onecxWebpackContainer
+  window.onecxWebpackContainer = __FEDERATION__ // NOSONAR
 }
 
 @NgModule({
@@ -341,6 +363,7 @@ export async function shareMfContainer() {
     VisibleKeyboardFocusDirective
   ],
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptorsFromDi()),
     provideAppInitializer(() => {
       return workspaceConfigInitializer(

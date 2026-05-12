@@ -34,6 +34,10 @@
       "PARAMS": "Parameter"
     }
   },
+  "ABOUT_SHELL_PAGE": {
+    "TITLE": "ÜBER SHELL",
+    "HIGHEST_ANGULAR_VERSIONS_SUPPORTED": "Höchste unterstützte Angular-Versionen pro Hauptversion. Niedrigere Versionen innerhalb dieser Hauptversionen werden ebenfalls unterstützt."
+  },
   "OCX_HEADER": {
     "HEADER_LEFT": "Kopfzeile links",
     "HEADER_CENTER": "Kopfzeile mitte",

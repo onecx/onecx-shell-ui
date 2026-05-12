@@ -1,8 +1,10 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
 import { getOneCXSharedRecommendations } from '@onecx/accelerator'
 
+const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
+
 const config: ModuleFederationConfig = {
-  name: '􏿿onecx-angular-19-loader',
+  name: magicChar + 'onecx-angular-19-loader',
   exposes: {
     ['./Angular19Loader']: 'src/main.ts'
   },

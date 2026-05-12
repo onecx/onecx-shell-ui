@@ -7,7 +7,7 @@ describe('AboutComponent', () => {
   let component: AboutComponent
 
   function resetFederation() {
-    ;(globalThis as any).__FEDERATION__ = {
+    (globalThis as any).__FEDERATION__ = {
       __INSTANCES__: [
         {
           name: 'onecx_shell_ui',
@@ -18,7 +18,7 @@ describe('AboutComponent', () => {
   }
 
   function mockFederation(entries: Record<string, Record<string, any>>) {
-    ;(globalThis as any).__FEDERATION__ = {
+    (globalThis as any).__FEDERATION__ = {
       __INSTANCES__: [
         {
           name: 'onecx_shell_ui',

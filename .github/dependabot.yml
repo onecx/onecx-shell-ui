@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: daily
+    labels:
+      - docker-image
+  - package-ecosystem: "helm"
+    directory: "/helm"
+    schedule:
+      interval: daily
+    labels:
+      - helm

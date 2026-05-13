@@ -17,7 +17,7 @@ Configure this only when the Shell’s default selectors are insufficient. The d
 .Value format
 [source,json]
 ----
-["[role=\"listbox\"]", ".p-multiselect"]
+["[role=\"checkbox\"]", ".p-togglebutton"]
 ----
 
 [NOTE]

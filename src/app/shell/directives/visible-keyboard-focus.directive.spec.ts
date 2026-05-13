@@ -129,6 +129,43 @@ describe('VisibleKeyboardFocusDirective', () => {
     expect(multiselect.classList.contains('ocx-focus-host')).toBe(false)
   })
 
+  it('should keep focus class when focus moves within active host', () => {
+    const multiselect = fixture.debugElement.query(By.css('#ms')).nativeElement as HTMLElement
+    const input = fixture.debugElement.query(By.css('#ms-input')).nativeElement as HTMLElement
+    const label = fixture.debugElement.query(By.css('#ms-label')).nativeElement as HTMLElement
+
+    pressTab()
+    input.focus()
+    dispatchFocusIn(input)
+
+    expect(multiselect.classList.contains('ocx-focus-host')).toBe(true)
+
+    dispatchFocusOut(label)
+
+    expect(multiselect.classList.contains('ocx-focus-host')).toBe(true)
+  })
+
+  it('should not enter keyboard mode on non-Tab key press', () => {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    const button = fixture.debugElement.query(By.css('#btn')).nativeElement as HTMLElement
+    dispatchFocusIn(button)
+    expect(button.classList.contains('ocx-focus-host')).toBe(false)
+  })
+
+  it('should use paramValues from service when provided', async () => {
+    parametersServiceMock.get.mockResolvedValue(['.custom-selector'])
+    const fixture2 = TestBed.createComponent(TestHostComponent)
+    fixture2.detectChanges()
+    await fixture2.whenStable()
+
+    const btn = fixture2.debugElement.query(By.css('#btn')).nativeElement as HTMLElement
+    pressTab()
+    dispatchFocusIn(btn)
+
+    expect(btn.classList.contains('ocx-focus-host')).toBe(true)
+    parametersServiceMock.get.mockResolvedValue(undefined)
+  })
+
   it('should ignore focus on document body when using keyboard', () => {
     pressTab()
     dispatchFocusIn(document.body as unknown as HTMLElement)

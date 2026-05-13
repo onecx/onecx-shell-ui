@@ -1,7 +1,6 @@
 import { Directive, Renderer2, AfterViewInit, OnDestroy, inject } from '@angular/core'
 import { DOCUMENT } from '@angular/common'
-import { CONFIG_KEY, ConfigurationService } from '@onecx/angular-integration-interface'
-import { ParametersService } from '@onecx/angular-integration-interface'
+import { CONFIG_KEY, ConfigurationService, ParametersService } from '@onecx/angular-integration-interface'
 
 @Directive({
   selector: '[ocxShellVisibleKeyboardFocus]',
@@ -11,16 +10,16 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
   private activeHost: HTMLElement | null = null
   private keyboardMode = false
 
-  private focusableSelectorKey = CONFIG_KEY.KEYBOARD_FOCUSABLE_SELECTOR
+  private readonly focusableSelectorKey = CONFIG_KEY.KEYBOARD_FOCUSABLE_SELECTOR
 
-  private listeners: Array<() => void> = [];
+  private readonly listeners: Array<() => void> = [];
 
-  private renderer = inject(Renderer2)
-  private document = inject(DOCUMENT)
-  private configurationService = inject(ConfigurationService)
-  private parametersService = inject(ParametersService)
+  private readonly renderer = inject(Renderer2)
+  private readonly document = inject(DOCUMENT)
+  private readonly configurationService = inject(ConfigurationService)
+  private readonly parametersService = inject(ParametersService)
 
-  private defaultSelectors = [
+  private readonly defaultSelectors = [
     '[role="listbox"]',
     '.p-multiselect',
     '.p-checkbox',
@@ -36,28 +35,28 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
   async ngAfterViewInit() {
     try {
       const paramValues = await this.parametersService.get(this.focusableSelectorKey, this.configurationService.getProperty(this.focusableSelectorKey), 'onecx-shell', 'onecx-shell-ui') as unknown as string[];
-      const set = new Set<string>([...(paramValues ?? []), ...(this.defaultSelectors ?? [])])
-      this.focusableSelector = [...set].join(',') ?? ''
+      const set = new Set<string>([...(paramValues ?? []), ...this.defaultSelectors])
+      this.focusableSelector = [...set].join(',')
     } catch (e) {
-      this.focusableSelector = this.defaultSelectors.join(',') ?? ''
+      console.error(e)
+      this.focusableSelector = this.defaultSelectors.join(',')
     }
 
-    this.listeners.push(this.renderer.listen(this.document, 'keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        this.keyboardMode = true
-      }
-    }))
-
-    this.listeners.push(this.renderer.listen(this.document, 'pointerdown', () => {
-      this.keyboardMode = false
-    }))
-
-    this.listeners.push(this.renderer.listen(this.document, 'focusin', this.onFocusIn))
-
-    this.listeners.push(this.renderer.listen(this.document, 'focusout', this.onFocusOut))
+    this.listeners.push(
+      this.renderer.listen(this.document, 'keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Tab') {
+          this.keyboardMode = true
+        }
+      }),
+      this.renderer.listen(this.document, 'pointerdown', () => {
+        this.keyboardMode = false
+      }),
+      this.renderer.listen(this.document, 'focusin', this.onFocusIn),
+      this.renderer.listen(this.document, 'focusout', this.onFocusOut)
+    )
   }
 
-  private onFocusIn = (event: FocusEvent) => {
+  private readonly onFocusIn = (event: FocusEvent) => {
     if (!this.keyboardMode) return
 
     const target = event.target as HTMLElement
@@ -74,7 +73,7 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private onFocusOut = (event: FocusEvent) => {
+  private readonly onFocusOut = (event: FocusEvent) => {
     const nextTarget = event.relatedTarget as HTMLElement | null
     if (this.activeHost && nextTarget && this.activeHost.contains(nextTarget)) {
       return
@@ -82,7 +81,7 @@ export class VisibleKeyboardFocusDirective implements AfterViewInit, OnDestroy {
     this.clear()
   }
 
-  private clear = () => {
+  private readonly clear = () => {
     if (this.activeHost) {
       this.renderer.removeClass(this.activeHost, 'ocx-focus-host')
       this.activeHost = null

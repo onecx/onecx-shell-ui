@@ -17,6 +17,7 @@ app:
     # Microfrontend
     microfrontend:
       enabled: true
+      entrySuffix: "mf-manifest.json"
       specs:
         shell-toast:
           exposedModule: "./OneCXShellToastComponent"

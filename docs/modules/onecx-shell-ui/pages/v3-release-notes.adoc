@@ -1,0 +1,166 @@
+:imagesdir: ../images
+
+:idprefix:
+:idseparator: -
+
+
+[#v3-release-notes]
+= onecx-shell-ui 3.0.0 Release Notes
+
+[#summary]
+== Summary
+
+OneCX Shell UI 3.0.0 is a major platform release that introduces a new integration path for Angular 21 while continuing to support previously supported Angular application versions.
+It also advances the shell layout model with updated slot-group conventions, improves startup and runtime efficiency, and delivers enhancements for shell integration, responsiveness, and deployment support.
+
+Because this release includes platform-level and integration-related changes, it should be validated carefully in consumer environments, especially where custom slot configuration, microfrontend integration, or deployment-specific settings are in use.
+
+[#highlights]
+== Highlights
+
+* Introduces a new Angular 21 integration path while maintaining compatibility for previously supported applications
+* Enhances shell layout and extensibility with viewport restructuring and slot-group based layout conventions
+* Improves startup and runtime efficiency, including reducing message exchange between microfrontends
+* Adds new shell capabilities including an About page and source maps support
+* Improves responsive and mobile behavior, together with multiple styling and layout refinements
+* Includes important stability improvements for Keycloak login, routing synchronization, remote entry exposure, and share scope handling
+
+[#upgrade-notes]
+== Important Upgrade Notes
+
+[IMPORTANT]
+====
+This is a major release.
+Consumers should validate shell integration, configuration, and deployment behavior before promoting to production.
+====
+
+[#module-federation-integration]
+=== Angular and module federation integration
+
+OneCX Shell v3 introduces support for Angular 21 as a new integration path.
+Previously supported Angular versions remain supported.
+
+[IMPORTANT]
+====
+The Shell v3 migration is recommended for any application consumed by Shell v3.
+
+The required migration actions primarily apply to Angular 21 applications and their related module federation and dependency migration path.
+====
+
+If you are planning Angular 21 adoption, verify the following:
+
+* module federation integration with the new shell setup
+* shared dependency handling and share scope configuration
+* alignment of OneCX UI library versions with the Angular 21 migration path
+
+[NOTE]
+====
+The OneCX UI libraries documentation indicates that Angular 21 compatibility is delivered through OneCX UI libraries v8 and the Shell v3 migration path.
+Applications remaining on previously supported Angular versions should continue to work, while Angular 21 applications should follow the dedicated migration guidance.
+====
+
+// TODO: replace with final Antora/xref link to shell-v3-migration.adoc
+See the Shell v3 migration guide for details: `TODO`
+
+[#slot-layout-migration]
+=== Slot layout and slot naming migration
+
+Shell v3 introduces a more structured slot naming convention based on layout regions and sub-regions.
+
+[IMPORTANT]
+====
+The Shell v3 migration is recommended for any application consumed by Shell v3.
+
+For applications that are not adopting Angular 21, the migration mainly helps align with the updated shell layout and slot naming conventions.
+
+For Angular 21 applications, the migration includes the required actions for adopting the new integration path.
+====
+
+Deprecated slot names continue to work through automatic remapping, but migration to the new slot names is recommended.
+Shell v3 also adds new layout regions for more granular content placement.
+
+[IMPORTANT]
+====
+Existing integrations should continue working through automatic remapping, but consumers are encouraged to migrate to the new slot names and validate custom slot placement, overrides, and layout assumptions.
+====
+
+// TODO: replace with final Antora/xref link to shell-v3-migration.adoc
+See the Shell v3 migration guide for slot naming, layout details, and migration guidance: `TODO`
+
+[#source-maps]
+=== Source maps
+
+This release adds source maps support.
+
+[CAUTION]
+====
+Source maps can help with diagnostics and debugging, but they are not recommended for production use by default.
+Review how source maps are exposed and delivered in your deployment pipeline before enabling or relying on them in production environments.
+====
+
+[#deployment-and-packaging]
+=== Deployment and packaging
+
+This release also includes updates to the Docker base image and Helm chart dependencies.
+Deployment behavior, shell exposure, and runtime configuration should be validated in lower environments before production rollout.
+
+[#new-features]
+== New Features
+
+[#platform-modernization]
+=== Platform Modernization
+
+* Introduced a new Angular 21 module federation integration path
+* Upgraded webpack packages in the shell and preloaders
+* Updated shell libraries and preloader library versions
+
+[#layout-and-extensibility]
+=== Layout and Extensibility
+
+* Restructured the viewport
+* Added and refined slot-group behavior
+* Adjusted shell behavior for the new slot logic
+
+[#shell-capabilities]
+=== Shell Capabilities
+
+* Added an About Shell page to internal routes
+* Added source maps support
+
+[#performance-and-efficiency]
+=== User Experience and Runtime Efficiency
+
+* Improved menu behavior
+* Added styling changes to better support mobile layouts
+* Improved support for MFE growth within the shell layout
+* Improved startup behavior and reduced loaded code
+* Reduced runtime overhead, including reducing the amount of messages exchanged between microfrontends
+
+[#documentation]
+=== Documentation
+
+* Restructured documentation navigation
+* Added shell version support documentation
+
+[#migration-checklist]
+== Migration Checklist
+
+Before upgrading to 3.0.0, verify the following:
+
+* confirm that your application integration still works with the updated shell and module federation setup
+* if adopting Angular 21, follow the dedicated Angular 21 migration path and compatible OneCX UI library versions
+* review slot-group usage, deprecated slot names, and custom values YAML overrides
+* validate layout rendering after viewport restructuring
+* validate remote entry loading and `mf-manifest.json` based integration expectations
+* test shell integration points such as toast usage, internal routes, and workspace behavior
+* validate Keycloak login, redirects, and environment-specific configuration
+* confirm mobile, responsive, and scrollbar behavior in target browsers
+* review source map exposure and deployment expectations carefully before production use
+
+[#references]
+== References
+
+* Release: https://github.com/onecx/onecx-shell-ui/releases/tag/3.0.0
+* Full changelog: https://github.com/onecx/onecx-shell-ui/compare/2.4.0...3.0.0
+* Shell v3 migration guide: `TODO`
+* OneCX UI libraries Angular 21 migration guide: https://github.com/onecx/onecx-portal-ui-libs/blob/a2cbe83f338710f46d561e043c32c0dda6b1d2a4/docs/modules/onecx-portal-ui-libs/pages/migrations/angular-21/index.adoc

@@ -304,7 +304,7 @@ describe('RoutesService', () => {
       expect(prefRoute?.pathMatch).toBe(PathMatch.prefix)
 
       await prefRoute?.loadChildren?.()
-      expect(loadRemoteMock).toHaveBeenCalledWith('prod-2|app-2/OneCXWelcomeModule')
+      expect(loadRemoteMock).toHaveBeenCalledWith('prefix-remote/OneCXWelcomeModule')
     })
 
     it('returns WebcomponentLoaderModule for non-angular routes', async () => {

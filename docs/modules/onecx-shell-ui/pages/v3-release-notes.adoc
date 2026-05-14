@@ -59,8 +59,7 @@ The OneCX UI libraries documentation indicates that Angular 21 compatibility is 
 Applications remaining on previously supported Angular versions should continue to work, while Angular 21 applications should follow the dedicated migration guidance.
 ====
 
-// TODO: replace with final Antora/xref link to shell-v3-migration.adoc
-See the Shell v3 migration guide for details: `TODO`
+See the Shell v3 migration guide for details: xref:documentation:onecx-docs-dev:shell-integration/shell-v3-migration.adoc[Shell v3 Migration Guide]
 
 [#slot-layout-migration]
 === Slot layout and slot naming migration
@@ -84,8 +83,7 @@ Shell v3 also adds new layout regions for more granular content placement.
 Existing integrations should continue working through automatic remapping, but consumers are encouraged to migrate to the new slot names and validate custom slot placement, overrides, and layout assumptions.
 ====
 
-// TODO: replace with final Antora/xref link to shell-v3-migration.adoc
-See the Shell v3 migration guide for slot naming, layout details, and migration guidance: `TODO`
+See the Shell v3 migration guide for slot naming, layout details, and migration guidance: xref:documentation:onecx-docs-dev:shell-integration/shell-v3-migration.adoc[Shell v3 Migration Guide]
 
 [#source-maps]
 === Source maps
@@ -162,5 +160,5 @@ Before upgrading to 3.0.0, verify the following:
 
 * Release: https://github.com/onecx/onecx-shell-ui/releases/tag/3.0.0
 * Full changelog: https://github.com/onecx/onecx-shell-ui/compare/2.4.0...3.0.0
-* Shell v3 migration guide: `TODO`
+* Shell v3 migration guide: xref:documentation:onecx-docs-dev:shell-integration/shell-v3-migration.adoc[Shell v3 Migration Guide]
 * OneCX UI libraries Angular 21 migration guide: https://github.com/onecx/onecx-portal-ui-libs/blob/a2cbe83f338710f46d561e043c32c0dda6b1d2a4/docs/modules/onecx-portal-ui-libs/pages/migrations/angular-21/index.adoc

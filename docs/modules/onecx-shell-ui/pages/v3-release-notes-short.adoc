@@ -35,7 +35,7 @@ This is a major release and should be validated carefully before production roll
 
 For detailed migration guidance, see:
 
-* Shell v3 migration guide: `TODO`
+* Shell v3 migration guide: xref:documentation:onecx-docs-dev:shell-integration/shell-v3-migration.adoc[Shell v3 Migration Guide]
 * OneCX UI libraries Angular 21 migration guide: https://github.com/onecx/onecx-portal-ui-libs/blob/a2cbe83f338710f46d561e043c32c0dda6b1d2a4/docs/modules/onecx-portal-ui-libs/pages/migrations/angular-21/index.adoc
 
 == Included in this Release

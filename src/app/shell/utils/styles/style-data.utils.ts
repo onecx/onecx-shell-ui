@@ -2,6 +2,7 @@ import {
   dataIntermediateMfeElementKey,
   dataIntermediateNoPortalLayoutStylesKey,
   dataIntermediateStyleIdKey,
+  dataIntermediateStyleIsolationKey,
   dataMfeElementKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
@@ -101,6 +102,11 @@ export function removeStyleDataRecursive(element: HTMLElement): void {
     delete element.dataset[dataStyleIdKey]
     delete element.dataset[dataNoPortalLayoutStylesKey]
     delete element.dataset[dataMfeElementKey]
+
+    delete element.dataset[dataIntermediateStyleIsolationKey]
+    delete element.dataset[dataIntermediateStyleIdKey]
+    delete element.dataset[dataIntermediateNoPortalLayoutStylesKey]
+    delete element.dataset[dataIntermediateMfeElementKey]
   }
 
   for (const child of Array.from(element.children)) {

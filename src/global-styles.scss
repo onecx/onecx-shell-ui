@@ -30,9 +30,24 @@ body {
   }
 }
 
-html,
-body {
-  height: 100dvh;
+// Styles to ensure correctness of cdk-overlay-container
+// TODO: Remove this once a valid solution is found for dynamic style wrapping
+.cdk-overlay-container,
+.cdk-global-overlay-wrapper {
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+}
+
+.cdk-overlay-container:empty {
+  display: none;
 }
 
 // disable default settings of dialogs created by portal dialog service

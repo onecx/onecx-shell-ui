@@ -3,21 +3,36 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "lint": {
       "cache": true
     },
     "@angular-devkit/build-angular:browser": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     }
   },
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": ["default"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default"
+    ],
     "sharedGlobals": []
   },
   "generators": {
@@ -29,5 +44,6 @@
     }
   },
   "defaultProject": "onecx-angular-20-loader",
-  "useInferencePlugins": false
+  "useInferencePlugins": false,
+  "analytics": false
 }

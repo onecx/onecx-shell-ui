@@ -2,6 +2,7 @@ import { POLYFILL_SCOPE_MODE } from '@onecx/angular-integration-interface'
 import { isCssScopeRuleSupported } from '@onecx/angular-utils'
 import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
+  appendStyleData,
   findStyleDataWrapper,
   getStyleDataOrIntermediateStyleData,
   markElement,
@@ -111,10 +112,34 @@ function wrapWithStyleData(
   return result
 }
 
+/**
+ * Leave cdk-overlay-container unstyled when adding to the DOM.
+ *
+ * When adding a child to cdk-overlay-container:
+ * - get style data of the appended child
+ * - set style data on the cdk container
+ */
 function overwriteAngularMaterialOverlayContainer(cdkNode: Node) {
   const originalAppendChild = cdkNode.appendChild
   cdkNode.appendChild = function (newChild: Node): any {
-    return wrapWithStyleData(this, newChild, originalAppendChild, undefined)
+    markElement(newChild, 'overwriteAppendChild')
+    if (newChild.nodeType === Node.ELEMENT_NODE && newChild instanceof HTMLElement) {
+      // Get style data
+      const onecxTriggerElement = getOnecxTriggerElement()
+      const triggerElementStyleData = onecxTriggerElement
+        ? getStyleDataOrIntermediateStyleData(onecxTriggerElement)
+        : null
+      const childElementStyleData = getStyleDataOrIntermediateStyleData(newChild)
+      const styleData = childElementStyleData ?? triggerElementStyleData ?? undefined
+
+      // Set style data on the cdk-overlay-container directly to have fresh value
+      if (styleData) {
+        appendStyleData(this as HTMLElement, styleData)
+      }
+      // Remove style data from children
+      removeStyleDataRecursive(newChild)
+    }
+    return originalAppendChild.call(this, newChild)
   }
 
   overwriteRemoveChild(cdkNode)

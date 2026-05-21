@@ -8,7 +8,7 @@ import {
   loadPreloaderModule
 } from './app/shell/utils/preloader.utils'
 
-// Make sure the shell federation instance is available globally
+// Make shell federation instance is available globally
 ensureProperty(globalThis, ['onecxFederationInstance'], __FEDERATION__.__INSTANCES__[0])
 
 window['onecxPreloaders'] ??= {}

@@ -7,6 +7,7 @@ import { provideMissingTranslationHandler, provideTranslateLoader, provideTransl
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideTokenInterceptor } from '@onecx/angular-auth'
 import { provideAuthService } from '@onecx/shell-auth'
+import { ZodSafeParseResult } from 'zod'
 
 import {
   APP_CONFIG,
@@ -29,14 +30,26 @@ import {
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import {
+  CurrentLocationTopic,
+  EventsTopic,
+  Technologies as LibTechnologies,
+  UserProfile,
+  Theme as LibTheme,
+  theme as themeSchema,
+  ThemePropertiesV2,
+  ThemeProperties,
+  CurrentThemesTopic
+} from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
   OverrideType,
+  Theme,
   UserProfileBffService,
-  WorkspaceConfigBffService
+  WorkspaceConfigBffService,
+  Technologies as BFFTechnologies
 } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
 
@@ -120,7 +133,7 @@ export async function workspaceConfigInitializer(
 
   await appStateService.isAuthenticated$.isInitialized
 
-  const loadWorkspaceConfigResponse = await firstValueFrom(
+  const loadWorkspaceConfigResponse: LoadWorkspaceConfigResponse = await firstValueFrom(
     workspaceConfigBffService
       .loadWorkspaceConfig({
         path: getLocation().applicationPath
@@ -132,28 +145,29 @@ export async function workspaceConfigInitializer(
   )
 
   if (loadWorkspaceConfigResponse) {
-    const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-      string,
-      Record<string, string>
-    >
-
-    const themeWithParsedProperties = {
-      ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties
-    }
-
+    const mappedComponents = loadWorkspaceConfigResponse.components.map((component) => {
+      const technology =
+        component.technology !== BFFTechnologies.WebComponent
+          ? (component.technology ?? LibTechnologies.WebComponentModule)
+          : LibTechnologies.WebComponentModule
+      return {
+        ...component,
+        remoteName: component.remoteName ?? '',
+        technology: technology as LibTechnologies
+      }
+    })
     await Promise.all([
       publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      applyThemeVariables(themeService, themeWithParsedProperties),
+      applyThemeVariables(themeService, loadWorkspaceConfigResponse.theme),
       remoteComponentsService.remoteComponents$.publish({
-        components: loadWorkspaceConfigResponse.components,
+        components: mappedComponents,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
-      })
+      }),
+      parametersService.initialize()
     ])
-    parametersService.initialize()
   }
 }
 
@@ -313,18 +327,76 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
+function applyThemeV2Variables(theme: ThemePropertiesV2, path: string[] = ['--onecx-theme']): void {
+  if (theme === null || theme === undefined) {
+    return
+  }
+  if (typeof theme === 'object' && !Array.isArray(theme)) {
+    for (const [key, value] of Object.entries(theme)) {
+      applyThemeV2Variables(value as ThemePropertiesV2, [...path, key])
+    }
+  } else {
+    document.documentElement.style.setProperty(path.join('-'), String(theme))
+  }
+}
+
 export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
-  console.log(`🎨 Applying theme: ${theme.name}`)
-  await themeService.currentTheme$.publish(theme)
-  if (theme.properties) {
-    for (const group of Object.values(theme.properties)) {
+  let libThemeV1: LibTheme | undefined
+  let libThemeV2: ThemePropertiesV2 | undefined
+  let receivedThemeVersions: Array<1 | 2> = []
+  if (theme.properties.includes('\\"usages\\":')) {
+    // themeSchema is an extremely deep z.ZodObject; resolving its method
+    // signatures triggers TS2589. Erase its type before invoking safeParse and
+    // re-type only the result against the manually maintained ThemeProperties.
+    const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
+    if (!parseResult.success) {
+      console.error('Failed to parse theme v2 properties:', parseResult.error)
+      return
+    }
+    libThemeV2 = parseResult.data.v2
+    libThemeV1 = {
+      ...theme,
+      properties: parseResult.data.v1 ?? {}
+    }
+    receivedThemeVersions = [2]
+    if (parseResult.data.v1) {
+      receivedThemeVersions.unshift(1)
+    }
+  } else {
+    const parsedProperties = JSON.parse(theme.properties) as Record<string, Record<string, string>>
+    receivedThemeVersions = [1]
+    libThemeV1 = {
+      ...theme,
+      properties: parsedProperties
+    }
+  }
+
+  console.log(`🎨 Applying theme: ${libThemeV1.name}`)
+
+  await (themeService.currentThemes$ as CurrentThemesTopic).publish({
+    ...theme,
+    properties: {
+      v1: libThemeV1.properties,
+      v2: libThemeV2
+    },
+    versions: receivedThemeVersions
+  })
+
+  await themeService.currentTheme$.publish(libThemeV1)
+  if (libThemeV1.properties) {
+    for (const group of Object.values(libThemeV1.properties)) {
       for (const [key, value] of Object.entries(group)) {
         document.documentElement.style.setProperty(`--${key}`, value)
       }
     }
   }
-  if (theme.overrides && theme.overrides.length > 0) {
-    theme.overrides
+
+  if (libThemeV2) {
+    applyThemeV2Variables(libThemeV2)
+  }
+
+  if (libThemeV1.overrides && libThemeV1.overrides.length > 0) {
+    libThemeV1.overrides
       .filter((ov) => ov.type === OverrideType.CSS)
       .forEach((override) => {
         if (override.value) {

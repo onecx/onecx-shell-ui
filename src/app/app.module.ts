@@ -336,7 +336,11 @@ function applyThemeV2Variables(theme: ThemePropertiesV2, path: string[] = ['--on
       applyThemeV2Variables(value as ThemePropertiesV2, [...path, key])
     }
   } else {
-    document.documentElement.style.setProperty(path.join('-'), String(theme))
+    const resolved = String(theme).replace(
+      /\{\{([^}]+)\}\}/g,
+      (_, referencePath: string) => `var(--onecx-theme-${referencePath.split('.').join('-')})`
+    )
+    document.documentElement.style.setProperty(path.join('-'), resolved)
   }
 }
 

@@ -92,7 +92,7 @@ export class ThemeApplyService {
   }
 
   private isV2ThemeProperties(raw: string): boolean {
-    return raw.includes('\\"usages\\":')
+    return raw.match(/"v2":\s*\{/) !== null
   }
 
   private applyThemeV1Variables(properties: Record<string, Record<string, string>>): void {

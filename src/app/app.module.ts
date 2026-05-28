@@ -15,7 +15,6 @@ import {
   ConfigurationService,
   POLYFILL_SCOPE_MODE,
   RemoteComponentsService,
-  ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
 import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
@@ -29,14 +28,19 @@ import {
 } from '@onecx/angular-utils'
 import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
 
-import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import {
+  CurrentLocationTopic,
+  EventsTopic,
+  Technologies as LibTechnologies,
+  UserProfile
+} from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  OverrideType,
   UserProfileBffService,
-  WorkspaceConfigBffService
+  WorkspaceConfigBffService,
+  Technologies as BFFTechnologies
 } from 'src/app/shared/generated'
 import { environment } from 'src/environments/environment'
 
@@ -54,8 +58,8 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
-import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
+import { ThemeApplyService } from './shell/services/theme-apply.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -108,7 +112,7 @@ function publishCurrentWorkspace(
 export async function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
-  themeService: ThemeService,
+  themeApplyService: ThemeApplyService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
   parametersService: ParametersService,
@@ -120,7 +124,7 @@ export async function workspaceConfigInitializer(
 
   await appStateService.isAuthenticated$.isInitialized
 
-  const loadWorkspaceConfigResponse = await firstValueFrom(
+  const loadWorkspaceConfigResponse: LoadWorkspaceConfigResponse = await firstValueFrom(
     workspaceConfigBffService
       .loadWorkspaceConfig({
         path: getLocation().applicationPath
@@ -132,28 +136,29 @@ export async function workspaceConfigInitializer(
   )
 
   if (loadWorkspaceConfigResponse) {
-    const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-      string,
-      Record<string, string>
-    >
-
-    const themeWithParsedProperties = {
-      ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties
-    }
-
+    const mappedComponents = loadWorkspaceConfigResponse.components.map((component) => {
+      const technology =
+        component.technology !== BFFTechnologies.WebComponent
+          ? (component.technology ?? LibTechnologies.WebComponentModule)
+          : LibTechnologies.WebComponentModule
+      return {
+        ...component,
+        remoteName: component.remoteName ?? '',
+        technology: technology as LibTechnologies
+      }
+    })
     await Promise.all([
       publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      applyThemeVariables(themeService, themeWithParsedProperties),
+      themeApplyService.applyTheme(loadWorkspaceConfigResponse.theme),
       remoteComponentsService.remoteComponents$.publish({
-        components: loadWorkspaceConfigResponse.components,
+        components: mappedComponents,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
-      })
+      }),
+      parametersService.initialize()
     ])
-    parametersService.initialize()
   }
 }
 
@@ -313,31 +318,6 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
-  console.log(`🎨 Applying theme: ${theme.name}`)
-  await themeService.currentTheme$.publish(theme)
-  if (theme.properties) {
-    for (const group of Object.values(theme.properties)) {
-      for (const [key, value] of Object.entries(group)) {
-        document.documentElement.style.setProperty(`--${key}`, value)
-      }
-    }
-  }
-  if (theme.overrides && theme.overrides.length > 0) {
-    theme.overrides
-      .filter((ov) => ov.type === OverrideType.CSS)
-      .forEach((override) => {
-        if (override.value) {
-          const el = document.createElement('style')
-          el.dataset['cssOverrides'] = ''
-          el.dataset[MARKED_AS_WRAPPED] = ''
-          el.append(override.value)
-          document.head.appendChild(el)
-        }
-      })
-  }
-}
-
 declare global {
   interface Window {
     onecxWebpackContainer: any
@@ -367,7 +347,7 @@ export async function shareMfContainer() {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),
         inject(RoutesService),
-        inject(ThemeService),
+        inject(ThemeApplyService),
         inject(AppStateService),
         inject(RemoteComponentsService),
         inject(ParametersService),

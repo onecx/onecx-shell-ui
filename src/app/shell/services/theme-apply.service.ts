@@ -34,6 +34,11 @@ export class ThemeApplyService {
 
     console.log(`🎨 Applying theme: ${libThemeV1.name}`)
 
+    document.documentElement.style.setProperty(
+      'color-scheme',
+      receivedThemeVersions.includes(2) ? 'light dark' : 'only light'
+    )
+
     await (this.themeService.currentThemes$ as CurrentThemesTopic).publish({
       ...theme,
       customCssVariables,
@@ -103,16 +108,33 @@ export class ThemeApplyService {
       return
     }
     if (typeof theme === 'object' && !Array.isArray(theme)) {
-      for (const [key, value] of Object.entries(theme)) {
-        this.applyThemeV2Variables(value as ThemePropertiesV2, [...path, key])
+      if (this.isLightDarkObject(theme)) {
+        const varName = path.join('-')
+        const lightResolved = this.resolveThemeRefs(String((theme as any).light))
+        const darkResolved = this.resolveThemeRefs(String((theme as any).dark))
+        document.documentElement.style.setProperty(`${varName}-light`, lightResolved)
+        document.documentElement.style.setProperty(`${varName}-dark`, darkResolved)
+        document.documentElement.style.setProperty(varName, `light-dark(var(${varName}-light), var(${varName}-dark))`)
+      } else {
+        for (const [key, value] of Object.entries(theme)) {
+          this.applyThemeV2Variables(value as ThemePropertiesV2, [...path, key])
+        }
       }
     } else {
-      const resolved = String(theme).replace(
-        /\{\{([^}]+)\}\}/g,
-        (_, referencePath: string) => `var(--onecx-theme-${referencePath.split('.').join('-')})`
-      )
+      const resolved = this.resolveThemeRefs(String(theme))
       document.documentElement.style.setProperty(path.join('-'), resolved)
     }
+  }
+
+  private isLightDarkObject(obj: object): obj is { light: string; dark: string } {
+    return 'light' in obj && 'dark' in obj
+  }
+
+  private resolveThemeRefs(value: string): string {
+    return value.replace(
+      /\{\{([^}]+)\}\}/g,
+      (_, referencePath: string) => `var(--onecx-theme-${referencePath.split('.').join('-')})`
+    )
   }
 
   private applyCssOverrides(overrides: Array<ThemeOverride>): void {

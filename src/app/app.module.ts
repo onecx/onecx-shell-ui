@@ -7,7 +7,6 @@ import { provideMissingTranslationHandler, provideTranslateLoader, provideTransl
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideTokenInterceptor } from '@onecx/angular-auth'
 import { provideAuthService } from '@onecx/shell-auth'
-import { ZodSafeParseResult } from 'zod'
 
 import {
   APP_CONFIG,
@@ -16,7 +15,6 @@ import {
   ConfigurationService,
   POLYFILL_SCOPE_MODE,
   RemoteComponentsService,
-  ThemeService,
   UserService
 } from '@onecx/angular-integration-interface'
 import { SLOT_SERVICE, SlotService } from '@onecx/angular-remote-components'
@@ -34,19 +32,12 @@ import {
   CurrentLocationTopic,
   EventsTopic,
   Technologies as LibTechnologies,
-  UserProfile,
-  Theme as LibTheme,
-  theme as themeSchema,
-  ThemePropertiesV2,
-  ThemeProperties,
-  CurrentThemesTopic
+  UserProfile
 } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  OverrideType,
-  Theme,
   UserProfileBffService,
   WorkspaceConfigBffService,
   Technologies as BFFTechnologies
@@ -67,8 +58,8 @@ import { PortalViewportComponent } from './shell/components/portal-viewport/port
 import { ParametersService } from './shell/services/parameters.service'
 import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
-import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
+import { ThemeApplyService } from './shell/services/theme-apply.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -121,7 +112,7 @@ function publishCurrentWorkspace(
 export async function workspaceConfigInitializer(
   workspaceConfigBffService: WorkspaceConfigBffService,
   routesService: RoutesService,
-  themeService: ThemeService,
+  themeApplyService: ThemeApplyService,
   appStateService: AppStateService,
   remoteComponentsService: RemoteComponentsService,
   parametersService: ParametersService,
@@ -161,7 +152,7 @@ export async function workspaceConfigInitializer(
       routesService
         .init(loadWorkspaceConfigResponse.routes)
         .then(urlChangeListenerInitializer(router, appStateService)),
-      applyThemeVariables(themeService, loadWorkspaceConfigResponse.theme),
+      themeApplyService.applyTheme(loadWorkspaceConfigResponse.theme),
       remoteComponentsService.remoteComponents$.publish({
         components: mappedComponents,
         slots: mapSlots(loadWorkspaceConfigResponse.slots)
@@ -327,93 +318,6 @@ export function urlChangeListenerInitializer(router: Router, appStateService: Ap
   }
 }
 
-function applyThemeV2Variables(theme: ThemePropertiesV2, path: string[] = ['--onecx-theme']): void {
-  if (theme === null || theme === undefined) {
-    return
-  }
-  if (typeof theme === 'object' && !Array.isArray(theme)) {
-    for (const [key, value] of Object.entries(theme)) {
-      applyThemeV2Variables(value as ThemePropertiesV2, [...path, key])
-    }
-  } else {
-    const resolved = String(theme).replace(
-      /\{\{([^}]+)\}\}/g,
-      (_, referencePath: string) => `var(--onecx-theme-${referencePath.split('.').join('-')})`
-    )
-    document.documentElement.style.setProperty(path.join('-'), resolved)
-  }
-}
-
-export async function applyThemeVariables(themeService: ThemeService, theme: Theme): Promise<void> {
-  let libThemeV1: LibTheme | undefined
-  let libThemeV2: ThemePropertiesV2 | undefined
-  let receivedThemeVersions: Array<1 | 2> = []
-  if (theme.properties.includes('\\"usages\\":')) {
-    // themeSchema is an extremely deep z.ZodObject; resolving its method
-    // signatures triggers TS2589. Erase its type before invoking safeParse and
-    // re-type only the result against the manually maintained ThemeProperties.
-    const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
-    if (!parseResult.success) {
-      console.error('Failed to parse theme v2 properties:', parseResult.error)
-      return
-    }
-    libThemeV2 = parseResult.data.v2
-    libThemeV1 = {
-      ...theme,
-      properties: parseResult.data.v1 ?? {}
-    }
-    receivedThemeVersions = [2]
-    if (parseResult.data.v1) {
-      receivedThemeVersions.unshift(1)
-    }
-  } else {
-    const parsedProperties = JSON.parse(theme.properties) as Record<string, Record<string, string>>
-    receivedThemeVersions = [1]
-    libThemeV1 = {
-      ...theme,
-      properties: parsedProperties
-    }
-  }
-
-  console.log(`🎨 Applying theme: ${libThemeV1.name}`)
-
-  await (themeService.currentThemes$ as CurrentThemesTopic).publish({
-    ...theme,
-    properties: {
-      v1: libThemeV1.properties,
-      v2: libThemeV2
-    },
-    versions: receivedThemeVersions
-  })
-
-  await themeService.currentTheme$.publish(libThemeV1)
-  if (libThemeV1.properties) {
-    for (const group of Object.values(libThemeV1.properties)) {
-      for (const [key, value] of Object.entries(group)) {
-        document.documentElement.style.setProperty(`--${key}`, value)
-      }
-    }
-  }
-
-  if (libThemeV2) {
-    applyThemeV2Variables(libThemeV2)
-  }
-
-  if (libThemeV1.overrides && libThemeV1.overrides.length > 0) {
-    libThemeV1.overrides
-      .filter((ov) => ov.type === OverrideType.CSS)
-      .forEach((override) => {
-        if (override.value) {
-          const el = document.createElement('style')
-          el.dataset['cssOverrides'] = ''
-          el.dataset[MARKED_AS_WRAPPED] = ''
-          el.append(override.value)
-          document.head.appendChild(el)
-        }
-      })
-  }
-}
-
 declare global {
   interface Window {
     onecxWebpackContainer: any
@@ -443,7 +347,7 @@ export async function shareMfContainer() {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),
         inject(RoutesService),
-        inject(ThemeService),
+        inject(ThemeApplyService),
         inject(AppStateService),
         inject(RemoteComponentsService),
         inject(ParametersService),

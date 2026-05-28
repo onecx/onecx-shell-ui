@@ -10,86 +10,89 @@ import {
   ThemePropertiesV2
 } from '@onecx/integration-interface'
 
-import { OverrideType, Theme } from 'src/app/shared/generated'
+import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
 import { MARKED_AS_WRAPPED } from '../utils/styles/shared-styles-host-overwrites.utils'
+
+interface ParsedTheme {
+  libThemeV1: LibTheme
+  libThemeV2: ThemePropertiesV2 | undefined
+  receivedThemeVersions: Array<1 | 2>
+}
 
 @Injectable({ providedIn: 'root' })
 export class ThemeApplyService {
   private readonly themeService = inject(ThemeService)
 
   async applyTheme(theme: Theme): Promise<void> {
-    let libThemeV1: LibTheme | undefined
-    let libThemeV2: ThemePropertiesV2 | undefined
-    const customCssVariables = theme.customCssVariables ? JSON.parse(theme.customCssVariables) as Record<string, string> : undefined
-    let receivedThemeVersions: Array<1 | 2> = []
-    if (theme.properties.includes('\\"usages\\":')) {
-      // themeSchema is an extremely deep z.ZodObject; resolving its method
-      // signatures triggers TS2589. Erase its type before invoking safeParse and
-      // re-type only the result against the manually maintained ThemeProperties.
-      const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
-      if (!parseResult.success) {
-        console.error('Failed to parse theme v2 properties:', parseResult.error)
-        return
-      }
-      libThemeV2 = parseResult.data.v2
-      libThemeV1 = {
-        ...theme,
-        properties: parseResult.data.v1 ?? {}
-      }
-      receivedThemeVersions = [2]
-      if (parseResult.data.v1) {
-        receivedThemeVersions.unshift(1)
-      }
-    } else {
-      const parsedProperties = JSON.parse(theme.properties) as Record<string, Record<string, string>>
-      receivedThemeVersions = [1]
-      libThemeV1 = {
-        ...theme,
-        properties: parsedProperties
-      }
-    }
+    const parsed = this.parseThemeProperties(theme)
+    if (!parsed) return
+
+    const { libThemeV1, libThemeV2, receivedThemeVersions } = parsed
+    const customCssVariables = theme.customCssVariables
+      ? (JSON.parse(theme.customCssVariables) as Record<string, string>)
+      : undefined
 
     console.log(`🎨 Applying theme: ${libThemeV1.name}`)
 
     await (this.themeService.currentThemes$ as CurrentThemesTopic).publish({
       ...theme,
       customCssVariables,
-      properties: {
-        v1: libThemeV1.properties,
-        v2: libThemeV2
-      },
+      properties: { v1: libThemeV1.properties, v2: libThemeV2 },
       versions: receivedThemeVersions
     })
 
     await this.themeService.currentTheme$.publish(libThemeV1)
-    if (libThemeV1.properties) {
-      for (const group of Object.values(libThemeV1.properties)) {
-        for (const [key, value] of Object.entries(group)) {
-          document.documentElement.style.setProperty(`--${key}`, value)
-        }
-      }
-    }
 
+    if (libThemeV1.properties) {
+      this.applyThemeV1Variables(libThemeV1.properties)
+    }
     if (libThemeV2) {
       this.applyThemeV2Variables(libThemeV2)
     }
+    if (theme.overrides?.length) {
+      this.applyCssOverrides(theme.overrides)
+    }
+    if (customCssVariables) {
+      this.applyCustomCssVariables(customCssVariables)
+    }
+  }
 
-    if (libThemeV1.overrides && libThemeV1.overrides.length > 0) {
-      libThemeV1.overrides
-        .filter((ov) => ov.type === OverrideType.CSS)
-        .forEach((override) => {
-          if (override.value) {
-            const el = document.createElement('style')
-            el.dataset['cssOverrides'] = ''
-            el.dataset[MARKED_AS_WRAPPED] = ''
-            el.append(override.value)
-            document.head.appendChild(el)
-          }
-        })
+  private parseThemeProperties(theme: Theme): ParsedTheme | undefined {
+    if (this.isV2ThemeProperties(theme.properties)) {
+      // themeSchema is an extremely deep z.ZodObject; resolving its method
+      // signatures triggers TS2589. Erase its type before invoking safeParse and
+      // re-type only the result against the manually maintained ThemeProperties.
+      const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
+      if (!parseResult.success) {
+        console.error('Failed to parse theme v2 properties:', parseResult.error)
+        return undefined
+      }
+
+      const receivedThemeVersions: Array<1 | 2> = []
+      if (parseResult.data.v1) receivedThemeVersions.push(1)
+      receivedThemeVersions.push(2)
+
+      return {
+        libThemeV1: { ...theme, properties: parseResult.data.v1 ?? {} },
+        libThemeV2: parseResult.data.v2,
+        receivedThemeVersions
+      }
     }
 
-    if (customCssVariables) {
-      for (const [key, value] of Object.entries(customCssVariables)) {
+    return {
+      libThemeV1: { ...theme, properties: JSON.parse(theme.properties) as Record<string, Record<string, string>> },
+      libThemeV2: undefined,
+      receivedThemeVersions: [1]
+    }
+  }
+
+  private isV2ThemeProperties(raw: string): boolean {
+    return raw.includes('\\"usages\\":')
+  }
+
+  private applyThemeV1Variables(properties: Record<string, Record<string, string>>): void {
+    for (const group of Object.values(properties)) {
+      for (const [key, value] of Object.entries(group)) {
         document.documentElement.style.setProperty(`--${key}`, value)
       }
     }
@@ -109,6 +112,26 @@ export class ThemeApplyService {
         (_, referencePath: string) => `var(--onecx-theme-${referencePath.split('.').join('-')})`
       )
       document.documentElement.style.setProperty(path.join('-'), resolved)
+    }
+  }
+
+  private applyCssOverrides(overrides: Array<ThemeOverride>): void {
+    overrides
+      .filter((ov) => ov.type === OverrideType.CSS && ov.value)
+      .forEach((override) => {
+        if (override.value) {
+          const el = document.createElement('style')
+          el.dataset['cssOverrides'] = ''
+          el.dataset[MARKED_AS_WRAPPED] = ''
+          el.append(override.value)
+          document.head.appendChild(el)
+        }
+      })
+  }
+
+  private applyCustomCssVariables(variables: Record<string, string>): void {
+    for (const [key, value] of Object.entries(variables)) {
+      document.documentElement.style.setProperty(`--${key}`, value)
     }
   }
 }

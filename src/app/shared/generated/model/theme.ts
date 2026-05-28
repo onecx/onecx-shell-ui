@@ -24,6 +24,7 @@ export interface Theme {
     previewImageUrl?: string;
     assetsUpdateDate?: string;
     properties: string;
+    customCssVariables?: string;
     overrides?: Array<ThemeOverride>;
 }
 

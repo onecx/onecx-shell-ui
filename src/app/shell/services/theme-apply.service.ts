@@ -20,6 +20,7 @@ export class ThemeApplyService {
   async applyTheme(theme: Theme): Promise<void> {
     let libThemeV1: LibTheme | undefined
     let libThemeV2: ThemePropertiesV2 | undefined
+    const customCssVariables = theme.customCssVariables ? JSON.parse(theme.customCssVariables) as Record<string, string> : undefined
     let receivedThemeVersions: Array<1 | 2> = []
     if (theme.properties.includes('\\"usages\\":')) {
       // themeSchema is an extremely deep z.ZodObject; resolving its method
@@ -52,6 +53,7 @@ export class ThemeApplyService {
 
     await (this.themeService.currentThemes$ as CurrentThemesTopic).publish({
       ...theme,
+      customCssVariables,
       properties: {
         v1: libThemeV1.properties,
         v2: libThemeV2
@@ -84,6 +86,12 @@ export class ThemeApplyService {
             document.head.appendChild(el)
           }
         })
+    }
+
+    if (customCssVariables) {
+      for (const [key, value] of Object.entries(customCssVariables)) {
+        document.documentElement.style.setProperty(`--${key}`, value)
+      }
     }
   }
 

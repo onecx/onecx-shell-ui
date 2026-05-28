@@ -205,4 +205,57 @@ describe('ThemeApplyService', () => {
       expect(document.head.querySelectorAll('style[data-css-overrides]')).toHaveLength(0)
     })
   })
+
+  describe('customCssVariables', () => {
+    it('parses, publishes and applies custom CSS variables when present', async () => {
+      const customCssVariables = { 'my-var': '#abcdef', 'other-var': '12px' }
+      const theme = baseTheme({
+        properties: JSON.stringify({}),
+        customCssVariables: JSON.stringify(customCssVariables)
+      })
+
+      const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
+
+      await service.applyTheme(theme)
+
+      expect(publishThemes).toHaveBeenCalledWith(expect.objectContaining({ customCssVariables }))
+      expect(document.documentElement.style.getPropertyValue('--my-var')).toBe('#abcdef')
+      expect(document.documentElement.style.getPropertyValue('--other-var')).toBe('12px')
+    })
+
+    it('publishes undefined customCssVariables when the field is absent', async () => {
+      const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
+
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}) }))
+
+      expect(publishThemes).toHaveBeenCalledWith(expect.objectContaining({ customCssVariables: undefined }))
+    })
+
+    it('skips setting CSS variables when parsed v1 properties are falsy', async () => {
+      const theme = baseTheme({ properties: 'null' })
+      const setPropertySpy = jest.spyOn(document.documentElement.style, 'setProperty')
+
+      await service.applyTheme(theme)
+
+      expect(setPropertySpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('applyThemeV2Variables edge cases', () => {
+    it('skips null and undefined nested values without setting CSS variables', async () => {
+      const v2 = {
+        color: { primary: null, secondary: undefined, tertiary: '#abcdef' }
+      }
+      jest.spyOn(themeSchema as any, 'safeParse').mockReturnValue({
+        success: true,
+        data: { v1: undefined, v2 }
+      })
+
+      await service.applyTheme(baseTheme({ properties: '\\"usages\\":' }))
+
+      expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-primary')).toBe('')
+      expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-secondary')).toBe('')
+      expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-tertiary')).toBe('#abcdef')
+    })
+  })
 })

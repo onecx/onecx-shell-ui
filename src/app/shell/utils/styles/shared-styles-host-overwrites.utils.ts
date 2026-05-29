@@ -1,5 +1,6 @@
 import { DynamicAppId } from '@onecx/angular-webcomponents'
-import { getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
+import { markElement } from './style-data.utils'
+import { getStyleDataOrIntermediateStyleData } from '@onecx/angular-utils/style'
 
 export const MARKED_FOR_WRAPPING = 'markedForWrapping'
 export const MARKED_AS_WRAPPED = 'markedAsWrapped'

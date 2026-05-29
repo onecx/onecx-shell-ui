@@ -69,10 +69,10 @@ const mfConfig: ModuleFederationOptions = {
       requiredVersion: dependencies['@onecx/integration-interface'],
       shareScope: 'react_19'
     },
-    // '@onecx/react-utils': {
-    //   requiredVersion: dependencies['@onecx/react-utils'],
-    //   shareScope: 'react_19'
-    // },
+    '@onecx/react-utils': {
+      requiredVersion: dependencies['@onecx/react-utils'],
+      shareScope: 'react_19'
+    },
     '@onecx/react-remote-components': {
       requiredVersion: dependencies['@onecx/react-remote-components'],
       shareScope: 'react_19'

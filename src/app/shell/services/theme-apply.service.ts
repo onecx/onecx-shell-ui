@@ -8,6 +8,7 @@ import {
   FontSourceDefinition,
   Theme as LibTheme,
   theme as themeSchema,
+  fontDefinitions as fontDefinitionSchema,
   ThemeProperties,
   ThemePropertiesV2
 } from '@onecx/integration-interface'
@@ -30,10 +31,8 @@ export class ThemeApplyService {
     if (!parsed) return
 
     const { libThemeV1, libThemeV2, receivedThemeVersions } = parsed
-    const customCssVariables = theme.customCssVariables
-      ? (JSON.parse(theme.customCssVariables) as Record<string, string>)
-      : undefined
-    const fonts = theme.fonts ? (JSON.parse(theme.fonts) as FontDefinition[]) : undefined
+    const customCssVariables = this.parseCustomCssVariables(theme.customCssVariables)
+    const fonts = this.parseFonts(theme.fonts)
 
     console.log(`🎨 Applying theme: ${libThemeV1.name}`)
 
@@ -69,12 +68,50 @@ export class ThemeApplyService {
     }
   }
 
+  private parseCustomCssVariables(raw: string | undefined): Record<string, string> | undefined {
+    if (!raw) {
+      return undefined
+    }
+    try {
+      return JSON.parse(raw) as Record<string, string>
+    } catch (err) {
+      console.error('Failed to parse theme customCssVariables:', err)
+      return undefined
+    }
+  }
+
+  private parseFonts(raw: string | undefined): FontDefinition[] | undefined {
+    if (!raw) {
+      return undefined
+    }
+    let parsedJson: unknown
+    try {
+      parsedJson = JSON.parse(raw)
+    } catch (err) {
+      console.error('Failed to parse theme fonts as JSON:', err)
+      return undefined
+    }
+    const parseResult = fontDefinitionSchema.safeParse(parsedJson)
+    if (!parseResult.success) {
+      console.error('Failed to parse theme fonts:', parseResult.error)
+      return undefined
+    }
+    return parseResult.data
+  }
+
   private parseThemeProperties(theme: Theme): ParsedTheme | undefined {
     if (this.isV2ThemeProperties(theme.properties)) {
       // themeSchema is an extremely deep z.ZodObject; resolving its method
       // signatures triggers TS2589. Erase its type before invoking safeParse and
       // re-type only the result against the manually maintained ThemeProperties.
-      const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
+      let parsedJson: unknown
+      try {
+        parsedJson = JSON.parse(theme.properties)
+      } catch (err) {
+        console.error('Failed to parse theme properties as JSON:', err)
+        return undefined
+      }
+      const parseResult = (themeSchema as any).safeParse(parsedJson) as ZodSafeParseResult<ThemeProperties>
       if (!parseResult.success) {
         console.error('Failed to parse theme v2 properties:', parseResult.error)
         return undefined
@@ -197,15 +234,12 @@ export class ThemeApplyService {
       ascentOverride: 'ascent-override',
       descentOverride: 'descent-override',
       lineGapOverride: 'line-gap-override',
-      sizeAdjust: 'size-adjust',
+      sizeAdjust: 'size-adjust'
     }
 
     const rules = fonts
       .map((font) => {
-        const lines: string[] = [
-          `  font-family: "${font.fontFamily}";`,
-          `  src: ${this.resolveFontSrc(font.src)};`,
-        ]
+        const lines: string[] = [`  font-family: "${font.fontFamily}";`, `  src: ${this.resolveFontSrc(font.src)};`]
         for (const [prop, descriptor] of Object.entries(descriptorMap)) {
           const value = (font as unknown as Record<string, unknown>)[prop]
           if (value !== undefined) {

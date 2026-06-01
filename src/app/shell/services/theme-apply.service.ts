@@ -239,7 +239,11 @@ export class ThemeApplyService {
 
     const rules = fonts
       .map((font) => {
-        const lines: string[] = [`  font-family: "${font.fontFamily}";`, `  src: ${this.resolveFontSrc(font.src)};`]
+        const resolvedSrc = this.resolveFontSrc(font.src)
+        if (!resolvedSrc) {
+          return ''
+        }
+        const lines: string[] = [`  font-family: "${font.fontFamily}";`, `  src: ${resolvedSrc};`]
         for (const [prop, descriptor] of Object.entries(descriptorMap)) {
           const value = (font as unknown as Record<string, unknown>)[prop]
           if (value !== undefined) {
@@ -250,6 +254,7 @@ export class ThemeApplyService {
 ${lines.join('\n')}
 }`
       })
+      .filter(Boolean)
       .join('\n')
 
     const el = document.createElement('style')

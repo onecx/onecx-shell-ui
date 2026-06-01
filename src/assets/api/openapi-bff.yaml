@@ -521,6 +521,8 @@ components:
           type: string
         customCssVariables:
           type: string
+        fonts:
+          type: string
         overrides:
           type: array
           items:

@@ -4,6 +4,8 @@ import { ZodSafeParseResult } from 'zod'
 import { ThemeService } from '@onecx/angular-integration-interface'
 import {
   CurrentThemesTopic,
+  FontDefinition,
+  FontSourceDefinition,
   Theme as LibTheme,
   theme as themeSchema,
   ThemeProperties,
@@ -31,6 +33,7 @@ export class ThemeApplyService {
     const customCssVariables = theme.customCssVariables
       ? (JSON.parse(theme.customCssVariables) as Record<string, string>)
       : undefined
+    const fonts = theme.fonts ? (JSON.parse(theme.fonts) as FontDefinition[]) : undefined
 
     console.log(`🎨 Applying theme: ${libThemeV1.name}`)
 
@@ -42,6 +45,7 @@ export class ThemeApplyService {
     await (this.themeService.currentThemes$ as CurrentThemesTopic).publish({
       ...theme,
       customCssVariables,
+      fonts,
       properties: { v1: libThemeV1.properties, v2: libThemeV2 },
       versions: receivedThemeVersions
     })
@@ -59,6 +63,9 @@ export class ThemeApplyService {
     }
     if (customCssVariables) {
       this.applyCustomCssVariables(customCssVariables)
+    }
+    if (fonts?.length) {
+      this.applyFonts(fonts)
     }
   }
 
@@ -155,5 +162,66 @@ export class ThemeApplyService {
     for (const [key, value] of Object.entries(variables)) {
       document.documentElement.style.setProperty(`--${key}`, value)
     }
+  }
+
+  private resolveFontSrc(src: string | FontSourceDefinition | FontSourceDefinition[]): string {
+    if (typeof src === 'string') {
+      return src
+    }
+    const entries = Array.isArray(src) ? src : [src]
+    return entries
+      .map((entry) => {
+        if (entry.local) {
+          return entry.format ? `local("${entry.local}") format("${entry.format}")` : `local("${entry.local}")`
+        }
+        if (entry.url) {
+          return entry.format ? `url("${entry.url}") format("${entry.format}")` : `url("${entry.url}")`
+        }
+        return ''
+      })
+      .filter(Boolean)
+      .join(', ')
+  }
+
+  private applyFonts(fonts: FontDefinition[]): void {
+    document.head.querySelectorAll('style[data-theme-fonts]').forEach((el) => el.remove())
+
+    const descriptorMap: Record<string, string> = {
+      fontDisplay: 'font-display',
+      fontStretch: 'font-stretch',
+      fontStyle: 'font-style',
+      fontWeight: 'font-weight',
+      fontFeatureSettings: 'font-feature-settings',
+      fontVariationSettings: 'font-variation-settings',
+      unicodeRange: 'unicode-range',
+      ascentOverride: 'ascent-override',
+      descentOverride: 'descent-override',
+      lineGapOverride: 'line-gap-override',
+      sizeAdjust: 'size-adjust',
+    }
+
+    const rules = fonts
+      .map((font) => {
+        const lines: string[] = [
+          `  font-family: "${font.fontFamily}";`,
+          `  src: ${this.resolveFontSrc(font.src)};`,
+        ]
+        for (const [prop, descriptor] of Object.entries(descriptorMap)) {
+          const value = (font as unknown as Record<string, unknown>)[prop]
+          if (value !== undefined) {
+            lines.push(`  ${descriptor}: ${value as string};`)
+          }
+        }
+        return `@font-face {
+${lines.join('\n')}
+}`
+      })
+      .join('\n')
+
+    const el = document.createElement('style')
+    el.dataset['themeFonts'] = ''
+    el.dataset[MARKED_AS_WRAPPED] = ''
+    el.append(rules)
+    document.head.appendChild(el)
   }
 }

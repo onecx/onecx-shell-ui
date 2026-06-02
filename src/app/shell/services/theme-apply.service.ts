@@ -1,10 +1,9 @@
 import { inject, Injectable } from '@angular/core'
-import { ZodSafeParseResult } from 'zod'
+import * as z from 'zod'
 
 import { ThemeService } from '@onecx/angular-integration-interface'
 import {
   CurrentThemesTopic,
-  FontDefinition,
   FontSourceDefinition,
   Theme as LibTheme,
   theme as themeSchema,
@@ -80,7 +79,7 @@ export class ThemeApplyService {
     }
   }
 
-  private parseFonts(raw: string | undefined): FontDefinition[] | undefined {
+  private parseFonts(raw: string | undefined): z.infer<typeof fontDefinitionSchema> | undefined {
     if (!raw) {
       return undefined
     }
@@ -111,7 +110,7 @@ export class ThemeApplyService {
         console.error('Failed to parse theme properties as JSON:', err)
         return undefined
       }
-      const parseResult = (themeSchema as any).safeParse(parsedJson) as ZodSafeParseResult<ThemeProperties>
+      const parseResult = (themeSchema as any).safeParse(parsedJson) as z.ZodSafeParseResult<ThemeProperties>
       if (!parseResult.success) {
         console.error('Failed to parse theme v2 properties:', parseResult.error)
         return undefined
@@ -220,22 +219,10 @@ export class ThemeApplyService {
       .join(', ')
   }
 
-  private applyFonts(fonts: FontDefinition[]): void {
+  private applyFonts(fonts: z.infer<typeof fontDefinitionSchema>): void {
     document.head.querySelectorAll('style[data-theme-fonts]').forEach((el) => el.remove())
 
-    const descriptorMap: Record<string, string> = {
-      fontDisplay: 'font-display',
-      fontStretch: 'font-stretch',
-      fontStyle: 'font-style',
-      fontWeight: 'font-weight',
-      fontFeatureSettings: 'font-feature-settings',
-      fontVariationSettings: 'font-variation-settings',
-      unicodeRange: 'unicode-range',
-      ascentOverride: 'ascent-override',
-      descentOverride: 'descent-override',
-      lineGapOverride: 'line-gap-override',
-      sizeAdjust: 'size-adjust'
-    }
+    const descriptorMap: Record<string, string> = this.getDescriptorMappings()
 
     const rules = fonts
       .map((font) => {
@@ -262,5 +249,21 @@ ${lines.join('\n')}
     el.dataset[MARKED_AS_WRAPPED] = ''
     el.append(rules)
     document.head.appendChild(el)
+  }
+
+  private getDescriptorMappings(): Record<string, string> {
+    return {
+      fontDisplay: 'font-display',
+      fontStretch: 'font-stretch',
+      fontStyle: 'font-style',
+      fontWeight: 'font-weight',
+      fontFeatureSettings: 'font-feature-settings',
+      fontVariationSettings: 'font-variation-settings',
+      unicodeRange: 'unicode-range',
+      ascentOverride: 'ascent-override',
+      descentOverride: 'descent-override',
+      lineGapOverride: 'line-gap-override',
+      sizeAdjust: 'size-adjust'
+    }
   }
 }

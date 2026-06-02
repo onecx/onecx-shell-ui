@@ -4,12 +4,12 @@ import * as z from 'zod'
 import { ThemeService } from '@onecx/angular-integration-interface'
 import {
   CurrentThemesTopic,
-  FontSourceDefinition,
   Theme as LibTheme,
   theme as themeSchema,
   fontDefinitions as fontDefinitionSchema,
   ThemeProperties,
-  ThemePropertiesV2
+  ThemePropertiesV2,
+  fontSourceDefinition
 } from '@onecx/integration-interface'
 
 import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
@@ -200,7 +200,7 @@ export class ThemeApplyService {
     }
   }
 
-  private resolveFontSrc(src: string | FontSourceDefinition | FontSourceDefinition[]): string {
+  private resolveFontSrc(src: string | z.infer<typeof fontSourceDefinition> | z.infer<typeof fontSourceDefinition>[]): string {
     if (typeof src === 'string') {
       return src
     }

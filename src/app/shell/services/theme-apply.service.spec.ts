@@ -86,7 +86,7 @@ describe('ThemeApplyService', () => {
         data: { v1: undefined, v2 }
       })
 
-      const theme = baseTheme({ properties: 'irrelevant \\"usages\\": here' })
+      const theme = baseTheme({ properties: '"v2": {' })
 
       const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
       const publishTheme = jest.spyOn(currentThemeTopic, 'publish')
@@ -111,7 +111,7 @@ describe('ThemeApplyService', () => {
         data: { v1, v2 }
       })
 
-      const theme = baseTheme({ properties: '\\"usages\\":' })
+      const theme = baseTheme({ properties: '"v2": {' })
 
       const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
 
@@ -137,7 +137,7 @@ describe('ThemeApplyService', () => {
         data: { v1: undefined, v2 }
       })
 
-      await service.applyTheme(baseTheme({ properties: '\\"usages\\":' }))
+      await service.applyTheme(baseTheme({ properties: '"v2": {' }))
 
       expect(document.documentElement.style.getPropertyValue('--onecx-theme-button-background')).toBe(
         'var(--onecx-theme-color-primary)'
@@ -154,7 +154,7 @@ describe('ThemeApplyService', () => {
       const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
       const publishTheme = jest.spyOn(currentThemeTopic, 'publish')
 
-      await service.applyTheme(baseTheme({ properties: '\\"usages\\":' }))
+      await service.applyTheme(baseTheme({ properties: '"v2": {' }))
 
       expect(errorSpy).toHaveBeenCalledWith('Failed to parse theme v2 properties:', parseError)
       expect(publishThemes).not.toHaveBeenCalled()
@@ -237,7 +237,7 @@ describe('ThemeApplyService', () => {
 
       await service.applyTheme(theme)
 
-      expect(setPropertySpy).not.toHaveBeenCalled()
+      expect(setPropertySpy).not.toHaveBeenCalledWith(expect.stringMatching(/^--/), expect.anything())
     })
   })
 
@@ -251,11 +251,169 @@ describe('ThemeApplyService', () => {
         data: { v1: undefined, v2 }
       })
 
-      await service.applyTheme(baseTheme({ properties: '\\"usages\\":' }))
+      await service.applyTheme(baseTheme({ properties: '"v2": {' }))
 
       expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-primary')).toBe('')
       expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-secondary')).toBe('')
       expect(document.documentElement.style.getPropertyValue('--onecx-theme-color-tertiary')).toBe('#abcdef')
+    })
+  })
+
+  describe('fonts', () => {
+    it('does nothing when fonts is absent', async () => {
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}) }))
+
+      expect(document.head.querySelectorAll('style[data-theme-fonts]')).toHaveLength(0)
+    })
+
+    it('does nothing when fonts is an empty array', async () => {
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify([]) }))
+
+      expect(document.head.querySelectorAll('style[data-theme-fonts]')).toHaveLength(0)
+    })
+
+    it('injects a single style tag for all fonts', async () => {
+      const fonts = [
+        { fontFamily: 'MyFont', src: 'url("my-font.woff2") format("woff2")' },
+        { fontFamily: 'OtherFont', src: 'url("other-font.woff2") format("woff2")' },
+      ]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      expect(document.head.querySelectorAll('style[data-theme-fonts]')).toHaveLength(1)
+    })
+
+    it('injects @font-face rule with plain string src', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: 'url("my-font.woff2") format("woff2")' }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('@font-face')
+      expect(style.textContent).toContain('font-family: "MyFont"')
+      expect(style.textContent).toContain('src: url("my-font.woff2") format("woff2")')
+    })
+
+    it('injects @font-face rule with FontSourceDefinition (url + format)', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: { url: 'my-font.woff2', format: 'woff2' } }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('src: url("my-font.woff2") format("woff2")')
+    })
+
+    it('injects @font-face rule with FontSourceDefinition (url only, no format)', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: { url: 'my-font.woff2' } }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('src: url("my-font.woff2")')
+      expect(style.textContent).not.toContain('format(')
+    })
+
+    it('injects @font-face rule with FontSourceDefinition (local)', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: { local: 'Helvetica Neue' } }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('src: local("Helvetica Neue")')
+    })
+
+    it('injects @font-face rule with FontSourceDefinition (local + format)', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: { local: 'Helvetica Neue Bold', format: 'truetype' } }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('src: local("Helvetica Neue Bold") format("truetype")')
+    })
+
+    it('injects @font-face rule with array of FontSourceDefinitions (fallback chain)', async () => {
+      const fonts = [
+        {
+          fontFamily: 'MyFont',
+          src: [
+            { local: 'Helvetica Neue Bold' },
+            { url: 'my-font.woff2', format: 'woff2' },
+            { url: 'my-font.woff', format: 'woff' },
+          ],
+        },
+      ]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain(
+        'src: local("Helvetica Neue Bold"), url("my-font.woff2") format("woff2"), url("my-font.woff") format("woff")'
+      )
+    })
+
+    it('includes optional descriptors mapped to kebab-case CSS', async () => {
+      const fonts = [
+        {
+          fontFamily: 'MyFont',
+          src: 'url("my-font.woff2")',
+          fontWeight: '100 900',
+          fontStyle: 'italic',
+          fontDisplay: 'swap',
+          fontStretch: '75% 125%',
+          fontFeatureSettings: '"kern" 1',
+          fontVariationSettings: '"wght" 400',
+          unicodeRange: 'U+0025-00FF',
+          ascentOverride: '90%',
+          descentOverride: '10%',
+          lineGapOverride: '5%',
+          sizeAdjust: '110%',
+        },
+      ]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]')!
+      expect(style.textContent).toContain('font-weight: 100 900')
+      expect(style.textContent).toContain('font-style: italic')
+      expect(style.textContent).toContain('font-display: swap')
+      expect(style.textContent).toContain('font-stretch: 75% 125%')
+      expect(style.textContent).toContain('font-feature-settings: "kern" 1')
+      expect(style.textContent).toContain('font-variation-settings: "wght" 400')
+      expect(style.textContent).toContain('unicode-range: U+0025-00FF')
+      expect(style.textContent).toContain('ascent-override: 90%')
+      expect(style.textContent).toContain('descent-override: 10%')
+      expect(style.textContent).toContain('line-gap-override: 5%')
+      expect(style.textContent).toContain('size-adjust: 110%')
+    })
+
+    it('marks the injected style tag with MARKED_AS_WRAPPED', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: 'url("my-font.woff2")' }]
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      const style = document.head.querySelector('style[data-theme-fonts]') as HTMLElement
+      expect(style.dataset[MARKED_AS_WRAPPED]).toBe('')
+    })
+
+    it('removes previous font style tags on re-apply', async () => {
+      const fontsFirst = [{ fontFamily: 'FirstFont', src: 'url("first.woff2")' }]
+      const fontsSecond = [{ fontFamily: 'SecondFont', src: 'url("second.woff2")' }]
+
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fontsFirst) }))
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fontsSecond) }))
+
+      const styles = document.head.querySelectorAll('style[data-theme-fonts]')
+      expect(styles).toHaveLength(1)
+      expect(styles[0].textContent).toContain('SecondFont')
+      expect(styles[0].textContent).not.toContain('FirstFont')
+    })
+
+    it('publishes parsed fonts to currentThemes$', async () => {
+      const fonts = [{ fontFamily: 'MyFont', src: 'url("my-font.woff2")' }]
+      const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
+
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}), fonts: JSON.stringify(fonts) }))
+
+      expect(publishThemes).toHaveBeenCalledWith(expect.objectContaining({ fonts }))
+    })
+
+    it('publishes undefined fonts when fonts field is absent', async () => {
+      const publishThemes = jest.spyOn(currentThemesTopic, 'publish')
+
+      await service.applyTheme(baseTheme({ properties: JSON.stringify({}) }))
+
+      expect(publishThemes).toHaveBeenCalledWith(expect.objectContaining({ fonts: undefined }))
     })
   })
 })

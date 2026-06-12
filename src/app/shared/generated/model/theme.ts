@@ -25,6 +25,7 @@ export interface Theme {
     assetsUpdateDate?: string;
     properties: string;
     customCssVariables?: string;
+    fonts?: string;
     overrides?: Array<ThemeOverride>;
 }
 

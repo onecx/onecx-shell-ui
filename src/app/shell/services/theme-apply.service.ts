@@ -1,13 +1,15 @@
 import { inject, Injectable } from '@angular/core'
-import { ZodSafeParseResult } from 'zod'
+import * as z from 'zod'
 
 import { ThemeService } from '@onecx/angular-integration-interface'
 import {
   CurrentThemesTopic,
   Theme as LibTheme,
   theme as themeSchema,
+  fontDefinitions as fontDefinitionSchema,
   ThemeProperties,
-  ThemePropertiesV2
+  ThemePropertiesV2,
+  fontSourceDefinition
 } from '@onecx/integration-interface'
 
 import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
@@ -28,9 +30,8 @@ export class ThemeApplyService {
     if (!parsed) return
 
     const { libThemeV1, libThemeV2, receivedThemeVersions } = parsed
-    const customCssVariables = theme.customCssVariables
-      ? (JSON.parse(theme.customCssVariables) as Record<string, string>)
-      : undefined
+    const customCssVariables = this.parseCustomCssVariables(theme.customCssVariables)
+    const fonts = this.parseFonts(theme.fonts)
 
     console.log(`🎨 Applying theme: ${libThemeV1.name}`)
 
@@ -42,6 +43,7 @@ export class ThemeApplyService {
     await (this.themeService.currentThemes$ as CurrentThemesTopic).publish({
       ...theme,
       customCssVariables,
+      fonts,
       properties: { v1: libThemeV1.properties, v2: libThemeV2 },
       versions: receivedThemeVersions
     })
@@ -60,6 +62,40 @@ export class ThemeApplyService {
     if (customCssVariables) {
       this.applyCustomCssVariables(customCssVariables)
     }
+    if (fonts?.length) {
+      this.applyFonts(fonts)
+    }
+  }
+
+  private parseCustomCssVariables(raw: string | undefined): Record<string, string> | undefined {
+    if (!raw) {
+      return undefined
+    }
+    try {
+      return JSON.parse(raw) as Record<string, string>
+    } catch (err) {
+      console.error('Failed to parse theme customCssVariables:', err)
+      return undefined
+    }
+  }
+
+  private parseFonts(raw: string | undefined): z.infer<typeof fontDefinitionSchema> | undefined {
+    if (!raw) {
+      return undefined
+    }
+    let parsedJson: unknown
+    try {
+      parsedJson = JSON.parse(raw)
+    } catch (err) {
+      console.error('Failed to parse theme fonts as JSON:', err)
+      return undefined
+    }
+    const parseResult = fontDefinitionSchema.safeParse(parsedJson)
+    if (!parseResult.success) {
+      console.error('Failed to parse theme fonts:', parseResult.error)
+      return undefined
+    }
+    return parseResult.data
   }
 
   private parseThemeProperties(theme: Theme): ParsedTheme | undefined {
@@ -67,7 +103,14 @@ export class ThemeApplyService {
       // themeSchema is an extremely deep z.ZodObject; resolving its method
       // signatures triggers TS2589. Erase its type before invoking safeParse and
       // re-type only the result against the manually maintained ThemeProperties.
-      const parseResult = (themeSchema as any).safeParse(theme.properties) as ZodSafeParseResult<ThemeProperties>
+      let parsedJson: unknown
+      try {
+        parsedJson = JSON.parse(theme.properties)
+      } catch (err) {
+        console.error('Failed to parse theme properties as JSON:', err)
+        return undefined
+      }
+      const parseResult = (themeSchema as any).safeParse(parsedJson) as z.ZodSafeParseResult<ThemeProperties>
       if (!parseResult.success) {
         console.error('Failed to parse theme v2 properties:', parseResult.error)
         return undefined
@@ -154,6 +197,73 @@ export class ThemeApplyService {
   private applyCustomCssVariables(variables: Record<string, string>): void {
     for (const [key, value] of Object.entries(variables)) {
       document.documentElement.style.setProperty(`--${key}`, value)
+    }
+  }
+
+  private resolveFontSrc(src: string | z.infer<typeof fontSourceDefinition> | z.infer<typeof fontSourceDefinition>[]): string {
+    if (typeof src === 'string') {
+      return src
+    }
+    const entries = Array.isArray(src) ? src : [src]
+    return entries
+      .map((entry) => {
+        if (entry.local) {
+          return entry.format ? `local("${entry.local}") format("${entry.format}")` : `local("${entry.local}")`
+        }
+        if (entry.url) {
+          return entry.format ? `url("${entry.url}") format("${entry.format}")` : `url("${entry.url}")`
+        }
+        return ''
+      })
+      .filter(Boolean)
+      .join(', ')
+  }
+
+  private applyFonts(fonts: z.infer<typeof fontDefinitionSchema>): void {
+    document.head.querySelectorAll('style[data-theme-fonts]').forEach((el) => el.remove())
+
+    const descriptorMap: Record<string, string> = this.getDescriptorMappings()
+
+    const rules = fonts
+      .map((font) => {
+        const resolvedSrc = this.resolveFontSrc(font.src)
+        if (!resolvedSrc) {
+          return ''
+        }
+        const lines: string[] = [`  font-family: "${font.fontFamily}";`, `  src: ${resolvedSrc};`]
+        for (const [prop, descriptor] of Object.entries(descriptorMap)) {
+          const value = (font as unknown as Record<string, unknown>)[prop]
+          if (value !== undefined) {
+            lines.push(`  ${descriptor}: ${value as string};`)
+          }
+        }
+        return `@font-face {
+${lines.join('\n')}
+}`
+      })
+      .filter(Boolean)
+      .join('\n')
+
+    const el = document.createElement('style')
+    el.dataset['themeFonts'] = ''
+    el.dataset[MARKED_AS_WRAPPED] = ''
+    el.append(rules)
+    document.head.appendChild(el)
+  }
+
+  private getDescriptorMappings(): Record<string, string> {
+    return {
+      fontDisplay: 'font-display',
+      fontStretch: 'font-stretch',
+      fontStyle: 'font-style',
+      fontWeight: 'font-weight',
+      fontFeatureSettings: 'font-feature-settings',
+      fontVariationSettings: 'font-variation-settings',
+      unicodeRange: 'unicode-range',
+      ascentOverride: 'ascent-override',
+      descentOverride: 'descent-override',
+      lineGapOverride: 'line-gap-override',
+      sizeAdjust: 'size-adjust'
     }
   }
 }

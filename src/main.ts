@@ -7,6 +7,9 @@ import {
   loadPreloaderModule
 } from './app/shell/utils/preloader.utils'
 
+// Make shell federation instance is available globally
+;(globalThis as any)['onecxFederationInstance'] = __FEDERATION__.__INSTANCES__[0]
+
 window['onecxPreloaders'] ??= {}
 const preloaders = [angular18Preloader, angular19Preloader, angular20Preloader, angular21Preloader]
 

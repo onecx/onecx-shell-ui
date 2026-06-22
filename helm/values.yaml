@@ -17,10 +17,13 @@ app:
     # Microfrontend
     microfrontend:
       enabled: true
+      entrySuffix: "mf-manifest.json"
+      spec:
+        shareScope: 'angular_21'
       specs:
         shell-toast:
           exposedModule: "./OneCXShellToastComponent"
-          shareScope: angular_21
+          shareScope: 'angular_21'
           description: "Display shell toast notifications"
           type: COMPONENT
           technology: WEBCOMPONENTMODULE

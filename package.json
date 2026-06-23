@@ -18,6 +18,7 @@
     "build:19": "rm -rf pre_loaders/angular-19/.nx && node ./create-dummies.js && (cd ./pre_loaders/angular-19 && npm run build) && npm run build",
     "build:20": "rm -rf pre_loaders/angular-20/.nx && node ./create-dummies.js && (cd ./pre_loaders/angular-20 && npm run build) && npm run build",
     "build:21": "rm -rf pre_loaders/angular-21/.nx && node ./create-dummies.js && (cd ./pre_loaders/angular-21 && npm run build) && npm run build",
+    "build:theme-test": "rm -rf dist .nx pre_loaders/angular-21/dist pre_loaders/angular-21/.nx && node ./create-dummies.js && (cd ./pre_loaders/angular-21 && npm run build) && npm run build-shell-only && npm run postbuild",
     "postbuild": "bash ./copy-preloaders.sh",
     "postinstall": "npm install --prefix pre_loaders/angular-18 && npm install --prefix pre_loaders/angular-19 && npm install --prefix pre_loaders/angular-20 && npm install --prefix pre_loaders/angular-21",
     "check": "nx lint --cache=true && npx prettier -c --cache .",

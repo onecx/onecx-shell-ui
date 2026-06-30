@@ -80,9 +80,13 @@ const allDependencies: Array<SharedDependency> = Object.keys(pkg.dependencies).f
 })
 const additionalShared = allDependencies
   .map((d) => {
+    const sharedConfig = getOneCXSharedRecommendations(d.name, { requiredVersion: d.requiredVersion })
+    if (d.name.startsWith('@angular/') && sharedConfig instanceof Object) {
+      sharedConfig.singleton = true
+    }
     return {
       libraryName: d.name,
-      sharedConfig: getOneCXSharedRecommendations(d.name, { requiredVersion: d.requiredVersion })
+      sharedConfig: sharedConfig
     }
   })
   .filter((config): config is { libraryName: string; sharedConfig: SharedLibraryConfig } => !!config.sharedConfig)
@@ -94,7 +98,7 @@ const additionalShared = allDependencies
  */
 
 const config: ModuleFederationConfig = {
-  // 'zzz' prefix is used to prefer this remote over any other remote that might have the same package version in the shared dependencies. 
+  // 'zzz' prefix is used to prefer this remote over any other remote that might have the same package version in the shared dependencies.
   // magicChar is not suitable for nx tools since angular 20 support since it normalizes to ASCII values.
   // valid ASCII characters like '~' did not work as a prefix for some reason and were normalized to '_'
   name: 'zzz_onecx-angular-21-loader',
@@ -103,7 +107,10 @@ const config: ModuleFederationConfig = {
   },
   shared: (libraryName, sharedConfig) => {
     const config = getOneCXSharedRecommendations(libraryName, sharedConfig)
-    // Add custom shared configurations to the config object if needed
+    // For @angular packages set singleton: true
+    if (libraryName.startsWith('@angular/') && config instanceof Object) {
+      config.singleton = true
+    }
     return config
   },
   additionalShared: additionalShared // This will add the additional shared dependencies generated from package.json to the module federation config

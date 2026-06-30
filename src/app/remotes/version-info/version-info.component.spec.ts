@@ -113,7 +113,7 @@ describe('OneCXVersionInfoComponent', () => {
       expect(versionInfo).toEqual(mockVersion)
     })
 
-    it('should getting version info - no workspace version', async () => {
+    it('should get version info - no workspace version', async () => {
       const mfe = { displayName: 'OneCX Workspace UI' } as MfeInfo
       mockAppStateService.currentMfe$.publish(mfe)
       const w = { workspaceName: 'ADMIN' } as Workspace
@@ -131,7 +131,7 @@ describe('OneCXVersionInfoComponent', () => {
       expect(versionInfo).toEqual(mockVersion)
     })
 
-    it('should getting version info - no workspace version', async () => {
+    it('should get version info - no workspace displayName && version (mfeInfo empty)', async () => {
       const mfe = {} as MfeInfo
       mockAppStateService.currentMfe$.publish(mfe)
       const w = { workspaceName: 'ADMIN' } as Workspace

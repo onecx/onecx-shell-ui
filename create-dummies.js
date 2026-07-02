@@ -29,11 +29,14 @@ const FULL_PACKAGE_BLACKLIST = [
   '@onecx/angular-accelerator/migrations.json'
 ]
 
+const PRELOADER_BLACKLIST_REGEX_LIST = [/^react.*/]
+
 async function main() {
   try {
     const folders = await fs.readdir('./pre_loaders')
 
     for (const folder of folders) {
+      if (PRELOADER_BLACKLIST_REGEX_LIST.some((regex) => regex.test(folder))) continue
       const folderPath = path.join('./pre_loaders', folder)
       const folderStat = await fs.stat(folderPath)
       if (!folderStat.isDirectory()) continue

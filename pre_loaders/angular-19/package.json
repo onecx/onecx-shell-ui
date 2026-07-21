@@ -34,6 +34,13 @@
     "@onecx/angular-webcomponents": "^6.25.0",
     "@onecx/integration-interface": "^6.25.0",
     "@onecx/shell-core": "^6.25.0",
+    "@onecx/ngrx-accelerator": "^6.25.0",
+    "@onecx/ngrx-integration-interface": "^6.25.0",
+    "@ngrx/component": "^19.2.1",
+    "@ngrx/effects": "^19.2.1",
+    "@ngrx/router-store": "^19.2.1",
+    "@ngrx/store": "^19.2.1",
+    "@ngrx/store-devtools": "^19.2.1",
     "primeng": "^19.1.4",
     "rxjs": "~7.8.2"
   },

@@ -57,6 +57,16 @@
       "matchPackageNames": ["/^@angular\\//", "/^@angular-devkit\\//", "!/^@nx\\//", "!/^@onecx\\//", "!nx"]
     },
     {
+      "matchFileNames": ["pre_loaders/react-19/package.json"],
+      "groupName": "React 19 Loader",
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "groupSlug": "react-19-loader",
+      "prPriority": 10,
+      "schedule": ["before 6am every weekday"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["!/^@onecx\\//", "!/^react\\//"]
+    },
+    {
       "matchFileNames": ["package.json"],
       "groupName": "Root NX",
       "matchDepTypes": ["dependencies", "devDependencies"],

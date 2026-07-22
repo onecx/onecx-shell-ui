@@ -341,3 +341,22 @@ For further details on version compatibility, refer to the following resources:
 
 * xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
 * xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]
+
+==== React - Libs Version Compatibility
+
+The following table outlines the compatibility between OneCX library versions and their corresponding React framework versions:
+
+[cols="1,1", width="50%"]
+|===
+|OneCX Libs |React
+
+|v8
+|19
+|===
+
+NOTE: The major React version in the application determines which OneCX library version should be used. While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
+
+For further details on version compatibility, refer to the following resources:
+
+* xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
+* xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]

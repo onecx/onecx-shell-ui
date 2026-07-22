@@ -1,1 +1,3 @@
 ** xref:documentation:onecx-shell-ui:index.adoc[User Interface]
+** Release Notes
+** xref:documentation:onecx-shell-ui:v3-release-notes.adoc[Shell v3 Release Notes]

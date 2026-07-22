@@ -43,16 +43,16 @@ git clone https://github.com/onecx/onecx-shell-ui.git
 ----
 
 The repository `onecx-shell` contains the source code of
-the OneCX Shell product. 
+the OneCX Shell product.
 The repository `onecx-shell-ui` contains the source code of
-the OneCX Shell user interface as part of the product. 
+the OneCX Shell user interface as part of the product.
 
 ==== Update local DNS resolution
-Assuming you are using WSL, updating the local host file for local 
+Assuming you are using WSL, updating the local host file for local
 development allows you to map domain names to specific IP addresses,
 making it easier to test and debug applications using custom domain names
 instead of IP addresses. To enable multiple services on the same port,
-we use traefik as a reverse proxy. A running traefik container is 
+we use traefik as a reverse proxy. A running traefik container is
 therefore essential for your local setup to route your traffic to the
 appropriate Docker containers based on hostnames.
 
@@ -101,7 +101,7 @@ scalability.
 * `pgadmin`: pgAdmin is an open-source administration and development
 platform that offers a user-friendly graphical interface for managing
 and interacting with the local PostgreSQL database.
-This is optional. 
+This is optional.
 * `keycloak`: Keycloak is an open-source identity and access management
 system that simplifies authentication, authorization, and single sign-on
 for web and mobile applications.
@@ -117,7 +117,7 @@ image::slot_groups_portal_viewport.png[]
 A Slot Group is a container component that divides content into three distinct regions:
 
 * **start:** The beginning region of the slot group
-* **center:** The middle region of the slot group  
+* **center:** The middle region of the slot group
 * **end:** The ending region of the slot group
 
 Each slot group automatically creates three named slots based on its name: `<name>.start`, `<name>.center`, and `<name>.end`. Remote components can be loaded into any of these slots dynamically based on configuration.
@@ -336,6 +336,25 @@ The following table outlines the compatibility between OneCX library versions an
 |===
 
 NOTE: The major Angular version in the application determines which OneCX library version should be used. While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
+
+For further details on version compatibility, refer to the following resources:
+
+* xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
+* xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]
+
+==== React - Libs Version Compatibility
+
+The following table outlines the compatibility between OneCX library versions and their corresponding React framework versions:
+
+[cols="1,1", width="50%"]
+|===
+|OneCX Libs |React
+
+|v8
+|19
+|===
+
+NOTE: The major React version in the application determines which OneCX library version should be used. While all versions within the major are compatible, it is **recommended to use the lowest possible OneCX library version** that provides the required features and fixes.
 
 For further details on version compatibility, refer to the following resources:
 

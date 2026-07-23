@@ -3,6 +3,7 @@ import {
   angular19Preloader,
   angular20Preloader,
   angular21Preloader,
+  react19Preloader,
   ensurePreloaderModuleLoaded,
   loadPreloaderModule
 } from './app/shell/utils/preloader.utils'
@@ -11,7 +12,7 @@ import {
 ;(globalThis as any)['onecxFederationInstance'] = __FEDERATION__.__INSTANCES__[0]
 
 window['onecxPreloaders'] ??= {}
-const preloaders = [angular18Preloader, angular19Preloader, angular20Preloader, angular21Preloader]
+const preloaders = [angular18Preloader, angular19Preloader, angular20Preloader, angular21Preloader, react19Preloader]
 
 Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)]).then(() => {
   return import('./bootstrap').catch((err) => console.error(err))

@@ -43,7 +43,7 @@ git clone https://github.com/onecx/onecx-shell-ui.git
 ----
 
 The repository `onecx-shell` contains the source code of
-the OneCX Shell product.
+the OneCX Shell product. 
 The repository `onecx-shell-ui` contains the source code of
 the OneCX Shell user interface as part of the product.
 

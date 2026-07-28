@@ -59,6 +59,11 @@
             "glob": "**/*",
             "input": "./pre_loaders/angular-21/dist/onecx-angular-21-loader",
             "output": "/pre_loaders/onecx-angular-21-loader"
+          },
+          {
+            "glob": "**/*",
+            "input": "./pre_loaders/react-19/dist/onecx-react-19-loader",
+            "output": "/pre_loaders/onecx-react-19-loader"
           }
         ],
         "styles": [

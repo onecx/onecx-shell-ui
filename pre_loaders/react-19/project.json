@@ -1,0 +1,42 @@
+{
+  "name": "zzz_onecx-react-19-loader",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "ocx-react-19-loader",
+  "sourceRoot": "./src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/onecx-react-19-loader",
+        "index": "src/index.html",
+        "main": "src/main.ts",
+        "tsConfig": "tsconfig.app.json",
+        "compiler": "swc",
+        "skipTypeChecking": true,
+        "webpackConfig": "webpack.config.ts",
+        "assets": []
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "sourceMap": false,
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    }
+  },
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  }
+}

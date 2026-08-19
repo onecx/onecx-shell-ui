@@ -15,8 +15,7 @@ export default composePlugins(
     // shell's registerRemotes type: 'module'. Matching Angular preloaders' ESM output ensures
     // consistent loading via <script type="module"> across all preloaders.
     const mfPlugin = config.plugins?.find((p) => p instanceof ModuleFederationPlugin) as
-      | ModuleFederationPlugin
-      | undefined
+      ModuleFederationPlugin | undefined
     if (mfPlugin) {
       ;(mfPlugin as any)._options = {
         ...(mfPlugin as any)._options,

@@ -284,7 +284,8 @@ describe('RoutesService', () => {
     })
 
     it('normalizes baseHref and default pathMatch variants', async () => {
-      (mockConfigurationService.getProperty as jest.Mock).mockResolvedValue('/portal')
+      const getProperty = mockConfigurationService.getProperty as jest.Mock
+      getProperty.mockResolvedValue('/portal')
       const fullMatchRoute = createBffRoute({ baseUrl: '/portal/admin/exact$', pathMatch: undefined })
       const prefixRoute = createBffRoute({
         appId: 'app-2',

@@ -1,0 +1,53 @@
+// This is a short version of the release notes, focused on key highlights and migration notes for Shell v3.
+// TODO: Decide if this should be the main release notes page, or if the full version should be.
+
+= onecx-shell-ui 3.0.0 Release Notes
+
+== Summary
+
+OneCX Shell UI 3.0.0 is a major release focused on platform modernization, improved shell extensibility, and better runtime behavior.
+It introduces a new integration path for Angular 21, enhances the shell layout model with updated slot conventions, and delivers improvements for responsiveness, startup efficiency, and deployment support.
+
+Previously supported Angular application versions remain supported.
+For teams adopting Angular 21, this release provides the foundation and migration path for integration with Shell v3.
+
+== Highlights
+
+* New Angular 21 integration path for applications adopting the latest shell integration model
+* Updated shell layout with improved slot-group based structure and viewport behavior
+* Faster startup and reduced runtime overhead between microfrontends
+* Improved responsive and mobile behavior
+* Added About page and source maps support
+* Stability improvements for authentication, routing, and shell integration behavior
+
+== Upgrade Notes
+
+[IMPORTANT]
+====
+This is a major release and should be validated carefully before production rollout.
+====
+
+* The Shell v3 migration is recommended for all applications consumed by Shell v3.
+* Required migration actions primarily apply to Angular 21 applications.
+* Existing applications on previously supported Angular versions should continue to work.
+* Deprecated slot names continue to work through automatic remapping, but migration to the new slot naming model is recommended.
+* Source maps are available for diagnostics, but are not recommended for production use by default.
+
+For detailed migration guidance, see:
+
+* Shell v3 migration guide: xref:documentation:onecx-docs-dev:shell-integration/shell-v3-migration.adoc[Shell v3 Migration Guide]
+* OneCX UI libraries Angular 21 migration guide: https://github.com/onecx/onecx-portal-ui-libs/blob/a2cbe83f338710f46d561e043c32c0dda6b1d2a4/docs/modules/onecx-portal-ui-libs/pages/migrations/angular-21/index.adoc
+
+== Included in this Release
+
+* Angular 21 integration path and related module federation updates
+* Viewport restructuring and slot-group layout improvements
+* Startup and runtime efficiency improvements
+* Mobile and styling improvements
+* Docker and Helm related deployment updates
+* Documentation updates, including shell version support information
+
+== References
+
+* Release: https://github.com/onecx/onecx-shell-ui/releases/tag/3.0.0
+* Full changelog: https://github.com/onecx/onecx-shell-ui/compare/2.4.0...3.0.0

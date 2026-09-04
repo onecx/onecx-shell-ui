@@ -38,6 +38,8 @@ export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWe
   constructor() {
     this.portalMessageService.message$.subscribe((message: Message) => {
       this.messageService.add(message)
+      // Primng fails to trigger change detection automatically and which cuses the messages to get stacked and pushed once the change detection triggers
+      // so we use setTimeout to manually trigger it
       setTimeout(() => this.cdr.detectChanges())
     })
   }

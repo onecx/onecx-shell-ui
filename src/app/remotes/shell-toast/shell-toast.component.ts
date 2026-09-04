@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { Component, inject, Input, OnInit, ChangeDetectorRef } from '@angular/core'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ReplaySubject } from 'rxjs'
 
@@ -29,13 +29,19 @@ export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWe
   private readonly primengConfig: PrimeNG = inject(PrimeNG)
   private readonly messageService = inject(MessageService)
   private readonly portalMessageService = inject(PortalMessageService)
+  private readonly cdr = inject(ChangeDetectorRef)
 
   @Input() set ocxRemoteComponentConfig(rcConfig: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(rcConfig)
   }
 
   constructor() {
-    this.portalMessageService.message$.subscribe((message: Message) => this.messageService.add(message))
+    this.portalMessageService.message$.subscribe((message: Message) => {
+      this.messageService.add(message)
+      // Primng fails to trigger change detection automatically and which cuses the messages to get stacked and pushed once the change detection triggers
+      // so we use setTimeout to manually trigger it
+      setTimeout(() => this.cdr.detectChanges())
+    })
   }
 
   ngOnInit() {

@@ -1,15 +1,15 @@
 import { POLYFILL_SCOPE_MODE } from '@onecx/angular-integration-interface'
-import { isCssScopeRuleSupported } from '@onecx/angular-utils'
+import { isCssScopeRuleSupported, dataOnecxDynamicContainerKey } from '@onecx/angular-utils'
 import { createNodeList, updateStyleSheets } from 'src/scope-polyfill/polyfill'
 import {
   appendStyleData,
   findStyleDataWrapper,
-  getStyleDataOrIntermediateStyleData,
   markElement,
   removeStyleDataRecursive,
   wrapWithDiv
 } from './style-data.utils'
 import { getOnecxTriggerElement } from './onecx-trigger-element.utils'
+import { getStyleDataOrIntermediateStyleData } from '@onecx/angular-utils/style'
 
 type blackListCondition = (newChild: Node) => boolean
 type blackListCallback = (newChild: Node) => void
@@ -33,6 +33,12 @@ const blackListConditions: blackListItem[] = [
       newChild.nodeType === Node.ELEMENT_NODE &&
       newChild instanceof HTMLElement &&
       newChild.classList.contains('cdk-visually-hidden')
+  },
+  {
+    condition: (newChild: Node) =>
+      newChild.nodeType === Node.ELEMENT_NODE &&
+      newChild instanceof HTMLElement &&
+      newChild.dataset[dataOnecxDynamicContainerKey] !== undefined
   }
 ]
 

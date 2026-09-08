@@ -6,14 +6,9 @@ import {
   dataMfeElementKey,
   dataNoPortalLayoutStylesKey,
   dataStyleIdKey,
-  dataStyleIsolationKey
+  dataStyleIsolationKey,
+  StyleData
 } from '@onecx/angular-utils'
-
-interface StyleData {
-  styleId: string | undefined
-  noPortalLayoutStyles: string | undefined
-  mfeElement: string | undefined
-}
 
 export const dataWrapperElementAttribute = 'data-dynamic-wrapper-element'
 export const dataWrapperElementKey = 'dynamicWrapperElement'
@@ -150,36 +145,4 @@ export function appendIntermediateStyleData(element: HTMLElement, styleData: Sty
   if (styleData.mfeElement || styleData.mfeElement === '') {
     element.dataset[dataIntermediateMfeElementKey] = styleData.mfeElement
   }
-}
-
-/**
- * Gets the style data from an element or its intermediate style data if it exists.
- * @param element HTMLElement to get style data from
- * @returns StyleData object or null if no style data is found.
- */
-export function getStyleDataOrIntermediateStyleData(element: Node | EventTarget): StyleData | null {
-  const styleElement = findElementWithStyleDataOrIntermediateStyleData(element)
-  if (!styleElement) return null
-
-  return {
-    styleId: styleElement.dataset[dataStyleIdKey] ?? styleElement.dataset[dataIntermediateStyleIdKey],
-    noPortalLayoutStyles:
-      styleElement.dataset[dataNoPortalLayoutStylesKey] ??
-      styleElement.dataset[dataIntermediateNoPortalLayoutStylesKey],
-    mfeElement: styleElement.dataset[dataMfeElementKey] ?? styleElement.dataset[dataIntermediateMfeElementKey]
-  }
-}
-
-/**
- * Finds the closest parent element with style data or intermediate style data.
- * @param startNode Starting node to search from
- * @returns The closest parent element with style data or intermediate style data, or null if not found.
- */
-export function findElementWithStyleDataOrIntermediateStyleData(startNode: Node | EventTarget): HTMLElement | null {
-  let currentNode = startNode
-  const hasStyleData = (node: HTMLElement) => node.dataset[dataStyleIdKey] || node.dataset[dataIntermediateStyleIdKey]
-  while (currentNode instanceof HTMLElement && !hasStyleData(currentNode) && currentNode.parentElement) {
-    currentNode = currentNode.parentElement
-  }
-  return currentNode instanceof HTMLElement && hasStyleData(currentNode) ? currentNode : null
 }

@@ -5,6 +5,8 @@ const EXPORTS_BLACKLIST = ['.', './package.json']
 
 const DEPENDENCY_BLACKLIST = [
   '@nx/angular',
+  '@nx/react',
+  '@nx/webpack',
   '@nx/module-federation',
   '@module-federation/enhanced',
   '@module-federation/runtime-core',
@@ -26,7 +28,25 @@ const FULL_PACKAGE_BLACKLIST = [
   'primeng/resources/',
   'primeng/editor',
   '@onecx/angular-accelerator/testing',
-  '@onecx/angular-accelerator/migrations.json'
+  '@onecx/angular-accelerator/migrations.json',
+  'react/jsx-dev-runtime',
+  'react/compiler-runtime',
+  'react-dom/server',
+  'react-dom/server.browser',
+  'react-dom/server.bun',
+  'react-dom/server.edge',
+  'react-dom/server.node',
+  'react-dom/static',
+  'react-dom/static.browser',
+  'react-dom/static.edge',
+  'react-dom/static.node',
+  'react-dom/profiling',
+  'react-dom/test-utils',
+  'react-router/internal',
+  'react-router/internal/react-server-client',
+  '@onecx/react-utils/prime-base-theme',
+  '@onecx/react-utils/prime-base-theme.css',
+  '@onecx/react-integration-interface/mocks'
 ]
 
 async function main() {

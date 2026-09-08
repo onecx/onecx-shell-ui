@@ -44,6 +44,14 @@ export const angular21Preloader: Preloader = {
   shareScope: 'angular_21'
 }
 
+export const react19Preloader: Preloader = {
+  name: 'react-19-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-react-19-loader/mf-manifest.json',
+  windowKey: 'react-19',
+  exposedModule: 'React19Loader',
+  shareScope: 'react_19'
+}
+
 export async function loadPreloaderModule(preloader: Preloader) {
   const moduleFederation = await import('@module-federation/enhanced/runtime')
   moduleFederation.registerRemotes([

@@ -14,6 +14,21 @@ globalThis.ngJest = {
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
 setupZoneTestEnv()
 
+Object.defineProperty(globalThis, 'matchMedia', {
+  value: (query: string): MediaQueryList => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    dispatchEvent: () => false
+  }),
+  writable: true,
+  configurable: true
+})
+
 // Ensure Module Federation runtime global exists in unit tests.
 // In browser builds this is injected by the federation runtime.
 Object.defineProperty(globalThis, '__FEDERATION__', {

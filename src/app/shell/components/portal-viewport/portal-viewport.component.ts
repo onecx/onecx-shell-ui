@@ -71,13 +71,11 @@ export class PortalViewportComponent implements OnInit {
     this.userService.profile$.pipe(untilDestroyed(this)).subscribe((profile) => {
       this.menuMode =
         (profile?.accountSettings?.layoutAndThemeSettings?.menuMode?.toLowerCase() as
-          | typeof this.menuMode
-          | undefined) ?? this.menuMode
+          typeof this.menuMode | undefined) ?? this.menuMode
 
       this.colorScheme =
         (profile?.accountSettings?.layoutAndThemeSettings?.colorScheme?.toLowerCase() as
-          | typeof this.colorScheme
-          | undefined) ?? this.colorScheme
+          typeof this.colorScheme | undefined) ?? this.colorScheme
     })
 
     this.themeService.currentTheme$

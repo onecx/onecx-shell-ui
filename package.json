@@ -50,7 +50,7 @@
     "reportPath": "reports"
   },
   "dependencies": {
-    "@angular-devkit/architect": "^0.2100.5",
+    "@angular-devkit/architect": "^0.2100.6",
     "@angular/animations": "^21.0.0",
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
@@ -86,15 +86,15 @@
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^21.2.18",
-    "@angular-devkit/core": "^21.2.18",
+    "@angular-devkit/build-angular": "^21.2.23",
+    "@angular-devkit/core": "^21.2.23",
     "@angular-eslint/eslint-plugin": "^21.1.0",
     "@angular-eslint/eslint-plugin-template": "^21.1.0",
     "@angular-eslint/template-parser": "^21.1.0",
     "@angular/cdk": "^21.0.0",
-    "@angular/cli": "~21.2.18",
-    "@angular/compiler-cli": "^21.1.6",
-    "@angular/language-service": "^21.1.6",
+    "@angular/cli": "~21.2.23",
+    "@angular/compiler-cli": "^21.2.22",
+    "@angular/language-service": "^21.2.22",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@nx/eslint": "22.3.3",

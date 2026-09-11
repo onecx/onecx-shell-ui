@@ -75,7 +75,7 @@
     "@onecx/angular-webcomponents": "^8.11.0",
     "@onecx/integration-interface": "^8.11.0",
     "@onecx/shell-auth": "^8.11.0",
-    "@onecx/portal-layout-styles": "^5.52.1",
+    "@onecx/portal-layout-styles": "^5.58.0",
     "@primeng/themes": "^21.0.0",
     "keycloak-js": "^26.2.3",
     "primeflex": "^4.0.0",

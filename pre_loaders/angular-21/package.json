@@ -51,7 +51,7 @@
     "@angular/compiler-cli": "^21.2.22",
     "@swc-node/register": "^1.8.0",
     "@swc/core": "^1.3.85",
-    "@onecx/build-utils": "^8.9.0",
+    "@onecx/build-utils": "^8.11.0",
     "modify-source-webpack-plugin": "^4.1.0",
     "nx": "22.7.11",
     "webpack": "5.104.1"

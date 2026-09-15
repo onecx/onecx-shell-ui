@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
     merge(
       this.translateService.onLangChange,
       this.translateService.onTranslationChange,
-      this.translateService.onDefaultLangChange
+      this.translateService.onFallbackLangChange
     )
       .pipe(mergeMap(() => this.translateService.get('SHELL')))
       .subscribe((res) => {

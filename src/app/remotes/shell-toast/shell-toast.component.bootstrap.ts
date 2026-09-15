@@ -11,12 +11,16 @@ import {
   RemoteComponentConfig
 } from '@onecx/angular-utils'
 
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
+
 import { environment } from 'src/environments/environment'
 
 import { OneCXShellToastComponent } from './shell-toast.component'
+import { importProvidersFrom } from '@angular/core'
 
 bootstrapRemoteComponent(OneCXShellToastComponent, 'ocx-shell-toast-component', environment.production, [
   { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<RemoteComponentConfig>(1) },
+  importProvidersFrom(AngularAcceleratorModule),
   provideTranslateService({
     defaultLanguage: 'en',
     loader: provideTranslateLoader(OnecxTranslateLoader),

@@ -56,6 +56,7 @@ footer {
   color: var(--topbar-item-text-color);
   background-color: var(--topbar-bg-color);
   width: 100%;
+  z-index: 998;
   min-height: 4rem;
   transition: width var(--p-transition-duration);
   // Use flexbox to layout the three sections

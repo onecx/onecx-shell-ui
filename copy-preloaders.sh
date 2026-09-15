@@ -6,6 +6,7 @@ PRELOADER_PATHS=(
   "./pre_loaders/angular-19/dist/onecx-angular-19-loader"
   "./pre_loaders/angular-20/dist/onecx-angular-20-loader"
   "./pre_loaders/angular-21/dist/onecx-angular-21-loader"
+  "./pre_loaders/react-19/dist/onecx-react-19-loader"
 )
 
 # Define destination base path
@@ -19,6 +20,7 @@ copy_preloader() {
   local dest="$SHELL_DIST_PRELOADERS_PATH/$name"
 
   if [ -d "$src" ]; then
+    rm -rf "$dest"
     mkdir -p "$dest"
     cp -r "$src/"* "$dest/"
     echo "Copied $name to $dest"

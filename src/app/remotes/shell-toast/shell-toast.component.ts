@@ -42,6 +42,7 @@ export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWe
     this.primengConfig.ripple.set(true)
   }
 
+  // Testing Ai worklows
   public ocxInitRemoteComponent(rcConfig: RemoteComponentConfig) {
     this.rcConfig.next(rcConfig)
   }

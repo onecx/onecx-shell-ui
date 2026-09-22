@@ -36,18 +36,21 @@ export class AboutComponent implements OnInit {
     }
 
     Object.entries(shellScopeMap).forEach(([scopeName, scopeData]: [string, any]) => {
-      Object.entries(scopeData['@angular/core']).forEach(([version, data]: [string, any]) => {
-        if (this.isAngularVersionBoundary(data)) {
-          this.supportedAngularVersions.push({
-            name: 'Angular ' + version.substring(0, version.indexOf('.')),
-            version: version,
-            from: data.from.replace(magicChar, ''),
-            eager: data['eager'],
-            loaded: data['loaded'] || 0,
-            shareScope: scopeName
-          })
-        }
-      })
+      const angularCoreData = scopeData['@angular/core']
+      if (angularCoreData) {
+        Object.entries(angularCoreData).forEach(([version, data]: [string, any]) => {
+          if (this.isAngularVersionBoundary(data)) {
+            this.supportedAngularVersions.push({
+              name: 'Angular ' + version.substring(0, version.indexOf('.')),
+              version: version,
+              from: data.from.replace(magicChar, ''),
+              eager: data['eager'],
+              loaded: data['loaded'] || 0,
+              shareScope: scopeName
+            })
+          }
+        })
+      }
     })
   }
 

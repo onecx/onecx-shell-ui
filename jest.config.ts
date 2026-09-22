@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 // list of patterns for which no transformation/transpiling should be made
-const ignoredModulePatterns: string = ['d3-.*', 'uuid', '(.*.mjs$)'].join('|')
+const ignoredModulePatterns: string = ['d3-.*', '(.*.mjs$)'].join('|')
 // list of patterns excluded by testing/coverage (default: node_modules)
 const ignoredPathPatterns: string[] = [
   '<rootDir>/pre_loaders/',

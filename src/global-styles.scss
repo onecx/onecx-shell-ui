@@ -30,6 +30,12 @@ body {
   }
 }
 
+// For p-toast z-index is applied onAnimationStart which is missed on Ocassional Page Reloads as a result the toast appears below the header
+// so below we provide a fallback z-index (value is taken from the default z-index of p-toast in normal scenarios)
+.p-toast {
+  z-index: 1102;
+}
+
 // Styles to ensure correctness of cdk-overlay-container
 // TODO: Remove this once a valid solution is found for dynamic style wrapping
 .cdk-overlay-container,

@@ -66,7 +66,13 @@ describe('InitializationErrorPageComponent', () => {
     })
   })
 
-  it('should log out', () => {
+  it('should publish logout event', () => {
+    jest.spyOn(component.eventsTopic, 'publish')
+
     component.onLogout()
+
+    expect(component.eventsTopic.publish).toHaveBeenCalledWith({
+      type: 'authentication#logoutButtonClicked'
+    })
   })
 })

@@ -38,6 +38,6 @@ export class PermissionProxyService {
         }
         this.permissionsTopic$.publish(answer)
       })
-    return Promise.resolve()
+    return
   }
 }

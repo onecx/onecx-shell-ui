@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component, inject, Input, OnInit, ChangeDetectorRef } from '@angular/core'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ReplaySubject } from 'rxjs'
@@ -20,7 +19,7 @@ import { ToastModule } from 'primeng/toast'
   selector: 'ocx-shell-toast',
   templateUrl: './shell-toast.component.html',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, AngularAcceleratorModule, ToastModule],
+  imports: [AngularRemoteComponentsModule, AngularAcceleratorModule, ToastModule],
   providers: [{ provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) }, MessageService]
 })
 @UntilDestroy()

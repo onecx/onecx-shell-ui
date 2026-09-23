@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -7,7 +6,6 @@ import { PageNotFoundComponent } from './components/not-found-page/not-found-pag
 
 @NgModule({
   imports: [
-    CommonModule,
     TranslateModule,
     PageNotFoundComponent,
     RouterModule.forChild([

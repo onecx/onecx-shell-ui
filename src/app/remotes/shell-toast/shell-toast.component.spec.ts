@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
@@ -54,7 +53,7 @@ describe('OneCXShellExtensionsComponent', () => {
     })
       .overrideComponent(OneCXShellToastComponent, {
         set: {
-          imports: [CommonModule, ToastModule],
+          imports: [ToastModule],
           providers: [
             providePortalMessageServiceMock(),
             { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) },

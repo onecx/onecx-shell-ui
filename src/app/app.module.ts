@@ -44,7 +44,6 @@ import { PermissionProxyService } from './shell/services/permission-proxy.servic
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
-import { CommonModule } from '@angular/common'
 import { providePrimeNG } from 'primeng/config'
 import { AppComponent } from './app.component'
 import { appRoutes, internalShellRoute } from './app.routes'
@@ -354,7 +353,6 @@ export async function shareMfContainer() {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    CommonModule,
     RouterModule.forRoot(appRoutes),
     PortalViewportComponent,
     GlobalErrorComponent,

@@ -52,6 +52,5 @@
       "unitTestRunner": "jest"
     }
   },
-  "useInferencePlugins": false,
-  "analytics": false
+  "useInferencePlugins": false
 }

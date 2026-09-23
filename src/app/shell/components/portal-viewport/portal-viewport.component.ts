@@ -25,7 +25,7 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
   ],
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
-  styleUrls: ['./portal-viewport.component.scss'],
+  styleUrl: './portal-viewport.component.scss',
   animations: [
     trigger('topbarActionPanelAnimation', [
       transition(':enter', [

@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
   standalone: true,
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',
-  styleUrls: ['./global-error.component.scss']
+  styleUrl: './global-error.component.scss'
 })
 export class GlobalErrorComponent {
   private readonly router = inject(Router)

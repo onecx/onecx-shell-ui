@@ -129,22 +129,6 @@ describe('RoutesService', () => {
   })
 
   describe('init', () => {
-    it('creates default routes when no routes are provided', async () => {
-      await routerService.init([])
-      expect(router.config).toBeDefined()
-      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
-      expect(router.config.find((r) => r.path === '**')).toBeDefined()
-      expect(router.config.find((r) => r.path === 'portal-initialization-error-page')).toBeDefined()
-      expect(router.config.find((r) => r.path === 'remote-loading-error-page')).toBeDefined()
-
-      const welcomeRoute = router.config.find((r) => r.path === '')
-      expect(welcomeRoute).toBeDefined()
-      expect(welcomeRoute?.redirectTo).toBeUndefined()
-      expect(welcomeRoute?.loadChildren).toBeDefined()
-      expect(welcomeRoute?.pathMatch).toBe(PathMatch.full)
-      expect(welcomeRoute?.path).toBe('')
-    })
-
     it('creates a route provided route', async () => {
       const testRoutes: Route[] = [
         {
@@ -164,7 +148,7 @@ describe('RoutesService', () => {
         }
       ]
       await routerService.init(testRoutes)
-      expect(router.config.length).toBe(testRoutes.length + notFoundCount + fallbackRouteCount + appRouteCount)
+      expect(router.config).toHaveLength(testRoutes.length + notFoundCount + fallbackRouteCount + appRouteCount)
       const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
       expect(createdRoute).toBeDefined()
       expect(createdRoute?.loadChildren).toBeDefined()
@@ -195,7 +179,7 @@ describe('RoutesService', () => {
         }
       ]
       await routerService.init(testRoutes)
-      expect(router.config.length).toBe(testRoutes.length + notFoundCount + appRouteCount)
+      expect(router.config).toHaveLength(testRoutes.length + notFoundCount + appRouteCount)
     })
 
     it('redirects to welcome if configured in the workspace', async () => {
@@ -203,7 +187,7 @@ describe('RoutesService', () => {
       await appStateServiceMock.currentWorkspace$.publish({ baseUrl: '/', homePage } as any)
 
       await routerService.init([])
-      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
+      expect(router.config).toHaveLength(notFoundCount + fallbackRouteCount + appRouteCount)
       const welcomeRoute = router.config.find((r) => r.path === '')
       expect(welcomeRoute).toBeDefined()
       expect(welcomeRoute?.redirectTo).toBe(homePage)
@@ -214,7 +198,7 @@ describe('RoutesService', () => {
       await routerService.init([])
 
       expect(router.config).toBeDefined()
-      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
+      expect(router.config).toHaveLength(notFoundCount + fallbackRouteCount + appRouteCount)
       expect(router.config.find((r) => r.path === '**')).toBeDefined()
       expect(router.config.find((r) => r.path === 'portal-initialization-error-page')).toBeDefined()
       expect(router.config.find((r) => r.path === 'remote-loading-error-page')).toBeDefined()
@@ -234,7 +218,7 @@ describe('RoutesService', () => {
       const testRoute = createBffRoute({ technology: Technologies.Angular })
       await routerService.init([testRoute])
 
-      expect(router.config.length).toBe(1 + notFoundCount + fallbackRouteCount + appRouteCount)
+      expect(router.config).toHaveLength(1 + notFoundCount + fallbackRouteCount + appRouteCount)
       const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
       expect(createdRoute).toBeDefined()
       expect(createdRoute?.loadChildren).toBeDefined()
@@ -269,14 +253,14 @@ describe('RoutesService', () => {
     it('does not provide a fallback welcome route when a matching workspace route exists', async () => {
       const testRoute = createBffRoute({ baseUrl: '' })
       await routerService.init([testRoute])
-      expect(router.config.length).toBe(1 + notFoundCount + appRouteCount)
+      expect(router.config).toHaveLength(1 + notFoundCount + appRouteCount)
     })
 
     it('redirects to home page if configured in the workspace', async () => {
       await appStateServiceMock.currentWorkspace$.publish({ baseUrl: '/', homePage: 'custom-welcome' } as any)
       await routerService.init([])
 
-      expect(router.config.length).toBe(notFoundCount + fallbackRouteCount + appRouteCount)
+      expect(router.config).toHaveLength(notFoundCount + fallbackRouteCount + appRouteCount)
       const welcomeRoute = router.config.find((r) => r.path === '')
       expect(welcomeRoute).toBeDefined()
       expect(welcomeRoute?.redirectTo).toBe('custom-welcome')

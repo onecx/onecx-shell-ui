@@ -44,7 +44,7 @@ describe('mapSlots', () => {
     ]
     const mappedSlots = mapSlots(slots)
 
-    expect(mappedSlots.length).toBe(1)
+    expect(mappedSlots).toHaveLength(1)
     expect(mappedSlots[0].name).toBe(slotNamesMapping['onecx-shell-footer'])
     expect(mappedSlots[0].components).toEqual(expect.arrayContaining(['A', 'B']))
   })
@@ -56,8 +56,8 @@ describe('mapSlots', () => {
     ]
     const mappedSlots = mapSlots(slots)
 
-    expect(mappedSlots.length).toBe(1)
+    expect(mappedSlots).toHaveLength(1)
     expect(mappedSlots[0].components).toEqual(expect.arrayContaining(['A', 'B', 'C']))
-    expect(mappedSlots[0].components.filter((c) => c === 'B').length).toBe(1)
+    expect(mappedSlots[0].components.filter((c) => c === 'B')).toHaveLength(1)
   })
 })

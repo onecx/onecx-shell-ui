@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
 import { Federation } from '@module-federation/runtime-core'
 import { TranslateModule } from '@ngx-translate/core'
@@ -16,7 +15,7 @@ const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloade
 
 @Component({
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [TranslateModule],
   selector: 'ocx-shell-about',
   templateUrl: './about.component.html'
 })

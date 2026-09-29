@@ -2,7 +2,7 @@
 
 **Ticket:** [onecx/internal-tasks#644](https://github.com/onecx/internal-tasks/issues/644)
 **Branch:** `feat/theming-fallback` (base `feat/theme-v2`)
-**Status:** plan (not yet implemented)
+**Status:** implemented
 
 ## Purpose
 
@@ -12,6 +12,12 @@ theme's `fallbackOrder`, recursed until a concrete value (or the terminal
 fully-relaxed base). The browser resolves the chains lazily, so fallbacks are
 created *before* the theme's concrete values are present and resolve automatically
 once `ThemeApplyService` applies them to `document.documentElement`.
+
+A variable's fallback is derived with the theme's relaxation order. Until that
+order is known, a referenced variable is **held** rather than built against the
+default order — this is the correctness gate. `ThemeApplyService` arms the order
+once its own values are applied, which builds the held variables against the
+order now in force and only for variables still undefined in the DOM.
 
 ## Non-goals
 
@@ -31,11 +37,11 @@ once `ThemeApplyService` applies them to `document.documentElement`.
 
 ### Placement
 
-A single head-level `MutationObserver` registered at app bootstrap, co-located
-with `styleChangesListenerInitializer` in `app.module.ts` (the existing
-head-level `{childList}` observer bootstrapped there). It shares the same
-`document.head` target and the same mutation surface the existing observer
-consumes.
+A single head-level `MutationObserver` owned by the
+`ThemeFallbackGapFillService`, registered at app bootstrap via a
+`provideAppInitializer` in `app.module.ts` (next to the other style
+initializers). It shares the same `document.head` target and the same mutation
+surface the existing observer consumes.
 
 Registration order relative to the other observers (see "Existing monitors"
 below) does not matter: the scan is idempotent and reads only final content.
@@ -44,12 +50,12 @@ below) does not matter: the scan is idempotent and reads only final content.
 
 Only added `<style>` elements that:
 
-1. are not the gap-fill sheet itself (identified by a `data-theme-gap-fill`
-   attribute on the element),
-2. are still connected at read time (`node.isConnected`),
-3. are not the same node identity that was already scanned (a `WeakSet` of
-   processed nodes — the gap-fill sheet is the only element we ever create and
-   it is skipped by rule 1 before reaching this check).
+1. are still connected at read time (`node.isConnected`) — this drops a node the
+   scope polyfill replaced (removed + re-inserted within a batched mutation) in
+   favour of its replacement, which arrives as its own `addedNode`,
+2. have non-empty text content,
+3. are not the gap-fill sheet itself (identified by a `data-onecx-theme-gap-fill`
+   attribute on the element).
 
 External `<link>` nodes and any other element kind are skipped.
 
@@ -74,8 +80,9 @@ make the deferred read always against **final** content:
 
 Combined: we only ever read a node whose `--onecx-theme-*` content is already
 post-modification, and a name that is expanded into the gap-fill sheet is
-reported as "present" by the DOM thereafter (see "Zero-state dedup"), so the
-same name is never expanded twice.
+reported as "present" by the DOM thereafter, and a bounded `Set` of emitted
+step names guards against duplicate lines (see "Deduplication"), so a step is
+never written twice.
 
 ### Initial sweep
 
@@ -90,51 +97,58 @@ bootstrap.
 For each qualifying `<style>` node:
 
 ```
-names = findOnexThemeVariables(node.textContent, name => !hasValueInDom(name))
-for name of names:
-    expand(name)
+referenced = findOnexThemeVariables(node.textContent, () => true)
+for name of referenced:
+    if hasValueInDom(name): continue          // resolves — no fallback needed
+    for { stepName, target } of expandName(name, fallbackOrder):
+        if emitted.has(stepName): continue    // already linked
+        if hasValueInDom(stepName): continue  // this step already resolves
+        emitted.add(stepName)
+        appendDeclaration(`  ${stepName}: var(${target});`)
 ```
 
 `findOnexThemeVariables` (from `@onecx/angular-utils/theme`) matches
-`var(--onecx-theme-*)` references in the CSS text. The default filter,
-`hasValueInDom`, keeps variables that **resolve to a value** on
-`document.documentElement`; we invert it to keep the **absent** ones.
+`var(--onecx-theme-*)` references in the CSS text and returns names **with**
+their `--` prefix; `resolveLeafFallback` likewise returns the target with its
+prefix. Both names are used verbatim in the declaration — the emitted property
+is named exactly the referenced name, so a `var(--onecx-theme-…)` reference
+resolves to the declared link. We pass `() => true` to collect **every**
+referenced name and apply the presence check ourselves — the library's default
+filter keeps only *present* variables, the opposite of what a gap scan needs.
 
-`expand(name)` walks the fallback chain and appends declarations to the gap-fill
-sheet:
-
-```
-expand(name):
-    cur = name
-    while true:
-        if hasValueInDom(cur): break          // concrete value present (theme applied it) — done
-        next = resolveLeafFallback(cur, fallbackOrder)
-        if next === undefined: break          // terminal base / not a known leaf — done
-        gapFillSheet.textContent += `  ${cur}: var(${next});\n`
-        cur = next
-```
+`expandName(name, order)` is a pure structural walk: it returns the full
+single-step fallback chain most-specific first, down to the terminal base (or a
+repeated name), using `resolveLeafFallback`. It knows nothing about the DOM.
+The presence check is an **emission** condition only: a step is declared only
+when it is itself undefined, so a variable that already resolves emits nothing,
+and a leaf whose value was applied mid-scan stops the chain naturally.
 
 Full-chain expansion is deliberate and required: a single link written without
 its continuation would leave the intermediate `var(…)` unresolvable, which the
 browser reports as *invalid at computed value time* and the whole chain comes
-out unset. Writing the entire chain down to a name that either has a concrete
-value or is the terminal base is what makes the top variable actually resolve.
+out unset. Walking to the base and emitting every still-undefined step is what
+makes the top variable actually resolve.
 
-## Zero-state dedup
+## Deduplication
 
-The only persistent state is the single gap-fill `<style>` element. No `Set`
-or `WeakSet` keyed by variable name is needed:
+Two mechanisms, each doing a different job:
 
-- After `expand` completes for a name, that name resolves through the
-  now-complete chain to a concrete value (or is itself the terminal base, which
-  receives its concrete value later from `ThemeApplyService`). Either way,
-  `hasValueInDom(name)` then reports **present**.
-- A second sheet that references the same name therefore gets it filtered out
-  at the extraction step, for free.
-- The browser's cascade + our sheet's content are the dedup mechanism; there is
-  no auxiliary index to maintain and the memory footprint is exactly the
-  artifact itself — one line per distinct fallback link — which is the
-  irreducible minimum.
+- **The DOM is the primary presence gate.** A variable that resolves to a
+  value is never scanned as a gap, and a leaf that has been given a concrete
+  value by the theme is skipped entirely. This is what keeps the work
+  self-limiting and theme-independent, and it is the only thing that decides
+  *what* is a gap.
+- **A bounded `Set` of already-emitted step names prevents duplicate lines.**
+  The DOM oracle alone does not dedup: a step that was only *scaffolded* (given
+  a `var(…)` link, no concrete value) is still "absent" to `hasValueInDom`, so
+  a second sheet referencing the same leaf would re-emit the identical chain.
+  The `emitted` set is the redundant-line guard.
+
+The `emitted` set is bounded by the number of distinct fallback links, i.e. the
+number of lines in the gap-fill sheet itself — it holds at most one short
+string per emitted line, so its footprint is O(the artifact) and clears with
+`resetGapFillState()`. It is not keyed by every referenced variable, only by
+the names that actually produced a declaration.
 
 ## Gap-fill sheet
 
@@ -142,7 +156,7 @@ or `WeakSet` keyed by variable name is needed:
 - Appended to `document.head` **at the end** (not at registration time), so any
   MFE/remote-component `<style>` injected afterwards still overrides it.
 - `:root` selector, applied to `<html>`; global by definition.
-- Tagged with a `data-theme-gap-fill` attribute so the monitor skips it and so
+- Tagged with a `data-onecx-theme-gap-fill` attribute so the monitor skips it
   the initial sweep skips it.
 - Content is append-only within a session.
 
@@ -167,12 +181,25 @@ re-observer, no re-scan.
 
 This is why the monitor registers at bootstrap, before the theme is applied.
 
-## `fallbackOrder` source
+## `fallbackOrder` source and readiness
 
-The Shell already parses `ThemePropertiesV2` in `ThemeApplyService`. The gap-
-fill reads `fallbackOrder` from the same parsed theme; when no theme has been
-applied yet it uses `FALLBACK_ORDER_DEFAULT` (imported from
-`@onecx/integration-interface`). No new configuration surface.
+The Shell already parses `ThemePropertiesV2` in `ThemeApplyService`. `applyTheme`
+arms the service with the order in force — the theme's `fallbackOrder` when a v2
+theme carries one, otherwise `FALLBACK_ORDER_DEFAULT` (imported from
+`@onecx/integration-interface`) — **after** it has applied the theme's inline
+values. No new configuration surface.
+
+Readiness is the correctness gate:
+
+- **Order not yet set** — a referenced, undefined variable is *held* (added to
+  the service's buffer) and no fallback line is emitted. Building one against the
+  default order here would point at bases the real order may not define, a
+  persistent, unfixable invalid-at-computed-value bug; so nothing is written
+  until the order is known.
+- **Order set** — `setFallbackOrder` builds every held variable against the order
+  now in force, then builds any later variable on the fly. `applyTheme` applies
+  the theme's values inline *before* it arms the order, so a variable the theme
+  defines is re-checked at build time and skipped — only true gaps are built.
 
 ## Existing Shell monitors (reference)
 
@@ -206,32 +233,64 @@ writes; local-only, never committed.
 
 ## New shell files
 
-- `src/app/shell/utils/styles/theme-fallback-gap-fill.utils.ts` — pure helpers:
-  `isGapFillSheet(node)`, `ensureGapFillSheet()`,
-  `scanNodeForGaps(node, { fallbackOrder })`,
-  `expandName(name, { fallbackOrder })`.
-- `src/app/shell/utils/styles/theme-fallback-gap-fill.utils.spec.ts` — jsdom
-  unit tests. The pure helpers accept a `filter` oracle (matching the
-  `findOnexThemeVariables` signature), so tests inject a fake oracle and do not
-  depend on jsdom's `getComputedStyle`.
-- One-line observer registration in `app.module.ts`, next to
-  `styleChangesListenerInitializer`.
+- `src/app/shell/services/theme-fallback-gap-fill.service.ts` — the
+  `ThemeFallbackGapFillService` (provided `root`). It owns the relaxation order,
+  the held-variable buffer, the emitted-step set, the gap-fill sheet, and the
+  head `MutationObserver`. Public surface:
+  - `startObserver()` — register the head observer and sweep existing styles
+    (idempotent).
+  - `setFallbackOrder(order)` — set the order and build any held variable against
+    it (the readiness gate; see "fallbackOrder source and readiness").
+  - `expandName(name, order)` — the pure single-step chain walk.
+  - `reset()` — disconnect the observer, remove the sheet, clear emitted/held
+    state and the order (test hook).
+- `src/app/shell/services/theme-fallback-gap-fill.service.spec.ts` — jsdom unit
+  tests against a single shared instance (the app uses one singleton). Coverage
+  includes: full-chain build, skip of a present variable, custom vs default order,
+  holding the sheet until the order is set, building held variables on
+  `setFallbackOrder`, skipping a variable the theme defines before arming the
+  order, no duplicate lines across scans, and the deferred final-content read
+  (scope polyfill replacement). jsdom reflects inline custom properties via
+  `getComputedStyle`, so the real `hasValueInDom` oracle is used directly (the
+  same mechanism `ThemeApplyService` applies values through).
+- A `provideAppInitializer` in `app.module.ts` that calls
+  `inject(ThemeFallbackGapFillService).startObserver()`, next to the other
+  style initializers.
+- A `gapFillService.setFallbackOrder(libThemeV2?.fallbackOrder ??
+  FALLBACK_ORDER_DEFAULT)` call in `ThemeApplyService.applyTheme`, after the
+  theme's inline values are applied.
 
 No libs changes required.
 
 ## Testing plan
 
-- Pure util tests (jsdom): extraction keeps only absent names; `expand` writes
-  the full chain and stops at a present var or the terminal base; the
-  gap-fill sheet is created lazily and marked; a second scan of the same name
-  does not re-append; the `isConnected` guard skips removed nodes; the
-  `data-theme-gap-fill` marker is skipped.
-- Observer wiring: registration in `app.module.ts` and the initial sweep —
-  covered by the existing `app.module` tests or a small integration test if
-  warranted.
+- Service tests (jsdom, one shared instance): full-chain build for an undefined
+  variable; a variable already defined on the root is left untouched; a custom
+  `fallbackOrder` drives the chain vs `FALLBACK_ORDER_DEFAULT`; a variable seen
+  before the order is set is held and the sheet is not created; setting the
+  order builds the held variables; a variable the theme defines before the order
+  is set is skipped; re-scanning the same variable emits each gap once; the
+  deferred read reads the node after the scope polyfill replaces it; the
+  gap-fill sheet is created lazily at the end of the head, marked with
+  `data-onecx-theme-gap-fill`, and skipped by the monitor and the initial sweep.
+- `expandName` is exercised through the emitted chains (a custom-order test
+  asserts the exact chain it yields).
+- Observer wiring: `startObserver()` is registered in `app.module.ts`; the
+  initial sweep and readiness flow are covered by the service tests.
 
 ## Confirmed decisions
 
-1. **Registration spot:** `app.module.ts`, co-located with
-   `styleChangesListenerInitializer`.
-2. **Gap-fill sheet selector:** `:root` (applied to `<html>`; global).
+1. **Ownership:** a `ThemeFallbackGapFillService` (provided `root`) owns the
+   order, the held-variable buffer, the emitted set, the sheet, and the
+   observer; `app.module.ts` only starts the observer and `ThemeApplyService`
+   arms the order.
+2. **Registration spot:** `app.module.ts`, co-located with the other style
+   initializers.
+3. **Gap-fill sheet selector:** `:root` (applied to `<html>`; global).
+4. **Dedup:** the DOM presence oracle decides *what* is a gap; a bounded `Set`
+   of emitted step names only guards against duplicate lines (see
+   "Deduplication").
+5. **Order readiness:** a variable is held until `setFallbackOrder` runs (armed
+   by `ThemeApplyService` after applying the theme); a no-order theme arms the
+   default. This is what guarantees every emitted line is built with the order in
+   force.

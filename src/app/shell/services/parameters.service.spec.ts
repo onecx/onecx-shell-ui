@@ -145,7 +145,7 @@ describe('ParametersService', () => {
       }
     })
 
-    expect(publishedParameters.parameters.length).toEqual(6)
+    expect(publishedParameters.parameters).toHaveLength(6)
 
     // In cache and was up-to-date -> we have not asked for an update -> unchanged
     expect(publishedParameters.parameters[0].productName).toEqual(cache.parameters[0].productName)

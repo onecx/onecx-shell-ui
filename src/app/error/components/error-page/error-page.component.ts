@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core'
-import { Location, CommonModule } from '@angular/common'
+import { Location } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -7,7 +7,7 @@ import { getLocation } from '@onecx/accelerator'
 
 @Component({
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [TranslateModule],
   template: `
     <div class="p-4 flex flex-column gap-5">
       <div>
@@ -21,7 +21,7 @@ import { getLocation } from '@onecx/accelerator'
       <button
         class="w-max"
         (click)="onReloadPage()"
-        [ngStyle]="{ cursor: 'pointer' }"
+        [style.cursor]="'pointer'"
         routerLinkActive="router-link-active"
         [attr.aria-label]="'ERROR_PAGE.ACTION' | translate"
         [attr.title]="'ERROR_PAGE.ACTION.TOOLTIP' | translate"

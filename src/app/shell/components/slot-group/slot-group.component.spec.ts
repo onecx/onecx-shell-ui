@@ -407,28 +407,16 @@ describe('SlotGroupComponent', () => {
         expect(computedSlotGroupClasses).toBe('flex-row w-full')
       })
 
-      it('should update classes when direction changes to column', () => {
-        componentRef.setInput('direction', 'column')
+      it.each([
+        ['column', 'flex-column h-full'],
+        ['row-reverse', 'flex-row-reverse w-full'],
+        ['column-reverse', 'flex-column-reverse h-full']
+      ])('should apply correct classes for %s direction', (direction, expectedClasses) => {
+        componentRef.setInput('direction', direction)
 
         const computedSlotGroupClasses = component.computedSlotGroupClasses()
 
-        expect(computedSlotGroupClasses).toBe('flex-column h-full')
-      })
-
-      it('should apply correct classes for row-reverse direction', () => {
-        componentRef.setInput('direction', 'row-reverse')
-
-        const computedSlotGroupClasses = component.computedSlotGroupClasses()
-
-        expect(computedSlotGroupClasses).toBe('flex-row-reverse w-full')
-      })
-
-      it('should apply correct classes for column-reverse direction', () => {
-        componentRef.setInput('direction', 'column-reverse')
-
-        const computedSlotGroupClasses = component.computedSlotGroupClasses()
-
-        expect(computedSlotGroupClasses).toBe('flex-column-reverse h-full')
+        expect(computedSlotGroupClasses).toBe(expectedClasses)
       })
 
       it('should merge custom slotGroupClasses with base classes', () => {

@@ -1,7 +1,7 @@
+import { AsyncPipe } from '@angular/common'
 import { Component, inject, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
-import { CommonModule } from '@angular/common'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { EventsTopic } from '@onecx/integration-interface'
@@ -17,7 +17,7 @@ interface InitializationError {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [AsyncPipe, TranslateModule],
   templateUrl: './initialization-error-page.component.html'
 })
 export class InitializationErrorPageComponent implements OnDestroy {

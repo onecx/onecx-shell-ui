@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import {
@@ -15,7 +14,7 @@ export type NgClassInputType = string | string[] | Set<string> | { [key: string]
 @Component({
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
-  imports: [AngularRemoteComponentsModule, CommonModule],
+  imports: [AngularRemoteComponentsModule],
   host: {
     '[attr.name]': 'name()',
     '[class]': '"flex justify-content-between " + computedSlotGroupClasses()',

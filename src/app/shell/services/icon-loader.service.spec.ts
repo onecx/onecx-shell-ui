@@ -203,7 +203,7 @@ describe('ShellIconLoaderService', () => {
     expect(s1).toBe(s2)
 
     const styles = document.querySelectorAll('#onecx-icons-css')
-    expect(styles.length).toBe(1)
+    expect(styles).toHaveLength(1)
   })
 
   it('should insert rules for svg, background, and background-before', () => {

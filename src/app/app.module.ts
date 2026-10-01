@@ -60,6 +60,7 @@ import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 import { ThemeApplyService } from './shell/services/theme-apply.service'
+import { ThemeFallbackGapFillService } from './shell/services/theme-fallback-gap-fill.service'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -404,6 +405,10 @@ export async function shareMfContainer() {
       return import('./shell/utils/styles/style-changes-listener.utils').then(({ styleChangesListenerInitializer }) =>
         styleChangesListenerInitializer()
       )
+    }),
+    provideAppInitializer(() => {
+      // Start the theme fallback gap-fill observer; it holds variables until the theme order is set.
+      inject(ThemeFallbackGapFillService).startObserver()
     }),
     provideAppInitializer(() => {
       return imageRepositoryServiceInitializer(inject(ImageRepositoryService))

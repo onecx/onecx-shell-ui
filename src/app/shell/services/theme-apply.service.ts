@@ -14,6 +14,7 @@ import {
 
 import { OverrideType, Theme, ThemeOverride } from 'src/app/shared/generated'
 import { MARKED_AS_WRAPPED } from '../utils/styles/shared-styles-host-overwrites.utils'
+import { ThemeFallbackGapFillService } from './theme-fallback-gap-fill.service'
 
 interface ParsedTheme {
   libThemeV1: LibTheme
@@ -24,6 +25,7 @@ interface ParsedTheme {
 @Injectable({ providedIn: 'root' })
 export class ThemeApplyService {
   private readonly themeService = inject(ThemeService)
+  private readonly gapFillService = inject(ThemeFallbackGapFillService)
 
   async applyTheme(theme: Theme): Promise<void> {
     const parsed = this.parseThemeProperties(theme)
@@ -56,6 +58,9 @@ export class ThemeApplyService {
     if (libThemeV2) {
       this.applyThemeV2Variables(libThemeV2)
     }
+    // Arm the fallback monitor once the theme's values are applied; held variables are then built only
+    // for those still undefined, against the theme's order (or the default for a v1-only theme).
+    this.gapFillService.setFallbackOrder(libThemeV2?.fallbackOrder)
     if (theme.overrides?.length) {
       this.applyCssOverrides(theme.overrides)
     }

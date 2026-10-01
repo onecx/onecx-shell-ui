@@ -48,11 +48,12 @@ below) does not matter: the scan is idempotent and reads only final content.
 
 ### What it scans
 
-Only added `<style>` elements that:
+Added `<style>` elements and existing `<style>` elements whose contents change,
+provided they:
 
 1. are still connected at read time (`node.isConnected`) — this drops a node the
    scope polyfill replaced (removed + re-inserted within a batched mutation) in
-   favour of its replacement, which arrives as its own `addedNode`,
+   favour of its replacement, which is scanned as an added node,
 2. have non-empty text content,
 3. are not the gap-fill sheet itself (identified by a `data-onecx-theme-gap-fill`
    attribute on the element).
@@ -61,9 +62,12 @@ External `<link>` nodes and any other element kind are skipped.
 
 ### When it scans (final-content guarantee)
 
-Mutations are collected from the observer callback and the scan is deferred to
-a `queueMicrotask`. Two properties of the existing style-interception system
-make the deferred read always against **final** content:
+The observer watches child-list and character-data changes throughout
+`document.head`. For each mutation it collects both newly added nodes and the
+containing `<style>` element of the mutation target, so edits to an existing
+stylesheet are scanned as well. A pending set coalesces repeated changes to a
+stylesheet, and the scan is deferred to a macrotask so it reads **final**
+content after other observers have finished their changes:
 
 1. **The scope polyfill only replaces nodes wholesale.** Its
    `deconstructScopeRule` rewrites `@supports`-containing sheets by removing
@@ -71,12 +75,14 @@ make the deferred read always against **final** content:
    mutates the text content of a surviving node in place. A node that is still
    connected when we read it therefore has content that is final with respect to
    `--onecx-theme-*` (the `--p-` prefix interceptor — `replacePrimengPrefix` —
-   does not touch `--onecx-theme-*` at all).
+   does not touch `--onecx-theme-*` at all). Other owners can edit a surviving
+   `<style>` in place; those child-list or character-data mutations are collected
+   and read in the same deferred scan.
 2. **`isConnected` filters out nodes the polyfill swapped.** If the polyfill
-   removed and re-inserted a scoped sheet between our observer's callback and
-   our microtask, the node we originally received is disconnected and skipped;
-   the polyfill's replacement node arrives as a separate `addedNode` mutation
-   and is processed on its own pass, against its final content.
+   removed and re-inserted a scoped sheet before our deferred scan, the node we
+   originally received is disconnected and skipped;
+   the polyfill's replacement node arrives as an added-node mutation and is
+   processed against its final content.
 
 Combined: we only ever read a node whose `--onecx-theme-*` content is already
 post-modification, and a name that is expanded into the gap-fill sheet is

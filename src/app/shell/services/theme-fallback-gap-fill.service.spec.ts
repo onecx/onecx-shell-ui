@@ -96,6 +96,25 @@ describe(ThemeFallbackGapFillService.name, () => {
       // Nothing is built and no sheet is created, so the observer is never delivered.
       expect(moDeliveries).toBe(0)
     })
+
+    it('builds a fallback chain when an existing style gains a variable reference', async () => {
+      const LEAF = '--onecx-theme-primitives-variant-primary-state-hover-severity-success-bg-color'
+      const L1 = '--onecx-theme-primitives-variant-primary-defaultState-severity-success-bg-color'
+      const L2 = '--onecx-theme-primitives-defaultVariant-defaultState-severity-success-bg-color'
+      const L3 = '--onecx-theme-primitives-defaultVariant-defaultState-defaultSeverity-bg-color'
+      const FULL_CHAIN = `:root {\n  ${LEAF}: var(${L1});\n  ${L1}: var(${L2});\n  ${L2}: var(${L3});\n}`
+      const style = addHeadStyle('.c { color: red; }')
+      service.startObserver()
+      service.setFallbackOrder(DEFAULT_ORDER)
+      await settle()
+
+      style.textContent = `.c { color: var(${LEAF}); }`
+      await settle()
+
+      expect(sheetText()).toBe(FULL_CHAIN)
+      expect(style.isConnected).toBe(true)
+      expect(document.head.querySelectorAll(GAP_FILL_SELECTOR)).toHaveLength(1)
+    })
   })
 
   describe('styles added after the observer starts', () => {

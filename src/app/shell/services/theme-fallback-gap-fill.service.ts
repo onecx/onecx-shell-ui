@@ -6,7 +6,7 @@ import type { RelaxedAxisKind } from '@onecx/integration-interface'
 /**
  * Fills in on-demand CSS fallbacks for theme variables.
  *
- * Scans every `<style>` node added to `document.head` (and the styles already present when the
+ * Scans `<style>` nodes added to or modified in `document.head` (and styles already present when the
  * observer starts) for `var(--onecx-theme-*)` references. For each referenced variable that has no
  * value in the DOM, it writes one-step relaxation links `--name: var(--less-specific)` into a single
  * `:root` stylesheet (a `style` element tagged `data-onecx-theme-gap-fill`) appended at the end of the
@@ -22,14 +22,16 @@ export class ThemeFallbackGapFillService {
   private gapFillSheet: HTMLStyleElement | null = null
   private fallbackOrder: RelaxedAxisKind[] | null = null
   private readonly pending = new Set<string>()
+  private readonly pendingScanNodes = new Set<Node>()
+  private scanTimer: ReturnType<typeof setTimeout> | null = null
   private sheetBuffer = ''
 
   startObserver(): void {
     if (this.observer) {
       return
     }
-    this.observer = new MutationObserver((mutationList: MutationRecord[]) => this.processAddedNodes(mutationList))
-    this.observer.observe(document.head, { childList: true })
+    this.observer = new MutationObserver((mutationList: MutationRecord[]) => this.processMutations(mutationList))
+    this.observer.observe(document.head, { childList: true, characterData: true, subtree: true })
     this.sweepExistingStyles()
   }
 
@@ -57,8 +59,15 @@ export class ThemeFallbackGapFillService {
     return hasValueInDom(varName)
   }
 
-  private processAddedNodes(mutationList: MutationRecord[]): void {
-    this.deferScan(mutationList.flatMap((mutation) => Array.from(mutation.addedNodes)))
+  private processMutations(mutationList: MutationRecord[]): void {
+    const styles = new Set<Node>()
+    for (const mutation of mutationList) {
+      for (const node of Array.from(mutation.addedNodes)) {
+        this.addContainingStyle(node, styles)
+      }
+      this.addContainingStyle(mutation.target, styles)
+    }
+    this.deferScan([...styles])
   }
 
   private sweepExistingStyles(): void {
@@ -71,16 +80,28 @@ export class ThemeFallbackGapFillService {
   // style node (remove + re-insert) within the same mutation batch, and only the surviving node is both
   // connected and fully written once the deferral runs.
   private deferScan(nodes: Node[]): void {
-    setTimeout(() => nodes.filter((node) => this.isScannableStyle(node)).forEach((node) => this.scanNode(node)), 0)
+    nodes.forEach((node) => this.pendingScanNodes.add(node))
+    if (this.scanTimer !== null) {
+      return
+    }
+    this.scanTimer = setTimeout(() => {
+      this.scanTimer = null
+      const nodesToScan = [...this.pendingScanNodes]
+      this.pendingScanNodes.clear()
+      nodesToScan.filter((node) => this.isScannableStyle(node)).forEach((node) => this.scanNode(node))
+    }, 0)
   }
 
-  private isScannableStyle(node: Node): node is Element {
-    return (
-      node.nodeType === Node.ELEMENT_NODE &&
-      node.isConnected &&
-      (node as Element).textContent !== '' &&
-      !this.isGapFillSheet(node)
-    )
+  private addContainingStyle(node: Node, styles: Set<Node>): void {
+    const element = node.nodeType === Node.ELEMENT_NODE ? (node as Element) : node.parentElement
+    const style = element?.closest('style')
+    if (style) {
+      styles.add(style)
+    }
+  }
+
+  private isScannableStyle(node: Node): node is HTMLStyleElement {
+    return node instanceof HTMLStyleElement && node.isConnected && node.textContent !== '' && !this.isGapFillSheet(node)
   }
 
   private isGapFillSheet(node: Node): boolean {
@@ -153,6 +174,11 @@ export class ThemeFallbackGapFillService {
   reset(): void {
     this.observer?.disconnect()
     this.observer = null
+    if (this.scanTimer !== null) {
+      clearTimeout(this.scanTimer)
+      this.scanTimer = null
+    }
+    this.pendingScanNodes.clear()
     this.gapFillSheet?.remove()
     this.gapFillSheet = null
     this.pending.clear()

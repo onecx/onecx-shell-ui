@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing'
+import { Subject } from 'rxjs'
+
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
-import { Subject } from 'rxjs'
 import { PageNotFoundComponent } from './not-found-page.component'
 
 describe('PageNotFoundComponent', () => {

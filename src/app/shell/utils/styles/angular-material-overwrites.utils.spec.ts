@@ -1,4 +1,5 @@
 import { dataIntermediateStyleIdKey } from '@onecx/angular-utils'
+
 import { ensureMaterialDynamicDataIncludesIntermediateStyleData } from './angular-material-overwrites.utils'
 
 type MarkedElement = HTMLElement & { onecx?: { markers: string[] } }

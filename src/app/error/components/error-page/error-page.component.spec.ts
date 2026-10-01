@@ -1,6 +1,7 @@
 import { Location } from '@angular/common'
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
+
 import { ErrorPageComponent } from './error-page.component'
 
 jest.mock('@onecx/accelerator', () => {

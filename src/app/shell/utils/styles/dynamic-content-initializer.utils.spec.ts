@@ -1,4 +1,5 @@
 import { CONFIG_KEY, ConfigurationService, POLYFILL_SCOPE_MODE } from '@onecx/angular-integration-interface'
+
 import * as angularMaterial from './angular-material-overwrites.utils'
 import * as bodyOverwrites from './body-overwrites.utils'
 import { dynamicContentInitializer } from './dynamic-content-initializer.utils'

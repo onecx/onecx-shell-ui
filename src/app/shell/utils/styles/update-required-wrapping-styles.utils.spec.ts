@@ -1,4 +1,10 @@
 import { dataStyleIdAttribute } from '@onecx/angular-utils'
+import { isCssScopeRuleSupported } from '@onecx/angular-utils'
+import { replaceRootAndHtmlWithScope } from '@onecx/angular-utils/style'
+
+import { MARKED_AS_WRAPPED, MARKED_FOR_WRAPPING } from './shared-styles-host-overwrites.utils'
+import { updateRequiredWrappingStyles } from './update-required-wrapping-styles.utils'
+
 jest.mock('@onecx/angular-utils', () => {
   const actual = jest.requireActual('@onecx/angular-utils')
   return { ...actual, isCssScopeRuleSupported: jest.fn() }
@@ -7,14 +13,6 @@ jest.mock('@onecx/angular-utils/style', () => {
   const actual = jest.requireActual('@onecx/angular-utils/style')
   return { ...actual, replaceRootAndHtmlWithScope: jest.fn() }
 })
-import { isCssScopeRuleSupported } from '@onecx/angular-utils'
-import { replaceRootAndHtmlWithScope } from '@onecx/angular-utils/style'
-import { MARKED_AS_WRAPPED, MARKED_FOR_WRAPPING } from './shared-styles-host-overwrites.utils'
-import { updateRequiredWrappingStyles } from './update-required-wrapping-styles.utils'
-
-function mutation(...nodes: Node[]): MutationRecord {
-  return { addedNodes: nodes } as unknown as MutationRecord
-}
 
 describe('updateRequiredWrappingStyles', () => {
   beforeEach(() => {
@@ -27,7 +25,7 @@ describe('updateRequiredWrappingStyles', () => {
     const style = document.createElement('style')
     style.textContent = 'body {}'
 
-    updateRequiredWrappingStyles([mutation(div, style)])
+    updateRequiredWrappingStyles([{ addedNodes: [div, style] } as unknown as MutationRecord])
 
     expect(style.dataset[MARKED_FOR_WRAPPING]).toBeUndefined()
   })
@@ -43,7 +41,7 @@ describe('updateRequiredWrappingStyles', () => {
     alreadyMarked.dataset[MARKED_AS_WRAPPED] = ''
     alreadyMarked.textContent = 'body {}'
 
-    updateRequiredWrappingStyles([mutation(empty, angularStyle, alreadyMarked)])
+    updateRequiredWrappingStyles([{ addedNodes: [empty, angularStyle, alreadyMarked] } as unknown as MutationRecord])
 
     expect(empty.dataset[MARKED_AS_WRAPPED]).toBe('')
     expect(angularStyle.dataset[MARKED_AS_WRAPPED]).toBe('')
@@ -61,7 +59,7 @@ describe('updateRequiredWrappingStyles', () => {
     })
     Object.defineProperty(style, 'dataset', { configurable: true, value: dataset })
 
-    updateRequiredWrappingStyles([mutation(style)])
+    updateRequiredWrappingStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
     expect(markerReads).toBe(2)
     expect(style.dataset[MARKED_AS_WRAPPED]).toBe('')
@@ -76,7 +74,7 @@ describe('updateRequiredWrappingStyles', () => {
     style.textContent = 'html, :root { color: red; }'
     document.head.appendChild(style)
 
-    updateRequiredWrappingStyles([mutation(style)])
+    updateRequiredWrappingStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
     const wrapped = document.head.querySelector('style') as HTMLStyleElement
     expect(wrapped).not.toBe(style)
@@ -95,7 +93,7 @@ describe('updateRequiredWrappingStyles', () => {
     style.textContent = 'html { color: blue; }'
     document.head.appendChild(style)
 
-    updateRequiredWrappingStyles([mutation(style)])
+    updateRequiredWrappingStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
     const wrapped = document.head.querySelector('style') as HTMLStyleElement & {
       onecxOriginalCss?: string
@@ -111,14 +109,14 @@ describe('updateRequiredWrappingStyles', () => {
     native.dataset[MARKED_FOR_WRAPPING] = 'app'
     native.textContent = '@scope([data-style-id="app"]) {}'
     supported.mockReturnValue(true)
-    updateRequiredWrappingStyles([mutation(native)])
+    updateRequiredWrappingStyles([{ addedNodes: [native] } as unknown as MutationRecord])
     expect(native.dataset[MARKED_AS_WRAPPED]).toBe('')
 
     const fallback = document.createElement('style')
     fallback.dataset[MARKED_FOR_WRAPPING] = 'app'
     fallback.textContent = '@supports(@scope([data-style-id="app"]) {})'
     supported.mockReturnValue(false)
-    updateRequiredWrappingStyles([mutation(fallback)])
+    updateRequiredWrappingStyles([{ addedNodes: [fallback] } as unknown as MutationRecord])
     expect(fallback.dataset[MARKED_AS_WRAPPED]).toBe('')
   })
 })

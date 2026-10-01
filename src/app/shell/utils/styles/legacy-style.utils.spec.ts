@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http'
+import { of } from 'rxjs'
+
 import { dataDynamicPortalLayoutStylesKey, dataPortalLayoutStylesKey } from '@onecx/angular-utils'
 import { isCssScopeRuleSupported } from '@onecx/angular-utils'
-import { of } from 'rxjs'
+
 import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './legacy-style.utils'
 
 jest.mock('@onecx/angular-utils', () => {

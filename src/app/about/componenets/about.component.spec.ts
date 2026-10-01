@@ -1,22 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { AboutComponent } from './about.component'
 import { TranslateModule } from '@ngx-translate/core'
+
+import { AboutComponent } from './about.component'
 
 describe('AboutComponent', () => {
   let fixture: ComponentFixture<AboutComponent>
   let component: AboutComponent
-
-  function resetFederation() {
-    const global = globalThis as any
-    global.__FEDERATION__ = {
-      __INSTANCES__: [
-        {
-          name: 'onecx_shell_ui',
-          shareScopeMap: {}
-        }
-      ]
-    }
-  }
 
   function mockFederation(entries: Record<string, Record<string, any>>) {
     const global = globalThis as any
@@ -40,8 +29,16 @@ describe('AboutComponent', () => {
   })
 
   afterEach(() => {
-    resetFederation()
-    jest.restoreAllMocks()
+    const federation = globalThis as any
+
+    federation.__FEDERATION__ = {
+      __INSTANCES__: [
+        {
+          name: 'onecx_shell_ui',
+          shareScopeMap: {}
+        }
+      ]
+    }
   })
 
   it('builds supportedAngularVersions from __FEDERATION__ entries', () => {

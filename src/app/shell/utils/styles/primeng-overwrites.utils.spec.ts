@@ -1,4 +1,5 @@
 import { dataIntermediateStyleIdKey } from '@onecx/angular-utils'
+
 import { ensurePrimengDynamicDataIncludesIntermediateStyleData } from './primeng-overwrites.utils'
 
 type MarkedElement = HTMLElement & { onecx?: { markers: string[] } }

@@ -1,12 +1,14 @@
 import { POLYFILL_SCOPE_MODE } from '@onecx/angular-integration-interface'
 import { dataOnecxDynamicContainerKey, dataStyleIdKey } from '@onecx/angular-utils'
+import { isCssScopeRuleSupported } from '@onecx/angular-utils'
+
+import * as polyfill from 'src/scope-polyfill/polyfill'
+import { ensureBodyChangesIncludeStyleData } from './body-overwrites.utils'
+
 jest.mock('@onecx/angular-utils', () => {
   const actual = jest.requireActual('@onecx/angular-utils')
   return { ...actual, isCssScopeRuleSupported: jest.fn() }
 })
-import { isCssScopeRuleSupported } from '@onecx/angular-utils'
-import * as polyfill from 'src/scope-polyfill/polyfill'
-import { ensureBodyChangesIncludeStyleData } from './body-overwrites.utils'
 
 describe('body style data overwrites', () => {
   beforeEach(() => {

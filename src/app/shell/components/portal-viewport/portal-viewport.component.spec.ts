@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
+
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { UserProfile } from '@onecx/integration-interface'
+
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
-import { RoutesService } from '../../services/routes.service'
 import { PortalViewportComponent } from './portal-viewport.component'
+import { RoutesService } from '../../services/routes.service'
 
 class ResizeObserverMock {
   private readonly callback: ResizeObserverCallback

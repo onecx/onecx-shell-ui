@@ -1,14 +1,12 @@
 import { dataNoPortalLayoutStylesKey, dataStyleIdKey } from '@onecx/angular-utils'
+import { replacePrimengPrefix } from '@onecx/angular-utils'
+
+import { updateAngularComponentsStyles } from './update-angular-components-styles.utils'
+
 jest.mock('@onecx/angular-utils', () => {
   const actual = jest.requireActual('@onecx/angular-utils')
   return { ...actual, replacePrimengPrefix: jest.fn() }
 })
-import { replacePrimengPrefix } from '@onecx/angular-utils'
-import { updateAngularComponentsStyles } from './update-angular-components-styles.utils'
-
-function mutation(...nodes: Node[]): MutationRecord {
-  return { addedNodes: nodes } as unknown as MutationRecord
-}
 
 describe('updateAngularComponentsStyles', () => {
   beforeEach(() => {
@@ -30,7 +28,9 @@ describe('updateAngularComponentsStyles', () => {
     })
     const nullContentNode = { textContent: null } as unknown as Node
 
-    updateAngularComponentsStyles([mutation(plain, emptyAngularStyle, changingContentStyle, nullContentNode)])
+    updateAngularComponentsStyles([
+      { addedNodes: [plain, emptyAngularStyle, changingContentStyle, nullContentNode] } as unknown as MutationRecord
+    ])
 
     expect(plain.textContent).toBe('body {}')
     expect(contentReads).toBe(2)
@@ -41,15 +41,15 @@ describe('updateAngularComponentsStyles', () => {
     missingOwner.textContent = '[_nghost-missing] {}'
     const missingAttribute = document.createElement('style')
     missingAttribute.textContent = '[_nghost] {}'
-    updateAngularComponentsStyles([mutation(missingOwner)])
-    updateAngularComponentsStyles([mutation(missingAttribute)])
+    updateAngularComponentsStyles([{ addedNodes: [missingOwner] } as unknown as MutationRecord])
+    updateAngularComponentsStyles([{ addedNodes: [missingAttribute] } as unknown as MutationRecord])
 
     const ownerWithoutStyle = document.createElement('div')
     ownerWithoutStyle.setAttribute('_nghost-owner', '')
     document.body.appendChild(ownerWithoutStyle)
     const missingStyleData = document.createElement('style')
     missingStyleData.textContent = '[_nghost-owner] {}'
-    updateAngularComponentsStyles([mutation(missingStyleData)])
+    updateAngularComponentsStyles([{ addedNodes: [missingStyleData] } as unknown as MutationRecord])
 
     expect(missingOwner.textContent).toContain('_nghost-missing')
     expect(missingAttribute.textContent).toContain('[_nghost]')
@@ -69,7 +69,7 @@ describe('updateAngularComponentsStyles', () => {
     style.textContent = originalCss
     const replace = jest.mocked(replacePrimengPrefix).mockReturnValue('replaced')
 
-    updateAngularComponentsStyles([mutation(style)])
+    updateAngularComponentsStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
     expect(replace).toHaveBeenCalledWith(originalCss, 'product|app')
     expect(style.textContent).toBe('replaced')
@@ -84,7 +84,7 @@ describe('updateAngularComponentsStyles', () => {
     style.textContent = '[_nghost-owner] { --p-color: red; }'
     const replace = jest.mocked(replacePrimengPrefix)
 
-    updateAngularComponentsStyles([mutation(style)])
+    updateAngularComponentsStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
     expect(replace).not.toHaveBeenCalled()
     expect(style.textContent).toContain('--p-color')

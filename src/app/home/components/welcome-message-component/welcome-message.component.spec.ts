@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing'
-import { AppStateService, UserService } from '@onecx/angular-integration-interface'
 import { Subject } from 'rxjs'
+
+import { AppStateService, UserService } from '@onecx/angular-integration-interface'
+
 import { WelcomeMessageComponent } from './welcome-message.component'
 
 describe('WelcomeMessageComponent', () => {

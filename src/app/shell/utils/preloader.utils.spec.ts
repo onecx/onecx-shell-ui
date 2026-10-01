@@ -1,5 +1,6 @@
-import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
 import * as moduleFederation from '@module-federation/enhanced/runtime'
+
+import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
 
 jest.mock('@module-federation/enhanced/runtime', () => ({
   registerRemotes: jest.fn(),

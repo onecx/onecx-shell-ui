@@ -1,4 +1,5 @@
 import { of } from 'rxjs'
+
 import { PermissionsCacheService } from './permissions-cache.service'
 
 describe('PermissionsCacheService', () => {

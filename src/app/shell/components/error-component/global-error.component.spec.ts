@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, Router } from '@angular/router'
+
 import { GlobalErrorComponent } from './global-error.component'
 
 describe('GlobalErrorComponent', () => {

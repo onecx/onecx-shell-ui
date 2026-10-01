@@ -1,4 +1,5 @@
 import { dataStyleIdKey } from '@onecx/angular-utils'
+
 import { getOnecxTriggerElement, initializeOnecxTriggerElementListener } from './onecx-trigger-element.utils'
 
 describe('OneCX trigger element utilities', () => {

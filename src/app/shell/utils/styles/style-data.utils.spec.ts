@@ -7,6 +7,7 @@ import {
   dataStyleIdKey,
   dataStyleIsolationKey
 } from '@onecx/angular-utils'
+
 import {
   appendIntermediateStyleData,
   appendStyleData,

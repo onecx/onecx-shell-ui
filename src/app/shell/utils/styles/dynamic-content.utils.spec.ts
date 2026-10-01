@@ -1,5 +1,6 @@
 import { dataIntermediateStyleIdKey, dataStyleIdKey } from '@onecx/angular-utils'
 import { getStyleDataFromInjector } from '@onecx/angular-utils/style'
+
 import { ensureCreateOnecxDynamicContainer, ensureCreateOnecxElement } from './dynamic-content.utils'
 
 jest.mock('@onecx/angular-utils/style', () => {

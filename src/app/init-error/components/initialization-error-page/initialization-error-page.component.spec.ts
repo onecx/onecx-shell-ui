@@ -1,10 +1,11 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
+import { TooltipModule } from 'primeng/tooltip'
 import { firstValueFrom, of } from 'rxjs'
 
-import { InitializationErrorPageComponent } from './initialization-error-page.component'
-import { TooltipModule } from 'primeng/tooltip'
 import { provideTranslateTestingService } from '@onecx/angular-testing'
+
+import { InitializationErrorPageComponent } from './initialization-error-page.component'
 
 describe('InitializationErrorPageComponent', () => {
   let component: InitializationErrorPageComponent

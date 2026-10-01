@@ -1,14 +1,16 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
-import { SlotGroupComponent } from './slot-group.component'
-import { ComponentRef, ElementRef, EventEmitter } from '@angular/core'
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
-import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
-import { SlotGroupHarness } from './slot-group.harness'
-import { SlotHarness } from '@onecx/angular-remote-components/testing'
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { ComponentRef, ElementRef, EventEmitter } from '@angular/core'
 import { By } from '@angular/platform-browser'
+
 import { SLOT_SERVICE, SlotComponent, SlotService } from '@onecx/angular-remote-components'
+import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
+import { SlotHarness } from '@onecx/angular-remote-components/testing'
+
+import { SlotGroupComponent } from './slot-group.component'
+import { SlotGroupHarness } from './slot-group.harness'
 
 class ResizeObserverMock {
   constructor(private readonly callback: ResizeObserverCallback) {}

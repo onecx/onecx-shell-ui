@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http'
-import { isCssScopeRuleSupported } from '@onecx/angular-utils'
 import { of } from 'rxjs'
+
+import { isCssScopeRuleSupported } from '@onecx/angular-utils'
+
 import { fetchShellStyles, loadShellStyles } from './shell-styles.utils'
 
 jest.mock('@onecx/angular-utils', () => {

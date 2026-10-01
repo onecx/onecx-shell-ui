@@ -1,8 +1,10 @@
 import { ElementRef } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
+import { of } from 'rxjs'
+
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { dataMfeElementKey } from '@onecx/angular-utils'
-import { of } from 'rxjs'
+
 import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 import { WebcomponentLoaderComponent } from './webcomponent-loader.component'
 import { WebcomponentLoaderModule } from './webcomponent-loader.module'

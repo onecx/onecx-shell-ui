@@ -12,7 +12,7 @@ export interface SlotGroupHarnessFilters extends BaseHarnessFilters {
  * within a slot group, including their styles, classes, and content.
  */
 export class SlotGroupHarness extends ContentContainerComponentHarness {
-  static readonly hostSelector = 'ocx-shell-slot-group'
+  static readonly hostSelector = 'ocx-slot-group'
 
   static with(options: SlotGroupHarnessFilters = {}): HarnessPredicate<SlotGroupHarness> {
     return new HarnessPredicate(SlotGroupHarness, options).addOption('name', options.name, (harness, name) =>

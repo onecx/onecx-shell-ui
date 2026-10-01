@@ -56,6 +56,10 @@ function doesStyleRequireWrapping(node: Node): boolean {
  * @param styleElement - style element to mark
  */
 function markAsWrapped(styleElement: Node) {
+  if (styleElement.nodeName !== 'STYLE') {
+    return
+  }
+
   const styleEl = styleElement as HTMLStyleElement
   delete styleEl.dataset[MARKED_FOR_WRAPPING]
   styleEl.dataset[MARKED_AS_WRAPPED] = ''
@@ -68,8 +72,7 @@ function markAsWrapped(styleElement: Node) {
  * @returns {void}
  */
 function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
-  const styleContent = styleElement.textContent
-  if (!styleContent || isStyleWrapped(styleElement, styleId, styleContent)) {
+  if (!styleElement.textContent || isStyleWrapped(styleElement, styleId)) {
     markAsWrapped(styleElement)
     return
   }
@@ -78,18 +81,18 @@ function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
   if (isCssScopeRuleSupported()) {
     const content = `
       @scope([${dataStyleIdAttribute}="${styleId}"]) to ([${dataStyleIsolationAttribute}]) {
-        ${replaceRootAndHtmlWithScope(styleContent)}
+        ${replaceRootAndHtmlWithScope(styleElement.textContent)}
       }
       `
     newStyleElement.appendChild(document.createTextNode(content))
   } else {
     const content = `
       @supports(@scope([${dataStyleIdAttribute}="${styleId}"]) to ([${dataStyleIsolationAttribute}])) {
-        ${replaceRootAndHtmlWithScope(styleContent)}
+        ${replaceRootAndHtmlWithScope(styleElement.textContent)}
       }
       `
     newStyleElement.appendChild(document.createTextNode(content))
-    ;(newStyleElement as any).onecxOriginalCss = styleContent
+    ;(newStyleElement as any).onecxOriginalCss = styleElement.textContent
   }
 
   copyDataset(styleElement.dataset, newStyleElement.dataset)
@@ -110,14 +113,14 @@ function replaceAndWrapStyle(styleElement: HTMLStyleElement, styleId: string) {
  * @param styleId
  * @returns {boolean} whether style is already wrapped
  */
-function isStyleWrapped(styleElement: HTMLStyleElement, styleId: string, styleContent: string): boolean {
-  if (styleContent.includes('[_nghost') || styleElement.dataset[MARKED_AS_WRAPPED] !== undefined) {
+function isStyleWrapped(styleElement: HTMLStyleElement, styleId: string): boolean {
+  if (styleElement.textContent?.includes('[_nghost') || styleElement.dataset[MARKED_AS_WRAPPED] !== undefined) {
     return true
   }
   if (isCssScopeRuleSupported()) {
-    return styleContent.includes(`@scope([${dataStyleIdAttribute}="${styleId}"]`)
+    return styleElement.textContent?.includes(`@scope([${dataStyleIdAttribute}="${styleId}"]`) ?? false
   } else {
-    return styleContent.includes(`@supports(@scope([${dataStyleIdAttribute}="${styleId}"]`)
+    return styleElement.textContent?.includes(`@supports(@scope([${dataStyleIdAttribute}="${styleId}"]`) ?? false
   }
 }
 

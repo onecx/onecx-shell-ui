@@ -21,7 +21,7 @@ export function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
     }
 
     const { styleId, noPortalLayoutStyles } = getStyleDataFromNodeContent(node.textContent)
-    if (!styleId || !doesStyleDataRequireReplacement(noPortalLayoutStyles)) {
+    if (!styleId || !doesStyleDataRequireReplacement(styleId, noPortalLayoutStyles)) {
       return
     }
 
@@ -29,7 +29,9 @@ export function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
   })
 }
 
-function doesStyleDataRequireReplacement(noPortalLayoutStyles: string | null | undefined) {
+function doesStyleDataRequireReplacement(styleId: string | null, noPortalLayoutStyles: string | null | undefined) {
+  if (!styleId) return false
+
   return noPortalLayoutStyles === ''
 }
 

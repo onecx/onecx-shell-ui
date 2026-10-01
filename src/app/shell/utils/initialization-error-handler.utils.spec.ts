@@ -80,4 +80,17 @@ describe('initializationErrorHandler', () => {
 
     consoleSpy.mockRestore()
   })
+
+  it('does not navigate when the error-page route is already active', () => {
+    const originalUrl = window.location.href
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+    window.history.replaceState(null, '', '/portal-initialization-error-page')
+
+    initializationErrorHandler(new Error('already redirected'), router)
+
+    expect(router.navigate).not.toHaveBeenCalled()
+
+    window.history.replaceState(null, '', originalUrl)
+    consoleSpy.mockRestore()
+  })
 })

@@ -84,7 +84,7 @@ export class PortalViewportComponent implements OnInit {
         mergeMap((theme) => {
           return (
             theme.faviconUrl
-              ? this.httpClient.get(theme.faviconUrl ?? '', { responseType: 'blob' })
+              ? this.httpClient.get(theme.faviconUrl, { responseType: 'blob' })
               : (this.workspaceConfigBffService?.getThemeFaviconByName(theme.name ?? '') ?? of())
           ).pipe(
             filter((blob) => !!blob),

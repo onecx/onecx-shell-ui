@@ -39,6 +39,7 @@ describe('AboutComponent', () => {
         }
       ]
     }
+    jest.restoreAllMocks()
   })
 
   it('builds supportedAngularVersions from __FEDERATION__ entries', () => {

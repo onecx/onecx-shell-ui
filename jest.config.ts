@@ -34,6 +34,7 @@ const config: Config = {
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment'
   ],
+  collectCoverage: true,
   coverageDirectory: '<rootDir>/reports/coverage/',
   coveragePathIgnorePatterns: ignoredPathPatterns,
   coverageReporters: ['json', 'text', 'lcov', 'text-summary'],

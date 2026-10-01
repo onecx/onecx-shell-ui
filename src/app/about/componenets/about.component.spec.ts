@@ -29,9 +29,8 @@ describe('AboutComponent', () => {
   })
 
   afterEach(() => {
-    const federation = globalThis as any
-
-    federation.__FEDERATION__ = {
+    const global = globalThis as any
+    global.__FEDERATION__ = {
       __INSTANCES__: [
         {
           name: 'onecx_shell_ui',

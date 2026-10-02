@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing'
-import { ThemeService } from '@onecx/angular-integration-interface'
-import { WorkspaceConfigBffService } from 'src/app/shared/generated'
 import { firstValueFrom, of, throwError } from 'rxjs'
+
 import { FakeTopic } from '@onecx/accelerator'
+import { ThemeService } from '@onecx/angular-integration-interface'
 import { CurrentThemeTopic } from '@onecx/integration-interface'
+
+import { WorkspaceConfigBffService } from 'src/app/shared/generated'
 import { ImageRepositoryService } from './image-repository.service'
 
 const THEME_SERVICE_MOCK = {
@@ -94,6 +96,19 @@ describe('ImageRepositoryService', () => {
       const imagePaths = await firstValueFrom(imageTopicMock.asObservable())
 
       expect(imagePaths).toEqual({ images: {} })
+    })
+
+    it('should publish empty images if available types are not an array', async () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation()
+      themeService.currentTheme$.publish(THEME_CONFIG)
+      jest.spyOn(workspaceConfigBffService, 'getAvailableImageTypes').mockReturnValue(of({ types: 'logo' } as any))
+
+      await service.init()
+      const imagePaths = await firstValueFrom(imageTopicMock.asObservable())
+
+      expect(imagePaths).toEqual({ images: {} })
+      expect(errorSpy).toHaveBeenCalled()
+      errorSpy.mockRestore()
     })
 
     it('should log error and not publish if available types are undefined (error in BFF)', async () => {

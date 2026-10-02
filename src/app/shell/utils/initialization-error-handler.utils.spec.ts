@@ -1,5 +1,5 @@
-import { TestBed } from '@angular/core/testing'
 import { HttpErrorResponse } from '@angular/common/http'
+import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 
 import { initializationErrorHandler } from './initialization-error-handler.utils'
@@ -78,6 +78,19 @@ describe('initializationErrorHandler', () => {
       fragment: expect.stringContaining('message=')
     })
 
+    consoleSpy.mockRestore()
+  })
+
+  it('does not navigate when the error-page route is already active', () => {
+    const originalUrl = window.location.href
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+    window.history.replaceState(null, '', '/portal-initialization-error-page')
+
+    initializationErrorHandler(new Error('already redirected'), router)
+
+    expect(router.navigate).not.toHaveBeenCalled()
+
+    window.history.replaceState(null, '', originalUrl)
     consoleSpy.mockRestore()
   })
 })

@@ -4,7 +4,7 @@ import { getOneCXSharedLibraryConfig, getOneCXSharedRecommendations } from '@one
 import * as pkg from 'package.json'
 
 const SINGLETON_PREFIXES = ['@onecx/']
-const SINGLETON_PACKAGES = ['react', 'react-dom', 'i18next', 'react-i18next', 'react-router', 'primereact']
+const SINGLETON_PACKAGES = ['react', 'react-dom', 'i18next', 'react-i18next', 'react-router', 'primereact', '@r2wc/react-to-web-component']
 
 function isSingletonPackage(name: string): boolean {
   return SINGLETON_PREFIXES.some((prefix) => name.startsWith(prefix)) || SINGLETON_PACKAGES.includes(name)

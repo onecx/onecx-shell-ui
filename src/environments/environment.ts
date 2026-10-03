@@ -4,5 +4,6 @@ export const environment = {
   KEYCLOAK_REALM: 'onecx',
   skipRemoteConfigLoad: true,
   production: false,
-  APP_VERSION: 'Local Shell Version'
+  APP_VERSION: 'Local Shell Version',
+  KEYBOARD_FOCUSABLE_SELECTOR: []
 }

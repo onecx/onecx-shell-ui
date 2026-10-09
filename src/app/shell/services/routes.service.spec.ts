@@ -1,21 +1,23 @@
-import { TestBed } from '@angular/core/testing'
-import { of } from 'rxjs'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
 import { NavigationEnd, NavigationSkipped, Router, provideRouter } from '@angular/router'
+import { loadRemote } from '@module-federation/enhanced/runtime'
+import { of } from 'rxjs'
+
 import { updateStylesForMfeChange } from '@onecx/angular-utils/style'
 import { getLocation } from '@onecx/accelerator'
-import { loadRemote } from '@module-federation/enhanced/runtime'
 
 import { DEFAULT_CATCH_ALL_ROUTE, RoutesService } from './routes.service'
 
 // External services to mock
 import { ConfigurationService, PortalMessageService } from '@onecx/angular-integration-interface'
 import { AppStateServiceMock, provideAppStateServiceMock } from '@onecx/angular-integration-interface/mocks'
+
+import { appRoutes } from 'src/app/app.routes'
 import { PathMatch, PermissionBffService, Route, Technologies } from 'src/app/shared/generated'
 import { PermissionsCacheService } from './permissions-cache.service'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
-import { appRoutes } from 'src/app/app.routes'
 
 jest.mock('@module-federation/enhanced/runtime', () => ({
   loadRemote: jest.fn(),

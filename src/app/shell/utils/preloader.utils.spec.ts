@@ -1,5 +1,6 @@
-import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
 import * as moduleFederation from '@module-federation/enhanced/runtime'
+
+import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
 
 jest.mock('@module-federation/enhanced/runtime', () => ({
   registerRemotes: jest.fn(),
@@ -9,6 +10,7 @@ jest.mock('@module-federation/enhanced/runtime', () => ({
 describe('Preloader Utils', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')
   })
 
   describe('loadPreloaderModule', () => {
@@ -59,6 +61,30 @@ describe('Preloader Utils', () => {
         }
       ])
       expect(moduleFederation.loadRemote).toHaveBeenCalledWith(`${mockPreloader.name}/${mockPreloader.exposedModule}`)
+    })
+
+    it('marks a preloader as failed when its remote module rejects', async () => {
+      const failure = new Error('preloader unavailable')
+      const warning = jest.spyOn(console, 'warn').mockImplementation()
+      const error = jest.spyOn(console, 'error').mockImplementation()
+      window.onecxPreloaders = {}
+      jest.mocked(moduleFederation.loadRemote).mockRejectedValue(failure)
+
+      await loadPreloaderModule({
+        name: 'mock-preloader',
+        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+        windowKey: 'mock-key',
+        exposedModule: 'MockModule',
+        shareScope: 'default'
+      })
+
+      expect(window.onecxPreloaders['mock-key']).toBe(true)
+      expect(warning).toHaveBeenCalledWith(
+        'Could not load preloader: mock-key. Application might not work as expected.'
+      )
+      expect(error).toHaveBeenCalledWith(failure)
+      warning.mockRestore()
+      error.mockRestore()
     })
   })
 

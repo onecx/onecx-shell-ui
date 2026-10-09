@@ -1,6 +1,6 @@
 import { Configuration } from 'webpack'
 import config from './module-federation.config'
-import { withModuleFederation } from '@nx/angular/module-federation'
+import { withModuleFederation } from '@nx/module-federation/angular'
 import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
 
 const modifyPrimeNgPlugin = new ModifySourcePlugin({

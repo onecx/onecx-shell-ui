@@ -203,7 +203,6 @@ describe('SlotGroupComponent', () => {
   })
 
   it('does not throw if resizeObserver is undefined on destroy (covers optional chain false branch)', () => {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(component as any).resizeObserver = undefined
     expect(() => fixture.destroy()).not.toThrow()
   })

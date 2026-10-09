@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { map, Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -7,6 +7,7 @@ import { WelcomeMessageComponent } from '../welcome-message-component/welcome-me
 import { Workspace } from '@onecx/integration-interface'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-home',
   imports: [TranslateModule, WelcomeMessageComponent],

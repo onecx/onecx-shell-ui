@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [AsyncPipe, RouterModule, TranslateModule],
   template: `

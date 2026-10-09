@@ -1,4 +1,14 @@
-import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  EventEmitter,
+  inject,
+  input,
+  OnDestroy,
+  OnInit
+} from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import {
   ResizedEventsTopic,
@@ -12,6 +22,7 @@ import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
   imports: [AngularRemoteComponentsModule],

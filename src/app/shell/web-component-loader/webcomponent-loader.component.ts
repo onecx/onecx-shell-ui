@@ -1,10 +1,11 @@
-import { AfterContentInit, Component, ElementRef, inject, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, AfterContentInit, Component, ElementRef, inject, ViewChild } from '@angular/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { dataMfeElementKey } from '@onecx/angular-utils'
 import { firstValueFrom } from 'rxjs'
 import { dataStyleIdKey, dataStyleIsolationKey } from 'src/scope-polyfill/utils'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
   template: '<div class="webcomponentwrapper" #wrapper></div>'
 })

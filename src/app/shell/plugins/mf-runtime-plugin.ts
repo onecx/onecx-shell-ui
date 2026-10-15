@@ -52,7 +52,7 @@ function getSection(pkgName: string): string {
 
 function parseVersion(v: string): [number, number, number] {
   const core = v.split('+')[0].split('-')[0]
-  const parts = core.split('.').map((n) => parseInt(n, 10) || 0)
+  const parts = core.split('.').map((n) => Number.parseInt(n, 10) || 0)
   return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0]
 }
 
@@ -231,7 +231,8 @@ export async function loadAllowedPackageGroupsForMFPlugin(): Promise<void> {
     if (!response.ok) throw new Error(`Failed to load runtime environment: ${response.status}`)
 
     const env = (await response.json()) as Record<string, unknown>
-    store.allowedPackageGroups = String(env['MF_PLUGIN_ALLOWED_PACKAGE_GROUPS'] ?? '')
+    const rawPackageGroups = env['MF_PLUGIN_ALLOWED_PACKAGE_GROUPS']
+    store.allowedPackageGroups = (typeof rawPackageGroups === 'string' ? rawPackageGroups : '')
       .split(/[\s,]+/)
       .map((group) => group.trim())
       .filter(Boolean)
@@ -254,9 +255,9 @@ export function isPartOfAllowedPackageOrPackageGroupMFPlugin(args: any, original
   if (pkgName === '') return false
   const packageGroup = pkgName.split('/')[0] ?? ''
   return (
-    allowedPackageGroups.some((pkg) => pkgName === pkg) ||
+    allowedPackageGroups.includes(pkgName) ||
     allowedPackageGroups.some((pkg) => pkgName?.startsWith(pkg)) ||
-    allowedPackageGroups.some((pkg) => packageGroup === pkg) ||
+    allowedPackageGroups.includes(packageGroup) ||
     allowedPackageGroups.some((pkg) => packageGroup?.startsWith(pkg))
   )
 }

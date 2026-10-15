@@ -1,0 +1,57 @@
+[#module-federation-runtime-plugin]
+=== Module Federation Runtime Plugin
+
+The Shell UI registers a Module Federation runtime plugin from `src/main.ts`. It aligns shared package versions between applications for configured package groups.
+
+==== Runtime Configuration
+
+The Docker image exposes `MF_PLUGIN_ALLOWED_PACKAGE_GROUPS` through `CONFIG_ENV_LIST`. The image injects its value into `assets/env.json`. At startup, before registering the plugin or loading preloaders, the Shell reads this file once and stores the parsed package groups in `window.__mfShareResolution__.allowedPackageGroups`.
+
+Set the variable to a comma- or whitespace-separated list of package names or groups. For example:
+
+[source,yaml]
+----
+env:
+  - name: MF_PLUGIN_ALLOWED_PACKAGE_GROUPS
+    value: "@onecx, primeng"
+----
+
+The generated runtime configuration contains the value as a string:
+
+[source,json]
+----
+{
+  "MF_PLUGIN_ALLOWED_PACKAGE_GROUPS": "@onecx, primeng"
+}
+----
+
+The loader splits this value into `@onecx` and `primeng`. A package matches when its full name or its first path segment matches a configured entry. For example, `@onecx` matches `@onecx/angular-utils`, and `primeng` matches `primeng/button`.
+
+Only packages that match a configured entry are processed by the plugin. Packages that do not match are left to normal Module Federation behavior. If loading `assets/env.json` fails, the loader logs a warning and uses an empty list, so no packages are selected for plugin processing.
+
+==== Version Alignment Behavior
+
+The plugin groups shared packages by their first path segment: `@onecx/angular-utils` belongs to `@onecx`, and `primeng/button` belongs to `primeng`. Only configured packages with a string `requiredVersion` starting with `^` are tracked for alignment; packages with exact versions or other range syntax are left to Module Federation.
+
+During `beforeInit`, it records packages from the app whose `requiredVersion` starts with `^`. Packages with exact versions or other range syntax are not included in alignment. During `beforeLoadShare`, the plugin:
+
+. Looks at loading or loaded versions of the requested package in the current share scope.
+. Keeps candidates whose major version matches the app's section requirement, then checks them from highest to lowest.
+. Accepts the first candidate version registered for every tracked package required by the requesting app in that section.
+. Sets the requested package's `requiredVersion` to that exact version. The result is cached by app and section and reused for later package loads.
+
+If no complete candidate is currently loading or loaded, the plugin does not cache a result; a later `beforeLoadShare` call may retry. If the requesting app's own version is higher than the selected candidate, the plugin logs a warning, caches a skip for that app and section, and leaves resolution to Module Federation. A successfully selected candidate is cached for the app and section, so subsequent package loads reuse that choice.
+
+==== Singleton Packages
+
+The plugin changes `shareInfo.shareConfig.requiredVersion` in `beforeLoadShare`. This requirement influences normal non-singleton version selection. Module Federation can select a singleton according to its singleton strategy regardless of this requirement; the current plugin does not implement a `resolveShare` override to force singleton selection.
+
+==== Runtime Hooks
+
+The plugin implements `beforeInit`, `beforeLoadShare` and these are the only hooks implemented in the current plugin.
+
+==== Troubleshooting
+
+* **A package is not aligned:** confirm its package name or group is listed in `MF_PLUGIN_ALLOWED_PACKAGE_GROUPS`, its `requiredVersion` starts with `^`, and a complete candidate version is loading or loaded.
+* **No packages are processed:** check the value injected into `assets/env.json` and confirm the package/group matching the shared package name.
+* **A package uses a version different from the alignment choice:** check whether it is configured as a singleton; the plugin does not override singleton selection with `resolveShare`.

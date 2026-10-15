@@ -7,13 +7,27 @@ import {
   ensurePreloaderModuleLoaded,
   loadPreloaderModule
 } from './app/shell/utils/preloader.utils'
+import { registerGlobalPlugins } from '@module-federation/enhanced/runtime'
+import mfRuntimePlugin, { loadAllowedPackageGroupsForMFPlugin } from './app/shell/plugins/mf-runtime-plugin'
 
 // Make shell federation instance is available globally
-;(globalThis as any)['onecxFederationInstance'] = __FEDERATION__.__INSTANCES__[0]
+const shellInstance = __FEDERATION__.__INSTANCES__[0]
+;(globalThis as any)['onecxFederationInstance'] = shellInstance
+
+const registerPlugins = async () => {
+  await loadAllowedPackageGroupsForMFPlugin()
+  registerGlobalPlugins([mfRuntimePlugin()])
+}
 
 window['onecxPreloaders'] ??= {}
 const preloaders = [angular18Preloader, angular19Preloader, angular20Preloader, angular21Preloader, react19Preloader]
 
-Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)]).then(() => {
-  return import('./bootstrap').catch((err) => console.error(err))
-})
+registerPlugins()
+  .then(() => {
+    return Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)]).then(
+      () => {
+        return import('./bootstrap').catch((err) => console.error(err))
+      }
+    )
+  })
+  .catch((err) => console.error(err))

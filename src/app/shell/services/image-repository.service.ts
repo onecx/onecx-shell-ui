@@ -53,9 +53,7 @@ export class ImageRepositoryService {
       )
       .subscribe({
         next: (urls) => {
-          if (urls) {
-            this.imageRepositoryInterface.imageRepositoryTopic.publish({ images: { ...urls } })
-          }
+          this.imageRepositoryInterface.imageRepositoryTopic.publish({ images: { ...urls } })
         }
       })
   }

@@ -1,10 +1,11 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
-import { of } from 'rxjs'
+import { TooltipModule } from 'primeng/tooltip'
+import { firstValueFrom, of } from 'rxjs'
+
+import { provideTranslateTestingService } from '@onecx/angular-testing'
 
 import { InitializationErrorPageComponent } from './initialization-error-page.component'
-import { TooltipModule } from 'primeng/tooltip'
-import { provideTranslateTestingService } from '@onecx/angular-testing'
 
 describe('InitializationErrorPageComponent', () => {
   let component: InitializationErrorPageComponent
@@ -74,5 +75,21 @@ describe('InitializationErrorPageComponent', () => {
     expect(component.eventsTopic.publish).toHaveBeenCalledWith({
       type: 'authentication#logoutButtonClicked'
     })
+  })
+
+  it('defaults missing fragment values to empty strings', async () => {
+    Object.assign(route, { fragment: of(null) })
+    const emptyFragmentComponent = TestBed.runInInjectionContext(() => new InitializationErrorPageComponent())
+
+    await expect(firstValueFrom(emptyFragmentComponent.error$)).resolves.toEqual({
+      message: '',
+      requestedUrl: '',
+      detail: null,
+      errorCode: null,
+      params: null,
+      invalidParams: null
+    })
+
+    emptyFragmentComponent.ngOnDestroy()
   })
 })

@@ -380,9 +380,3 @@ OneCX ships a migration guide for each Angular major-version transition. Complet
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-19/index.adoc[Migrate from Angular 18 to Angular 19 (libs v6)]
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-20/index.adoc[Migrate from Angular 19 to Angular 20 (libs v7)]
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-21/index.adoc[Migrate from Angular 20 to Angular 21 (libs v8)]
-
-==== Shell-Side Breaking Changes
-
-In addition to the library changes covered by the migration guides, upgrading the Shell includes the following shell-side changes:
-
-* **Topic publisher classes removed (libs v8 / Angular 21).** The deprecated `@onecx/integration-interface` publisher classes (`EventsPublisher`, `ResizedEventsPublisher`, `ParametersPublisher`, `CurrentLocationPublisher`) were removed in libs v8. Replace them with their topic equivalents: the Shell's slot-group resize events are now published on `ResizedEventsTopic` rather than a removed publisher class. See the xref:documentation:onecx-portal-ui-libs:migrations/angular-21/replace-topic-publishers.adoc[Replace deprecated topic publisher classes] guide and the xref:#resize-events[Resize Events] section above for the current API.

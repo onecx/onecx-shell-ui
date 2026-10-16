@@ -13,8 +13,6 @@
 
   .onecx-body-start,
   .onecx-body-end {
-    // Shared max-width between header start and body start
-    max-width: 20rem;
     background-color: var(--menu-bg-color);
     box-shadow: 1px 1px 0 0 var(--divider-color, #0003);
     overflow-x: hidden;
@@ -86,8 +84,6 @@ footer {
     // Shrink if necessary
     flex-shrink: 1;
     background-color: var(--topbar-left-bg-color);
-    // Shared max-width between header start and body start
-    max-width: 20rem;
 
     .onecx-menu-button {
       display: flex;
@@ -126,9 +122,7 @@ footer {
     // Not grow to keep the size of the left section static until not possible
     flex-grow: 0;
     // Shrink if necessary
-    flex-shrink: 1;
-    // Shared max-width between header end and body end
-    max-width: 25rem;
+    flex-shrink: 1;  
 
     .onecx_header_end_actions_right {
       height: 100%;

@@ -1,5 +1,5 @@
 import { ModuleFederationConfig } from '@nx/module-federation'
-import { getOneCXSharedRecommendations } from '@onecx/accelerator'
+import { getOneCXSharedRecommendations } from '@onecx/build-utils'
 const config: ModuleFederationConfig = {
   name: 'onecx-shell-ui',
   exposes: {

@@ -26,14 +26,13 @@ import {
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
-import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/optimus'
 
-import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, OverrideType, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  OverrideType,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'

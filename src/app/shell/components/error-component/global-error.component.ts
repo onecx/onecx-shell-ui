@@ -1,7 +1,8 @@
-import { Component, Input, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',

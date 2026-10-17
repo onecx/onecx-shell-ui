@@ -1,18 +1,18 @@
 import { dataNoPortalLayoutStylesKey, dataStyleIdKey } from '@onecx/angular-utils'
-import { replacePrimengPrefix } from '@onecx/angular-utils'
+import { replaceOptimusPrefix } from '@onecx/angular-utils'
 
 import { updateAngularComponentsStyles } from './update-angular-components-styles.utils'
 
 jest.mock('@onecx/angular-utils', () => {
   const actual = jest.requireActual('@onecx/angular-utils')
-  return { ...actual, replacePrimengPrefix: jest.fn() }
+  return { ...actual, replaceOptimusPrefix: jest.fn() }
 })
 
 describe('updateAngularComponentsStyles', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
     jest.restoreAllMocks()
-    jest.mocked(replacePrimengPrefix).mockReset()
+    jest.mocked(replaceOptimusPrefix).mockReset()
   })
 
   it('ignores ordinary styles and Angular component styles without text', () => {
@@ -67,7 +67,7 @@ describe('updateAngularComponentsStyles', () => {
     const style = document.createElement('style')
     const originalCss = '[_nghost-owner] { --p-color: red; }'
     style.textContent = originalCss
-    const replace = jest.mocked(replacePrimengPrefix).mockReturnValue('replaced')
+    const replace = jest.mocked(replaceOptimusPrefix).mockReturnValue('replaced')
 
     updateAngularComponentsStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 
@@ -82,7 +82,7 @@ describe('updateAngularComponentsStyles', () => {
     document.body.appendChild(owner)
     const style = document.createElement('style')
     style.textContent = '[_nghost-owner] { --p-color: red; }'
-    const replace = jest.mocked(replacePrimengPrefix)
+    const replace = jest.mocked(replaceOptimusPrefix)
 
     updateAngularComponentsStyles([{ addedNodes: [style] } as unknown as MutationRecord])
 

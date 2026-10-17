@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { Location } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { getLocation } from '@onecx/accelerator'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [TranslateModule],
   template: `

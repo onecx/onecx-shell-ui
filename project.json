@@ -1,15 +1,22 @@
 {
   "name": "onecx-shell-ui",
   "$schema": "node_modules/nx/schemas/project-schema.json",
+  "includedScripts": [],
   "projectType": "application",
   "prefix": "ocx-shell",
   "sourceRoot": "./src",
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  },
   "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/angular:webpack-browser",
       "dependsOn": ["^build"],
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/onecx-shell-ui",
         "index": "./src/index.html",
@@ -135,11 +142,16 @@
           "baseHref": "/onecx-shell/",
           "outputHashing": "all"
         }
-      },
-      "defaultConfiguration": "production"
+      }
     },
     "serve": {
       "executor": "@nx/angular:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "hmr": false,
+        "port": 4300,
+        "proxyConfig": "proxy.conf.js"
+      },
       "configurations": {
         "production": {
           "buildTarget": "onecx-shell-ui:build:production"
@@ -154,12 +166,6 @@
           "publicHost": "http://localhost:4300/onecx-shell/",
           "port": 4300
         }
-      },
-      "defaultConfiguration": "development",
-      "options": {
-        "hmr": false,
-        "port": 4300,
-        "proxyConfig": "proxy.conf.js"
       }
     },
     "extract-i18n": {
@@ -182,11 +188,6 @@
         "jestConfig": "jest.config.ts",
         "codeCoverage": true
       }
-    }
-  },
-  "cli": {
-    "cache": {
-      "enabled": false
     }
   }
 }

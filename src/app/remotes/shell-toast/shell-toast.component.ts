@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, ChangeDetectorRef } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, ChangeDetectorRef } from '@angular/core'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ReplaySubject } from 'rxjs'
 
@@ -16,6 +16,7 @@ import { ToastModule } from 'primeng/toast'
 
 // Should be moved out of shell to another repo later, so that primeNG dependency can be started to be removed from shell
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'ocx-shell-toast',
   templateUrl: './shell-toast.component.html',
   standalone: true,

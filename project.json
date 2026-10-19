@@ -69,6 +69,11 @@
           },
           {
             "glob": "**/*",
+            "input": "./pre_loaders/angular-22/dist/onecx-angular-22-loader",
+            "output": "/pre_loaders/onecx-angular-22-loader"
+          },
+          {
+            "glob": "**/*",
             "input": "./pre_loaders/react-19/dist/onecx-react-19-loader",
             "output": "/pre_loaders/onecx-react-19-loader"
           }

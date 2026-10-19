@@ -1,6 +1,11 @@
 import * as moduleFederation from '@module-federation/enhanced/runtime'
 
-import { loadPreloaderModule, ensurePreloaderModuleLoaded } from './preloader.utils'
+import {
+  loadPreloaderModule,
+  ensurePreloaderModuleLoaded,
+  angular21Preloader,
+  angular22Preloader
+} from './preloader.utils'
 
 jest.mock('@module-federation/enhanced/runtime', () => ({
   registerRemotes: jest.fn(),
@@ -8,6 +13,24 @@ jest.mock('@module-federation/enhanced/runtime', () => ({
 }))
 
 describe('Preloader Utils', () => {
+  describe('preloader definitions', () => {
+    it('defines the Angular 22 preloader with the angular_22 share scope', () => {
+      expect(angular22Preloader).toEqual({
+        name: 'angular-22-preloader',
+        relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-22-loader/mf-manifest.json',
+        windowKey: 'angular-22',
+        exposedModule: 'Angular22Loader',
+        shareScope: 'angular_22'
+      })
+    })
+
+    it('keeps the Angular 21 preloader isolated in the angular_21 share scope', () => {
+      expect(angular21Preloader.shareScope).toBe('angular_21')
+      expect(angular22Preloader.shareScope).toBe('angular_22')
+      expect(angular21Preloader.shareScope).not.toBe(angular22Preloader.shareScope)
+    })
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')

@@ -403,14 +403,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type string to the slot-group host element', async () => {
         const slotGroupClassesString = 'test-group-class another-class'
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesString)
         fixture.detectChanges()
@@ -421,14 +414,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type string array to the slot-group host element', async () => {
         const slotGroupClassesArray = ['test-group-class', 'another-class']
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesArray)
         fixture.detectChanges()
@@ -439,14 +425,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type Set to the slot-group host element', async () => {
         const slotGroupClassesSet = new Set(['test-group-class', 'another-class'])
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesSet)
         fixture.detectChanges()
@@ -457,14 +436,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type object to the slot-group host element', async () => {
         const slotGroupClassesObject = { 'test-group-class': true, 'another-class': false, 'third-class': true }
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'third-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'third-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesObject)
         fixture.detectChanges()
@@ -482,9 +454,9 @@ describe('SlotGroupComponent', () => {
       })
 
       it.each([
-        ['column', 'flex-column h-full'],
+        ['column', 'flex-col h-full'],
         ['row-reverse', 'flex-row-reverse w-full'],
-        ['column-reverse', 'flex-column-reverse h-full']
+        ['column-reverse', 'flex-col-reverse h-full']
       ])('should apply correct classes for %s direction', (direction, expectedClasses) => {
         componentRef.setInput('direction', direction)
 
@@ -514,7 +486,7 @@ describe('SlotGroupComponent', () => {
 
         const slotClasses = component.computedSlotClasses()
 
-        expect(slotClasses).toBe('flex-column')
+        expect(slotClasses).toBe('flex-col')
       })
 
       it('should merge custom slotClasses with base classes', () => {

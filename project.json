@@ -89,7 +89,7 @@
             "inject": true
           },
           {
-            "input": "./src/shell-styles.scss",
+            "input": "./src/shell-styles.css",
             "bundleName": "shell-styles",
             "inject": false
           },

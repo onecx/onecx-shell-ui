@@ -10,7 +10,7 @@ import { getLocation } from '@onecx/accelerator'
   standalone: true,
   imports: [TranslateModule],
   template: `
-    <div class="p-4 flex flex-column gap-5">
+    <div class="p-4 flex flex-col gap-5">
       <div>
         <h1 class="md:text-xl text-lg">{{ 'ERROR_PAGE.TITLE' | translate }}</h1>
         <p class="mb-1">{{ 'ERROR_PAGE.DETAILS' | translate }}</p>

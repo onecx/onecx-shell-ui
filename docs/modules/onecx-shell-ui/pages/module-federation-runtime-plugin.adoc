@@ -3,6 +3,11 @@
 
 The Shell UI registers a Module Federation runtime plugin from `src/main.ts`. It aligns shared package versions between applications for configured package groups.
 
+[NOTE]
+====
+Only apps whose Module Federation runtime is built on `@module-federation/enhanced` invoke these hooks. 
+====
+
 ==== Runtime Configuration
 
 The Docker image exposes `MF_PLUGIN_ALLOWED_PACKAGE_GROUPS` through `CONFIG_ENV_LIST`. The image injects its value into `assets/env.json`. At startup, before registering the plugin or loading preloaders, the Shell reads this file once and stores the parsed package groups in `window.__mfShareResolution__.allowedPackageGroups`.
@@ -35,7 +40,7 @@ The plugin groups shared packages by their first path segment: `@onecx/angular-u
 
 During `beforeInit`, it records packages from the app whose `requiredVersion` starts with `^`. Packages with exact versions or other range syntax are not included in alignment. During `beforeLoadShare`, the plugin:
 
-. Looks at loading or loaded versions of the requested package in the current share scope.
+. Looks at loading or loaded versions (including packages that already have a resolved module) of the requested package in the current share scope.
 . Keeps candidates whose major version matches the app's section requirement, then checks them from highest to lowest.
 . Accepts the first candidate version registered for every tracked package required by the requesting app in that section.
 . Sets the requested package's `requiredVersion` to that exact version. The result is cached by app and section and reused for later package loads.
@@ -48,7 +53,13 @@ The plugin changes `shareInfo.shareConfig.requiredVersion` in `beforeLoadShare`.
 
 ==== Runtime Hooks
 
-The plugin implements `beforeInit`, `beforeLoadShare` and these are the only hooks implemented in the current plugin.
+The plugin implements three hooks:
+
+* `beforeInit` - records, per app, which shared packages belong to an allowed group and declare a caret (`^`) `requiredVersion`, grouped by section. This is bookkeeping only; no version is picked here.
+* `beforeLoadShare` - for each package about to load, finds (or reuses a cached) best candidate version for its section and overrides this app's `requiredVersion` for that package to the exact candidate version.
+* `errorLoadShare` - logs every shared package load failure, regardless of the allowlist, so failures are never silent.
+
+These are the only hooks currently implemented by the plugin.
 
 ==== Troubleshooting
 

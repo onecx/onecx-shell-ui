@@ -86,3 +86,15 @@ For further details on version compatibility, refer to the following resources:
 
 * xref:documentation:onecx-portal-ui-libs:onecx-compatibility.adoc[OneCX Compatibility Documentation]
 * xref:onecx-docs-dev:guides/troubleshooting.adoc#shell-related[Troubleshooting for Shell Issues]
+
+=== Upgrading the Shell
+
+Upgrading the OneCX Shell means moving to a newer OneCX library major version in step with the Angular version it supports. Use the Angular - Libs Version Compatibility table above to choose the target library version, then follow the library migration guide for your target Angular version.
+
+==== Library Migration Guides
+
+OneCX ships a migration guide for each Angular major-version transition. Complete the steps in the guide that matches the Angular version you are upgrading to:
+
+* xref:documentation:onecx-portal-ui-libs:migrations/angular-19/index.adoc[Migrate from Angular 18 to Angular 19 (libs v6)]
+* xref:documentation:onecx-portal-ui-libs:migrations/angular-20/index.adoc[Migrate from Angular 19 to Angular 20 (libs v7)]
+* xref:documentation:onecx-portal-ui-libs:migrations/angular-21/index.adoc[Migrate from Angular 20 to Angular 21 (libs v8)]

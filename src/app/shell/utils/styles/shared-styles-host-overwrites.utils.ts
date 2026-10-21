@@ -34,7 +34,7 @@ export function ensureAngularComponentStylesContainStyleId() {
       )
       return el
     }
-    const styleData = contextElement ? getStyleDataOrIntermediateStyleData(contextElement) : null
+    const styleData = getStyleDataOrIntermediateStyleData(contextElement)
     if (!styleData) {
       console.warn(
         `Expected to overwrite SharedStyleHost createElement method, but could not find style data for Angular component styles in context element: ${contextElementName}`

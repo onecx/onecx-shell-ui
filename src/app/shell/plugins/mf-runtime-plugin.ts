@@ -94,8 +94,8 @@ function parseVersion(version: string): Version {
   const withoutRangePrefix = version.replace(/^[^\d]+/, '')
   const [core] = withoutRangePrefix.split('+')
   const [numericCore] = core.split('-')
-  const [major, minor, patch] = numericCore.split('.').map((part) => parseInt(part, 10) || 0)
-  return { major: major ?? 0, minor: minor ?? 0, patch: patch ?? 0 }
+  const [major, minor, patch] = numericCore.split('.').map((part) => Number.parseInt(part, 10) || 0)
+  return { major, minor: minor ?? 0, patch: patch ?? 0 }
 }
 
 // Compares two CONCRETE versions (not ranges). Returns <0, 0, or >0, like Array#sort comparators.
@@ -332,7 +332,6 @@ export default function mfRuntimePlugin(): ModuleFederationRuntimePlugin {
       return args
     },
 
-    // Logged for every package load failure, regardless of the allowlist, so failures are never silent.
     errorLoadShare(args: any) {
       console.error('[ModuleFederationPlugin] errorLoadShare error: ', args)
       return args
@@ -396,11 +395,11 @@ export function isPartOfAllowedPackageOrPackageGroupMFPlugin(args: any, original
     args?.origin?.name ??
     ''
   if (pkgName === '') return false
-  const packageGroup = pkgName.split('/')[0] ?? ''
+  const packageGroup = pkgName.split('/')[0]
   return (
-    allowedPackageGroups.some((pkg) => pkgName === pkg) ||
+    allowedPackageGroups.includes(pkgName) ||
     allowedPackageGroups.some((pkg) => pkgName?.startsWith(pkg)) ||
-    allowedPackageGroups.some((pkg) => packageGroup === pkg) ||
+    allowedPackageGroups.includes(packageGroup) ||
     allowedPackageGroups.some((pkg) => packageGroup?.startsWith(pkg))
   )
 }

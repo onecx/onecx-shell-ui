@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-import { AboutComponent } from './componenets/about.component'
+import { AboutComponent } from './components/about.component'
 import { TranslateModule } from '@ngx-translate/core'
 
 const routes: Routes = [

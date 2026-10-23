@@ -23,7 +23,9 @@ describe('NavigationFocusService', () => {
     Object.defineProperty(element, 'scrollTop', {
       configurable: true,
       get: () => value,
-      set: (next: number) => (value = next)
+      set: (next: number) => {
+        value = next
+      }
     })
   }
   const setTitle = async (title: string) => {
@@ -86,6 +88,53 @@ describe('NavigationFocusService', () => {
     expect(announce).toHaveBeenCalledWith('Start - Workspace', 'polite')
   })
 
+  it('resets only the main region and its shell scroll containers, not the document', () => {
+    document.body.innerHTML = `
+      <div class="onecx-body-wrapper" id="outer">
+        <div class="onecx-body-center" id="center"><main id="ocx_main_content"></main></div>
+      </div>
+      <div class="onecx-body-center" id="unrelated"></div>`
+    const outer = document.getElementById('outer') as HTMLElement
+    const center = document.getElementById('center') as HTMLElement
+    const unrelated = document.getElementById('unrelated') as HTMLElement
+    const region = document.getElementById('ocx_main_content') as HTMLElement
+    for (const element of [document.documentElement, document.body, outer, center, unrelated, region]) {
+      trackScrollTop(element, 300)
+    }
+    interact()
+    navigateTo('/workspace/app-b')
+    flushRender()
+
+    expect(region.scrollTop).toBe(0)
+    expect(center.scrollTop).toBe(0)
+    expect(outer.scrollTop).toBe(0)
+    expect(unrelated.scrollTop).toBe(300)
+    expect(document.body.scrollTop).toBe(300)
+    expect(document.documentElement.scrollTop).toBe(300)
+  })
+
+  it.each([
+    [
+      '#ocx_main_content over an earlier main',
+      '<main id="other"></main><div id="ocx_main_content"></div>',
+      'ocx_main_content'
+    ],
+    ['main over an earlier .onecx-body', '<div class="onecx-body"></div><main id="expected"></main>', 'expected'],
+    [
+      '.onecx-body over an earlier .onecx-no-theme-content',
+      '<div class="onecx-no-theme-content"></div><div class="onecx-body" id="expected"></div>',
+      'expected'
+    ],
+    ['.onecx-no-theme-content as last fallback', '<div class="onecx-no-theme-content" id="expected"></div>', 'expected']
+  ])('picks the main region by priority, not document order: %s', (_, html, expectedId) => {
+    document.body.innerHTML = html
+    interact()
+    navigateTo('/workspace/app-b')
+    flushRender()
+
+    expect(document.activeElement).toBe(document.getElementById(expectedId))
+  })
+
   it('handles navigations within one MFE and across MFEs, never leaving focus on the body', () => {
     interact()
     for (const url of ['/workspace/app-a/search', '/workspace/app-a/details/1', '/workspace/app-b']) {
@@ -144,16 +193,25 @@ describe('NavigationFocusService', () => {
   })
 
   it('does nothing on the first navigation', () => {
-    const freshService = TestBed.runInInjectionContext(() => new NavigationFocusService())
+    const freshEvents = new Subject<Event>()
+    const freshAnnounce = jest.fn().mockResolvedValue(undefined)
+    TestBed.resetTestingModule()
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Router, useValue: { events: freshEvents } },
+        { provide: LiveAnnouncer, useValue: { announce: freshAnnounce } }
+      ]
+    })
+    const freshService = TestBed.inject(NavigationFocusService)
     freshService.init()
     interact()
     menuLink.focus()
-    navigateTo('/workspace/app-b')
+    freshEvents.next(new NavigationEnd(1, '/workspace/app-b', '/workspace/app-b'))
     flushRender()
     flushTitle()
 
-    // only the already initialised service reacts; the fresh one treats this as its first load
-    expect(announce).toHaveBeenCalledTimes(1)
+    expect(document.activeElement).toBe(menuLink)
+    expect(freshAnnounce).not.toHaveBeenCalled()
     freshService.ngOnDestroy()
   })
 

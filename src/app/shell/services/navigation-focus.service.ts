@@ -4,8 +4,14 @@ import { inject, Injectable, NgZone, OnDestroy } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
 import { filter, Subscription } from 'rxjs'
 
-/** The shell main region (#1051 renders `<main id="ocx_main_content">`; older templates use the body containers). */
-export const MAIN_REGION_SELECTOR = '#ocx_main_content, main, .onecx-body, .onecx-no-theme-content'
+/**
+ * Candidates for the shell main region, in priority order: #1051 renders `<main id="ocx_main_content">`,
+ * older templates use the body containers. They are looked up one after another, because a single
+ * comma-separated selector would return the first match in document order instead.
+ */
+export const MAIN_REGION_SELECTORS = ['#ocx_main_content', 'main', '.onecx-body', '.onecx-no-theme-content'] as const
+/** Shell scroll containers around the main region that return to the top on a route change. */
+export const SCROLL_CONTAINER_SELECTOR = '.onecx-body-center, .onecx-body-wrapper'
 /** Focus inside one of these belongs to a dialog that manages its own focus and must not be interrupted. */
 export const DIALOG_SELECTOR = '[role="dialog"], [role="alertdialog"], [aria-modal="true"], dialog[open]'
 /** The title is announced once it did not change for this long (shell and MFE titles are set asynchronously). */
@@ -107,10 +113,14 @@ export class NavigationFocusService implements OnDestroy {
     return stop
   }
 
+  /** Only the main region and the shell scroll containers around it; the document scroll position is left alone. */
   private resetScroll(): void {
-    for (let element = this.mainRegion(); element; element = element.parentElement) {
-      element.scrollTop = 0
-    }
+    const main = this.mainRegion()
+    if (!main) return
+    main.scrollTop = 0
+    this.document.querySelectorAll<HTMLElement>(SCROLL_CONTAINER_SELECTOR).forEach((container) => {
+      if (container.contains(main)) container.scrollTop = 0
+    })
   }
 
   private moveFocus(onlyIfLost: boolean): void {
@@ -124,7 +134,11 @@ export class NavigationFocusService implements OnDestroy {
   }
 
   private mainRegion(): HTMLElement | null {
-    return this.document.querySelector<HTMLElement>(MAIN_REGION_SELECTOR)
+    for (const selector of MAIN_REGION_SELECTORS) {
+      const region = this.document.querySelector<HTMLElement>(selector)
+      if (region) return region
+    }
+    return null
   }
 
   private removeInteractionListeners(): void {

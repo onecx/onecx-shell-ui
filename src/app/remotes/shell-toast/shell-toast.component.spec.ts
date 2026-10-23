@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ReplaySubject, firstValueFrom } from 'rxjs'
 
@@ -101,5 +101,71 @@ describe('OneCXShellExtensionsComponent', () => {
         })
       )
     }))
+  })
+
+  describe('toast policy', () => {
+    afterEach(() => jest.useRealTimers())
+
+    function toastElements(fixture: { nativeElement: HTMLElement }) {
+      return Array.from(fixture.nativeElement.querySelectorAll<HTMLElement>('.p-toast-message'))
+    }
+
+    async function flush(fixture: ComponentFixture<OneCXShellToastComponent>, ms = 0) {
+      jest.advanceTimersByTime(ms)
+      await Promise.resolve()
+      fixture.detectChanges()
+    }
+
+    it('keeps an error toast after 60 s until it is closed', async () => {
+      jest.useFakeTimers()
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.error({ summaryKey: 'ERR', detailKey: 'D' })
+      await flush(fixture, 1)
+      expect(toastElements(fixture).length).toBe(1)
+
+      await flush(fixture, 60000)
+      expect(toastElements(fixture).length).toBe(1)
+    })
+
+    it('keeps an info toast for at least 10 s and pauses while a control inside has focus', async () => {
+      jest.useFakeTimers()
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.info({ summaryKey: 'INFO' })
+      await flush(fixture, 1)
+      const item = toastElements(fixture)[0]
+      const button = item.querySelector<HTMLElement>('button')!
+
+      await flush(fixture, 5000)
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      await flush(fixture, 60000)
+      expect(toastElements(fixture).length).toBe(1)
+
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      await flush(fixture, 9000)
+      expect(toastElements(fixture).length).toBe(1)
+    })
+
+    it('closes the focused toast on Escape', async () => {
+      jest.useFakeTimers()
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.error({ summaryKey: 'ERR' })
+      await flush(fixture, 1)
+      const button = toastElements(fixture)[0].querySelector<HTMLElement>('button')!
+      const closeSpy = jest.spyOn(button, 'click')
+
+      button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+
+      expect(closeSpy).toHaveBeenCalled()
+    })
+
+    it('does not stack identical open toasts', async () => {
+      jest.useFakeTimers()
+      const { fixture, portalMessageServiceMock } = setUp()
+      for (let i = 0; i < 10; i++) {
+        portalMessageServiceMock.error({ summaryKey: 'SAME', detailKey: 'SAME_D' })
+      }
+      await flush(fixture, 1)
+      expect(toastElements(fixture).length).toBe(1)
+    })
   })
 })

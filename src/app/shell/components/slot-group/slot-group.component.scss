@@ -1,0 +1,20 @@
+// Reflow (WCAG 1.4.10 / 1.4.4): below the shell mobile breakpoint, which also covers
+// 1280 px desktops at 200 % and 400 % zoom, row slot groups (e.g. the top bar) wrap their
+// slots and the remote components inside them instead of overflowing the viewport.
+// Desktop widths are outside this media query and keep their layout unchanged.
+$shell-reflow-breakpoint: 991px; // keep in sync with $mobileBreakpoint in global-styles.scss
+
+@media (max-width: $shell-reflow-breakpoint) {
+  :host(.flex-row),
+  :host(.flex-row-reverse) {
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+
+    > ocx-slot {
+      flex-wrap: wrap;
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+}

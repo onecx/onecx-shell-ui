@@ -200,3 +200,43 @@ footer {
 #ocx_main_content:focus {
   outline: none;
 }
+
+// Reflow (WCAG 1.4.10 / 1.4.4): below the shell mobile breakpoint, which also covers
+// 1280 px desktops at 200 % and 400 % zoom, the frame must never be wider than the viewport.
+// The body has overflow: hidden, so anything wider would be clipped, not scrollable.
+// Desktop widths are outside this media query and keep their layout unchanged.
+$shell-reflow-breakpoint: 991px; // keep in sync with $mobileBreakpoint in global-styles.scss
+
+@media (max-width: $shell-reflow-breakpoint) {
+  .onecx-viewport-wrapper {
+    max-width: 100%;
+    // Let the frame scroll vertically when the wrapped top bar and the content do not fit the height
+    overflow-y: auto;
+  }
+
+  .onecx-header {
+    // Top bar actions wrap onto further rows instead of being pushed off-screen
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
+
+    > div {
+      min-width: 0;
+    }
+  }
+
+  .onecx-body-wrapper {
+    // Keep room for the page content when the top bar wraps onto several rows
+    min-height: 50dvh;
+
+    .onecx-body-start,
+    .onecx-body-end {
+      max-width: 100%;
+    }
+
+    .onecx-body-center {
+      min-width: 0;
+    }
+  }
+}

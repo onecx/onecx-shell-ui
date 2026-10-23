@@ -14,6 +14,7 @@ export type NgClassInputType = string | string[] | Set<string> | { [key: string]
 @Component({
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
+  styleUrl: './slot-group.component.scss',
   imports: [AngularRemoteComponentsModule],
   host: {
     '[attr.name]': 'name()',

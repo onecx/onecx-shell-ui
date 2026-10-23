@@ -182,9 +182,19 @@ describe('PortalViewportComponent', () => {
   })
 
   describe('landmarks', () => {
+    const slotService = () => TestBed.inject(SlotService) as unknown as SlotServiceStub
+
+    const createLandmarkFixture = () => {
+      const noProfile = null
+      const noFavicon = of(undefined)
+      const defaultWorkspaceConfig = undefined
+      const emitTheme = false
+      return createFixture({ name: 'theme' }, noProfile, noFavicon, defaultWorkspaceConfig, emitTheme)
+    }
+
     const renderWithSlots = (slotsWithContent: string[]) => {
-      const fixtureData = createFixture({ name: 'theme' }, null, of(undefined), undefined, false)
-      ;(TestBed.inject(SlotService) as unknown as SlotServiceStub).slotsWithContent$.next(slotsWithContent)
+      const fixtureData = createLandmarkFixture()
+      slotService().slotsWithContent$.next(slotsWithContent)
       const translate = TestBed.inject(TranslateService)
       translate.setTranslation('en', { SHELL_LANDMARKS: { MAIN_NAVIGATION: 'Main navigation' } })
       translate.use('en')
@@ -196,6 +206,17 @@ describe('PortalViewportComponent', () => {
 
     const query = (element: HTMLElement, selector: string) => element.querySelector(selector) as HTMLElement
 
+    // A <header> outside of sectioning content is an implicit banner unless its role is overridden
+    const expectBanner = (element: HTMLElement) => {
+      const headers = element.querySelectorAll('header')
+      expect(headers).toHaveLength(1)
+      expect(headers[0].hasAttribute('role')).toBe(false)
+    }
+
+    const expectNoBanner = (element: HTMLElement) => {
+      expect(query(element, 'header').getAttribute('role')).toBe('none')
+    }
+
     it('exposes one banner, a named navigation and the body footer as the only contentinfo on a standard workspace', () => {
       const { fixture, element } = renderWithSlots([
         'onecx-shell-header.start',
@@ -203,8 +224,7 @@ describe('PortalViewportComponent', () => {
         'onecx-shell-body-footer.start'
       ])
 
-      expect(element.querySelectorAll('header')).toHaveLength(1)
-      expect(query(element, 'header').getAttribute('role')).toBeNull()
+      expectBanner(element)
       const navigation = element.querySelectorAll('[role="navigation"]')
       expect(navigation).toHaveLength(1)
       expect(navigation[0].getAttribute('name')).toBe('onecx-shell-body-start')
@@ -212,6 +232,32 @@ describe('PortalViewportComponent', () => {
       const contentInfo = element.querySelectorAll('[role="contentinfo"], footer')
       expect(contentInfo).toHaveLength(1)
       expect(contentInfo[0].getAttribute('name')).toBe('onecx-shell-body-footer')
+      fixture.destroy()
+    })
+
+    it.each(['onecx-shell-header.center', 'onecx-shell-header.end'])(
+      'exposes the header as banner when only %s has content',
+      (slot) => {
+        const { fixture, element } = renderWithSlots([slot])
+
+        expectBanner(element)
+        fixture.destroy()
+      }
+    )
+
+    it('does not expose the header as banner when only other slot groups have content', () => {
+      const { fixture, element } = renderWithSlots(['onecx-shell-body-start.center', 'onecx-shell-footer.end'])
+
+      expectNoBanner(element)
+      fixture.destroy()
+    })
+
+    it('exposes the banner together with the navigation', () => {
+      const { fixture, element } = renderWithSlots(['onecx-shell-header.end', 'onecx-shell-body-start.center'])
+
+      expectBanner(element)
+      expect(element.querySelectorAll('[role="navigation"]')).toHaveLength(1)
+      expect(query(element, 'header').contains(query(element, '[role="navigation"]'))).toBe(false)
       fixture.destroy()
     })
 
@@ -226,7 +272,7 @@ describe('PortalViewportComponent', () => {
     it('does not expose empty landmarks and does not display the footer without content', () => {
       const { fixture, element } = renderWithSlots([])
 
-      expect(query(element, 'header').getAttribute('role')).toBe('none')
+      expectNoBanner(element)
       expect(element.querySelector('[role="navigation"]')).toBeNull()
       expect(element.querySelector('[aria-label]')).toBeNull()
       expect(element.querySelector('[role="contentinfo"]')).toBeNull()
@@ -253,7 +299,7 @@ describe('PortalViewportComponent', () => {
       const main = element.querySelectorAll('main, [role="main"]')
       expect(main).toHaveLength(1)
       expect(main[0].id).toBe('ocx_main_content')
-      expect(element.querySelectorAll('header')).toHaveLength(1)
+      expectBanner(element)
       expect(element.querySelectorAll('[role="navigation"]')).toHaveLength(1)
       expect(element.querySelectorAll('[role="contentinfo"], footer')).toHaveLength(1)
       expect(main[0].contains(query(element, '[role="navigation"]'))).toBe(false)
@@ -261,14 +307,34 @@ describe('PortalViewportComponent', () => {
       fixture.destroy()
     })
 
-    it('updates the landmarks when slot content changes', () => {
+    it('adds the landmarks when slot content appears', () => {
       const { fixture, element } = renderWithSlots([])
-      ;(TestBed.inject(SlotService) as unknown as SlotServiceStub).slotsWithContent$.next([
-        'onecx-shell-body-start.end'
+      slotService().slotsWithContent$.next([
+        'onecx-shell-header.center',
+        'onecx-shell-body-start.end',
+        'onecx-shell-body-footer.start'
       ])
       fixture.detectChanges()
 
+      expectBanner(element)
       expect(query(element, '[role="navigation"]').getAttribute('aria-label')).toBe('Main navigation')
+      expect(element.querySelectorAll('[role="contentinfo"]')).toHaveLength(1)
+      fixture.destroy()
+    })
+
+    it('removes the landmarks again when slot content disappears', () => {
+      const { fixture, element } = renderWithSlots([
+        'onecx-shell-header.center',
+        'onecx-shell-body-start.end',
+        'onecx-shell-body-footer.start'
+      ])
+      slotService().slotsWithContent$.next([])
+      fixture.detectChanges()
+
+      expectNoBanner(element)
+      expect(element.querySelector('[role="navigation"]')).toBeNull()
+      expect(element.querySelector('[aria-label="Main navigation"]')).toBeNull()
+      expect(element.querySelector('[role="contentinfo"]')).toBeNull()
       fixture.destroy()
     })
   })

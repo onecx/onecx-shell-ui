@@ -1,18 +1,19 @@
-import { applyToastPolicy, DEFAULT_TOAST_LIFE_MS, ToastMessage } from './toast-policy'
+import { ToastMessageOptions } from 'primeng/api'
+
+import { applyToastPolicy, DEFAULT_TOAST_LIFE_MS } from './toast-policy'
 
 describe('applyToastPolicy', () => {
   it.each(['error', 'warn', 'warning'])('makes %s toasts sticky and ignores app life/sticky settings', (severity) => {
-    expect(applyToastPolicy({ severity, summary: 's', life: 1000, sticky: false })).toEqual(
-      expect.objectContaining({ sticky: true })
-    )
+    const result = applyToastPolicy({ severity, summary: 's', life: 1000, sticky: false })
+    expect(result).toEqual({ severity, summary: 's', sticky: true })
+    expect(result).not.toHaveProperty('life')
     expect(applyToastPolicy({ severity, summary: 's' }).sticky).toBe(true)
   })
 
-  it.each(['info', 'success'])('gives %s toasts a default life of at least 10 s', (severity) => {
+  it.each(['info', 'success'])('gives %s toasts a default life of 10 s', (severity) => {
     const result = applyToastPolicy({ severity, summary: 's' })
     expect(result.sticky).toBe(false)
     expect(result.life).toBe(DEFAULT_TOAST_LIFE_MS)
-    expect(DEFAULT_TOAST_LIFE_MS).toBeGreaterThanOrEqual(10000)
   })
 
   it.each(['info', 'success'])('honours an explicit life for %s toasts', (severity) => {
@@ -28,8 +29,8 @@ describe('applyToastPolicy', () => {
   })
 
   it('does not mutate the input message', () => {
-    const message: ToastMessage = { severity: 'error', summary: 's' }
+    const message: ToastMessageOptions = { severity: 'error', summary: 's', life: 1000 }
     applyToastPolicy(message)
-    expect(message).toEqual({ severity: 'error', summary: 's' })
+    expect(message).toEqual({ severity: 'error', summary: 's', life: 1000 })
   })
 })

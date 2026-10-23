@@ -193,6 +193,61 @@ describe('OneCXShellExtensionsComponent', () => {
       expect(toastElements(fixture)).toHaveLength(0)
     })
 
+    it('keeps a focused toast paused when the pointer enters and leaves it', async () => {
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.info({ summaryKey: 'INFO' })
+      await flush(fixture, 1)
+      const item = firstToast(fixture)
+      const button = closeButton(item)
+
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      item.dispatchEvent(new MouseEvent('mouseenter'))
+      item.dispatchEvent(new MouseEvent('mouseleave'))
+      await flush(fixture, 60000)
+      expect(toastElements(fixture)).toHaveLength(1)
+
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      await flush(fixture, 9000)
+      expect(toastElements(fixture)).toHaveLength(1)
+      await flush(fixture, 1001)
+      await flush(fixture, 1000)
+      expect(toastElements(fixture)).toHaveLength(0)
+    })
+
+    it('keeps a hovered toast paused when the focus leaves it', async () => {
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.info({ summaryKey: 'INFO' })
+      await flush(fixture, 1)
+      const item = firstToast(fixture)
+      const button = closeButton(item)
+
+      item.dispatchEvent(new MouseEvent('mouseenter'))
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      await flush(fixture, 60000)
+      expect(toastElements(fixture)).toHaveLength(1)
+
+      item.dispatchEvent(new MouseEvent('mouseleave'))
+      await flush(fixture, 10001)
+      await flush(fixture, 1000)
+      expect(toastElements(fixture)).toHaveLength(0)
+    })
+
+    it('ignores pointer events on elements inside a toast', async () => {
+      const { fixture, portalMessageServiceMock } = setUp()
+      portalMessageServiceMock.info({ summaryKey: 'INFO' })
+      await flush(fixture, 1)
+      const item = firstToast(fixture)
+      const button = closeButton(item)
+
+      item.dispatchEvent(new MouseEvent('mouseenter'))
+      button.dispatchEvent(new MouseEvent('mouseleave'))
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+      await flush(fixture, 60000)
+      expect(toastElements(fixture)).toHaveLength(1)
+    })
+
     it('does not restart the timer when focus moves within the same toast', async () => {
       const { fixture, portalMessageServiceMock } = setUp()
       portalMessageServiceMock.info({ summaryKey: 'INFO' })
@@ -260,6 +315,8 @@ describe('OneCXShellExtensionsComponent', () => {
 
       expect(() => component.onFocusIn(focusEvent)).not.toThrow()
       expect(() => component.onFocusOut(focusEvent)).not.toThrow()
+      expect(() => component.onPointerEnter(new MouseEvent('mouseenter'))).not.toThrow()
+      expect(() => component.onPointerLeave(new MouseEvent('mouseleave'))).not.toThrow()
       component.onEscape(keyEvent)
       expect(keyEvent.defaultPrevented).toBe(false)
     })
@@ -279,6 +336,10 @@ describe('OneCXShellExtensionsComponent', () => {
         component.onFocusIn({ target: foreignButton, relatedTarget: null } as unknown as FocusEvent)
         component.onFocusOut({ target: foreignButton, relatedTarget: null } as unknown as FocusEvent)
         component.onEscape({ target: foreignButton, preventDefault: jest.fn() } as unknown as Event)
+        const stopPropagation = jest.fn()
+        component.onPointerEnter({ target: foreignItem } as unknown as Event)
+        component.onPointerLeave({ target: foreignItem, stopPropagation } as unknown as Event)
+        expect(stopPropagation).not.toHaveBeenCalled()
 
         expect(dispatchSpy).not.toHaveBeenCalled()
         expect(clickSpy).not.toHaveBeenCalled()

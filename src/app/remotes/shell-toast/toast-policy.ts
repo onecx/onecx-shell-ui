@@ -1,7 +1,4 @@
-import { Message } from '@onecx/angular-integration-interface'
-
-/** Portal message as published on the message topic; the severity is added at runtime by PortalMessageService. */
-export type ToastMessage = Message & { severity?: string; summary?: string; detail?: string }
+import { ToastMessageOptions } from 'primeng/api'
 
 /** Minimum lifetime (ms) of info/success toasts that do not set an explicit life. WCAG 2.2.1 Timing Adjustable. */
 export const DEFAULT_TOAST_LIFE_MS = 10000
@@ -13,14 +10,17 @@ const STICKY_SEVERITIES: ReadonlySet<string | undefined> = new Set(['error', 'wa
  * Shell-wide toast timing policy (WCAG 2.2.1, 4.1.3).
  *
  * - `error`, `warn` and `warning` toasts are always sticky: they stay until the user closes them. An app-provided `life` or
- *   `sticky: false` is ignored for these severities.
+ *   `sticky: false` is ignored for these severities (`life` is removed).
  * - `info` and `success` toasts use the app-provided `life` if set (and `sticky` is not requested),
  *   otherwise {@link DEFAULT_TOAST_LIFE_MS}.
  * - Hovering or focusing a toast pauses its timer (see OneCXShellToastComponent).
+ *
+ * The portal message (with the severity added at runtime by PortalMessageService) is passed through as PrimeNG toast options.
  */
-export function applyToastPolicy(message: ToastMessage): ToastMessage {
+export function applyToastPolicy(message: ToastMessageOptions): ToastMessageOptions {
   if (STICKY_SEVERITIES.has(message.severity)) {
-    return { ...message, sticky: true }
+    const { life, ...rest } = message // eslint-disable-line @typescript-eslint/no-unused-vars
+    return { ...rest, sticky: true }
   }
   if (message.sticky) {
     return message

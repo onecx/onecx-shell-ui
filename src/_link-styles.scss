@@ -1,0 +1,27 @@
+// Shared link styles (WCAG 1.4.1 / 1.4.3), included by global-styles.scss and portal-layout-styles.scss.
+// portal-layout-styles must include it after shell.scss, whose `body a { text-decoration: none }` would otherwise win.
+
+// Selectors of links that are not inline links in running text and keep their plain look.
+// PrimeNG 21 puts role="menuitem"/"treeitem" on the li, so the contained links are matched via `[role] a`.
+$plainLinkContexts: '.ocx-link-plain, .ocx-link-plain a, nav a, [role="menu"] a, [role="menubar"] a, [role="menuitem"] a, [role="treeitem"] a, .p-breadcrumb a, [aria-label="breadcrumb"] a, .p-dock a, .p-dock-link, .p-button, [role="button"]';
+
+@mixin ocx-link-styles {
+  // Inline links, e.g. in running text of any MFE, are underlined and use the regular text colour
+  // (not the secondary text colour) so they stand out without relying on colour only.
+  //
+  // Opt-out: links in menus, breadcrumbs, footer menus and docks (and anything marked with the
+  // `ocx-link-plain` class on the link or on any ancestor) keep the previous look
+  // (no underline, secondary text colour). Add `ocx-link-plain` to custom navigation-like link groups.
+  // The opt-out list is wrapped in :where() so it adds no specificity and component styles still win.
+  body {
+    a:not(:where(#{$plainLinkContexts})) {
+      text-decoration: underline;
+      color: var(--text-color, var(--text-color-default));
+    }
+
+    a:where(#{$plainLinkContexts}) {
+      text-decoration: none;
+      color: var(--text-secondary-color, var(--text-secondary-color-default));
+    }
+  }
+}

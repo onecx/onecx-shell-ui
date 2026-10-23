@@ -9,7 +9,10 @@
 // Import theme_defaults so default theme variables are available on the page
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss';
 
+@import 'link-styles';
+
 $mobileBreakpoint: 991px !default;
+
 :root {
   --mobile-break-point: #{$mobileBreakpoint};
   font-size: var(--font-size, var(--font-size-default));
@@ -23,12 +26,9 @@ body {
   padding: 0;
   margin: 0;
   min-height: 100%;
-
-  a {
-    text-decoration: none;
-    color: var(--text-secondary-color, var(--text-secondary-color-default));
-  }
 }
+
+@include ocx-link-styles;
 
 // Primeng Bug: For p-toast z-index is applied onAnimationStart which is missed on Ocassional Page Reloads as a result the toast appears below the header
 // so below we provide a fallback z-index (value is taken from the default z-index of p-toast in normal scenarios)

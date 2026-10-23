@@ -1,11 +1,15 @@
 import * as axe from 'axe-core'
 
 /**
- * Runs axe-core on the given element and fails with a readable list of violations.
+ * Runs axe-core and fails with a readable list of violations.
+ *
+ * What is scanned:
+ * - default: only `element` and its descendants; the `region` rule is disabled.
+ * - `pageLevel: true`: the whole `document` with `region` (all content inside landmarks) enabled, because axe
+ *   skips page level rules unless the context is the entire page. `element` is ignored then, so the caller must
+ *   make sure `document.body` contains nothing but the fixture under test (remove previous fixture hosts).
  *
  * jsdom does not compute layout or styles, so the rules that depend on them (color-contrast) are disabled.
- * `region` is a page level rule; it is only enabled when `pageLevel` is set,
- * which analyses the whole document and is meant for tests that render a complete shell frame.
  */
 export async function expectNoA11yViolations(element: Element, options: { pageLevel?: boolean } = {}): Promise<void> {
   const rules: Record<string, { enabled: boolean }> = {
@@ -15,7 +19,6 @@ export async function expectNoA11yViolations(element: Element, options: { pageLe
     'document-title': { enabled: false },
     'html-has-lang': { enabled: false }
   }
-  // page level rules only evaluate when the whole document is the context
   const results = await axe.run(options.pageLevel ? document : element, { rules })
   const report = results.violations
     .map((v) => `${v.id} (${v.impact}): ${v.help}\n${v.nodes.map((n) => `  ${n.html}`).join('\n')}`)

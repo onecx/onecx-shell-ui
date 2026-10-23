@@ -42,5 +42,11 @@
     "HEADER_LEFT": "Kopfzeile links",
     "HEADER_CENTER": "Kopfzeile mitte",
     "HEADER_RIGHT": "Kopfzeile rechts"
+  },
+  "GLOBAL_ERROR": {
+    "TITLE": "Etwas ist schiefgelaufen",
+    "DESCRIPTION": "Die Anwendung konnte nicht gestartet werden. Bitte versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich an Ihre Administration.",
+    "ERROR_CODE": "Fehlercode:",
+    "ACTION": "Erneut versuchen"
   }
 }

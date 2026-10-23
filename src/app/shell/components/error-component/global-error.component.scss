@@ -1,5 +1,7 @@
 .pages-body {
-  height: 100dvh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .topbar {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -42,13 +44,26 @@
       margin-left: auto;
       margin-right: auto;
 
-      h2 {
+      h1 {
         margin: 0;
+        font-size: 1.5rem;
+        overflow-wrap: anywhere;
+        outline: none;
+
+        &:focus-visible {
+          outline: 2px solid #ffffff;
+          outline-offset: 2px;
+        }
       }
+    }
+
+    .pages-description {
+      overflow-wrap: anywhere;
     }
 
     .pages-detail {
       color: var(--text-secondary-color);
+      overflow-wrap: anywhere;
     }
   }
 

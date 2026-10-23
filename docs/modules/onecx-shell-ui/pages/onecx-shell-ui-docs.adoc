@@ -380,3 +380,21 @@ OneCX ships a migration guide for each Angular major-version transition. Complet
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-19/index.adoc[Migrate from Angular 18 to Angular 19 (libs v6)]
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-20/index.adoc[Migrate from Angular 19 to Angular 20 (libs v7)]
 * xref:documentation:onecx-portal-ui-libs:migrations/angular-21/index.adoc[Migrate from Angular 20 to Angular 21 (libs v8)]
+
+=== Focus ring baseline
+
+The shell ships a global focus-ring baseline (`focus-ring.scss`, part of `global-styles`) for keyboard focus (`:focus-visible`) on links, buttons, form controls and elements with a `tabindex`. It is defined with `:where()` and therefore has zero specificity: any focus style of a remote application or component overrides it.
+
+Remote authors can adjust the ring with CSS custom properties on `:root` or any ancestor:
+
+[cols="2,1,3"]
+|===
+|Token |Default |Purpose
+
+|`--onecx-focus-ring-width` |`2px` |Outline width
+|`--onecx-focus-ring-offset` |`2px` |Gap between element and outline
+|`--onecx-focus-ring-color` |`#0b57d0` |Ring colour (at least 3:1 against the surrounding surface)
+|`--onecx-focus-ring-contrast-color` |`#ffffff` |Halo filling the offset gap, keeps the ring visible on dark surfaces
+|===
+
+In forced-colors mode the ring uses the system `Highlight` colour and the halo is removed. The tokens are expected to be provided by the shared theme preset of the OneCX libs; until then the defaults above apply.

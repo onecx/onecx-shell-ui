@@ -1,0 +1,27 @@
+/*
+  Platform focus-ring baseline.
+
+  Tokens (all optional, set them on :root or any ancestor to override):
+    --onecx-focus-ring-width          default 2px
+    --onecx-focus-ring-offset         default 2px
+    --onecx-focus-ring-color          default #0b57d0 (>= 3:1 on white)
+    --onecx-focus-ring-contrast-color default #ffffff (halo that keeps the ring >= 3:1 on dark surfaces)
+
+  The shared token from the libs preset (onecx/internal-tasks#1070) is expected to define these
+  custom properties; until it is consumed the fallbacks below apply.
+
+  :where() keeps the specificity at zero, so any focus style of a remote or component wins.
+*/
+:where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: var(--onecx-focus-ring-width, 2px) solid var(--onecx-focus-ring-color, #0b57d0);
+  outline-offset: var(--onecx-focus-ring-offset, 2px);
+  // halo fills the offset gap so the ring is visible on light and dark backgrounds
+  box-shadow: 0 0 0 var(--onecx-focus-ring-offset, 2px) var(--onecx-focus-ring-contrast-color, #ffffff);
+}
+
+@media (forced-colors: active) {
+  :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+    outline-color: Highlight;
+    box-shadow: none;
+  }
+}

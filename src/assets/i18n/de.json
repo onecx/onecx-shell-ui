@@ -42,5 +42,8 @@
     "HEADER_LEFT": "Kopfzeile links",
     "HEADER_CENTER": "Kopfzeile mitte",
     "HEADER_RIGHT": "Kopfzeile rechts"
+  },
+  "SHELL_LANDMARKS": {
+    "MAIN_NAVIGATION": "Hauptnavigation"
   }
 }

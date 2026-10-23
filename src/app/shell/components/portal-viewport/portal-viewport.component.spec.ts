@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
+import { BehaviorSubject, map, Observable, of, Subject } from 'rxjs'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
 
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
+import { SlotService } from '@onecx/angular-remote-components'
 import { UserProfile } from '@onecx/integration-interface'
 
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
@@ -38,6 +40,18 @@ function mockFileReader(result: string | null, includeTarget = true) {
   )
 }
 
+class SlotServiceStub {
+  readonly slotsWithContent$ = new BehaviorSubject<string[]>([])
+
+  isSomeComponentDefinedForSlot(slotName: string): Observable<boolean> {
+    return this.slotsWithContent$.pipe(map((slotNames) => slotNames.includes(slotName)))
+  }
+
+  getComponentsForSlot(): Observable<never[]> {
+    return of([])
+  }
+}
+
 describe('PortalViewportComponent', () => {
   const createFixture = (
     theme: Theme,
@@ -51,8 +65,9 @@ describe('PortalViewportComponent', () => {
     const globalError$ = new Subject<string | undefined>()
     const get = jest.fn((): Observable<Blob | undefined> => favicon)
     TestBed.configureTestingModule({
-      imports: [PortalViewportComponent],
+      imports: [PortalViewportComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: SlotService, useClass: SlotServiceStub },
         { provide: AppStateService, useValue: { globalError$ } },
         { provide: UserService, useValue: { profile$ } },
         { provide: ThemeService, useValue: { currentTheme$ } },
@@ -162,5 +177,79 @@ describe('PortalViewportComponent', () => {
     expect(document.querySelector("link[rel~='icon']")?.getAttribute('href')).toBe('data:image/png;base64,updated')
     fixtureData.fixture.destroy()
     reader.mockRestore()
+  })
+
+  describe('landmarks', () => {
+    const renderWithSlots = (slotsWithContent: string[]) => {
+      const fixtureData = createFixture({ name: 'theme' }, null, of(undefined), undefined, false)
+      ;(TestBed.inject(SlotService) as unknown as SlotServiceStub).slotsWithContent$.next(slotsWithContent)
+      const translate = TestBed.inject(TranslateService)
+      translate.setTranslation('en', { SHELL_LANDMARKS: { MAIN_NAVIGATION: 'Main navigation' } })
+      translate.use('en')
+      fixtureData.fixture.detectChanges()
+      fixtureData.currentTheme$.next({ name: 'theme' })
+      fixtureData.fixture.detectChanges()
+      return { ...fixtureData, element: fixtureData.fixture.nativeElement as HTMLElement }
+    }
+
+    const query = (element: HTMLElement, selector: string) => element.querySelector(selector) as HTMLElement
+
+    it('exposes one banner, a named navigation and the body footer as the only contentinfo on a standard workspace', () => {
+      const { fixture, element } = renderWithSlots([
+        'onecx-shell-header.start',
+        'onecx-shell-body-start.start',
+        'onecx-shell-body-footer.start'
+      ])
+
+      expect(element.querySelectorAll('header')).toHaveLength(1)
+      expect(query(element, 'header').getAttribute('role')).toBeNull()
+      const navigation = element.querySelectorAll('[role="navigation"]')
+      expect(navigation).toHaveLength(1)
+      expect(navigation[0].getAttribute('name')).toBe('onecx-shell-body-start')
+      expect(navigation[0].getAttribute('aria-label')).toBe('Main navigation')
+      const contentInfo = element.querySelectorAll('[role="contentinfo"], footer')
+      expect(contentInfo).toHaveLength(1)
+      expect(contentInfo[0].getAttribute('name')).toBe('onecx-shell-body-footer')
+      fixture.destroy()
+    })
+
+    it('does not expose the hard-coded region "Start"', () => {
+      const { fixture, element } = renderWithSlots(['onecx-shell-header.center'])
+
+      expect(element.querySelector('section')).toBeNull()
+      expect(element.querySelector('[aria-label="Start"]')).toBeNull()
+      fixture.destroy()
+    })
+
+    it('does not expose empty landmarks and does not display the footer without content', () => {
+      const { fixture, element } = renderWithSlots([])
+
+      expect(query(element, 'header').getAttribute('role')).toBe('none')
+      expect(element.querySelector('[role="navigation"]')).toBeNull()
+      expect(element.querySelector('[aria-label]')).toBeNull()
+      expect(element.querySelector('[role="contentinfo"]')).toBeNull()
+      expect(element.querySelector('footer')).toBeNull()
+      fixture.destroy()
+    })
+
+    it('uses the footer slot group as the only contentinfo when it has content', () => {
+      const { fixture, element } = renderWithSlots(['onecx-shell-footer.end', 'onecx-shell-body-footer.start'])
+
+      expect(element.querySelectorAll('footer')).toHaveLength(1)
+      expect(query(element, 'footer').querySelector('[name="onecx-shell-footer"]')).not.toBeNull()
+      expect(element.querySelector('[role="contentinfo"]')).toBeNull()
+      fixture.destroy()
+    })
+
+    it('updates the landmarks when slot content changes', () => {
+      const { fixture, element } = renderWithSlots([])
+      ;(TestBed.inject(SlotService) as unknown as SlotServiceStub).slotsWithContent$.next([
+        'onecx-shell-body-start.end'
+      ])
+      fixture.detectChanges()
+
+      expect(query(element, '[role="navigation"]').getAttribute('aria-label')).toBe('Main navigation')
+      fixture.destroy()
+    })
   })
 })

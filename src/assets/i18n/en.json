@@ -42,5 +42,8 @@
     "HEADER_LEFT": "Header left",
     "HEADER_CENTER": "Header center",
     "HEADER_RIGHT": "Header right"
+  },
+  "SHELL_LANDMARKS": {
+    "MAIN_NAVIGATION": "Main navigation"
   }
 }

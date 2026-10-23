@@ -75,7 +75,7 @@ export class RoutesService {
       path: await this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
-        breadcrumb: r.productName
+        breadcrumb: r.displayName || r.productName
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),

@@ -1,7 +1,7 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y'
 import { TestBed } from '@angular/core/testing'
 import { TranslateService } from '@ngx-translate/core'
-import { of, Subject } from 'rxjs'
+import { of, Subject, throwError } from 'rxjs'
 
 import { AppLoadingSpinnerComponent, LOADING_ANNOUNCE_DELAY_MS } from './app-loading-spinner.component'
 
@@ -56,6 +56,15 @@ describe('AppLoadingSpinnerComponent', () => {
 
     await jest.advanceTimersByTimeAsync(10 * LOADING_ANNOUNCE_DELAY_MS)
     expect(announce).toHaveBeenCalledTimes(1)
+    fixture.destroy()
+  })
+
+  it('falls back to "Loading" when the translation fails', async () => {
+    get.mockReturnValue(throwError(() => new Error('no translations')))
+    const fixture = createSpinner()
+
+    await jest.advanceTimersByTimeAsync(LOADING_ANNOUNCE_DELAY_MS)
+    expect(announce).toHaveBeenCalledWith('Loading', 'polite')
     fixture.destroy()
   })
 

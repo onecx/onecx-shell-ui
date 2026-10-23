@@ -36,7 +36,7 @@ export class AppLoadingSpinnerComponent implements OnInit, OnDestroy {
   }
 
   private async announceLoading(): Promise<void> {
-    const message = await firstValueFrom(this.translateService.get('LOADING'))
+    const message = await firstValueFrom(this.translateService.get('LOADING')).catch(() => 'Loading')
     if (this.destroyed) return
     await this.liveAnnouncer.announce(message, 'polite')
   }

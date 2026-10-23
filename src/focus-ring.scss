@@ -1,22 +1,20 @@
 /*
-  Platform focus-ring baseline.
+  Platform focus-ring baseline. No colour is hardcoded: OneCX themes change the palette per workspace,
+  so the ring follows the theme tokens published by the libs preset (onecx/internal-tasks#1070):
 
-  Tokens (all optional, set them on :root or any ancestor to override):
-    --onecx-focus-ring-width          default 2px
-    --onecx-focus-ring-offset         default 2px
-    --onecx-focus-ring-color          default #0b57d0 (>= 3:1 on white)
-    --onecx-focus-ring-contrast-color default #ffffff (halo that keeps the ring >= 3:1 on dark surfaces)
-
-  The shared token from the libs preset (onecx/internal-tasks#1070) is expected to define these
-  custom properties; until it is consumed the fallbacks below apply.
+    --p-onecx-focus-ring-color          contrast-checked ring colour (falls back to --primary-color)
+    --p-onecx-focus-ring-inverse-color  halo colour (falls back to --content-bg-color)
+    --p-focus-ring-width / --p-focus-ring-offset
 
   :where() keeps the specificity at zero, so any focus style of a remote or component wins.
 */
+:where() keeps the specificity at zero, so any focus style of a remote or component wins.
+*/
 :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
-  outline: var(--onecx-focus-ring-width, 2px) solid var(--onecx-focus-ring-color, #0b57d0);
-  outline-offset: var(--onecx-focus-ring-offset, 2px);
+  outline: var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color));
+  outline-offset: var(--p-focus-ring-offset, 2px);
   // halo fills the offset gap so the ring is visible on light and dark backgrounds
-  box-shadow: 0 0 0 var(--onecx-focus-ring-offset, 2px) var(--onecx-focus-ring-contrast-color, #ffffff);
+  box-shadow: 0 0 0 var(--p-focus-ring-offset, 2px) var(--p-onecx-focus-ring-inverse-color, var(--content-bg-color));
 }
 
 @media (forced-colors: active) {

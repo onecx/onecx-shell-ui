@@ -8,10 +8,11 @@ describe('focus-ring baseline', () => {
     expect(css).toMatch(/:where\([^{]*\):focus-visible/)
   })
 
-  it('defines a 2px outline with token and fallbacks', () => {
-    expect(css).toContain('var(--onecx-focus-ring-width, 2px) solid var(--onecx-focus-ring-color, #0b57d0)')
-    expect(css).toContain('outline-offset: var(--onecx-focus-ring-offset, 2px)')
-    expect(css).toContain('var(--onecx-focus-ring-contrast-color, #ffffff)')
+  it('defines a 2px outline from theme tokens without hardcoded colours', () => {
+    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(css).toContain('var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color))')
+    expect(css).toContain('outline-offset: var(--p-focus-ring-offset, 2px)')
+    expect(css).toContain('var(--p-onecx-focus-ring-inverse-color, var(--content-bg-color))')
   })
 
   it('keeps a visible Highlight outline in forced-colors mode', () => {

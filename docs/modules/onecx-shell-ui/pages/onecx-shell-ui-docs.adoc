@@ -391,10 +391,10 @@ Remote authors can adjust the ring with CSS custom properties on `:root` or any 
 |===
 |Token |Default |Purpose
 
-|`--onecx-focus-ring-width` |`2px` |Outline width
-|`--onecx-focus-ring-offset` |`2px` |Gap between element and outline
-|`--onecx-focus-ring-color` |`#0b57d0` |Ring colour (at least 3:1 against the surrounding surface)
-|`--onecx-focus-ring-contrast-color` |`#ffffff` |Halo filling the offset gap, keeps the ring visible on dark surfaces
+|`--p-focus-ring-width` |`2px` |Outline width
+|`--p-focus-ring-offset` |`2px` |Gap between element and outline
+|`--p-onecx-focus-ring-color` |`var(--primary-color)` |Ring colour (at least 3:1 against the surrounding surface)
+|`--p-onecx-focus-ring-inverse-color` |`var(--content-bg-color)` |Halo filling the offset gap, keeps the ring visible on dark surfaces
 |===
 
 In forced-colors mode the ring uses the system `Highlight` colour and the halo is removed. The tokens are expected to be provided by the shared theme preset of the OneCX libs; until then the defaults above apply.

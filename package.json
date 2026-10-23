@@ -133,6 +133,7 @@
     "ngx-translate-testing": "^7.0.0",
     "nx": "22.7.9",
     "prettier": "^3.6.2",
+    "sass": "^1.97.3",
     "sonar-scanner": "^3.1.0",
     "ts-node": "10.9.2",
     "typescript": "~5.9.3",

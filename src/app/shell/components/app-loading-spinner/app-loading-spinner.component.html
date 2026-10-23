@@ -1,3 +1,10 @@
-<div class="w-full h-full absolute top-0 left-0 element-overlay">
+<!-- Purely visual: the loading state is announced once via LiveAnnouncer, the main region carries aria-busy. -->
+<div
+  class="w-full h-full absolute top-0 left-0 element-overlay"
+  aria-hidden="true"
+  data-testid="ocx-shell-loading-spinner"
+>
   <div class="loader"></div>
+  <!-- Visible only with prefers-reduced-motion, as text next to the static ring. Not announced (aria-hidden). -->
+  <span class="loader-text" data-testid="ocx-shell-loading-spinner-text">{{ loadingText$ | async }}</span>
 </div>

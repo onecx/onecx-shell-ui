@@ -39,12 +39,6 @@ $loader-border-bottom-color: transparent;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  &.loader-small {
-    width: 20px;
-    height: 20px;
-    top: 20%;
-    left: 45%;
-  }
 }
 
 // Shown only with reduced motion (see below), as a text cue next to the static ring
@@ -56,7 +50,7 @@ $loader-border-bottom-color: transparent;
   transform: translateX(-50%);
   z-index: 2;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--p-border-radius-sm, 4px);
   white-space: nowrap;
   // Colours come from the active theme (surface background/text pair), readable on top of the dimmed overlay
   background-color: var(--content-bg-color, var(--p-content-background));

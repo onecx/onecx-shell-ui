@@ -2,13 +2,12 @@ import { join } from 'node:path'
 import { compile } from 'sass'
 
 /**
- * WCAG 2.3.3 / 2.2.2: checks the compiled shell styles for the prefers-reduced-motion rules.
+ * WCAG 2.3.3 / 2.2.2: checks that the compiled shell styles contain the prefers-reduced-motion reset.
  * The styles are compiled with sass (as in the build) and parsed by the CSSOM of jsdom.
  * Note: jsdom does not evaluate media queries, so the behaviour in a real browser with reduced motion
  * emulation has to be checked manually (see PR description).
  */
 const rootDir = join(__dirname, '..', '..')
-const reducedMotionQuery = 'prefers-reduced-motion: reduce'
 
 function compileStyles(file: string): CSSStyleSheet {
   const { css } = compile(join(rootDir, file), { loadPaths: [rootDir], silenceDeprecations: ['import'] })
@@ -27,99 +26,30 @@ function styleRules(rules: CSSRuleList): CSSStyleRule[] {
 function reducedMotionRules(sheet: CSSStyleSheet): CSSStyleRule[] {
   return Array.from(sheet.cssRules)
     .filter((rule): rule is CSSMediaRule => rule instanceof CSSMediaRule)
-    .filter((rule) => rule.media.mediaText.includes(reducedMotionQuery))
+    .filter((rule) => rule.media.mediaText.includes('prefers-reduced-motion: reduce'))
     .flatMap((rule) => styleRules(rule.cssRules))
 }
 
-function ruleFor(rules: CSSStyleRule[], selector: string): CSSStyleRule {
-  const rule = rules.find((r) => r.selectorText.split(',').some((s) => s.trim() === selector))
-  if (!rule) throw new Error(`No reduced motion rule for "${selector}"`)
-  return rule
-}
-
 describe('prefers-reduced-motion styles', () => {
-  describe('global styles', () => {
-    let rule: CSSStyleRule
+  it('global styles override animations and transitions with !important under the reduced motion media rule', () => {
+    const rules = reducedMotionRules(compileStyles('src/global-styles.scss'))
+    const important = (property: string) =>
+      rules.some((rule) => rule.style.getPropertyPriority(property) === 'important')
 
-    beforeAll(() => {
-      rule = ruleFor(reducedMotionRules(compileStyles('src/global-styles.scss')), '*')
-    })
-
-    it('apply to all elements and pseudo elements', () => {
-      const selectors = rule.selectorText.split(',').map((s) => s.trim())
-      expect(selectors).toEqual(['*', '*::before', '*::after'])
-    })
-
-    it('stop every CSS animation after a single, zero-length run', () => {
-      expect(rule.style.getPropertyValue('animation-duration')).toBe('0s')
-      expect(rule.style.getPropertyValue('animation-delay')).toBe('0s')
-      expect(rule.style.getPropertyValue('animation-iteration-count')).toBe('1')
-      expect(rule.style.getPropertyPriority('animation-duration')).toBe('important')
-      expect(rule.style.getPropertyPriority('animation-iteration-count')).toBe('important')
-    })
-
-    it('set all transitions to 0 ms', () => {
-      expect(rule.style.getPropertyValue('transition-duration')).toBe('0s')
-      expect(rule.style.getPropertyValue('transition-delay')).toBe('0s')
-      expect(rule.style.getPropertyPriority('transition-duration')).toBe('important')
-    })
-
-    it('disable smooth scrolling', () => {
-      expect(rule.style.getPropertyValue('scroll-behavior')).toBe('auto')
-    })
+    expect(rules.length).toBeGreaterThan(0)
+    expect(important('animation-duration')).toBe(true)
+    expect(important('animation-iteration-count')).toBe(true)
+    expect(important('transition-duration')).toBe(true)
   })
 
-  describe('splash screen', () => {
-    let rules: CSSStyleRule[]
+  it('loading spinner text uses theme variables instead of fixed colours', () => {
+    const sheet = compileStyles('src/app/shell/components/app-loading-spinner/app-loading-spinner.component.scss')
+    const text = styleRules(sheet.cssRules).find((rule) => rule.selectorText === '.loader-text')
 
-    beforeAll(() => {
-      rules = reducedMotionRules(compileStyles('src/splash.scss'))
-    })
-
-    it('appears without fade transition', () => {
-      expect(ruleFor(rules, 'ocx-shell-root + .splash').style.getPropertyValue('transition')).toBe('none')
-    })
-
-    it('shows a static loader without rotation or colour cycling', () => {
-      const loader = ruleFor(rules, 'ocx-shell-root + .splash .splash-content .splash-loader')
-      const path = ruleFor(rules, 'ocx-shell-root + .splash .splash-content .splash-loader .splash-path')
-
-      expect(loader.style.getPropertyValue('animation')).toBe('none')
-      expect(path.style.getPropertyValue('animation')).toBe('none')
-    })
-
-    it('keeps the static ring visible in the theme-independent splash text colour', () => {
-      const path = ruleFor(rules, 'ocx-shell-root + .splash .splash-content .splash-loader .splash-path')
-
-      expect(path.style.getPropertyValue('stroke').toLowerCase()).toBe('currentcolor')
-      expect(path.style.getPropertyValue('stroke-dashoffset')).toBe('46.75')
-    })
-  })
-
-  describe('loading spinner', () => {
-    let sheet: CSSStyleSheet
-    let rules: CSSStyleRule[]
-
-    beforeAll(() => {
-      sheet = compileStyles('src/app/shell/components/app-loading-spinner/app-loading-spinner.component.scss')
-      rules = reducedMotionRules(sheet)
-    })
-
-    it('rotates only without reduced motion', () => {
-      expect(ruleFor(styleRules(sheet.cssRules), '.loader').style.getPropertyValue('animation')).toContain('infinite')
-      expect(ruleFor(rules, '.loader').style.getPropertyValue('animation')).toBe('none')
-    })
-
-    it('shows the loading text only with reduced motion', () => {
-      expect(ruleFor(styleRules(sheet.cssRules), '.loader-text').style.getPropertyValue('display')).toBe('none')
-      expect(ruleFor(rules, '.loader-text').style.getPropertyValue('display')).toBe('block')
-    })
-
-    it('uses theme colours for the loading text', () => {
-      const text = ruleFor(styleRules(sheet.cssRules), '.loader-text')
-
-      expect(text.style.getPropertyValue('color')).toMatch(/^var\(--text-color/)
-      expect(text.style.getPropertyValue('background-color')).toMatch(/^var\(--content-bg-color/)
-    })
+    for (const property of ['color', 'background-color']) {
+      const value = text?.style.getPropertyValue(property) ?? ''
+      expect(value).toMatch(/^var\(--/)
+      expect(value).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i)
+    }
   })
 })

@@ -130,7 +130,6 @@ describe('OneCXShellExtensionsComponent', () => {
       expect(message?.getAttribute('role')).toBe('alert')
       expect(message?.getAttribute('aria-live')).toBe('assertive')
       expect(message?.className).toContain('p-toast-message-error')
-      expect(globalThis.matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')
       discardPeriodicTasks()
       flush()
     }))

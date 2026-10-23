@@ -302,6 +302,8 @@ If the user enables the operating system setting to reduce motion (`prefers-redu
 
 Toast messages are still displayed and announced in this mode.
 
+The reset covers CSS only. Animations started from JavaScript (for example the Web Animations API, `element.animate()` or `@angular/animations`) in micro frontends are not affected. Micro frontends that animate this way must check the preference themselves, for example with `window.matchMedia('(prefers-reduced-motion: reduce)')`, and skip or shorten the animation.
+
 [#shell-version-information]
 === Shell Version Information
 

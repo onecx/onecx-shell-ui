@@ -51,7 +51,9 @@ export class PortalViewportComponent implements OnInit {
 
   menuButtonTitle = ''
   // The document has <base href="/">, so a bare "#id" would resolve against the root URL.
-  skipLinkHref = `${globalThis.location.pathname}${globalThis.location.search}#ocx_main_content`
+  get skipLinkHref(): string {
+    return `${globalThis.location.pathname}${globalThis.location.search}#ocx_main_content`
+  }
 
   colorScheme: 'auto' | 'light' | 'dark' = 'light'
   menuMode: 'horizontal' | 'static' | 'overlay' | 'slim' | 'slimplus' = 'static'

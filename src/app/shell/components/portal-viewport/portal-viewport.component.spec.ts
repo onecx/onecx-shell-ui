@@ -181,13 +181,25 @@ describe('PortalViewportComponent', () => {
 
     it('renders exactly one main landmark on the global error page', () => {
       const { fixture, globalError$ } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
-      jest.spyOn(console, 'error').mockImplementation()
-      fixture.componentInstance.ngOnInit()
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation()
+      fixture.detectChanges()
       globalError$.next('failed')
       fixture.detectChanges()
 
       expect(fixture.nativeElement.querySelectorAll('main')).toHaveLength(1)
       expect(fixture.nativeElement.querySelector('main ocx-shell-error')).not.toBeNull()
+      errorSpy.mockRestore()
+      fixture.destroy()
+    })
+
+    it('keeps the skip link href in sync after SPA navigation', () => {
+      const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      fixture.detectChanges()
+      globalThis.history.pushState({}, '', '/other')
+      fixture.detectChanges()
+
+      const link: HTMLAnchorElement = fixture.nativeElement.querySelector('a.onecx-skip-link')
+      expect(link.getAttribute('href')?.startsWith('/other')).toBe(true)
       fixture.destroy()
     })
 

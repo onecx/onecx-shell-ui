@@ -4,7 +4,7 @@ import * as sass from 'sass'
 describe('focus-ring baseline', () => {
   const css = sass.compile(path.join(__dirname, '..', 'focus-ring.scss')).css
 
-  it('uses zero-specificity :where() selector on :focus-visible', () => {
+  it('uses lowest-specificity :where() selector on :focus-visible', () => {
     expect(css).toMatch(/:where\([^{]*\):focus-visible/)
   })
 

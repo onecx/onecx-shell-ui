@@ -6,7 +6,7 @@
     --p-onecx-focus-ring-inverse-color  halo colour (falls back to --content-bg-color)
     --p-focus-ring-width / --p-focus-ring-offset
 
-  :where() keeps the specificity at zero, so any focus style of a remote or component wins.
+  :where() keeps the selector at the specificity of a single pseudo-class, so any focus style of a remote or component wins.
 */
 :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
   outline: var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color));

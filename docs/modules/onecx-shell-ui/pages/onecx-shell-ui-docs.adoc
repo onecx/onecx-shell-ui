@@ -383,7 +383,7 @@ OneCX ships a migration guide for each Angular major-version transition. Complet
 
 === Focus ring baseline
 
-The shell ships a global focus-ring baseline (`focus-ring.scss`, part of `global-styles`) for keyboard focus (`:focus-visible`) on links, buttons, form controls and elements with a `tabindex`. It is defined with `:where()` and therefore has zero specificity: any focus style of a remote application or component overrides it.
+The shell ships a global focus-ring baseline (`focus-ring.scss`, part of `global-styles`) for keyboard focus (`:focus-visible`) on links, buttons, form controls and elements with a `tabindex`. It is defined with `:where()` and therefore has lowest specificity (one pseudo-class): any focus style of a remote application or component overrides it.
 
 Remote authors can adjust the ring with CSS custom properties on `:root` or any ancestor:
 

@@ -1,5 +1,8 @@
 .pages-body {
-  min-height: 100dvh;
+  height: 100dvh;
+  box-sizing: border-box;
+  // compensates the negative margin of .pages-header so the heading is never clipped when scrolled to top
+  padding-top: 3rem;
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -24,16 +27,8 @@
     z-index: 200;
 
     &.card {
-      img {
-        width: 100%;
-      }
-
       border: 1.5px solid var(--divider-color);
       border-radius: 6px;
-
-      > .card {
-        background-color: var(--content-alt-bg-color);
-      }
     }
 
     .pages-header {

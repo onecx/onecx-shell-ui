@@ -31,15 +31,20 @@ function reducedMotionRules(sheet: CSSStyleSheet): CSSStyleRule[] {
 }
 
 describe('prefers-reduced-motion styles', () => {
-  it('global styles override animations and transitions with !important under the reduced motion media rule', () => {
+  it('global styles reset animations and transitions with ID-level specificity instead of !important under the reduced motion media rule', () => {
     const rules = reducedMotionRules(compileStyles('src/global-styles.scss'))
-    const important = (property: string) =>
-      rules.some((rule) => rule.style.getPropertyPriority(property) === 'important')
+    const reset = rules.find((rule) => rule.style.getPropertyValue('animation-duration') !== '')
 
-    expect(rules.length).toBeGreaterThan(0)
-    expect(important('animation-duration')).toBe(true)
-    expect(important('animation-iteration-count')).toBe(true)
-    expect(important('transition-duration')).toBe(true)
+    expect(reset).toBeDefined()
+    expect(reset?.selectorText).toContain(':not(#\\#)')
+    expect(reset?.style.getPropertyValue('animation-duration')).toBe('0s')
+    expect(reset?.style.getPropertyValue('animation-delay')).toBe('0s')
+    expect(reset?.style.getPropertyValue('animation-iteration-count')).toBe('1')
+    expect(reset?.style.getPropertyValue('transition-duration')).toBe('0s')
+    expect(reset?.style.getPropertyValue('transition-delay')).toBe('0s')
+    for (const rule of rules) {
+      expect(rule.cssText).not.toMatch(/!important|#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i)
+    }
   })
 
   it('loading spinner text uses theme variables instead of fixed colours', () => {

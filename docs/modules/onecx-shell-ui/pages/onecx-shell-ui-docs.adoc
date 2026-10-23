@@ -261,7 +261,7 @@ The extensions slot is rendered with a size of 0 x 0 pixels and `overflow: hidde
 
 Never place focusable content (links, buttons, form fields, elements with `tabindex`) in normal flow inside the slot. It would be clipped and invisible, but keyboard users could still tab to it and lose track of the focus (WCAG 2.4.7 Focus Visible, 2.4.11 Focus Not Obscured).
 
-Extensions that animate (for example overlays that slide or fade in) must respect `prefers-reduced-motion: reduce`. The shell stops all CSS animations and transitions for this preference globally; see <<reduced-motion>>.
+Extensions that animate (for example overlays that slide or fade in) must respect `prefers-reduced-motion: reduce`. The shell stops CSS animations and transitions for this preference globally (except inline styles, ID-based selectors and `!important` declarations); see <<reduced-motion>>.
 
 ==== Shell Toast Remote Component
 
@@ -296,7 +296,7 @@ Once configured in the extensions slot, any micro frontend can send messages thr
 
 If the user enables the operating system setting to reduce motion (`prefers-reduced-motion: reduce`), the shell:
 
-* stops all CSS animations and sets CSS transitions to 0 ms for the whole page (`global-styles.scss`), so elements jump directly to their end state,
+* stops CSS animations and sets CSS transitions to 0 ms for the whole page (`global-styles.scss`), so elements jump directly to their end state. The reset uses ID-level specificity instead of `!important`, so it overrides class- and element-based rules of components and PrimeNG, but not inline styles, ID-based selectors or `!important` declarations in micro frontends,
 * shows the start-up splash as a static ring without rotation, colour cycling or fade,
 * shows the main region loading indicator as a static ring with the visible text "Loading". The loading state is still announced once to screen readers.
 

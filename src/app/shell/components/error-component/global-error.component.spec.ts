@@ -75,10 +75,11 @@ describe('GlobalErrorComponent', () => {
       return fixture
     }
 
-    it('renders main, a level 1 heading and a named button', () => {
+    it('renders no own main landmark, a level 1 heading and a named button', () => {
       const fixture = render('en')
       const el: HTMLElement = fixture.nativeElement
-      expect(el.querySelector('main')).not.toBeNull()
+      // the shell frame (portal viewport) provides the single main landmark
+      expect(el.querySelector('main')).toBeNull()
       expect(el.querySelectorAll('h1')).toHaveLength(1)
       expect(el.querySelector('h1')?.textContent?.trim()).toBe('Something went wrong')
       expect(el.querySelector('button')?.textContent?.trim()).toBe('Try again')

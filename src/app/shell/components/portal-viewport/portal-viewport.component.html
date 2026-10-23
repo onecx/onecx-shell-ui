@@ -1,58 +1,71 @@
+<a class="onecx-skip-link" [attr.href]="skipLinkHref" (click)="onSkipLinkClick($event)" data-testid="onecx-skip-link"
+  >{{ 'SKIP_TO_MAIN_CONTENT' | translate }}</a
+>
 @if (!globalErrMsg) {
 <div class="onecx-viewport-wrapper">
   @if (themeService.currentTheme$ | async) {
   <!-- Header slot group -->
-  <header class="onecx-header" id="ocx_header">
-    <section [style.width]="'100%'" [attr.aria-label]="'Start'">
+  <!-- Exposed as banner only when the header slots have content -->
+  <header class="onecx-header" id="ocx_header" [attr.role]="(headerHasContent$ | async) ? null : 'none'">
+    <div [style.width]="'100%'">
       <ocx-shell-slot-group
         name="onecx-shell-header"
         direction="row"
         [slotInputs]="slotHeaderInputs"
         [slotOutputs]="slotHeaderOutputs"
       ></ocx-shell-slot-group>
-    </section>
+    </div>
   </header>
 
   <!-- SubHeader slot group -->
   <ocx-shell-slot-group class="onecx-subheader" name="onecx-shell-sub-header"></ocx-shell-slot-group>
   <div class="onecx-body-wrapper">
-    <!-- BodyStart slot group -->
+    <!-- BodyStart slot group (holds the menu), exposed as navigation only when it has content -->
     <ocx-shell-slot-group
       class="onecx-body-start"
       name="onecx-shell-body-start"
       direction="column"
+      [attr.role]="(menuHasContent$ | async) ? 'navigation' : null"
+      [attr.aria-label]="(menuHasContent$ | async) ? ('SHELL_LANDMARKS.MAIN_NAVIGATION' | translate) : null"
     ></ocx-shell-slot-group>
     <div class="onecx-body-center">
       <!-- BodyHeader slot group -->
       <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
-      <div class="onecx-body">
+      <main class="onecx-body" id="ocx_main_content" tabindex="-1" #mainRegion>
         @if (!routesService || (routesService.showContent$ | async)) {
         <router-outlet></router-outlet>
         } @else {
         <ocx-shell-loading-spinner></ocx-shell-loading-spinner>
         }
-      </div>
-      <!-- BodyFooter slot group -->
-      <ocx-shell-slot-group class="onecx-body-footer" name="onecx-shell-body-footer"></ocx-shell-slot-group>
+      </main>
+      <!-- BodyFooter slot group (legacy footer slots are mapped here), the contentinfo unless the footer slot group has content -->
+      <ocx-shell-slot-group
+        class="onecx-body-footer"
+        name="onecx-shell-body-footer"
+        [attr.role]="(bodyFooterIsContentInfo$ | async) ? 'contentinfo' : null"
+      ></ocx-shell-slot-group>
     </div>
     <!-- BodyEnd slot group -->
     <ocx-shell-slot-group class="onecx-body-end" name="onecx-shell-body-end" direction="column"></ocx-shell-slot-group>
   </div>
 
-  <!-- Footer slot group -->
+  <!-- Footer slot group, not displayed without content -->
+  @if (footerHasContent$ | async) {
   <footer>
     <ocx-shell-slot-group name="onecx-shell-footer"></ocx-shell-slot-group>
   </footer>
-  } @else {
+  } } @else {
   <div class="onecx-no-theme-main">
-    <div class="onecx-no-theme-content relative">
+    <main class="onecx-no-theme-content relative" id="ocx_main_content" tabindex="-1" #mainRegion>
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </div>
   }
 </div>
 } @else {
-<ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
+<main id="ocx_main_content" tabindex="-1" #mainRegion>
+  <ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
+</main>
 }
 
 <!-- Extensions slot for adding custom functionality -->

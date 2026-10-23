@@ -17,15 +17,14 @@ import { TranslateModule } from '@ngx-translate/core'
         <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
       </div>
       @if (workspace$ | async; as workspace) {
-        <button
-          class="w-max"
+        <a
+          id="onecxNotFoundPageAction"
+          class="w-max max-w-full underline"
           [routerLink]="[workspace.baseUrl]"
-          [style.cursor]="'pointer'"
-          [attr.aria-label]="'NOT_FOUND_PAGE.ACTION' | translate"
           [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
         >
           {{ 'NOT_FOUND_PAGE.ACTION' | translate }}
-        </button>
+        </a>
       }
     </div>
   `

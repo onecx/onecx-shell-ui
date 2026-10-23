@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common'
 import { Component, inject } from '@angular/core'
 
 import { AppStateService, UserService } from '@onecx/angular-integration-interface'
@@ -7,7 +8,7 @@ import { TranslateModule } from '@ngx-translate/core'
 @Component({
   standalone: true,
   selector: 'ocx-shell-welcome-message',
-  imports: [TranslateModule],
+  imports: [AsyncPipe, TranslateModule],
   templateUrl: './welcome-message.component.html'
 })
 export class WelcomeMessageComponent {

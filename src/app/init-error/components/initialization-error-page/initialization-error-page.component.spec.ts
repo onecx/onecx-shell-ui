@@ -67,6 +67,34 @@ describe('InitializationErrorPageComponent', () => {
     })
   })
 
+  describe('reflow', () => {
+    const longUrl = 'https://example.com/' + 'a'.repeat(280)
+
+    beforeEach(() => {
+      Object.assign(route, {
+        fragment: of(new URLSearchParams({ ...fragmentParams, requestedUrl: longUrl }).toString())
+      })
+      fixture = TestBed.createComponent(InitializationErrorPageComponent)
+      fixture.detectChanges()
+    })
+
+    it('renders a 300-character URL completely in a wrapping value element', () => {
+      const compiled = fixture.nativeElement as HTMLElement
+      const value = compiled.querySelector('#onecxInitializationErrorRequestedUrl .onecx-init-error-value')
+
+      expect(longUrl).toHaveLength(300)
+      expect(value?.textContent).toBe(longUrl)
+      expect(compiled.querySelectorAll('.onecx-init-error-value')).toHaveLength(Object.keys(fragmentParams).length)
+    })
+
+    it('keeps the "Log out" button available and constrained to the page width', () => {
+      const compiled = fixture.nativeElement as HTMLElement
+      const button = compiled.querySelector('section.onecx-init-error button.onecx-init-error-logout')
+
+      expect(button?.textContent?.trim()).toBe('LOGOUT')
+    })
+  })
+
   it('should publish logout event', () => {
     jest.spyOn(component.eventsTopic, 'publish')
 

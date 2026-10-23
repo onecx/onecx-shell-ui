@@ -7,7 +7,8 @@
   "LOGOUT": "Abmelden",
   "LOGOUT.TOOLTIP": "Abmelden und zur Anmeldeseite wechseln",
   "WELCOME": {
-    "TITLE": "Hallo"
+    "TITLE": "Hallo",
+    "WORKSPACE": "Workspace:"
   },
   "NOT_FOUND_PAGE": {
     "TITLE": "Die Seite konnte nicht gefunden werden.",

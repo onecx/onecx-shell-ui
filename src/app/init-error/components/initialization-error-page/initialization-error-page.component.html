@@ -1,4 +1,4 @@
-<section class="p-4" [attr.aria-label]="'INITIALIZATION_ERROR_PAGE.SECTION' | translate">
+<section class="onecx-init-error p-4" [attr.aria-label]="'INITIALIZATION_ERROR_PAGE.SECTION' | translate">
   <h1 class="md:text-xl text-lg mb-1">{{ 'INITIALIZATION_ERROR_PAGE.TITLE' | translate }}</h1>
   <p class="text-base">{{ 'INITIALIZATION_ERROR_PAGE.SUBTITLE' | translate }}</p>
 
@@ -7,39 +7,39 @@
     @if (error.message) {
     <div id="onecxInitializationErrorMessage">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.MESSAGE' | translate }}</div>
-      <i>{{ error.message }}</i>
+      <i class="onecx-init-error-value">{{ error.message }}</i>
     </div>
     } @if (error.requestedUrl) {
     <div id="onecxInitializationErrorRequestedUrl">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.REQUESTED_URL' | translate }}</div>
-      <i>{{ error.requestedUrl }}</i>
+      <i class="onecx-init-error-value">{{ error.requestedUrl }}</i>
     </div>
     } @if (error.detail) {
     <div id="onecxInitializationErrorDetail">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.DETAILS' | translate }}</div>
-      <i>{{ error.detail }}</i>
+      <i class="onecx-init-error-value">{{ error.detail }}</i>
     </div>
     } @if (error.errorCode) {
     <div id="onecxInitializationErrorErrorCode">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.ERRORCODE' | translate }}</div>
-      <i>{{ error.errorCode }}</i>
+      <i class="onecx-init-error-value">{{ error.errorCode }}</i>
     </div>
     } @if (error.invalidParams) {
     <div id="onecxInitializationErrorInvalidParams">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.INVALID_PARAMS' | translate }}</div>
-      <i>{{ error.invalidParams }}</i>
+      <i class="onecx-init-error-value">{{ error.invalidParams }}</i>
     </div>
     } @if (error.params) {
     <div id="onecxInitializationErrorParams">
       <div class="font-bold">{{ 'INITIALIZATION_ERROR_PAGE.DETAILS.PARAMS' | translate }}</div>
-      <i>{{ error.params }}</i>
+      <i class="onecx-init-error-value">{{ error.params }}</i>
     </div>
     }
   </div>
   }
 
   <button
-    class="mt-4 w-max"
+    class="onecx-init-error-logout mt-4 w-max"
     (click)="onLogout()"
     [attr.aria-label]="'LOGOUT' | translate"
     [attr.title]="'LOGOUT.TOOLTIP' | translate"

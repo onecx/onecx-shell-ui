@@ -32,14 +32,42 @@ describe('AppLoadingSpinnerComponent', () => {
     jest.useRealTimers()
   })
 
-  it('renders a purely visual overlay without text, roles or live regions', () => {
+  it('renders a purely visual overlay without roles or live regions', () => {
     const fixture = createSpinner()
     const root: HTMLElement = fixture.nativeElement
     const overlay = root.querySelector('[data-testid="ocx-shell-loading-spinner"]')
 
     expect(overlay?.getAttribute('aria-hidden')).toBe('true')
-    expect(root.textContent?.trim()).toBe('')
     expect(root.querySelector('[role], [aria-live], [tabindex], a, button, input')).toBeNull()
+    fixture.destroy()
+  })
+
+  it('keeps the visible loading text inside the aria-hidden overlay, so it is not announced twice', () => {
+    const fixture = createSpinner()
+    const root: HTMLElement = fixture.nativeElement
+    const text = root.querySelector('[data-testid="ocx-shell-loading-spinner-text"]')
+
+    expect(text?.textContent?.trim()).toBe('Loading')
+    expect(text?.closest('[aria-hidden="true"]')).not.toBeNull()
+    expect(root.textContent?.trim()).toBe('Loading')
+    fixture.destroy()
+  })
+
+  it('shows the English loading text when the translation fails', () => {
+    get.mockReturnValue(throwError(() => new Error('no translations')))
+    const fixture = createSpinner()
+    const text = fixture.nativeElement.querySelector('[data-testid="ocx-shell-loading-spinner-text"]')
+
+    expect(text?.textContent?.trim()).toBe('Loading')
+    fixture.destroy()
+  })
+
+  it('requests the translation only once for the visible text and the announcement', async () => {
+    const fixture = createSpinner()
+
+    await jest.advanceTimersByTimeAsync(LOADING_ANNOUNCE_DELAY_MS)
+    expect(get).toHaveBeenCalledTimes(1)
+    expect(announce).toHaveBeenCalledWith('Loading', 'polite')
     fixture.destroy()
   })
 

@@ -5,4 +5,6 @@
   data-testid="ocx-shell-loading-spinner"
 >
   <div class="loader"></div>
+  <!-- Visible only with prefers-reduced-motion, as text next to the static ring. Not announced (aria-hidden). -->
+  <span class="loader-text" data-testid="ocx-shell-loading-spinner-text">{{ loadingText$ | async }}</span>
 </div>

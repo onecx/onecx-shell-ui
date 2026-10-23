@@ -252,6 +252,17 @@ Extensions are defined in the slot configuration and can be managed through the 
 
 Each extension component loaded into the `onecx-shell-extensions` slot receives standard slot inputs and can emit events back to the shell through the OneCX Topic event system.
 
+===== Accessibility rules
+
+The extensions slot is rendered with a size of 0 x 0 pixels and `overflow: hidden`, so that it takes no space in the layout. It is not hidden with `display: none`, `visibility: hidden` or the `hidden` attribute, because live regions such as the toast container must stay rendered to be announced by screen readers. Therefore, a component in this slot must be one of:
+
+* **Non-visual:** it renders nothing visible, for example a service, an event listener or a live region that only announces messages.
+* **Fixed overlay:** everything it shows is positioned with `position: fixed` (or rendered into an overlay container outside the slot, such as the CDK overlay), like the Shell Toast Remote Component.
+
+Never place focusable content (links, buttons, form fields, elements with `tabindex`) in normal flow inside the slot. It would be clipped and invisible, but keyboard users could still tab to it and lose track of the focus (WCAG 2.4.7 Focus Visible, 2.4.11 Focus Not Obscured).
+
+Extensions that animate (for example overlays that slide or fade in) must respect `prefers-reduced-motion: reduce`. The shell stops all CSS animations and transitions for this preference globally; see <<reduced-motion>>.
+
 ==== Shell Toast Remote Component
 
 The Shell Toast component provides a centralized, application-wide notification system for displaying messages across the OneCX Shell and all loaded micro frontends.
@@ -279,6 +290,17 @@ To enable toast messages by using the `OneCXShellToastComponent`, it must be con
 3. The component will automatically subscribe to the `PortalMessageService` message stream
 
 Once configured in the extensions slot, any micro frontend can send messages through the `PortalMessageService`, and they will be displayed as toast notifications to the user.
+
+[#reduced-motion]
+==== Reduced Motion
+
+If the user enables the operating system setting to reduce motion (`prefers-reduced-motion: reduce`), the shell:
+
+* stops all CSS animations and sets CSS transitions to 0 ms for the whole page (`global-styles.scss`), so elements jump directly to their end state,
+* shows the start-up splash as a static ring without rotation, colour cycling or fade,
+* shows the main region loading indicator as a static ring with the visible text "Loading". The loading state is still announced once to screen readers.
+
+Toast messages are still displayed and announced in this mode.
 
 [#shell-version-information]
 === Shell Version Information

@@ -155,7 +155,9 @@ footer {
 
 // Necessary to visually hide the extensions slot.
 // Using [hidden]=true causes the slot to be present in DOM, but not rendered visibly
-// which causes <p-toast> not to be rendered and toast messages not being displayed
+// which causes <p-toast> not to be rendered and toast messages not being displayed.
+// Only non-visual or fixed-position overlay content belongs here: anything in normal flow is clipped,
+// so focusable content inside it would be invisible while focused (see "OneCX Extensions Slot" docs).
 .extensions-slot {
   width: 0 !important;
   height: 0 !important;

@@ -169,6 +169,21 @@ describe('PortalViewportComponent', () => {
     reader.mockRestore()
   })
 
+  describe('extensions slot', () => {
+    it('stays rendered outside the main landmark, so the toast live region can be announced', () => {
+      const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      fixture.detectChanges()
+      const slot: HTMLElement | null = fixture.nativeElement.querySelector('ocx-slot[name="onecx-shell-extensions"]')
+
+      expect(slot).not.toBeNull()
+      expect(slot?.classList).toContain('extensions-slot')
+      expect(slot?.hasAttribute('hidden')).toBe(false)
+      expect(slot?.getAttribute('aria-hidden')).toBeNull()
+      expect(slot?.closest('main')).toBeNull()
+      fixture.destroy()
+    })
+  })
+
   describe('skip link and main landmark', () => {
     it('renders the skip link first and exactly one main landmark without a theme', () => {
       const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)

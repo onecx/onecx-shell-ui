@@ -30,6 +30,22 @@ body {
   }
 }
 
+// WCAG 2.3.3 / 2.2.2: respect the reduced-motion preference of the user for the whole page.
+// No infinite or long-running CSS animation and no transition runs; elements jump to their end state.
+// Animation end events still fire (zero-length animation), PrimeNG motion skips itself in this mode.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 // Primeng Bug: For p-toast z-index is applied onAnimationStart which is missed on Ocassional Page Reloads as a result the toast appears below the header
 // so below we provide a fallback z-index (value is taken from the default z-index of p-toast in normal scenarios)
 p-toast {

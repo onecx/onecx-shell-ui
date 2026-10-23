@@ -1,3 +1,6 @@
+<a class="onecx-skip-link" [attr.href]="skipLinkHref" (click)="onSkipLinkClick($event)" data-testid="onecx-skip-link"
+  >{{ 'SKIP_TO_MAIN_CONTENT' | translate }}</a
+>
 @if (!globalErrMsg) {
 <div class="onecx-viewport-wrapper">
   @if (themeService.currentTheme$ | async) {
@@ -28,13 +31,13 @@
     <div class="onecx-body-center">
       <!-- BodyHeader slot group -->
       <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
-      <div class="onecx-body">
+      <main class="onecx-body" id="ocx_main_content" tabindex="-1" #mainRegion>
         @if (!routesService || (routesService.showContent$ | async)) {
         <router-outlet></router-outlet>
         } @else {
         <ocx-shell-loading-spinner></ocx-shell-loading-spinner>
         }
-      </div>
+      </main>
       <!-- BodyFooter slot group (legacy footer slots are mapped here), the contentinfo unless the footer slot group has content -->
       <ocx-shell-slot-group
         class="onecx-body-footer"
@@ -53,14 +56,16 @@
   </footer>
   } } @else {
   <div class="onecx-no-theme-main">
-    <div class="onecx-no-theme-content relative">
+    <main class="onecx-no-theme-content relative" id="ocx_main_content" tabindex="-1" #mainRegion>
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </div>
   }
 </div>
 } @else {
-<ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
+<main id="ocx_main_content" tabindex="-1" #mainRegion>
+  <ocx-shell-error [errCode]="globalErrMsg"></ocx-shell-error>
+</main>
 }
 
 <!-- Extensions slot for adding custom functionality -->

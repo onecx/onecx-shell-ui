@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { BehaviorSubject, map, Observable, of, Subject } from 'rxjs'
+import { provideRouter } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { BehaviorSubject, map, Observable, of, Subject } from 'rxjs'
 
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { SlotService } from '@onecx/angular-remote-components'
@@ -68,6 +69,7 @@ describe('PortalViewportComponent', () => {
       imports: [PortalViewportComponent, TranslateModule.forRoot()],
       providers: [
         { provide: SlotService, useClass: SlotServiceStub },
+        provideRouter([]),
         { provide: AppStateService, useValue: { globalError$ } },
         { provide: UserService, useValue: { profile$ } },
         { provide: ThemeService, useValue: { currentTheme$ } },
@@ -241,6 +243,24 @@ describe('PortalViewportComponent', () => {
       fixture.destroy()
     })
 
+    it('keeps exactly one main landmark alongside the banner, navigation and contentinfo', () => {
+      const { fixture, element } = renderWithSlots([
+        'onecx-shell-header.start',
+        'onecx-shell-body-start.start',
+        'onecx-shell-body-footer.start'
+      ])
+
+      const main = element.querySelectorAll('main, [role="main"]')
+      expect(main).toHaveLength(1)
+      expect(main[0].id).toBe('ocx_main_content')
+      expect(element.querySelectorAll('header')).toHaveLength(1)
+      expect(element.querySelectorAll('[role="navigation"]')).toHaveLength(1)
+      expect(element.querySelectorAll('[role="contentinfo"], footer')).toHaveLength(1)
+      expect(main[0].contains(query(element, '[role="navigation"]'))).toBe(false)
+      expect(main[0].contains(query(element, '[role="contentinfo"]'))).toBe(false)
+      fixture.destroy()
+    })
+
     it('updates the landmarks when slot content changes', () => {
       const { fixture, element } = renderWithSlots([])
       ;(TestBed.inject(SlotService) as unknown as SlotServiceStub).slotsWithContent$.next([
@@ -249,6 +269,60 @@ describe('PortalViewportComponent', () => {
       fixture.detectChanges()
 
       expect(query(element, '[role="navigation"]').getAttribute('aria-label')).toBe('Main navigation')
+      fixture.destroy()
+    })
+  })
+
+  describe('skip link and main landmark', () => {
+    it('renders the skip link first and exactly one main landmark without a theme', () => {
+      const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      fixture.detectChanges()
+      const root: HTMLElement = fixture.nativeElement
+
+      expect(root.firstElementChild?.matches('a.onecx-skip-link')).toBe(true)
+      expect(root.querySelectorAll('main')).toHaveLength(1)
+      expect(root.querySelector('main')?.getAttribute('tabindex')).toBe('-1')
+      fixture.destroy()
+    })
+
+    it('renders exactly one main landmark on the global error page', () => {
+      const { fixture, globalError$ } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation()
+      fixture.detectChanges()
+      globalError$.next('failed')
+      fixture.detectChanges()
+
+      expect(fixture.nativeElement.querySelectorAll('main')).toHaveLength(1)
+      expect(fixture.nativeElement.querySelector('main ocx-shell-error')).not.toBeNull()
+      errorSpy.mockRestore()
+      fixture.destroy()
+    })
+
+    it('keeps the skip link href in sync after SPA navigation', () => {
+      const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      fixture.detectChanges()
+      globalThis.history.pushState({}, '', '/other')
+      fixture.detectChanges()
+
+      const link: HTMLAnchorElement = fixture.nativeElement.querySelector('a.onecx-skip-link')
+      expect(link.getAttribute('href')?.startsWith('/other')).toBe(true)
+      fixture.destroy()
+    })
+
+    it('focuses the main element and prevents default navigation on click', () => {
+      const { fixture } = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      fixture.detectChanges()
+      document.body.appendChild(fixture.nativeElement)
+      const link: HTMLAnchorElement = fixture.nativeElement.querySelector('a.onecx-skip-link')
+      const main: HTMLElement = fixture.nativeElement.querySelector('main')
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      link.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(true)
+      expect(document.activeElement).toBe(main)
+      expect(link.getAttribute('href')).toContain('#ocx_main_content')
+      fixture.nativeElement.remove()
       fixture.destroy()
     })
   })

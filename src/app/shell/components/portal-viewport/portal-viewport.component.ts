@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { AsyncPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, EventEmitter, inject, OnInit } from '@angular/core'
+import { Component, ElementRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { TranslatePipe } from '@ngx-translate/core'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
@@ -58,7 +58,13 @@ export class PortalViewportComponent implements OnInit {
     this.footerHasContent$
   ]).pipe(map(([bodyFooterHasContent, footerHasContent]) => bodyFooterHasContent && !footerHasContent))
 
+  @ViewChild('mainRegion') mainRegion?: ElementRef<HTMLElement>
+
   menuButtonTitle = ''
+  // The document has <base href="/">, so a bare "#id" would resolve against the root URL.
+  get skipLinkHref(): string {
+    return `${globalThis.location.pathname}${globalThis.location.search}#ocx_main_content`
+  }
 
   colorScheme: 'auto' | 'light' | 'dark' = 'light'
   menuMode: 'horizontal' | 'static' | 'overlay' | 'slim' | 'slimplus' = 'static'
@@ -121,6 +127,11 @@ export class PortalViewportComponent implements OnInit {
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
     })
+  }
+
+  onSkipLinkClick(event: Event) {
+    event.preventDefault()
+    this.mainRegion?.nativeElement.focus()
   }
 
   private slotGroupHasContent(slotGroupName: string): Observable<boolean> {

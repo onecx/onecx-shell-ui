@@ -19,7 +19,7 @@ import { TranslateModule } from '@ngx-translate/core'
       @if (workspace$ | async; as workspace) {
         <a
           id="onecxNotFoundPageAction"
-          class="w-max max-w-full underline"
+          class="max-w-full underline"
           [routerLink]="[workspace.baseUrl]"
           [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
         >

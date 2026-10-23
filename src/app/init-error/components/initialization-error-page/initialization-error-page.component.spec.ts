@@ -21,16 +21,20 @@ describe('InitializationErrorPageComponent', () => {
     params: '[key1: value1]'
   }
 
-  beforeEach(() => {
-    route = {
-      fragment: of(new URLSearchParams(fragmentParams).toString())
-    } as any
+  function configureTestingModule(fragment: string): ActivatedRoute {
+    const activatedRoute = { fragment: of(fragment) } as any
 
     TestBed.configureTestingModule({
       declarations: [],
       imports: [InitializationErrorPageComponent, TooltipModule],
-      providers: [{ provide: ActivatedRoute, useValue: route }, provideTranslateTestingService({})]
+      providers: [{ provide: ActivatedRoute, useValue: activatedRoute }, provideTranslateTestingService({})]
     }).compileComponents()
+
+    return activatedRoute
+  }
+
+  beforeEach(() => {
+    route = configureTestingModule(new URLSearchParams(fragmentParams).toString())
 
     fixture = TestBed.createComponent(InitializationErrorPageComponent)
     component = fixture.componentInstance
@@ -71,9 +75,9 @@ describe('InitializationErrorPageComponent', () => {
     const longUrl = 'https://example.com/' + 'a'.repeat(280)
 
     beforeEach(() => {
-      Object.assign(route, {
-        fragment: of(new URLSearchParams({ ...fragmentParams, requestedUrl: longUrl }).toString())
-      })
+      // Use a fresh testing module with its own route instead of mutating the shared one after creation
+      TestBed.resetTestingModule()
+      configureTestingModule(new URLSearchParams({ ...fragmentParams, requestedUrl: longUrl }).toString())
       fixture = TestBed.createComponent(InitializationErrorPageComponent)
       fixture.detectChanges()
     })
@@ -87,7 +91,7 @@ describe('InitializationErrorPageComponent', () => {
       expect(compiled.querySelectorAll('.onecx-init-error-value')).toHaveLength(Object.keys(fragmentParams).length)
     })
 
-    it('keeps the "Log out" button available and constrained to the page width', () => {
+    it('renders the "Log out" button with its label inside the error section', () => {
       const compiled = fixture.nativeElement as HTMLElement
       const button = compiled.querySelector('section.onecx-init-error button.onecx-init-error-logout')
 

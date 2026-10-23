@@ -8,8 +8,6 @@
 
   :where() keeps the specificity at zero, so any focus style of a remote or component wins.
 */
-:where() keeps the specificity at zero, so any focus style of a remote or component wins.
-*/
 :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
   outline: var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color));
   outline-offset: var(--p-focus-ring-offset, 2px);

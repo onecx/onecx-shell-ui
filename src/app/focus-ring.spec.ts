@@ -9,7 +9,7 @@ describe('focus-ring baseline', () => {
   })
 
   it('defines a 2px outline from theme tokens without hardcoded colours', () => {
-    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
     expect(css).toContain('var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color))')
     expect(css).toContain('outline-offset: var(--p-focus-ring-offset, 2px)')
     expect(css).toContain('var(--p-onecx-focus-ring-inverse-color, var(--content-bg-color))')

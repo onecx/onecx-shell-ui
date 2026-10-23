@@ -20,8 +20,15 @@ export async function expectNoA11yViolations(element: Element, options: { pageLe
     'html-has-lang': { enabled: false }
   }
   const results = await axe.run(options.pageLevel ? document : element, { rules })
-  const report = results.violations
-    .map((v) => `${v.id} (${v.impact}): ${v.help}\n${v.nodes.map((n) => `  ${n.html}`).join('\n')}`)
+  expect(formatViolations(results.violations)).toBe('')
+}
+
+/** One line per violation, followed by the offending nodes (indented). */
+export function formatViolations(violations: axe.Result[]): string {
+  return violations
+    .map((v) => {
+      const nodes = v.nodes.map((n) => '  ' + n.html).join('\n')
+      return `${v.id} (${v.impact}): ${v.help}\n${nodes}`
+    })
     .join('\n')
-  expect(report).toBe('')
 }

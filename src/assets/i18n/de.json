@@ -1,12 +1,14 @@
 {
   "SHELL": "",
+  "SKIP_TO_MAIN_CONTENT": "Zum Hauptinhalt springen",
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnten nicht geladen werden."
   },
   "LOGOUT": "Abmelden",
   "LOGOUT.TOOLTIP": "Abmelden und zur Anmeldeseite wechseln",
   "WELCOME": {
-    "TITLE": "Hallo"
+    "TITLE": "Hallo",
+    "WORKSPACE": "Workspace:"
   },
   "NOT_FOUND_PAGE": {
     "TITLE": "Die Seite konnte nicht gefunden werden.",

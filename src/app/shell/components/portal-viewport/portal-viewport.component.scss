@@ -32,12 +32,16 @@
 }
 
 // Styles for no theme template
+// The wrapper is limited to 100dvh and the body has overflow: hidden, so this container
+// owns scrolling; otherwise content below the fold is clipped at 400% zoom or short viewports.
 .onecx-no-theme-main {
   padding-top: 4rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100dvh;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   transition: margin-left var(--animation-duration);
 
   .onecx-no-theme-content {
@@ -160,4 +164,43 @@ footer {
   width: 0 !important;
   height: 0 !important;
   overflow: hidden !important;
+}
+
+// Skip link: visually hidden until it receives keyboard focus
+.onecx-skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  padding: 0.75rem 1rem;
+  // Colours come from the active theme (surface background/text pair)
+  background-color: var(--content-bg-color, var(--p-content-background));
+  color: var(--text-color, var(--p-text-color));
+  border: 2px solid var(--primary-color, var(--p-primary-color));
+  border-radius: 4px;
+  text-decoration: underline;
+  transform: translateY(-200%);
+
+  &:focus,
+  &:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--primary-color, var(--p-primary-color));
+    outline-offset: 2px;
+  }
+
+  // Windows High Contrast / forced colours: use system colours so the link stays visible
+  @media (forced-colors: active) {
+    background-color: Canvas;
+    color: LinkText;
+    border-color: CanvasText;
+
+    &:focus,
+    &:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
+
+#ocx_main_content:focus {
+  outline: none;
 }

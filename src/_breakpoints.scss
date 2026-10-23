@@ -1,0 +1,4 @@
+// Width below which the shell frame reflows (WCAG 1.4.10 / 1.4.4), shared by the shell component styles.
+// It covers 1280 px desktops at 200 % (640 px) and 400 % (320 px) zoom; desktop widths keep their layout.
+// Note: this is not --mobile-break-point, which comes from @onecx/portal-layout-styles (767 px).
+$shell-reflow-breakpoint: 991px;

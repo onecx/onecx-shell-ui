@@ -1,3 +1,5 @@
+@use '../../../../breakpoints' as *;
+
 .onecx-viewport-wrapper {
   display: flex;
   flex-direction: column;
@@ -201,34 +203,35 @@ footer {
   outline: none;
 }
 
-// Reflow (WCAG 1.4.10 / 1.4.4): below the shell mobile breakpoint, which also covers
-// 1280 px desktops at 200 % and 400 % zoom, the frame must never be wider than the viewport.
+// Reflow (WCAG 1.4.10 / 1.4.4): below $shell-reflow-breakpoint (see src/_breakpoints.scss), the frame must never be wider than the viewport.
 // The body has overflow: hidden, so anything wider would be clipped, not scrollable.
 // Desktop widths are outside this media query and keep their layout unchanged.
-$shell-reflow-breakpoint: 991px; // keep in sync with $mobileBreakpoint in global-styles.scss
-
 @media (max-width: $shell-reflow-breakpoint) {
-  .onecx-viewport-wrapper {
-    max-width: 100%;
-    // Let the frame scroll vertically when the wrapped top bar and the content do not fit the height
-    overflow-y: auto;
-  }
-
   .onecx-header {
     // Top bar actions wrap onto further rows instead of being pushed off-screen
     flex-wrap: wrap;
     flex-shrink: 0;
-    min-width: 0;
-    max-width: 100%;
+    // A top bar wrapped onto many rows scrolls itself instead of pushing the page content out of view
+    max-height: 50dvh;
+    overflow-y: auto;
 
     > div {
       min-width: 0;
     }
+
+    // Remote components rendered into the top bar slots may shrink and wrap instead of
+    // forcing the slot (and the top bar) wider than the viewport
+    ::ng-deep ocx-slot > * {
+      min-width: 0;
+      max-width: 100%;
+    }
   }
 
   .onecx-body-wrapper {
-    // Keep room for the page content when the top bar wraps onto several rows
-    min-height: 50dvh;
+    // When a static side menu and the content do not fit next to each other (e.g. 320 px),
+    // the content wraps below the menu instead of collapsing to a few pixels beside it.
+    // The 20rem basis only decides when to wrap: on one line the content still grows to fill the row.
+    flex-wrap: wrap;
 
     .onecx-body-start,
     .onecx-body-end {
@@ -236,6 +239,7 @@ $shell-reflow-breakpoint: 991px; // keep in sync with $mobileBreakpoint in globa
     }
 
     .onecx-body-center {
+      flex-basis: 20rem;
       min-width: 0;
     }
   }

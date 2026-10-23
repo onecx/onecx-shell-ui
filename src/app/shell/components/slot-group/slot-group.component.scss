@@ -1,9 +1,9 @@
-// Reflow (WCAG 1.4.10 / 1.4.4): below the shell mobile breakpoint, which also covers
-// 1280 px desktops at 200 % and 400 % zoom, row slot groups (e.g. the top bar) wrap their
-// slots and the remote components inside them instead of overflowing the viewport.
-// Desktop widths are outside this media query and keep their layout unchanged.
-$shell-reflow-breakpoint: 991px; // keep in sync with $mobileBreakpoint in global-styles.scss
+@use '../../../../breakpoints' as *;
 
+// Reflow (WCAG 1.4.10 / 1.4.4): below $shell-reflow-breakpoint (see src/_breakpoints.scss), row slot groups (e.g. the top bar) wrap their
+// slots instead of overflowing the viewport (the remote components inside the top bar slots
+// are allowed to shrink in portal-viewport.component.scss).
+// Desktop widths are outside this media query and keep their layout unchanged.
 @media (max-width: $shell-reflow-breakpoint) {
   :host(.flex-row),
   :host(.flex-row-reverse) {

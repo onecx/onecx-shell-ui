@@ -1,7 +1,7 @@
 import { applyToastPolicy, DEFAULT_TOAST_LIFE_MS, ToastMessage } from './toast-policy'
 
 describe('applyToastPolicy', () => {
-  it.each(['error', 'warn'])('makes %s toasts sticky and ignores app life/sticky settings', (severity) => {
+  it.each(['error', 'warn', 'warning'])('makes %s toasts sticky and ignores app life/sticky settings', (severity) => {
     expect(applyToastPolicy({ severity, summary: 's', life: 1000, sticky: false })).toEqual(
       expect.objectContaining({ sticky: true })
     )
@@ -21,6 +21,10 @@ describe('applyToastPolicy', () => {
 
   it('keeps an explicit sticky info toast sticky', () => {
     expect(applyToastPolicy({ severity: 'info', summary: 's', sticky: true }).sticky).toBe(true)
+  })
+
+  it('treats a toast without severity like info', () => {
+    expect(applyToastPolicy({ summary: 's' })).toEqual({ summary: 's', sticky: false, life: DEFAULT_TOAST_LIFE_MS })
   })
 
   it('does not mutate the input message', () => {

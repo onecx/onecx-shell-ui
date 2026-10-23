@@ -280,6 +280,16 @@ To enable toast messages by using the `OneCXShellToastComponent`, it must be con
 
 Once configured in the extensions slot, any micro frontend can send messages through the `PortalMessageService`, and they will be displayed as toast notifications to the user.
 
+===== Toast Timing Policy
+
+To meet WCAG 2.2.1 (Timing Adjustable) and 4.1.3 (Status Messages), the shell applies a timing policy to every toast:
+
+* `error`, `warn` and `warning` toasts are sticky: they stay until the user closes them. An app-provided `life` or `sticky: false` is ignored.
+* `info` and `success` toasts use the app-provided `life`, or 10 seconds if none is set. `sticky: true` is honoured.
+* Hovering a toast or moving keyboard focus into it pauses its timer; the timer restarts when the pointer or focus leaves the toast.
+* Pressing `Escape` while a toast has focus closes that toast.
+* Identical toasts that are already open are not shown again.
+
 [#shell-version-information]
 === Shell Version Information
 

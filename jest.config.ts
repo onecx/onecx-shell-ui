@@ -36,7 +36,7 @@ const config: Config = {
   ],
   collectCoverage: true,
   coverageDirectory: '<rootDir>/reports/coverage/',
-  coveragePathIgnorePatterns: ignoredPathPatterns,
+  coveragePathIgnorePatterns: [...ignoredPathPatterns, '<rootDir>/src/app/a11y/'],
   coverageReporters: ['json', 'text', 'lcov', 'text-summary'],
   reporters: [
     'default',

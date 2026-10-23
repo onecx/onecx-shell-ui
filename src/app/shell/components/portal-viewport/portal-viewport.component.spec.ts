@@ -1,3 +1,4 @@
+import { LiveAnnouncer } from '@angular/cdk/a11y'
 import { HttpClient } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
@@ -10,6 +11,7 @@ import { UserProfile } from '@onecx/integration-interface'
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
 import { PortalViewportComponent } from './portal-viewport.component'
 import { RoutesService } from '../../services/routes.service'
+import { LOADING_ANNOUNCE_DELAY_MS } from '../app-loading-spinner/app-loading-spinner.component'
 
 class ResizeObserverMock {
   private readonly callback: ResizeObserverCallback
@@ -217,6 +219,70 @@ describe('PortalViewportComponent', () => {
       expect(document.activeElement).toBe(main)
       expect(link.getAttribute('href')).toContain('#ocx_main_content')
       fixture.nativeElement.remove()
+      fixture.destroy()
+    })
+  })
+
+  describe('loading state', () => {
+    const renderThemed = (showContent$?: BehaviorSubject<boolean>) => {
+      const data = createFixture({ name: 'plain' }, null, of(undefined), null, false)
+      data.component.routesService = (showContent$ ? { showContent$ } : undefined) as unknown as RoutesService
+      data.fixture.detectChanges()
+      data.currentTheme$.next({ name: 'plain' })
+      data.fixture.detectChanges()
+      const root: HTMLElement = data.fixture.nativeElement
+      return { ...data, root, main: () => root.querySelector('main') as HTMLElement }
+    }
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('marks the main region busy and shows a hidden spinner while the content is loading', () => {
+      const { fixture, main } = renderThemed(new BehaviorSubject(false))
+      const spinner = main().querySelector('[data-testid="ocx-shell-loading-spinner"]')
+
+      expect(main().getAttribute('aria-busy')).toBe('true')
+      expect(main().getAttribute('id')).toBe('ocx_main_content')
+      expect(spinner?.getAttribute('aria-hidden')).toBe('true')
+      expect(main().querySelector('[aria-live], [role="status"], [role="alert"]')).toBeNull()
+      expect(main().querySelector('router-outlet')).toBeNull()
+      fixture.destroy()
+    })
+
+    it('removes aria-busy and the spinner once the content is shown', () => {
+      const showContent$ = new BehaviorSubject(false)
+      const { fixture, main } = renderThemed(showContent$)
+
+      showContent$.next(true)
+      fixture.detectChanges()
+
+      expect(main().hasAttribute('aria-busy')).toBe(false)
+      expect(main().querySelector('ocx-shell-loading-spinner')).toBeNull()
+      expect(main().querySelector('router-outlet')).not.toBeNull()
+      fixture.destroy()
+    })
+
+    it('is not busy when no routes service is available', () => {
+      const { fixture, main } = renderThemed()
+
+      expect(main().hasAttribute('aria-busy')).toBe(false)
+      expect(main().querySelector('router-outlet')).not.toBeNull()
+      fixture.destroy()
+    })
+
+    it('announces "Loading" only once although loading is signalled repeatedly', async () => {
+      jest.useFakeTimers()
+      const showContent$ = new BehaviorSubject(false)
+      const { fixture } = renderThemed(showContent$)
+      const announce = jest.spyOn(TestBed.inject(LiveAnnouncer), 'announce').mockResolvedValue()
+
+      showContent$.next(false)
+      fixture.detectChanges()
+      await jest.advanceTimersByTimeAsync(5 * LOADING_ANNOUNCE_DELAY_MS)
+
+      expect(announce).toHaveBeenCalledTimes(1)
+      expect(announce).toHaveBeenCalledWith('LOADING', 'polite')
       fixture.destroy()
     })
   })

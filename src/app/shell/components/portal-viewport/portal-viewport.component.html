@@ -28,8 +28,15 @@
     <div class="onecx-body-center">
       <!-- BodyHeader slot group -->
       <ocx-shell-slot-group class="onecx-body-header" name="onecx-shell-body-header"></ocx-shell-slot-group>
-      <main class="onecx-body" id="ocx_main_content" tabindex="-1" #mainRegion>
-        @if (!routesService || (routesService.showContent$ | async)) {
+      @let contentReady = !routesService || (routesService.showContent$ | async);
+      <main
+        class="onecx-body"
+        id="ocx_main_content"
+        tabindex="-1"
+        #mainRegion
+        [attr.aria-busy]="contentReady ? null : 'true'"
+      >
+        @if (contentReady) {
         <router-outlet></router-outlet>
         } @else {
         <ocx-shell-loading-spinner></ocx-shell-loading-spinner>

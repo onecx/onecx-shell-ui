@@ -1,5 +1,6 @@
 {
   "SHELL": "",
+  "SKIP_TO_MAIN_CONTENT": "Skip to main content",
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
   },
@@ -42,5 +43,11 @@
     "HEADER_LEFT": "Header left",
     "HEADER_CENTER": "Header center",
     "HEADER_RIGHT": "Header right"
+  },
+  "GLOBAL_ERROR": {
+    "TITLE": "Something went wrong",
+    "DESCRIPTION": "The application could not be started. Please try again. If the problem persists, contact your administrator.",
+    "ERROR_CODE": "Error code:",
+    "ACTION": "Try again"
   }
 }

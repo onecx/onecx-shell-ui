@@ -74,8 +74,13 @@ describe('ShellTitleStrategy', () => {
   })
 
   it('falls back to the app displayName when the leaf has no title', () => {
-    routeTitle = 'Theme App'
-    update()
+    // run the real Angular buildTitle; only the (internal) resolved-title lookup is replaced
+    jest.mocked(strategy.buildTitle).mockRestore()
+    jest.spyOn(strategy, 'getResolvedTitleForRoute').mockImplementation((route: any) => route.data?.title)
+    const leaf = { outlet: 'primary', data: {}, children: [] }
+    const parent = { outlet: 'primary', data: { title: 'Theme App' }, children: [leaf] }
+    const root = { outlet: 'primary', data: {}, children: [parent] }
+    strategy.updateTitle({ root } as unknown as RouterStateSnapshot)
     expect(setTitle).toHaveBeenLastCalledWith('Theme App - My Workspace')
   })
 

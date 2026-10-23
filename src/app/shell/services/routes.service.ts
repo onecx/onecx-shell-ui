@@ -25,7 +25,7 @@ import { toLoadRemoteEntryOptions } from '@onecx/angular-utils'
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
   loadChildren: () => import('src/app/not-found/not-found.module').then((m) => m.NotFoundModule),
-  title: 'OneCX Error'
+  title: 'PAGE_TITLES.NOT_FOUND'
 }
 
 @Injectable({ providedIn: 'root' })

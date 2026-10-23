@@ -151,10 +151,10 @@ describe('OneCXShellExtensionsComponent', () => {
       const { fixture, portalMessageServiceMock } = setUp()
       portalMessageServiceMock.error({ summaryKey: 'ERR', detailKey: 'D' })
       await flush(fixture, 1)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
 
       await flush(fixture, 60000)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
     })
 
     it('keeps an info toast for at least 10 s, pauses while a control inside has focus and closes once focus left', async () => {
@@ -166,15 +166,15 @@ describe('OneCXShellExtensionsComponent', () => {
       await flush(fixture, 5000)
       button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
       await flush(fixture, 60000)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
 
       button.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
       await flush(fixture, 9000)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
 
       await flush(fixture, 1001)
       await flush(fixture, 1000)
-      expect(toastElements(fixture).length).toBe(0)
+      expect(toastElements(fixture)).toHaveLength(0)
     })
 
     it('pauses an info toast while it is hovered', async () => {
@@ -185,12 +185,12 @@ describe('OneCXShellExtensionsComponent', () => {
 
       item.dispatchEvent(new MouseEvent('mouseenter'))
       await flush(fixture, 60000)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
 
       item.dispatchEvent(new MouseEvent('mouseleave'))
       await flush(fixture, 10001)
       await flush(fixture, 1000)
-      expect(toastElements(fixture).length).toBe(0)
+      expect(toastElements(fixture)).toHaveLength(0)
     })
 
     it('does not restart the timer when focus moves within the same toast', async () => {
@@ -208,7 +208,7 @@ describe('OneCXShellExtensionsComponent', () => {
       dispatchSpy.mockRestore()
 
       await flush(fixture, 60000)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
     })
 
     it('closes the focused toast on Escape', async () => {
@@ -222,7 +222,7 @@ describe('OneCXShellExtensionsComponent', () => {
       await flush(fixture, 1000)
 
       expect(event.defaultPrevented).toBe(true)
-      expect(toastElements(fixture).length).toBe(0)
+      expect(toastElements(fixture)).toHaveLength(0)
     })
 
     it('ignores Escape when the focus is outside any toast', async () => {
@@ -235,7 +235,7 @@ describe('OneCXShellExtensionsComponent', () => {
       await flush(fixture, 1000)
 
       expect(event.defaultPrevented).toBe(false)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
     })
 
     it('ignores Escape in a toast without close button', async () => {
@@ -250,7 +250,7 @@ describe('OneCXShellExtensionsComponent', () => {
       await flush(fixture, 1000)
 
       expect(event.defaultPrevented).toBe(false)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
     })
 
     it('ignores events whose target is not an element', () => {
@@ -293,7 +293,7 @@ describe('OneCXShellExtensionsComponent', () => {
         portalMessageServiceMock.error({ summaryKey: 'SAME', detailKey: 'SAME_D' })
       }
       await flush(fixture, 1)
-      expect(toastElements(fixture).length).toBe(1)
+      expect(toastElements(fixture)).toHaveLength(1)
     })
   })
 })

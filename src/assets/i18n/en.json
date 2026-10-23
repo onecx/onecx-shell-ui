@@ -1,5 +1,7 @@
 {
   "SHELL": "",
+  "SKIP_TO_MAIN_CONTENT": "Skip to main content",
+  "LOADING": "Loading",
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
   },

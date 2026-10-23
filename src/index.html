@@ -19,10 +19,18 @@
   </head>
   <body>
     <ocx-shell-root data-style-isolation data-style-id="shell-ui" data-no-portal-layout-styles></ocx-shell-root>
-    <div class="splash">
+    <!-- Decorative only: no heading or text (the shell provides the page heading), hidden from assistive technology -->
+    <div class="splash" aria-hidden="true">
       <div class="splash-content flex flex-column align-items-center gap-2">
-        <h1>Welcome</h1>
-        <svg class="splash-loader" width="60px" height="60px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          class="splash-loader"
+          width="60px"
+          height="60px"
+          viewBox="0 0 66 66"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
           <circle
             class="splash-path"
             fill="none"

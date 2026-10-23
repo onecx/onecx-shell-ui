@@ -1,7 +1,7 @@
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { inject, NgModule, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { Router, RouterModule } from '@angular/router'
+import { Router, RouterModule, TitleStrategy } from '@angular/router'
 import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideTokenInterceptor } from '@onecx/angular-auth'
@@ -54,6 +54,7 @@ import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
 import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
+import { ShellTitleStrategy } from './shell/services/shell-title.strategy'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -375,6 +376,7 @@ export async function shareMfContainer() {
       loader: provideTranslateLoader(OnecxTranslateLoader),
       missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
     }),
+    { provide: TitleStrategy, useExisting: ShellTitleStrategy },
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideAuthService(),

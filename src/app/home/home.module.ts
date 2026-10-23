@@ -11,7 +11,8 @@ import { WelcomeMessageComponent } from './components/welcome-message-component/
     RouterModule.forChild([
       {
         path: '',
-        component: HomeComponent
+        component: HomeComponent,
+        title: 'PAGE_TITLES.HOME'
       }
     ])
   ]

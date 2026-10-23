@@ -9,10 +9,10 @@
 // Import theme_defaults so default theme variables are available on the page
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss';
 
+@import 'link-styles';
+
 $mobileBreakpoint: 991px !default;
 
-// Selectors of links that are not inline links in running text and keep their plain look (see body a below)
-$plainLinkContexts: '.ocx-link-plain, .ocx-link-plain a, nav a, [role="menu"] a, [role="menubar"] a, [role="menuitem"], .p-menuitem-link, .p-breadcrumb a, [aria-label="breadcrumb"] a, .p-dock a, .p-dock-link, .p-button, [role="button"]';
 :root {
   --mobile-break-point: #{$mobileBreakpoint};
   font-size: var(--font-size, var(--font-size-default));
@@ -26,24 +26,9 @@ body {
   padding: 0;
   margin: 0;
   min-height: 100%;
-
-  // Links (WCAG 1.4.1 / 1.4.3): inline links, e.g. in running text of any MFE, are underlined and use the
-  // regular text colour (not the secondary text colour) so they stand out without relying on colour only.
-  //
-  // Opt-out: links in menus, breadcrumbs, footer menus and docks (and anything marked with the
-  // `ocx-link-plain` class on the link or on any ancestor) keep the previous look
-  // (no underline, secondary text colour). Add `ocx-link-plain` to custom navigation-like link groups.
-  // The opt-out list is wrapped in :where() so it adds no specificity and component styles still win.
-  a:not(:where(#{$plainLinkContexts})) {
-    text-decoration: underline;
-    color: var(--text-color, var(--text-color-default));
-  }
-
-  a:where(#{$plainLinkContexts}) {
-    text-decoration: none;
-    color: var(--text-secondary-color, var(--text-secondary-color-default));
-  }
 }
+
+@include ocx-link-styles;
 
 // Primeng Bug: For p-toast z-index is applied onAnimationStart which is missed on Ocassional Page Reloads as a result the toast appears below the header
 // so below we provide a fallback z-index (value is taken from the default z-index of p-toast in normal scenarios)

@@ -158,13 +158,17 @@ async function buildSharedMap() {
  *
  * `options` here is the `@nx/rspack` executor's normalized options. For a `serve`
  * task it additionally carries `devServer` — the dev-server target's resolved
- * options (host / port / publicHost / proxy) — and we forward those so that
- * `createConfig`'s own dev-server config (which wins the `@nx/rspack:dev-server`
- * merge over the executor's) matches the original dev-server behaviour.
+ * options (host / port / publicHost / proxy) — and we forward host / port /
+ * publicHost so that `createConfig`'s own dev-server config (which wins the
+ * `@nx/rspack:dev-server` merge over the executor's) matches the original
+ * dev-server behaviour. The resolved proxy is forwarded separately, after
+ * `createConfig`, because `createConfig` only resolves a proxy from a
+ * `devServer.proxyConfig` path and this config no longer pins one.
  */
 function buildAngularRspackOptions(options: any, configuration: string | undefined) {
-  // Rspack dev-server options. For a `serve` task, forward the resolved values so
-  // the merged result (host / port / publicHost / proxy) is preserved.
+  // Rspack dev-server options. For a `serve` task, forward the resolved host /
+  // port / publicHost so the merged result is preserved (the resolved proxy is
+  // handled after `createConfig`, which cannot take a pre-resolved proxy object).
   const serveDevServer = options?.devServer
   const devServer: Record<string, any> = {
     hmr: false,
@@ -176,11 +180,18 @@ function buildAngularRspackOptions(options: any, configuration: string | undefin
     devServer.port = serveDevServer.port ?? devServer.port
     if (serveDevServer.client?.webSocketURL) {
       devServer.publicHost = serveDevServer.client.webSocketURL
+    } else {
+      // The executor only populates `client.webSocketURL` from the dev-server's
+      // `publicHost` option (set by the `local-env` configuration). When it is
+      // absent, derive a public host from the resolved host + port so the
+      // browser's WebSocket/HMR reconnect target stays valid. A `0.0.0.0`
+      // interface is reached from the browser via `localhost`, and an unset host
+      // defaults to `localhost` as well.
+      const publicHostHost =
+        serveDevServer.host && serveDevServer.host !== '0.0.0.0' ? serveDevServer.host : 'localhost'
+      const publicHostPort = serveDevServer.port ?? devServer.port
+      devServer.publicHost = `http://${publicHostHost}:${publicHostPort}/`
     }
-    // `createConfig` re-resolves the proxy from its path; the resolved object the
-    // executor computed is not re-forwardable, so point back at the same file the
-    // original `serve` target used.
-    devServer.proxyConfig = 'proxy.conf.js'
     // Faithful to the original `disableHostCheck: true` (local-env, which binds to
     // `0.0.0.0`). The `@nx/rspack` dev-server schema has no `disableHostCheck`, so
     // allow all hosts when serving on a non-localhost interface.
@@ -257,6 +268,19 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
   const angularOptions = buildAngularRspackOptions(options, configuration)
   const [browserConfig] = await createConfig({ options: angularOptions })
   const { shared, sharedLibraries } = await buildSharedMap()
+
+  // Forward the resolved proxy the `@nx/rspack:dev-server` executor computed from
+  // the resolved `proxyConfig` (per-configuration / CLI). `createConfig` resolves
+  // the proxy only from a `devServer.proxyConfig` path and this config no longer
+  // pins one, so its `devServer.proxy` would be `undefined` — which the dev-server
+  // executor's merge (the config's devServer wins) would then drop. Setting the
+  // resolved object here preserves whichever proxy file the current serve run used
+  // (`proxy.conf.js` for the default/development configs,
+  // `proxy.local-env.conf.js` for `local-env`).
+  if (options?.devServer?.proxy) {
+    browserConfig.devServer ??= {}
+    browserConfig.devServer.proxy = options.devServer.proxy
+  }
 
   // --- Module Federation (direct, via @module-federation/enhanced/rspack) ---
   // Mirrors `@nx/module-federation`'s Rspack `withModuleFederation` wrapper.

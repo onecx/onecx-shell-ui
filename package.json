@@ -159,5 +159,16 @@
     "picomatch@^4.0.0": "^4.0.4",
     "qs": "^6.16.0",
     "smol-toml": "^1.7.0"
+  },
+  "allowScripts": {
+    "@openapitools/openapi-generator-cli": false,
+    "@parcel/watcher": false,
+    "@swc/core": false,
+    "esbuild": false,
+    "lmdb": false,
+    "msgpackr-extract": false,
+    "nx": false,
+    "sonar-scanner": false,
+    "unrs-resolver": false
   }
 }

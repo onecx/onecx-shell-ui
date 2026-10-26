@@ -153,6 +153,22 @@ async function buildSharedMap() {
 }
 
 /**
+ * Extract the path portion an Angular `baseHref` contributes to a public host
+ * (always with a leading slash), so a derived dev-server `publicHost` can fold
+ * the build's base path (e.g. the `local-env` configuration's `/onecx-shell/`)
+ * into its URL. An empty/absent `baseHref` yields `/`, the no-base-path default.
+ */
+function publicHostPath(baseHref: string | undefined): string {
+  if (typeof baseHref !== 'string' || !baseHref) {
+    return '/'
+  }
+  // Strip a scheme+host prefix if the baseHref is a full URL, then keep the
+  // path portion.
+  const path = baseHref.replace(/^https?:\/\/[^/]+/, '')
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+/**
  * Assemble the `@nx/angular-rspack` `createConfig` options for a given Nx
  * configuration.
  *
@@ -183,14 +199,17 @@ function buildAngularRspackOptions(options: any, configuration: string | undefin
     } else {
       // The executor only populates `client.webSocketURL` from the dev-server's
       // `publicHost` option (set by the `local-env` configuration). When it is
-      // absent, derive a public host from the resolved host + port so the
-      // browser's WebSocket/HMR reconnect target stays valid. A `0.0.0.0`
+      // absent, derive a public host from the resolved host + port + base path so
+      // the browser's WebSocket/HMR reconnect target stays valid. A `0.0.0.0`
       // interface is reached from the browser via `localhost`, and an unset host
-      // defaults to `localhost` as well.
+      // defaults to `localhost` as well. The build's `baseHref` path (e.g. the
+      // `local-env` `/onecx-shell/`) is folded into the URL so the derived
+      // publicHost matches the original dev-server value
+      // (`http://localhost:4300/onecx-shell/`), not just the bare origin.
       const publicHostHost =
         serveDevServer.host && serveDevServer.host !== '0.0.0.0' ? serveDevServer.host : 'localhost'
       const publicHostPort = serveDevServer.port ?? devServer.port
-      devServer.publicHost = `http://${publicHostHost}:${publicHostPort}/`
+      devServer.publicHost = `http://${publicHostHost}:${publicHostPort}${publicHostPath(options?.baseHref)}`
     }
     // Faithful to the original `disableHostCheck: true` (local-env, which binds to
     // `0.0.0.0`). The `@nx/rspack` dev-server schema has no `disableHostCheck`, so

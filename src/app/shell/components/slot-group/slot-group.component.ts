@@ -43,6 +43,17 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   // Only when center is used, so a wide start (e.g. a legacy footer) is not squeezed for nothing
   applyCenterAlignment = computed(() => this.centerAligned() && this.centerSlotHasComponents())
 
+  // Centered when stacked on small screens, start/center/end from md up
+  slotAlignmentClasses = computed(() =>
+    this.centerAligned()
+      ? {
+          start: 'justify-content-center md:justify-content-start',
+          center: 'justify-content-center',
+          end: 'justify-content-center md:justify-content-end'
+        }
+      : { start: '', center: '', end: '' }
+  )
+
   slotStyles = input<{ [key: string]: any }>({})
 
   slotClasses = input<NgClassInputType>('')

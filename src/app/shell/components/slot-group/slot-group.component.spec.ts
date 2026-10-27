@@ -527,25 +527,29 @@ describe('SlotGroupComponent', () => {
         const { startHost, centerHost, endHost } = await getSlotHosts()
 
         expect(await startHost.hasClass('flex-1')).toBe(false)
+        expect(await startHost.hasClass('md:justify-content-start')).toBe(false)
         expect(await centerHost.hasClass('justify-content-center')).toBe(false)
         expect(await endHost.hasClass('flex-1')).toBe(false)
-        expect(await endHost.hasClass('justify-content-end')).toBe(false)
+        expect(await endHost.hasClass('md:justify-content-end')).toBe(false)
       })
 
-      it('should apply centering classes when enabled', async () => {
+      it('should apply equal widths and responsive alignment when enabled', async () => {
         componentRef.setInput('centerAligned', true)
         fixture.detectChanges()
 
         const { startHost, centerHost, endHost } = await getSlotHosts()
 
         expect(await startHost.hasClass('flex-1')).toBe(true)
+        expect(await startHost.hasClass('justify-content-center')).toBe(true)
+        expect(await startHost.hasClass('md:justify-content-start')).toBe(true)
         expect(await centerHost.hasClass('justify-content-center')).toBe(true)
         expect(await centerHost.hasClass('flex-grow-1')).toBe(true)
         expect(await endHost.hasClass('flex-1')).toBe(true)
-        expect(await endHost.hasClass('justify-content-end')).toBe(true)
+        expect(await endHost.hasClass('justify-content-center')).toBe(true)
+        expect(await endHost.hasClass('md:justify-content-end')).toBe(true)
       })
 
-      it('should not apply centering classes when enabled but center slot has no components', async () => {
+      it('should apply responsive alignment but not equal widths when center slot has no components', async () => {
         slotServiceMock.assignComponents({})
         componentRef.setInput('centerAligned', true)
         fixture.detectChanges()
@@ -553,9 +557,10 @@ describe('SlotGroupComponent', () => {
         const { startHost, centerHost, endHost } = await getSlotHosts()
 
         expect(await startHost.hasClass('flex-1')).toBe(false)
-        expect(await centerHost.hasClass('justify-content-center')).toBe(false)
+        expect(await startHost.hasClass('md:justify-content-start')).toBe(true)
+        expect(await centerHost.hasClass('justify-content-center')).toBe(true)
         expect(await endHost.hasClass('flex-1')).toBe(false)
-        expect(await endHost.hasClass('justify-content-end')).toBe(false)
+        expect(await endHost.hasClass('md:justify-content-end')).toBe(true)
       })
     })
 

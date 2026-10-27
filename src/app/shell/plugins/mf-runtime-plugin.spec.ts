@@ -379,7 +379,7 @@ describe('mf-runtime-plugin', () => {
       })
     })
 
-    it('warns and skips packages without a caret requiredVersion', () => {
+    it('warns and records packages without a caret requiredVersion', () => {
       resetStore(['@onecx'])
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
       const args = {
@@ -389,7 +389,9 @@ describe('mf-runtime-plugin', () => {
       }
 
       const sectionData = collectAppSectionData(args, 'app1')
-      expect(sectionData).toEqual({})
+      expect(sectionData).toEqual({
+        '@onecx': { versions: ['1.2.3'], packages: ['@onecx/foo'], packageMapping: { '@onecx/foo': '1.2.3' } }
+      })
       expect(warnSpy).toHaveBeenCalledTimes(1)
       warnSpy.mockRestore()
     })

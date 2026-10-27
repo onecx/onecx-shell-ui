@@ -100,7 +100,7 @@
         },
         "local-env": {
           "baseHref": "/onecx-shell/",
-          "outputHashing": "all"
+          "outputHashing": "media"
         }
       },
       "defaultConfiguration": "production"

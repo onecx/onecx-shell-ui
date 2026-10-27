@@ -1,4 +1,4 @@
-import type { Configuration } from '@rspack/core'
+import type { Compilation, Compiler, Configuration } from '@rspack/core'
 import { DefinePlugin } from '@rspack/core'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 import { createConfig } from '@nx/angular-rspack'
@@ -41,8 +41,8 @@ import mfConfig from './module-federation.config'
  * `NGRS_CONFIG` env var, which Nx never sets, so it would fall back to
  * `WEBPACK_SERVE ? 'development' : 'production'`. We instead drive the mode from
  * the Nx `configuration` argument (`context.configurationName`, which reflects
- * `defaultConfiguration`) and set `WEBPACK_SERVE` ourselves for `serve` so the
- * config emits the dev (classic, non-module) output.
+ * `defaultConfiguration`). `WEBPACK_SERVE` is not set by this config, so the
+ * dev server also gets ES module output.
  */
 
 /**
@@ -276,16 +276,58 @@ function buildAngularRspackOptions(options: any, configuration: string | undefin
  * where `configuration` is `context.configurationName` (which reflects
  * `defaultConfiguration`).
  */
-export default async (_baseConfig: Configuration, { options, configuration }: any) => {
-  // Set before `createConfig` runs so it emits the classic (non-module)
-  // development output the dev server expects. `@nx/rspack:dev-server` sets it
-  // too, but only after this config file has already been loaded.
-  if (Boolean(options?.devServer)) {
-    process.env.WEBPACK_SERVE = 'true'
+// Drops the JS output of entries that only contain stylesheets. Nx's
+// `SuppressJsForCssOnlyEntryPlugin` reads `module.resourceResolveData`, which
+// Rspack 1.x does not provide, so it never matches and the empty style-entry
+// JS (which carries `import.meta` from the MF runtime) was still emitted and
+// loaded as a classic script. Matching on `module.resource` works with Rspack.
+class SuppressJsForCssOnlyEntryPlugin {
+  apply(compiler: Compiler) {
+    compiler.hooks.thisCompilation.tap('SuppressJsForCssOnlyEntryPlugin', (compilation: Compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'SuppressJsForCssOnlyEntryPlugin',
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE
+        },
+        () => {
+          for (const chunk of compilation.chunks) {
+            const cssFiles = [...chunk.files].filter((f) => f.endsWith('.css'))
+            const jsFiles = [...chunk.files].filter((f) => f.endsWith('.js'))
+            if (cssFiles.length === 0 || jsFiles.length !== 1) continue
+            // Module Federation injects a `data:` runtime module into every entry chunk; ignore it.
+            const modules = [...compilation.chunkGraph.getChunkModulesIterable(chunk)].filter(
+              (module) => !(module.resource ?? '').startsWith('data:')
+            )
+            const cssOnly =
+              modules.length > 0 && modules.every((module) => /\.(css|scss|sass|less)$/.test(module.resource ?? ''))
+            if (cssOnly) compilation.deleteAsset(jsFiles[0])
+          }
+        }
+      )
+    })
   }
+}
 
+export default async (_baseConfig: Configuration, { options, configuration }: any) => {
+  // `@rspack/dev-server` sets `WEBPACK_SERVE` before this file loads, and while it
+  // is set `createConfig` emits classic (non-module) output, which cannot contain
+  // `import.meta` (used by @onecx/angular-utils). Clear it only for `createConfig`.
   const angularOptions = buildAngularRspackOptions(options, configuration)
-  const [browserConfig] = await createConfig({ options: angularOptions })
+  const webpackServe = process.env.WEBPACK_SERVE
+  delete process.env.WEBPACK_SERVE
+  let browserConfig: Configuration
+  try {
+    ;[browserConfig] = await createConfig({ options: angularOptions })
+  } finally {
+    if (webpackServe !== undefined) {
+      process.env.WEBPACK_SERVE = webpackServe
+    }
+  }
+  // Replace Nx's plugin (see SuppressJsForCssOnlyEntryPlugin above).
+  browserConfig.plugins = browserConfig.plugins.filter(
+    (plugin) => plugin?.constructor?.name !== 'SuppressJsForCssOnlyEntryPlugin'
+  )
+  browserConfig.plugins.push(new SuppressJsForCssOnlyEntryPlugin())
   const { shared, sharedLibraries } = await buildSharedMap()
 
   // Forward the resolved proxy the `@nx/rspack:dev-server` executor computed from

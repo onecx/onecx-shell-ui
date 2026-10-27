@@ -7,7 +7,7 @@ import {
   RequestedEventsChangedEvent,
   ResizedEventType
 } from '@onecx/integration-interface'
-import { BehaviorSubject, debounceTime, filter, of, Subscription, switchMap } from 'rxjs'
+import { BehaviorSubject, debounceTime, filter, Subscription, switchMap } from 'rxjs'
 import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 
 export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
@@ -31,12 +31,10 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   // Equal-sized start/end slots keep the center slot centered even if one side is empty
   centerAligned = input<boolean>(false)
 
-  private readonly slotService = inject(SLOT_SERVICE, { optional: true })
+  private readonly slotService = inject(SLOT_SERVICE)
 
   private readonly centerSlotHasComponents = toSignal(
-    toObservable(this.name).pipe(
-      switchMap((name) => this.slotService?.isSomeComponentDefinedForSlot(`${name}.center`) ?? of(false))
-    ),
+    toObservable(this.name).pipe(switchMap((name) => this.slotService.isSomeComponentDefinedForSlot(`${name}.center`))),
     { initialValue: false }
   )
 

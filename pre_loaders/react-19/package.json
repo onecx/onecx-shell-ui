@@ -9,6 +9,12 @@
   "scripts": {
     "build": "nx build"
   },
+  "allowScripts": {
+    "nx": false,
+    "@parcel/watcher": false,
+    "@swc/core": false,
+    "less": false
+  },
   "dependencies": {
     "@module-federation/enhanced": "^2.0.1",
     "@module-federation/runtime-core": "^2.0.1",

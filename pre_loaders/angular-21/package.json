@@ -9,6 +9,15 @@
   "scripts": {
     "build": "nx build"
   },
+  "allowScripts": {
+    "esbuild": false,
+    "nx": false,
+    "@parcel/watcher": false,
+    "@swc/core": false,
+    "less": false,
+    "lmdb": false,
+    "msgpackr-extract": false
+  },
   "dependencies": {
     "@angular/animations": "^21.2.22",
     "@angular/common": "^21.2.22",

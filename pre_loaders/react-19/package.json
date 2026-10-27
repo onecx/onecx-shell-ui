@@ -10,10 +10,12 @@
     "build": "nx build"
   },
   "allowScripts": {
-    "nx": false,
-    "@parcel/watcher": false,
-    "@swc/core": false,
-    "less": false
+    "nx@22.7.7": false,
+    "nx@22.7.12": false,
+    "@parcel/watcher@2.6.0": false,
+    "@swc/core@1.16.2": false,
+    "less@4.5.1": false,
+    "fsevents@2.3.3": false
   },
   "dependencies": {
     "@module-federation/enhanced": "^2.0.1",

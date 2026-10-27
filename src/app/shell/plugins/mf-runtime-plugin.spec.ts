@@ -15,7 +15,7 @@ import mfRuntimePlugin, {
 } from './mf-runtime-plugin'
 
 function resetStore(allowedPackageGroups?: string[]): void {
-  ;(window as any).__mfShareResolution__ = undefined
+  (window as any).__mfShareResolution__ = undefined
   if (allowedPackageGroups) {
     getStore().allowedPackageGroups = allowedPackageGroups
   }
@@ -333,7 +333,7 @@ describe('mf-runtime-plugin', () => {
       expect(resolveBestCandidate('app2', '@onecx/foo', thisApp, 'default', origin, '1.0.0')).toBeUndefined()
     })
 
-    it('returns null and warns when the app already provides a higher version than the candidate', () => {
+    it('returns undefined and warns when the app already provides a higher version than the candidate', () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
       const origin = {
         shareScopeMap: {
@@ -344,7 +344,7 @@ describe('mf-runtime-plugin', () => {
         }
       }
       const result = resolveBestCandidate('app2', '@onecx/foo', thisApp, 'default', origin, '1.5.0')
-      expect(result).toBeNull()
+      expect(result).toBeUndefined()
       expect(warnSpy).toHaveBeenCalledTimes(1)
       warnSpy.mockRestore()
     })
@@ -651,7 +651,7 @@ describe('mf-runtime-plugin', () => {
         expect(getStore().resolved['app2']).toEqual({})
       })
 
-      it('caches a skip (null) and reuses it for later packages in the same app/section', () => {
+      it('does not cache a skip decision, so a later package in the same app/section retries and warns again', () => {
         resetStore(['@onecx'])
         seedSection('app2', '@onecx', { requiredVersion: '^1.0.0', packages: ['@onecx/foo', '@onecx/bar'] })
         const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
@@ -675,7 +675,7 @@ describe('mf-runtime-plugin', () => {
         }
         plugin.beforeLoadShare(firstArgs)
         expect(firstArgs.shareInfo.shareConfig.requiredVersion).toBe('^1.0.0')
-        expect(getStore().resolved['app2']['@onecx']).toBeNull()
+        expect(getStore().resolved['app2']).toEqual({})
 
         const secondArgs = {
           pkgName: '@onecx/bar',
@@ -684,7 +684,7 @@ describe('mf-runtime-plugin', () => {
         }
         plugin.beforeLoadShare(secondArgs)
         expect(secondArgs.shareInfo.shareConfig.requiredVersion).toBe('^1.0.0')
-        expect(warnSpy).toHaveBeenCalledTimes(1)
+        expect(warnSpy).toHaveBeenCalledTimes(2)
         warnSpy.mockRestore()
       })
     })

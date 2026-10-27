@@ -53,16 +53,15 @@ interface ResolvedSection {
  *   `appName` shares under `section`, and the requiredVersion declared for them.
  * - `resolved[appName][section]`: cached output of `resolveBestCandidate` for `appName`/`section`:
  *     - a `ResolvedSection` - the chosen candidate app and the exact version to use per package.
- *     - `null` - alignment was deliberately skipped (e.g. this app's own version is higher);
- *       do not retry for the rest of this app/section.
- *     - key absent - not resolved yet; the next `beforeLoadShare` call for this app/section may
- *       retry (e.g. once another app has registered a share for this section).
+ *     - key absent - not resolved yet (no candidate exists, or alignment was deliberately skipped
+ *       because this app's own version is already higher than the best candidate); the next
+ *       `beforeLoadShare` call for this app/section may retry.
  * - `allowedPackageGroups`: cached runtime allowlist, loaded once via
  *   `loadAllowedPackageGroupsForMFPlugin`.
  */
 interface ShareResolutionStore {
   sections: Record<string, SectionData>
-  resolved: Record<string, Record<string, ResolvedSection | null>>
+  resolved: Record<string, Record<string, ResolvedSection>>
   allowedPackageGroups?: string[]
 }
 
@@ -138,15 +137,14 @@ function pickRequiredVersion(versions: string[]): string {
 /**
  * Finds the version every package this app requires in `section` should align to.
  *
- * Resolution order:
- * 1. Among versions of `pkgName` that some app has already started loading or finished loading
- *    (or already has a resolved `lib`), pick the highest one that is ALSO registered (by some app)
- *    for every other package this app needs in the section. This re-uses what's already on the
- *    page instead of adding a new copy.
- * 2. If this app's own provided version is higher than that candidate, prefer leaving resolution
- *    to Module Federation instead (this app most likely ships a newer, compatible version).
- * 3. If no loading/loaded candidate exists yet, return `undefined` so the caller does not cache
- *    anything and may retry once another app has registered a share for this section.
+ * Among versions of `pkgName` that some app has already started loading or finished loading
+ * (or already has a resolved `lib`), picks the highest one that is ALSO registered (by some app)
+ * for every other package this app needs in the section. This re-uses what's already on the
+ * page instead of adding a new copy.
+ *
+ * Returns `undefined` when there is nothing to align to yet: no complete candidate is loading or
+ * loaded, or this app's own provided version is already higher than the best candidate. Either
+ * way the caller does not cache the result, so a later `beforeLoadShare` call may retry.
  *
  * @param appProvidedVersion the CONCRETE version `appName` itself provides for `pkgName`
  *   (e.g. "8.11.0"), not a requiredVersion range.
@@ -158,7 +156,7 @@ function resolveBestCandidate(
   sharedScope: string,
   origin: any,
   appProvidedVersion: string
-): ResolvedSection | null | undefined {
+): ResolvedSection | undefined {
   // Global, cross-app state for this share scope: { [pkgName]: { [version]: SharedEntry } }.
   const shareScopeMap = origin?.shareScopeMap ?? {}
   const sharedScopeState = shareScopeMap[sharedScope] ?? {}
@@ -176,8 +174,6 @@ function resolveBestCandidate(
     .filter((candidate) => !requiredMajor || String(parseVersion(candidate.version).major) === requiredMajor)
     .sort((a, b) => compareVersions(b.version, a.version))
 
-  if (loadingOrLoadedCandidates.length === 0) return undefined
-
   let bestCandidate: (ResolvedSection & { version: string }) | undefined
   for (const candidate of loadingOrLoadedCandidates) {
     const candidateCoversAllRequiredPackages = appRequiredPackages.every(
@@ -193,17 +189,18 @@ function resolveBestCandidate(
     }
   }
 
-  if (appProvidedVersion && bestCandidate && compareVersions(appProvidedVersion, bestCandidate.version) > 0) {
+  if (!bestCandidate) return undefined
+
+  if (appProvidedVersion && compareVersions(appProvidedVersion, bestCandidate.version) > 0) {
     console.warn(
       `[MF][VersionResolver] Skipping alignment for "${appName}"/"${pkgName}": the version this app provides ` +
         `(${appProvidedVersion}) is higher than the best already-loaded candidate (${bestCandidate.version}); ` +
         `leaving resolution to Module Federation.`
     )
-    return null
+    return undefined
   }
 
-  if (bestCandidate) return { candidateApp: bestCandidate.candidateApp, versions: bestCandidate.versions }
-  return undefined
+  return { candidateApp: bestCandidate.candidateApp, versions: bestCandidate.versions }
 }
 
 function hasCaretRequiredVersion(requiredVersion: unknown): requiredVersion is string {
@@ -242,9 +239,8 @@ function collectAppSectionData(args: any, appName: string): Record<string, Colle
     const requiredVersion = entry.shareConfig?.requiredVersion
     if (!hasCaretRequiredVersion(requiredVersion)) {
       console.warn(
-        `[ModuleFederationPlugin] Always use a caret (^) for the required version of "${pkgName}" shared by "${appName}". Current required version: "${requiredVersion}"`
+        `[ModuleFederationPlugin] Always use a caret (^) for the "${pkgName}" shared by "${appName}". Current version: "${requiredVersion}"`
       )
-      continue
     }
 
     const section = getSection(pkgName)
@@ -312,16 +308,14 @@ export default function mfRuntimePlugin(): ModuleFederationRuntimePlugin {
 
         store.resolved[appName] ??= {}
         const hasCachedResolution = Object.hasOwn(store.resolved[appName], section)
-        let resolution: ResolvedSection | null | undefined = store.resolved[appName][section]
-        if (!hasCachedResolution) {
-          // args.shareInfo.version is the CONCRETE version this app provides for pkgName.
-          resolution = resolveBestCandidate(appName, pkgName, thisApp, sharedScope, args.origin, args.shareInfo.version)
-          if (resolution === undefined) return args
-          store.resolved[appName][section] = resolution
-          if (resolution === null) return args
-        }
+        // args.shareInfo.version is the CONCRETE version this app provides for pkgName.
+        const resolution = hasCachedResolution
+          ? store.resolved[appName][section]
+          : resolveBestCandidate(appName, pkgName, thisApp, sharedScope, args.origin, args.shareInfo.version)
 
         if (!resolution) return args
+        if (!hasCachedResolution) store.resolved[appName][section] = resolution
+
         const exactVersion = resolution.versions[pkgName]
         if (exactVersion && exactVersion !== requiredVersion) {
           args.shareInfo.shareConfig.requiredVersion = exactVersion

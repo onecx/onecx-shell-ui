@@ -33,7 +33,11 @@
         }
       </div>
       <!-- BodyFooter slot group -->
-      <ocx-shell-slot-group class="onecx-body-footer" name="onecx-shell-body-footer"></ocx-shell-slot-group>
+      <ocx-shell-slot-group
+        class="onecx-body-footer"
+        name="onecx-shell-body-footer"
+        [centerAligned]="true"
+      ></ocx-shell-slot-group>
     </div>
     <!-- BodyEnd slot group -->
     <ocx-shell-slot-group class="onecx-body-end" name="onecx-shell-body-end" direction="column"></ocx-shell-slot-group>
@@ -41,7 +45,7 @@
 
   <!-- Footer slot group -->
   <footer>
-    <ocx-shell-slot-group name="onecx-shell-footer"></ocx-shell-slot-group>
+    <ocx-shell-slot-group name="onecx-shell-footer" [centerAligned]="true"></ocx-shell-slot-group>
   </footer>
   } @else {
   <div class="onecx-no-theme-main">

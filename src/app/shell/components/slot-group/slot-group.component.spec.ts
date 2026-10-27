@@ -501,6 +501,62 @@ describe('SlotGroupComponent', () => {
 
         expect(computedSlotGroupClasses).toBe('flex-row w-full custom-class another-class')
       })
+
+      it('should stack slots on small screens when centerAligned is enabled for row direction', () => {
+        componentRef.setInput('centerAligned', true)
+
+        expect(component.computedSlotGroupClasses()).toBe('flex-column md:flex-row w-full')
+      })
+
+      it('should not stack slots when centerAligned is enabled for column direction', () => {
+        componentRef.setInput('centerAligned', true)
+        componentRef.setInput('direction', 'column')
+
+        expect(component.computedSlotGroupClasses()).toBe('flex-column h-full')
+      })
+    })
+
+    describe('centerAligned input signal', () => {
+      const getSlotHosts = async () => {
+        const slots = await slotGroupHarness.getAllSlots()
+        const [startHost, centerHost, endHost] = await Promise.all(slots.map((slot) => slot.host()))
+        return { startHost, centerHost, endHost }
+      }
+
+      it('should not apply centering classes by default', async () => {
+        const { startHost, centerHost, endHost } = await getSlotHosts()
+
+        expect(await startHost.hasClass('flex-1')).toBe(false)
+        expect(await centerHost.hasClass('justify-content-center')).toBe(false)
+        expect(await endHost.hasClass('flex-1')).toBe(false)
+        expect(await endHost.hasClass('justify-content-end')).toBe(false)
+      })
+
+      it('should apply centering classes when enabled', async () => {
+        componentRef.setInput('centerAligned', true)
+        fixture.detectChanges()
+
+        const { startHost, centerHost, endHost } = await getSlotHosts()
+
+        expect(await startHost.hasClass('flex-1')).toBe(true)
+        expect(await centerHost.hasClass('justify-content-center')).toBe(true)
+        expect(await centerHost.hasClass('flex-grow-1')).toBe(true)
+        expect(await endHost.hasClass('flex-1')).toBe(true)
+        expect(await endHost.hasClass('justify-content-end')).toBe(true)
+      })
+
+      it('should not apply centering classes when enabled but center slot has no components', async () => {
+        slotServiceMock.assignComponents({})
+        componentRef.setInput('centerAligned', true)
+        fixture.detectChanges()
+
+        const { startHost, centerHost, endHost } = await getSlotHosts()
+
+        expect(await startHost.hasClass('flex-1')).toBe(false)
+        expect(await centerHost.hasClass('justify-content-center')).toBe(false)
+        expect(await endHost.hasClass('flex-1')).toBe(false)
+        expect(await endHost.hasClass('justify-content-end')).toBe(false)
+      })
     })
 
     describe('computedSlotClasses computed signal', () => {

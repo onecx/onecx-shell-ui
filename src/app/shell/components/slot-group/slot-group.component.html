@@ -3,6 +3,7 @@
   [name]="name() + '.start'"
   [style]="slotStyles()"
   [class]="computedSlotClasses()"
+  [class.flex-1]="applyCenterAlignment()"
   [inputs]="slotInputsStart()"
   [outputs]="slotOutputs()"
 ></ocx-slot>
@@ -11,6 +12,7 @@
   [name]="name() + '.center'"
   [style]="slotStyles()"
   [class]="computedSlotClasses()"
+  [class.justify-content-center]="applyCenterAlignment()"
   [inputs]="slotInputsCenter()"
   [outputs]="slotOutputs()"
 ></ocx-slot>
@@ -19,6 +21,8 @@
   [name]="name() + '.end'"
   [style]="slotStyles()"
   [class]="computedSlotClasses()"
+  [class.flex-1]="applyCenterAlignment()"
+  [class.justify-content-end]="applyCenterAlignment()"
   [inputs]="slotInputsEnd()"
   [outputs]="slotOutputs()"
 ></ocx-slot>

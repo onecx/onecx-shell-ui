@@ -1,12 +1,13 @@
 import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
-import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
+import { toObservable, toSignal } from '@angular/core/rxjs-interop'
+import { AngularRemoteComponentsModule, SLOT_SERVICE } from '@onecx/angular-remote-components'
 import {
   ResizedEventsTopic,
   SlotGroupResizedEvent,
   RequestedEventsChangedEvent,
   ResizedEventType
 } from '@onecx/integration-interface'
-import { BehaviorSubject, debounceTime, filter, Subscription } from 'rxjs'
+import { BehaviorSubject, debounceTime, filter, of, Subscription, switchMap } from 'rxjs'
 import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 
 export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
@@ -26,6 +27,21 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
   name = input.required<string>()
 
   direction = input<'row' | 'row-reverse' | 'column' | 'column-reverse'>('row')
+
+  // Equal-sized start/end slots keep the center slot centered even if one side is empty
+  centerAligned = input<boolean>(false)
+
+  private readonly slotService = inject(SLOT_SERVICE, { optional: true })
+
+  private readonly centerSlotHasComponents = toSignal(
+    toObservable(this.name).pipe(
+      switchMap((name) => this.slotService?.isSomeComponentDefinedForSlot(`${name}.center`) ?? of(false))
+    ),
+    { initialValue: false }
+  )
+
+  // Only when center is used, so a wide start (e.g. a legacy footer) is not squeezed for nothing
+  applyCenterAlignment = computed(() => this.centerAligned() && this.centerSlotHasComponents())
 
   slotStyles = input<{ [key: string]: any }>({})
 
@@ -48,7 +64,9 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
       'column-reverse': 'flex-column-reverse h-full'
     }
 
-    const baseClasses = directionClasses[this.direction()]
+    // Stack slots on small screens so the sides are not squeezed next to the center
+    const stackOnMobile = this.centerAligned() && this.direction() === 'row'
+    const baseClasses = stackOnMobile ? 'flex-column md:flex-row w-full' : directionClasses[this.direction()]
     const customClasses = normalizeClassesToString(this.slotGroupClasses())
 
     return `${baseClasses} ${customClasses}`.trim()

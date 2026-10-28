@@ -8,7 +8,7 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
     {
       test: (module) => {
         if (module.resource) {
-          return module.resource.includes('primeng')
+          return module.resource.includes('@openng/optimus-ui')
         }
         return false
       },

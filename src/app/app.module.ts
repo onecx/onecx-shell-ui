@@ -42,7 +42,7 @@ import { PermissionProxyService } from './shell/services/permission-proxy.servic
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
-import { providePrimeNG } from 'primeng/config'
+import { provideOptimus } from '@openng/optimus-ui/config'
 import { AppComponent } from './app.component'
 import { appRoutes, internalShellRoute } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
@@ -377,7 +377,7 @@ export async function shareMfContainer() {
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideAuthService(),
-    providePrimeNG(),
+    provideOptimus(),
     {
       provide: SKIP_STYLE_SCOPING,
       useValue: true

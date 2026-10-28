@@ -22,13 +22,13 @@
     "@angular/platform-server": "^22.0.0",
     "@angular/router": "^22.0.0",
     "@angular/service-worker": "^22.0.0",
-    "@module-federation/enhanced": "^2.0.1",
+    "@module-federation/enhanced": "2.9.2",
     "@module-federation/runtime-core": "^2.0.1",
-    "@ngrx/component": "22.0.1",
-    "@ngrx/effects": "22.0.1",
-    "@ngrx/router-store": "22.0.1",
-    "@ngrx/store": "22.0.1",
-    "@ngrx/store-devtools": "22.0.1",
+    "@ngrx/component": "^22.0.1",
+    "@ngrx/effects": "^22.0.1",
+    "@ngrx/router-store": "^22.0.1",
+    "@ngrx/store": "^22.0.1",
+    "@ngrx/store-devtools": "^22.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@nx/angular": "23.3.0",
@@ -48,7 +48,7 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^22.0.0",
+    "@angular-devkit/build-angular": "22.2.3",
     "@angular/compiler-cli": "^22.0.0",
     "@nx/webpack": "23.3.0",
     "@onecx/build-utils": "^9.0.0-rc.14",
@@ -56,8 +56,8 @@
     "@swc/core": "^1.15.8",
     "modify-source-webpack-plugin": "^4.1.0",
     "nx": "23.3.0",
-    "webpack": "5.105.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "webpack": "5.105.2"
   },
   "overrides": {
     "webpack": "5.105.2",

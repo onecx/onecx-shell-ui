@@ -3,6 +3,7 @@ import mfRuntimePlugin, {
   compareVersions,
   findAppShareEntry,
   getSection,
+  getLoadingOrLoadedCandidates,
   getStore,
   hasCaretRequiredVersion,
   isPartOfAllowedPackageOrPackageGroupMFPlugin,
@@ -83,6 +84,44 @@ describe('mf-runtime-plugin', () => {
     it('orders by patch when major and minor are equal', () => {
       expect(compareVersions('1.2.4', '1.2.3')).toBeGreaterThan(0)
       expect(compareVersions('1.2.3', '1.2.4')).toBeLessThan(0)
+    })
+  })
+
+  describe('getLoadingOrLoadedCandidates', () => {
+    it('returns active registrations for the requested package, sorted highest version first', () => {
+      const sharedScopeState = {
+        '@onecx/foo': {
+          '1.1.0': { from: 'app1', loaded: true },
+          '1.3.0': { from: 'app3', loading: Promise.resolve() },
+          '1.2.0': { from: 'app2', lib: () => undefined },
+          '1.4.0': { from: 'app4' },
+          '1.5.0': { loaded: true }
+        },
+        '@onecx/bar': { '1.9.0': { from: 'other-app', loaded: true } }
+      }
+
+      expect(getLoadingOrLoadedCandidates(sharedScopeState, '@onecx/foo')).toEqual([
+        { version: '1.3.0', from: 'app3' },
+        { version: '1.2.0', from: 'app2' },
+        { version: '1.1.0', from: 'app1' }
+      ])
+    })
+
+    it('filters candidates to the required major version', () => {
+      const sharedScopeState = {
+        '@onecx/foo': {
+          '1.2.0': { from: 'app1', loaded: true },
+          '2.0.0': { from: 'app2', loaded: true }
+        }
+      }
+
+      expect(getLoadingOrLoadedCandidates(sharedScopeState, '@onecx/foo', '1')).toEqual([
+        { version: '1.2.0', from: 'app1' }
+      ])
+    })
+
+    it('returns an empty list when the package has no registrations', () => {
+      expect(getLoadingOrLoadedCandidates({}, '@onecx/foo', '1')).toEqual([])
     })
   })
 

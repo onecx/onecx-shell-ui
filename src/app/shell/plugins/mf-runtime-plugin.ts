@@ -106,6 +106,30 @@ function compareVersions(a: string, b: string): number {
   return versionA.patch - versionB.patch
 }
 
+interface LoadingOrLoadedCandidate {
+  version: string
+  from: string
+}
+
+/**
+ * Returns active registrations for a package, filtered to the required major (when present)
+ * and sorted from highest to lowest version.
+ */
+function getLoadingOrLoadedCandidates(
+  sharedScopeState: Record<string, any>,
+  pkgName: string,
+  requiredMajor?: string
+): LoadingOrLoadedCandidate[] {
+  return Object.entries(sharedScopeState[pkgName] ?? {})
+    .filter(
+      ([, registeredShare]: [string, any]) =>
+        registeredShare?.from && (registeredShare.loaded || registeredShare.loading || registeredShare.lib)
+    )
+    .map(([version, registeredShare]: [string, any]) => ({ version, from: registeredShare.from as string }))
+    .filter((candidate) => !requiredMajor || String(parseVersion(candidate.version).major) === requiredMajor)
+    .sort((candidateA, candidateB) => compareVersions(candidateB.version, candidateA.version))
+}
+
 /**
  * A section's packages are normally released in lockstep with one identical requiredVersion
  * (e.g. every @onecx/* package ships the same version). This picks that common value.
@@ -165,14 +189,7 @@ function resolveBestCandidate(
   const appRequiredPackages = thisApp.packages
   const requiredMajor = /\d+/.exec(thisApp.requiredVersion ?? '')?.[0]
 
-  const loadingOrLoadedCandidates = Object.entries(sharedScopeState[pkgName] ?? {})
-    .filter(
-      ([, registeredShare]: [string, any]) =>
-        registeredShare?.from && (registeredShare.loaded || registeredShare.loading || registeredShare.lib)
-    )
-    .map(([version, registeredShare]: [string, any]) => ({ version, from: registeredShare.from as string }))
-    .filter((candidate) => !requiredMajor || String(parseVersion(candidate.version).major) === requiredMajor)
-    .sort((a, b) => compareVersions(b.version, a.version))
+  const loadingOrLoadedCandidates = getLoadingOrLoadedCandidates(sharedScopeState, pkgName, requiredMajor)
 
   let bestCandidate: (ResolvedSection & { version: string }) | undefined
   for (const candidate of loadingOrLoadedCandidates) {
@@ -269,6 +286,16 @@ function storeAppSectionData(
   }
 }
 
+/**
+ * Creates the Module Federation runtime plugin that coordinates shared-package versions
+ * across apps using the enhanced runtime. It records each app's shared-package sections
+ * during `beforeInit` and aligns allowed packages to an already-loading or loaded version
+ * during `beforeLoadShare`. Packages without a suitable candidate are left to Module
+ * Federation's normal resolution.
+ *
+ * Load the runtime allowlist with `loadAllowedPackageGroupsForMFPlugin` before registering
+ * this plugin so the hooks can identify which packages they should process.
+ */
 export default function mfRuntimePlugin(): ModuleFederationRuntimePlugin {
   const plugin: any = {
     name: 'OneCXModuleFederationPlugin',
@@ -404,6 +431,7 @@ export {
   getSection,
   parseVersion,
   compareVersions,
+  getLoadingOrLoadedCandidates,
   pickRequiredVersion,
   resolveBestCandidate,
   hasCaretRequiredVersion,
@@ -412,4 +440,12 @@ export {
   storeAppSectionData,
   parseAllowedPackageGroups
 }
-export type { Version, SectionAppData, SectionData, ResolvedSection, ShareResolutionStore, CollectedSectionData }
+export type {
+  Version,
+  SectionAppData,
+  SectionData,
+  ResolvedSection,
+  ShareResolutionStore,
+  CollectedSectionData,
+  LoadingOrLoadedCandidate
+}

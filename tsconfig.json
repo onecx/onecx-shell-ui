@@ -20,9 +20,7 @@
     "target": "es2022",
     "useDefineForClassFields": false,
     "noUncheckedSideEffectImports": false,
-    "types": ["*"],
-    "esModuleInterop": false,
-    "ignoreDeprecations": "6.0"
+    "types": ["*"]
   },
   "files": [],
   "include": [],

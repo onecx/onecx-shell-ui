@@ -4,6 +4,11 @@ import nx from '@nx/eslint-plugin'
 import typescriptEslintEslintPlugin from '@typescript-eslint/eslint-plugin'
 import typescriptEslintParser from '@typescript-eslint/parser'
 
+// eslint.config.mjs sits at the repo root, where tsconfig.json (and the
+// referenced app/spec tsconfigs) live. This is the tsconfigRootDir the
+// type-aware parser needs to resolve the project service.
+const tsconfigRootDir = dirname(fileURLToPath(import.meta.url))
+
 export default [
   ...nx.configs['flat/base'],
   { plugins: { '@typescript-eslint': typescriptEslintEslintPlugin } },
@@ -17,8 +22,20 @@ export default [
   },
   ...nx.configs['flat/typescript'],
   {
-    files: ['**/*.ts', '**/*.tsx'],
-    rules: {}
+    files: ['**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir,
+        projectService: {
+          // Component .harness.ts files are excluded from tsconfig.app.json
+          // and not matched by tsconfig.spec.json's include globs
+          allowDefaultProject: ['src/app/shell/components/*/*.harness.ts']
+        }
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-deprecated': 'warn'
+    }
   },
   ...nx.configs['flat/javascript'],
   {

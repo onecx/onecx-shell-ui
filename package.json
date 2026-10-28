@@ -95,9 +95,11 @@
     "@angular/cli": "~21.2.23",
     "@angular/compiler-cli": "^21.2.22",
     "@angular/language-service": "^21.2.22",
+    "@angular/localize": "21.2.23",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@nx/angular": "22.7.11",
+    "@nx/angular-rspack": "^22.7.11",
     "@nx/eslint": "22.7.11",
     "@nx/eslint-plugin": "22.7.11",
     "@nx/jest": "22.7.11",
@@ -158,6 +160,9 @@
     },
     "picomatch@^4.0.0": "^4.0.4",
     "qs": "^6.16.0",
-    "smol-toml": "^1.7.0"
+    "smol-toml": "^1.7.0",
+    "@angular/localize": "21.2.23",
+    "@angular/platform-server": "21.2.23",
+    "@angular/ssr": "21.2.23"
   }
 }

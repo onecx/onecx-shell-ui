@@ -10,7 +10,7 @@ Useful Links:
 
 ## Source maps
 
-- Webpack source maps are generated for all shell remotes and preloaders.
+- Source maps are generated for all shell remotes and preloaders (the shell is built with Rspack; the pre-loaders use Webpack).
 - In Docker images, delivery of `*.map` files is controlled at runtime with `SOURCE_MAPS_ACCESS_RULE`.
 	- Default: `deny all;` (recommended for production)
 	- Development example: `allow all;`

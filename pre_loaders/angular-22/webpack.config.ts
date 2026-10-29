@@ -3,6 +3,27 @@ import config from './module-federation.config'
 import { withModuleFederation } from '@nx/module-federation/angular'
 import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
 
+const modifyOptimisUiPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        if (module.resource) {
+          return module.resource.includes('@openng/optimus-ui')
+        }
+        return false
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(',
+          'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
+        ),
+        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+      ]
+    }
+  ]
+})
+
 // Replace createElement only in @angular/platform-browser SharedStylesHost
 const modifyAngularCorePlugin = new ModifySourcePlugin({
   rules: [
@@ -32,7 +53,7 @@ export default async function (baseConfig: Configuration) {
 
   return {
     ...webpackConfig,
-    plugins: [...(webpackConfig.plugins ?? []), modifyAngularCorePlugin],
+    plugins: [...(webpackConfig.plugins ?? []), modifyAngularCorePlugin, modifyOptimisUiPlugin],
     output: {
       ...webpackConfig.output,
       uniqueName: 'zzz_onecx-angular-22-loader',

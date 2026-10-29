@@ -3,7 +3,7 @@ import config from './module-federation.config'
 import { withModuleFederation } from '@nx/module-federation/angular'
 import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
 
-const modifyPrimeNgPlugin = new ModifySourcePlugin({
+const modifyOptimusUiPlugin = new ModifySourcePlugin({
   rules: [
     {
       test: (module) => {
@@ -16,7 +16,7 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
         new ReplaceOperation(
           'all',
           'document\\.createElement\\(',
-          'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments)},'
+          'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
         ),
         new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
       ]
@@ -54,7 +54,7 @@ export default async function (baseConfig: Configuration) {
   return {
     ...webpackConfig,
     devtool: 'source-map',
-    plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
+    plugins: [...(webpackConfig.plugins ?? []), modifyOptimusUiPlugin, modifyAngularCorePlugin],
     module: {
       ...webpackConfig.module,
       parser: {

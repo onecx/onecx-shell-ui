@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import { PrimeNG } from 'primeng/config'
 import { merge, mergeMap } from 'rxjs'
@@ -6,6 +6,7 @@ import { merge, mergeMap } from 'rxjs'
 import { UserService } from '@onecx/angular-integration-interface'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
   selector: 'ocx-shell-root',
   templateUrl: './app.component.html'

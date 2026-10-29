@@ -69,5 +69,14 @@
     "uuid": "^11.1.1",
     "smol-toml": "^1.7.1",
     "qs@^6.0.0": "^6.16.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "@swc/core": false,
+    "esbuild": false,
+    "less": false,
+    "lmdb": false,
+    "msgpackr-extract": false,
+    "nx": false
   }
 }

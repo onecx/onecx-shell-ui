@@ -8,6 +8,8 @@ Useful Links:
 
 . [OneCX Local Environment](https://onecx.github.io/docs/documentation/current/onecx-local-env/index.html)
 
+. [Contributing (commit hooks)](CONTRIBUTING.md)
+
 ## Source maps
 
 - Webpack source maps are generated for all shell remotes and preloaders.

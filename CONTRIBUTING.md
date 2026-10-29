@@ -9,7 +9,9 @@ Commits are validated locally by [Husky](https://typicode.github.io/husky/) hook
 ### pre-commit
 
 - `npm run lint` and `npm run prettier` run on every commit.
-- `build`, `test:ci` and `sonar` (plus `test:arch` and `test:a11y` if defined) only run when the `CI` or `FORCE_CI_COMMIT_HOOKS` environment variable is set.
+- `build` and `test:ci` (plus `test:arch` and `test:a11y` if defined) only run when the `CI` or `FORCE_CI_COMMIT_HOOKS` environment variable is set.
+- `test:ci` runs Karma with `--browsers=ChromeHeadless`, so a forced run needs Chrome or Chromium installed locally (set `CHROME_BIN` if it is not found).
+- `sonar` is skipped by default, even in CI, because it needs `sonar-scanner` and a Sonar server. Set `RUN_SONAR_COMMIT_HOOKS=1` together with `CI` or `FORCE_CI_COMMIT_HOOKS` to run it.
 - `EXTRA_LINT_SCRIPTS` adds more always-run scripts and `EXTRA_QA_SCRIPTS` adds more CI-gated scripts, both as space-separated script names.
 - The commit is aborted if any check fails. Fix the reported issues, for example with `npm run format` or `npx prettier --write <file>`, and commit again.
 

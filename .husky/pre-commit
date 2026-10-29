@@ -29,6 +29,11 @@ if [ -n "$CI" ] || [ -n "$FORCE_CI_COMMIT_HOOKS" ]; then
   echo "pre-commit: CI/FORCE_CI_COMMIT_HOOKS detected, running remaining configured QA checks..."
   # shellcheck disable=SC2086 # EXTRA_QA_SCRIPTS is intentionally word-split, one script name per word
   for name in build test:ci sonar test:arch test:a11y $EXTRA_QA_SCRIPTS; do
+    # sonar needs a scanner, a Sonar server and per-library project config, so it is opt-in only.
+    if [ "$name" = "sonar" ] && [ "$RUN_SONAR_COMMIT_HOOKS" != "1" ]; then
+      echo "pre-commit: skipping sonar (set RUN_SONAR_COMMIT_HOOKS=1 to run it)."
+      continue
+    fi
     if has_script "$name"; then
       run_check "$name"
     fi

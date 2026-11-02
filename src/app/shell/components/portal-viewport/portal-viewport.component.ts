@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { AsyncPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, EventEmitter, inject, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
@@ -14,6 +14,7 @@ import { GlobalErrorComponent } from '../error-component/global-error.component'
 import { SlotGroupComponent } from '../slot-group/slot-group.component'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [
     AsyncPipe,

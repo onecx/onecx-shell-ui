@@ -81,5 +81,14 @@
     "@babel/core": "^7.29.6",
     "ajv": "^8.18.0",
     "webpack-dev-server": "^5.2.6"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "@swc/core": false,
+    "esbuild": false,
+    "lmdb": false,
+    "msgpackr-extract": false,
+    "msw": false,
+    "nx": false
   }
 }

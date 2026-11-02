@@ -7,7 +7,6 @@ export const MARKED_AS_WRAPPED = 'markedAsWrapped'
 
 // When creating style elements via Renderer from Angular Core, make sure to include the style id data in the style elements so when appending to the head we don't lose context of the current App
 export function ensureAngularComponentStylesContainStyleId() {
-  // eslint-disable-next-line @typescript-eslint/no-extra-semi
   ;(document as any).createElementFromSharedStylesHost = function (
     context: any,
     tagName: any,

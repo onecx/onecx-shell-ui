@@ -1,0 +1,71 @@
+import { Configuration } from 'webpack'
+import config from './module-federation.config'
+import { withModuleFederation } from '@nx/module-federation/angular'
+import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
+
+const modifyOptimisUiPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        if (module.resource) {
+          return module.resource.includes('@openng/optimus-ui')
+        }
+        return false
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(',
+          'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
+        ),
+        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+      ]
+    }
+  ]
+})
+
+// Replace createElement only in @angular/platform-browser SharedStylesHost
+const modifyAngularCorePlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        if (module.resource) {
+          return module.resource.includes('@angular/platform-browser')
+        }
+        return false
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          "this\\.doc\\.createElement\\(\\'style\\'",
+          "this.doc.createElementFromSharedStylesHost({'this': this, 'arguments': Array.from(arguments)},'style'"
+        )
+      ]
+    }
+  ]
+})
+
+export default async function (baseConfig: Configuration) {
+  const withMf = await withModuleFederation(config, {
+    shareScope: 'angular_22'
+  })
+  const webpackConfig = withMf(baseConfig)
+
+  return {
+    ...webpackConfig,
+    plugins: [...(webpackConfig.plugins ?? []), modifyAngularCorePlugin, modifyOptimisUiPlugin],
+    output: {
+      ...webpackConfig.output,
+      uniqueName: 'zzz_onecx-angular-22-loader',
+      publicPath: 'auto',
+      devtoolNamespace: 'onecx-angular-22-loader'
+    },
+    module: {
+      ...webpackConfig.module,
+      parser: {
+        ...webpackConfig.module.parser,
+        javascript: { ...webpackConfig.module.parser.javascript, importMeta: false }
+      }
+    }
+  }
+}

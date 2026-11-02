@@ -1,0 +1,42 @@
+/*
+  Style sheet for shell styles.
+  This file should ONLY contain styles that are meant to be applied FOR SHELL'S CONTENT.
+  Shell is going to load this style sheet with a style tag on the startup and scope the styles to the Shell app only.
+
+  IMPORTANT: Styles defined in this file will be applied only to the children of the ocx-shell-root element.
+
+  Tailwind CSS v4 entry. This file is the only stylesheet the build compiles with Tailwind (see
+  postcss.config.json + scripts/tailwind-shell-postcss.js, which run @tailwindcss/postcss for this
+  entry only). Tailwind generates production utilities for every class used across the Shell (the
+  `@source` directory) plus the Optimus styled-mode theme and utilities from
+  @openng/optimus-ui-tailwindcss. The legacy PrimeFlex utilities are no longer bundled here; the
+  Shell uses Tailwind utilities instead. PrimeFlex remains a build-time dependency of the legacy
+  portal-layout-styles entry only.
+
+  `@import url(...)` (rather than `@import '...'`) keeps the icon import out of Tailwind's own
+  import resolution so its font URLs are resolved by the standard css-loader pipeline, which
+  handles `@font-face` URLs for every other stylesheet.
+
+  To define global styles, please refer to global-styles.scss.
+*/
+@source "./";
+@import 'tailwindcss';
+@import '@openng/optimus-ui-tailwindcss';
+@import url('@openng/icons/openng-icons.css');
+
+.onecx-body {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  flex-grow: 1;
+}
+
+/* Important for allowing MFEs to grow and fill the available space */
+.onecx-body > ng-component {
+  flex-grow: 1;
+}
+
+/* Important for allowing MFEs to grow and fill the available space */
+.webcomponentwrapper {
+  height: 100%;
+}

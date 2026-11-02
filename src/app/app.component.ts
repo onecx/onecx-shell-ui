@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
-import { PrimeNG } from 'primeng/config'
+import { Optimus } from '@openng/optimus-ui/config'
 import { merge, mergeMap } from 'rxjs'
 
 import { UserService } from '@onecx/angular-integration-interface'
@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   title = 'shell'
 
   private readonly translateService: TranslateService = inject(TranslateService)
-  private readonly config: PrimeNG = inject(PrimeNG)
+  private readonly config: Optimus = inject(Optimus)
   private readonly userService: UserService = inject(UserService)
 
   ngOnInit(): void {

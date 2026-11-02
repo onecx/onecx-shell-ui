@@ -10,11 +10,11 @@ import {
   ocxRemoteWebcomponent
 } from '@onecx/angular-remote-components'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
-import { MessageService } from 'primeng/api'
-import { PrimeNG } from 'primeng/config'
-import { ToastModule } from 'primeng/toast'
+import { MessageService } from '@openng/optimus-ui/api'
+import { Optimus } from '@openng/optimus-ui/config'
+import { ToastModule } from '@openng/optimus-ui/toast'
 
-// Should be moved out of shell to another repo later, so that primeNG dependency can be started to be removed from shell
+// Should be moved out of shell to another repo later, so that the Optimus UI dependency can be started to be removed from shell
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'ocx-shell-toast',
@@ -26,7 +26,7 @@ import { ToastModule } from 'primeng/toast'
 @UntilDestroy()
 export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnInit {
   private readonly rcConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
-  private readonly primengConfig: PrimeNG = inject(PrimeNG)
+  private readonly optimusConfig: Optimus = inject(Optimus)
   private readonly messageService = inject(MessageService)
   private readonly portalMessageService = inject(PortalMessageService)
   private readonly cdr = inject(ChangeDetectorRef)
@@ -45,7 +45,7 @@ export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWe
   }
 
   ngOnInit() {
-    this.primengConfig.ripple.set(true)
+    this.optimusConfig.ripple.set(true)
   }
 
   public ocxInitRemoteComponent(rcConfig: RemoteComponentConfig) {

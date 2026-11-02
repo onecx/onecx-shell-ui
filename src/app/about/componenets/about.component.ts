@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
 import { Federation } from '@module-federation/runtime-core'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -14,6 +14,7 @@ interface AngularVersion {
 const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [TranslateModule],
   selector: 'ocx-shell-about',

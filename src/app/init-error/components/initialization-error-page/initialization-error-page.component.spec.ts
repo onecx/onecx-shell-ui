@@ -1,6 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
-import { TooltipModule } from 'primeng/tooltip'
+import { TooltipModule } from '@openng/optimus-ui/tooltip'
 import { firstValueFrom, of } from 'rxjs'
 
 import { provideTranslateTestingService } from '@onecx/angular-testing'

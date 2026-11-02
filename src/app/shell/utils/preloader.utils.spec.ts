@@ -13,6 +13,11 @@ jest.mock('@module-federation/enhanced/runtime', () => ({
 }))
 
 describe('Preloader Utils', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')
+  })
+
   describe('preloader definitions', () => {
     it('defines the Angular 22 preloader with the angular_22 share scope', () => {
       expect(angular22Preloader).toEqual({
@@ -29,11 +34,6 @@ describe('Preloader Utils', () => {
       expect(angular22Preloader.shareScope).toBe('angular_22')
       expect(angular21Preloader.shareScope).not.toBe(angular22Preloader.shareScope)
     })
-  })
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-    jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')
   })
 
   describe('loadPreloaderModule', () => {

@@ -280,27 +280,25 @@ function buildAngularRspackOptions(options: any, configuration: string | undefin
 // `SuppressJsForCssOnlyEntryPlugin` reads `module.resourceResolveData`, which
 // Rspack 1.x does not provide, so it never matches and the empty style-entry
 // JS (which carries `import.meta` from the MF runtime) was still emitted and
-// loaded as a classic script. Matching on `module.resource` works with Rspack.
+// loaded as a classic script. Use Angular's explicit global-style entry names.
 class SuppressJsForCssOnlyEntryPlugin {
+  constructor(private readonly styleEntries: Set<string>) {}
+
   apply(compiler: Compiler) {
     compiler.hooks.thisCompilation.tap('SuppressJsForCssOnlyEntryPlugin', (compilation: Compilation) => {
       compilation.hooks.processAssets.tap(
         {
           name: 'SuppressJsForCssOnlyEntryPlugin',
-          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE - 1
         },
         () => {
           for (const chunk of compilation.chunks) {
+            if (!this.styleEntries.has(chunk.name ?? '')) continue
             const cssFiles = [...chunk.files].filter((f) => f.endsWith('.css'))
             const jsFiles = [...chunk.files].filter((f) => f.endsWith('.js'))
             if (cssFiles.length === 0 || jsFiles.length !== 1) continue
-            // Module Federation injects a `data:` runtime module into every entry chunk; ignore it.
-            const modules = [...compilation.chunkGraph.getChunkModulesIterable(chunk)].filter(
-              (module) => !(module.resource ?? '').startsWith('data:')
-            )
-            const cssOnly =
-              modules.length > 0 && modules.every((module) => /\.(css|scss|sass|less)$/.test(module.resource ?? ''))
-            if (cssOnly) compilation.deleteAsset(jsFiles[0])
+            compilation.deleteAsset(jsFiles[0])
+            chunk.files.delete(jsFiles[0])
           }
         }
       )
@@ -327,7 +325,19 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
   browserConfig.plugins = browserConfig.plugins.filter(
     (plugin) => plugin?.constructor?.name !== 'SuppressJsForCssOnlyEntryPlugin'
   )
-  browserConfig.plugins.push(new SuppressJsForCssOnlyEntryPlugin())
+  const styleEntries = new Set(
+    Object.entries(browserConfig.entry ?? {})
+      .filter(([, entry]) => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false
+        return (
+          Array.isArray(entry.import) &&
+          entry.import.length > 0 &&
+          entry.import.every((input) => input.endsWith('?ngGlobalStyles'))
+        )
+      })
+      .map(([name]) => name)
+  )
+  browserConfig.plugins.push(new SuppressJsForCssOnlyEntryPlugin(styleEntries))
   const { shared, sharedLibraries } = await buildSharedMap()
 
   // Forward the resolved proxy the `@nx/rspack:dev-server` executor computed from
@@ -369,6 +379,11 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
       {
         name: normalizeProjectName(mfConfig.name),
         filename: 'remoteEntry.js',
+        library: { type: 'module' },
+        dev: {
+          disableHotTypesReload: true,
+          disableDynamicRemoteTypeHints: true
+        },
         exposes: mfConfig.exposes,
         remotes: {},
         shared,

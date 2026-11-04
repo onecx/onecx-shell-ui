@@ -23,7 +23,5 @@ const preloaders = [
 ]
 
 Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)])
-  .then(() => {
-    return import('./bootstrap').catch((err) => console.error(err))
-  })
+  .then(() => import('./bootstrap'))
   .catch((err) => console.error(err))

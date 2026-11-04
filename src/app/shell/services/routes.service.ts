@@ -104,7 +104,7 @@ export class RoutesService {
           return WebcomponentLoaderModule
         }
       } catch (err) {
-        return await this.onRemoteLoadError(err)
+        return this.onRemoteLoadError(err)
       }
     } finally {
       await this.appStateService.globalLoading$.publish(false)
@@ -112,7 +112,7 @@ export class RoutesService {
   }
 
   private async updateAppEnvironment(r: BffGeneratedRoute, joinedBaseUrl: string): Promise<boolean> {
-    this.updateAppStyles(r)
+    this.updateAppStyles(r).catch((err) => console.error(err))
     return this.updateAppState(r, joinedBaseUrl)
   }
 
@@ -168,7 +168,7 @@ export class RoutesService {
     await this.permissionsTopic$.publish(permissions)
   }
 
-  private async onRemoteLoadError(err: unknown) {
+  private onRemoteLoadError(err: unknown) {
     console.log(`Failed to load remote module: ${err}`)
     this.portalMessageService.error({
       summaryKey: 'ERROR_MESSAGES.ON_REMOTE_LOAD_ERROR'

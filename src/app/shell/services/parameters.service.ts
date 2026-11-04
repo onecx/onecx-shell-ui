@@ -23,7 +23,7 @@ export class ParametersService implements OnDestroy {
 
   initialize() {
     //Not awaited on purpose
-    this.init()
+    this.init().catch((err) => console.error(err))
   }
 
   ngOnDestroy() {

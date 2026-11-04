@@ -59,6 +59,19 @@ describe('ParametersService', () => {
     expect(destroySpy).toHaveBeenCalled()
   })
 
+  it('should log error when initialization fails', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
+    const error = new Error('init failed')
+    const initSpy = jest.spyOn(parametersService as any, 'init').mockRejectedValue(error)
+
+    parametersService.initialize()
+    await Promise.resolve()
+
+    expect(initSpy).toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error)
+    consoleErrorSpy.mockRestore()
+  })
+
   it('should not call service if there are no apps in workspace', async () => {
     const cache = { parameters: [] }
     const parameters: GetParametersResponse = { products: {} }

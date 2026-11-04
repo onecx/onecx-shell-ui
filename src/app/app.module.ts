@@ -26,14 +26,13 @@ import {
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
-import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/optimus'
 
-import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, OverrideType, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  OverrideType,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -43,7 +42,7 @@ import { PermissionProxyService } from './shell/services/permission-proxy.servic
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
-import { providePrimeNG } from 'primeng/config'
+import { provideOptimus } from '@openng/optimus-ui/config'
 import { AppComponent } from './app.component'
 import { appRoutes, internalShellRoute } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
@@ -378,7 +377,7 @@ export async function shareMfContainer() {
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideAuthService(),
-    providePrimeNG(),
+    provideOptimus(),
     {
       provide: SKIP_STYLE_SCOPING,
       useValue: true

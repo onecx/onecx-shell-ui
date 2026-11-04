@@ -1,15 +1,22 @@
 {
   "name": "onecx-shell-ui",
   "$schema": "node_modules/nx/schemas/project-schema.json",
+  "includedScripts": [],
   "projectType": "application",
   "prefix": "ocx-shell",
   "sourceRoot": "./src",
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  },
   "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/rspack:rspack",
       "dependsOn": ["^build"],
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
         "rspackConfig": "./rspack.config.ts",
         "outputPath": "dist/onecx-shell-ui",
@@ -61,6 +68,11 @@
           },
           {
             "glob": "**/*",
+            "input": "./pre_loaders/angular-22/dist/onecx-angular-22-loader",
+            "output": "/pre_loaders/onecx-angular-22-loader"
+          },
+          {
+            "glob": "**/*",
             "input": "./pre_loaders/react-19/dist/onecx-react-19-loader",
             "output": "/pre_loaders/onecx-react-19-loader"
           }
@@ -76,7 +88,7 @@
             "inject": true
           },
           {
-            "input": "./src/shell-styles.scss",
+            "input": "./src/shell-styles.css",
             "bundleName": "shell-styles",
             "inject": false
           },
@@ -102,8 +114,7 @@
           "baseHref": "/onecx-shell/",
           "outputHashing": "media"
         }
-      },
-      "defaultConfiguration": "production"
+      }
     },
     "serve": {
       "executor": "@nx/rspack:dev-server",
@@ -227,11 +238,6 @@
         "jestConfig": "jest.config.ts",
         "codeCoverage": true
       }
-    }
-  },
-  "cli": {
-    "cache": {
-      "enabled": false
     }
   }
 }

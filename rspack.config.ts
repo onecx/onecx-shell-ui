@@ -26,7 +26,7 @@ import mfConfig from './module-federation.config'
  *     reconstructing `exposes` / `shared` / the container name by hand (mirroring
  *     `@nx/module-federation`'s Rspack `withModuleFederation` wrapper, whose
  *     deprecated `@nx/angular/module-federation` variant this replaces);
- *   - the two former `ModifySourcePlugin` patches (PrimeNG + Angular
+ *   - the two former `ModifySourcePlugin` patches (Optimus UI + Angular
  *     `SharedStylesHost`) are re-implemented as a source loader
  *     (`./source-patch.loader.js`).
  *
@@ -387,9 +387,9 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
         exposes: mfConfig.exposes,
         remotes: {},
         shared,
-        // The original config passed `{ shareScope: 'angular_21' }` to
+        // The Angular 22 config passes `{ shareScope: 'angular_22' }` to
         // `withModuleFederation` (via `configOverride`).
-        shareScope: 'angular_21',
+        shareScope: 'angular_22',
         runtimePlugins
       },
       sharedLibraries.getReplacementPlugin()
@@ -400,10 +400,10 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
   // runtime plugin (matches the original wrapper).
   browserConfig.plugins.push(new DefinePlugin({ 'process.env.NX_MF_DEV_REMOTES': process.env.NX_MF_DEV_REMOTES }))
 
-  // --- Source patches (PrimeNG + Angular SharedStylesHost) as a source loader ---
+  // --- Source patches (Optimus UI + Angular SharedStylesHost) as a source loader ---
   // Re-implements the two former `ModifySourcePlugin` patches.
   browserConfig.module.rules.push({
-    test: /[\/\\]node_modules[\/\\](primeng|@angular[\/\\]platform-browser)[\/\\]/,
+    test: /[\/\\]node_modules[\/\\](@openng[\/\\]optimus-ui|@angular[\/\\]platform-browser)[\/\\]/,
     enforce: 'pre',
     loader: require.resolve('./source-patch.loader.js')
   })

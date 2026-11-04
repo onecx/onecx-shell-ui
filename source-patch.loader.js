@@ -4,7 +4,7 @@
  *
  * It performs plain source-string (global) replacements and is only applied to
  * modules whose resource path matches the original `ModifySourcePlugin` rules:
- *   - `primeng`              -> PrimeNG `document.createElement` + theme-load patch
+ *   - `@openng/optimus-ui`    -> Optimus UI `document.createElement` + theme-load patch
  *   - `@angular/platform-browser` -> Angular `SharedStylesHost` patch
  *
  * The replacement strings contain no `$` so they are safe to use verbatim with
@@ -16,12 +16,12 @@ module.exports = function sourcePatchLoader(source) {
 
   let result = source
 
-  // PrimeNG patch: route `document.createElement(` through a runtime hook and
+  // Optimus UI patch: route `document.createElement(` through a runtime hook and
   // disable the style-name setter (avoids duplicate style injection).
-  if (resourcePath.includes('primeng')) {
+  if (resourcePath.includes('@openng/optimus-ui')) {
     result = result.replace(
       /document\.createElement\(/g,
-      'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments)},'
+      'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
     )
     result = result.replace(/Theme.setLoadedStyleName/g, '(function(_){})')
   }

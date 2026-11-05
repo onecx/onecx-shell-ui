@@ -1,4 +1,6 @@
 import type { Compilation, Compiler, Configuration } from '@rspack/core'
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
 import { DefinePlugin } from '@rspack/core'
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack'
 import { createConfig } from '@nx/angular-rspack'
@@ -30,19 +32,10 @@ import mfConfig from './module-federation.config'
  *     `SharedStylesHost`) are re-implemented as a source loader
  *     (`./source-patch.loader.js`).
  *
- * The options the `@nx/rspack` executor hands to this function are forwarded
- * straight into `createConfig`, so `project.json` stays the single source of
- * truth. Only the values whose *shape* differs between the two APIs are
- * translated here (see `buildAngularRspackOptions`), plus the two options the
- * `@nx/rspack` executor schema cannot express — the `sourceMap` object form and
- * `budgets` — which are driven from the Nx `configuration`.
- *
- * Configuration mode: `createConfig`'s `configurations` map is keyed off the
- * `NGRS_CONFIG` env var, which Nx never sets, so it would fall back to
- * `WEBPACK_SERVE ? 'development' : 'production'`. We instead drive the mode from
- * the Nx `configuration` argument (`context.configurationName`, which reflects
- * `defaultConfiguration`). `WEBPACK_SERVE` is not set by this config, so the
- * dev server also gets ES module output.
+ * The inferred targets run the standard Rspack CLI. Build options live here;
+ * Nx's task configuration selects production, development, or local-env.
+ * `WEBPACK_SERVE` is cleared while creating Angular's config so the dev server
+ * also gets ES module output.
  */
 
 /**
@@ -68,20 +61,14 @@ const NPM_PACKAGES_TO_AVOID = ['zone.js', '@nx/angular/mf', '@nrwl/angular/mf', 
 const DEFAULT_PACKAGES_TO_LOAD_EAGERLY = ['@angular/localize', '@angular/localize/init']
 
 /**
- * The `@nx/rspack:rspack` executor schema only accepts a boolean/string
- * `sourceMap`, so the original fine-grained `sourceMap` object (scripts + vendor
- * on, styles off) cannot live in `project.json`. It is applied here instead,
- * matching the value the original `build` target used for every non-`development`
- * configuration.
+ * Preserve script/vendor source maps for non-development configurations.
  */
 const SOURCE_MAP = { scripts: true, styles: false, vendor: true, hidden: false }
 
 /**
- * Production budgets. The `@nx/rspack:rspack` executor schema has no `budgets`
- * option, so they cannot live in `project.json` and are enforced here instead
- * (the original `build:production` configuration enforced these same values).
+ * Preserve the original production budgets.
  */
-const PRODUCTION_BUDGETS = [
+const PRODUCTION_BUDGETS: NonNullable<Parameters<typeof createConfig>[0]['options']['budgets']> = [
   { type: 'initial', maximumWarning: '1mb', maximumError: '5mb' },
   { type: 'anyComponentStyle', maximumWarning: '2kb', maximumError: '4kb' }
 ]
@@ -152,129 +139,64 @@ async function buildSharedMap() {
   return { shared, sharedLibraries }
 }
 
-/**
- * Extract the path portion an Angular `baseHref` contributes to a public host
- * (always with a leading slash), so a derived dev-server `publicHost` can fold
- * the build's base path (e.g. the `local-env` configuration's `/onecx-shell/`)
- * into its URL. An empty/absent `baseHref` yields `/`, the no-base-path default.
- */
-function publicHostPath(baseHref: string | undefined): string {
-  if (typeof baseHref !== 'string' || !baseHref) {
-    return '/'
-  }
-  // Strip a scheme+host prefix if the baseHref is a full URL, then keep the
-  // path portion.
-  const path = baseHref.replace(/^https?:\/\/[^/]+/, '')
-  return path.startsWith('/') ? path : `/${path}`
-}
-
-/**
- * Assemble the `@nx/angular-rspack` `createConfig` options for a given Nx
- * configuration.
- *
- * `options` here is the `@nx/rspack` executor's normalized options. For a `serve`
- * task it additionally carries `devServer` — the dev-server target's resolved
- * options (host / port / publicHost / proxy) — and we forward host / port /
- * publicHost so that `createConfig`'s own dev-server config (which wins the
- * `@nx/rspack:dev-server` merge over the executor's) matches the original
- * dev-server behaviour. The resolved proxy is forwarded separately, after
- * `createConfig`, because `createConfig` only resolves a proxy from a
- * `devServer.proxyConfig` path and this config no longer pins one.
- */
-function buildAngularRspackOptions(options: any, configuration: string | undefined) {
-  // Rspack dev-server options. For a `serve` task, forward the resolved host /
-  // port / publicHost so the merged result is preserved (the resolved proxy is
-  // handled after `createConfig`, which cannot take a pre-resolved proxy object).
-  const serveDevServer = options?.devServer
-  const devServer: Record<string, any> = {
-    hmr: false,
-    liveReload: true,
-    port: 4300
-  }
-  if (serveDevServer) {
-    devServer.host = serveDevServer.host
-    devServer.port = serveDevServer.port ?? devServer.port
-    if (serveDevServer.client?.webSocketURL) {
-      devServer.publicHost = serveDevServer.client.webSocketURL
-    } else {
-      // The executor only populates `client.webSocketURL` from the dev-server's
-      // `publicHost` option (set by the `local-env` configuration). When it is
-      // absent, derive a public host from the resolved host + port + base path so
-      // the browser's WebSocket/HMR reconnect target stays valid. A `0.0.0.0`
-      // interface is reached from the browser via `localhost`, and an unset host
-      // defaults to `localhost` as well. The build's `baseHref` path (e.g. the
-      // `local-env` `/onecx-shell/`) is folded into the URL so the derived
-      // publicHost matches the original dev-server value
-      // (`http://localhost:4300/onecx-shell/`), not just the bare origin.
-      const publicHostHost =
-        serveDevServer.host && serveDevServer.host !== '0.0.0.0' ? serveDevServer.host : 'localhost'
-      const publicHostPort = serveDevServer.port ?? devServer.port
-      devServer.publicHost = `http://${publicHostHost}:${publicHostPort}${publicHostPath(options?.baseHref)}`
-    }
-    // Faithful to the original `disableHostCheck: true` (local-env, which binds to
-    // `0.0.0.0`). The `@nx/rspack` dev-server schema has no `disableHostCheck`, so
-    // allow all hosts when serving on a non-localhost interface.
-    if (serveDevServer.host === '0.0.0.0') {
-      devServer.allowedHosts = true
-    }
-  }
-
-  // The `@nx/rspack` executor schema declares `polyfills` as a *string*, but
-  // `createConfig`'s `normalizeOptions` expects an *array* (it spreads it into the
-  // polyfills entry). Convert the string to a single-element array; leave a real
-  // array untouched.
-  const polyfills = Array.isArray(options?.polyfills)
-    ? options.polyfills
-    : options?.polyfills
-      ? [options.polyfills]
-      : ['zone.js']
-
+function buildAngularRspackOptions(configuration: string): Parameters<typeof createConfig>[0]['options'] {
+  const development = configuration === 'development'
+  const localEnv = configuration === 'local-env'
   return {
     root: __dirname,
-    // `main` (`@nx/rspack` executor option) -> `browser` (`createConfig` option).
-    browser: options?.main ?? './src/main.ts',
-    index: options?.index ?? './src/index.html',
-    tsConfig: options?.tsConfig ?? './tsconfig.app.json',
-    polyfills,
-    // The `@nx/rspack` schema has no `inlineStyleLanguage`; the global styles are
-    // SCSS, so pin it here (the original build set it explicitly).
+    browser: './src/main.ts',
+    index: './src/index.html',
+    tsConfig: './tsconfig.app.json',
+    polyfills: ['zone.js'],
     inlineStyleLanguage: 'scss',
-    // Flat output: `browser: '.'` writes directly to `dist/onecx-shell-ui`, which
-    // the Dockerfile `COPY dist/onecx-shell-ui/` depends on (a plain string would
-    // nest it under `dist/onecx-shell-ui/browser`).
-    outputPath: { base: options?.outputPath ?? 'dist/onecx-shell-ui', browser: '.' },
-    // Forward the real asset / style / script sets from `project.json` (the
-    // `@nx/rspack` executor has already normalized `assets` to absolute inputs).
-    assets: options?.assets ?? [],
-    styles: options?.styles ?? [],
-    scripts: options?.scripts ?? [],
-    // The options below are forwarded verbatim from `project.json` (schema-valid
-    // for `@nx/rspack`); `createConfig` normalizes them the same way the Angular
-    // build does. `optimization` is already an object after the executor's
-    // normalization, which `createConfig` resolves to the correct per-configuration
-    // behaviour (optimized for production, not for development).
-    baseHref: options?.baseHref,
-    outputHashing: options?.outputHashing,
-    optimization: options?.optimization,
-    vendorChunk: options?.vendorChunk,
-    namedChunks: options?.namedChunks,
-    extractLicenses: options?.extractLicenses,
-    // The `@nx/rspack` schema only accepts a boolean/string `sourceMap`, so the
-    // original fine-grained value cannot live in `project.json`; it is applied per
-    // configuration here (object form for the non-development configs, all-on for
-    // development — matching the original).
-    sourceMap: configuration === 'development' ? true : SOURCE_MAP,
+    outputPath: { base: 'dist/onecx-shell-ui', browser: '.' },
+    assets: [
+      './src/assets',
+      {
+        glob: '**/*',
+        input: './pre_loaders/angular-18/node_modules/@onecx/portal-integration-angular/assets/',
+        output: '/onecx-portal-lib/assets/'
+      },
+      ...['angular-accelerator', 'angular-utils', 'shell-core'].map((name) => ({
+        glob: '**/*',
+        input: `./node_modules/@onecx/${name}/assets/`,
+        output: `/onecx-${name}/assets/`
+      })),
+      ...['angular-18', 'angular-19', 'angular-20', 'angular-21', 'angular-22', 'react-19'].map((name) => ({
+        glob: '**/*',
+        input: `./pre_loaders/${name}/dist/onecx-${name}-loader`,
+        output: `/pre_loaders/onecx-${name}-loader`
+      }))
+    ],
+    styles: [
+      { input: './src/splash.scss', inject: true },
+      { input: './src/global-styles.scss', bundleName: 'global-styles', inject: true },
+      { input: './src/shell-styles.css', bundleName: 'shell-styles', inject: false },
+      { input: './src/portal-layout-styles.scss', bundleName: 'portal-layout-styles', inject: false }
+    ],
+    scripts: [],
+    baseHref: localEnv ? '/onecx-shell/' : undefined,
+    outputHashing: development ? 'none' : localEnv ? 'media' : 'all',
+    optimization: !development,
+    vendorChunk: development,
+    namedChunks: development,
+    extractLicenses: false,
+    sourceMap: development ? true : SOURCE_MAP,
     budgets: configuration === 'production' ? PRODUCTION_BUDGETS : undefined,
-    devServer
+    devServer: {
+      hmr: false,
+      liveReload: true,
+      port: 5000,
+      host: localEnv ? '0.0.0.0' : 'localhost',
+      allowedHosts: localEnv ? true : undefined,
+      publicHost: localEnv ? 'http://localhost:5000/onecx-shell/' : undefined,
+      proxyConfig: localEnv ? 'proxy.local-env.conf.js' : 'proxy.conf.js'
+    }
   }
 }
 
 /**
- * Nx Rspack config entry point.
- *
- * Invoked as `userDefinedConfig(baseConfig, { options, context, configuration })`
- * where `configuration` is `context.configurationName` (which reflects
- * `defaultConfiguration`).
+ * Standard Rspack CLI config entry point.
  */
 // Drops the JS output of entries that only contain stylesheets. Nx's
 // `SuppressJsForCssOnlyEntryPlugin` reads `module.resourceResolveData`, which
@@ -306,11 +228,38 @@ class SuppressJsForCssOnlyEntryPlugin {
   }
 }
 
-export default async (_baseConfig: Configuration, { options, configuration }: any) => {
+export default async (env: { production?: boolean; configuration?: string } = {}) => {
+  const configuration =
+    env.configuration ??
+    process.env['NX_TASK_TARGET_CONFIGURATION'] ??
+    (env.production || process.env['NODE_ENV'] === 'production' ? 'production' : 'development')
+  if (!['production', 'development', 'local-env'].includes(configuration)) {
+    throw new Error(`Unknown Rspack configuration: ${configuration}`)
+  }
+  // Inference only needs output metadata; creating the full config here would
+  // recursively request the project graph from buildSharedMap.
+  if ((globalThis as typeof globalThis & { NX_GRAPH_CREATION?: boolean }).NX_GRAPH_CREATION) {
+    return { output: { path: join(__dirname, 'dist/onecx-shell-ui') }, devServer: { port: 4300 } }
+  }
+  process.env['NG_BUILD_PARALLEL_TS'] ??= 'false'
+
+  // Nx's in-process compilation bypasses Angular 22's hash initialization.
+  // Resolve from the compiler so a second installed @angular/build is not initialized instead.
+  const rspackRequire = createRequire(require.resolve('@nx/angular-rspack'))
+  const compilerRequire = createRequire(rspackRequire.resolve('@nx/angular-rspack-compiler'))
+  const angularBuildRoot = dirname(compilerRequire.resolve('@angular/build/package.json'))
+  const { initializeHash }: { initializeHash: () => Promise<void> } = compilerRequire(
+    join(angularBuildRoot, 'src/utils/hash.js')
+  )
+  const { shutdownSassWorkerPool }: { shutdownSassWorkerPool: () => void } = compilerRequire(
+    join(angularBuildRoot, 'src/tools/esbuild/stylesheets/sass-language.js')
+  )
+  await initializeHash()
+
   // `@rspack/dev-server` sets `WEBPACK_SERVE` before this file loads, and while it
   // is set `createConfig` emits classic (non-module) output, which cannot contain
   // `import.meta` (used by @onecx/angular-utils). Clear it only for `createConfig`.
-  const angularOptions = buildAngularRspackOptions(options, configuration)
+  const angularOptions = buildAngularRspackOptions(configuration)
   const webpackServe = process.env.WEBPACK_SERVE
   delete process.env.WEBPACK_SERVE
   let browserConfig: Configuration
@@ -338,20 +287,13 @@ export default async (_baseConfig: Configuration, { options, configuration }: an
       .map(([name]) => name)
   )
   browserConfig.plugins.push(new SuppressJsForCssOnlyEntryPlugin(styleEntries))
+  // Angular's application builder normally shuts down this shared pool.
+  browserConfig.plugins.push({
+    apply(compiler) {
+      compiler.hooks.shutdown.tap('ShutdownAngularSassWorkerPool', shutdownSassWorkerPool)
+    }
+  })
   const { shared, sharedLibraries } = await buildSharedMap()
-
-  // Forward the resolved proxy the `@nx/rspack:dev-server` executor computed from
-  // the resolved `proxyConfig` (per-configuration / CLI). `createConfig` resolves
-  // the proxy only from a `devServer.proxyConfig` path and this config no longer
-  // pins one, so its `devServer.proxy` would be `undefined` — which the dev-server
-  // executor's merge (the config's devServer wins) would then drop. Setting the
-  // resolved object here preserves whichever proxy file the current serve run used
-  // (`proxy.conf.js` for the default/development configs,
-  // `proxy.local-env.conf.js` for `local-env`).
-  if (options?.devServer?.proxy) {
-    browserConfig.devServer ??= {}
-    browserConfig.devServer.proxy = options.devServer.proxy
-  }
 
   // --- Module Federation (direct, via @module-federation/enhanced/rspack) ---
   // Mirrors `@nx/module-federation`'s Rspack `withModuleFederation` wrapper.

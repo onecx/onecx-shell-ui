@@ -25,3 +25,29 @@ The Shell's own content (v9 / Angular 22 surface: slot groups, loading/error/Abo
 - In Docker images, delivery of `*.map` files is controlled at runtime with `SOURCE_MAPS_ACCESS_RULE`.
 	- Default: `deny all;` (recommended for production)
 	- Development example: `allow all;`
+
+## Angular Rspack compilation
+
+Build and serve targets are inferred by `@nx/rspack/plugin`. Angular build options
+live in `rspack.config.ts`; `project.json` retains the named configurations and
+defaults. `npm start`, `npm run start:local-env`, and `nx build` keep their existing
+defaults. Use `nx build --configuration=development` for an unoptimized build.
+For direct Rspack CLI usage, select a configuration with
+`--env configuration=production` (or `development` / `local-env`).
+
+The default server uses `proxy.conf.js`; `local-env` uses
+`proxy.local-env.conf.js` and the `/onecx-shell/` base path. Override the listening
+port with `npm start -- --port=5000`. TypeScript configuration files are loaded
+with SWC (`@swc-node/register` for Nx and ts-node's `swc` option for the CLI).
+
+The Nx 23.3 / Angular 22 build defaults to in-process TypeScript compilation
+(`NG_BUILD_PARALLEL_TS=false`). The worker path fails because Nx passes a compiler
+options callback that Angular 22 cannot clone. Keep the default until the Nx
+integration supports Angular 22's worker API.
+
+In-process compilation also requires explicit Angular hash initialization.
+`rspack.config.ts` awaits this before creating the build configuration, resolving
+the internal hash utility from the compiler's own `@angular/build` installation.
+The config also shuts down Angular's shared Sass worker pool when the compiler
+closes, allowing one-shot CLI builds to exit. Revisit these compatibility
+workarounds when upgrading Nx or Angular.

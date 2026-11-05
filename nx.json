@@ -47,5 +47,15 @@
       "unitTestRunner": "jest"
     }
   },
-  "useInferencePlugins": false
+  "plugins": [
+    {
+      "plugin": "@nx/rspack/plugin",
+      "include": ["rspack.config.ts"],
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve"
+      }
+    }
+  ],
+  "analytics": false
 }

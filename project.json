@@ -13,130 +13,21 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/rspack:rspack",
       "dependsOn": ["^build"],
-      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
-      "options": {
-        "rspackConfig": "./rspack.config.ts",
-        "outputPath": "dist/onecx-shell-ui",
-        "index": "./src/index.html",
-        "main": "./src/main.ts",
-        "polyfills": "zone.js",
-        "tsConfig": "./tsconfig.app.json",
-        "assets": [
-          "./src/assets",
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-18/node_modules/@onecx/portal-integration-angular/assets/",
-            "output": "/onecx-portal-lib/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/angular-accelerator/assets/",
-            "output": "/onecx-angular-accelerator/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/angular-utils/assets/",
-            "output": "/onecx-angular-utils/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./node_modules/@onecx/shell-core/assets/",
-            "output": "/onecx-shell-core/assets/"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-18/dist/onecx-angular-18-loader",
-            "output": "/pre_loaders/onecx-angular-18-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-19/dist/onecx-angular-19-loader",
-            "output": "/pre_loaders/onecx-angular-19-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-20/dist/onecx-angular-20-loader",
-            "output": "/pre_loaders/onecx-angular-20-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-21/dist/onecx-angular-21-loader",
-            "output": "/pre_loaders/onecx-angular-21-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/angular-22/dist/onecx-angular-22-loader",
-            "output": "/pre_loaders/onecx-angular-22-loader"
-          },
-          {
-            "glob": "**/*",
-            "input": "./pre_loaders/react-19/dist/onecx-react-19-loader",
-            "output": "/pre_loaders/onecx-react-19-loader"
-          }
-        ],
-        "styles": [
-          {
-            "input": "./src/splash.scss",
-            "inject": true
-          },
-          {
-            "input": "./src/global-styles.scss",
-            "bundleName": "global-styles",
-            "inject": true
-          },
-          {
-            "input": "./src/shell-styles.css",
-            "bundleName": "shell-styles",
-            "inject": false
-          },
-          {
-            "input": "./src/portal-layout-styles.scss",
-            "bundleName": "portal-layout-styles",
-            "inject": false
-          }
-        ],
-        "scripts": [],
-        "extractLicenses": false
-      },
       "configurations": {
-        "production": {
-          "outputHashing": "all"
-        },
-        "development": {
-          "optimization": false,
-          "vendorChunk": true,
-          "namedChunks": true
-        },
-        "local-env": {
-          "baseHref": "/onecx-shell/",
-          "outputHashing": "media"
-        }
+        "production": {},
+        "development": {},
+        "local-env": {}
       }
     },
     "serve": {
-      "executor": "@nx/rspack:dev-server",
       "configurations": {
-        "production": {
-          "buildTarget": "onecx-shell-ui:build:production"
-        },
-        "development": {
-          "buildTarget": "onecx-shell-ui:build:development"
-        },
-        "local-env": {
-          "buildTarget": "onecx-shell-ui:build:local-env",
-          "host": "0.0.0.0",
-          "publicHost": "http://localhost:4300/onecx-shell/",
-          "port": 4300
-        }
+        "production": {},
+        "development": {},
+        "local-env": {}
       },
-      "defaultConfiguration": "development",
-      "options": {
-        "port": 4300,
-        "proxyConfig": "proxy.conf.js"
-      }
+      "defaultConfiguration": "development"
     },
     "build-i18n": {
       "executor": "@angular-devkit/build-angular:browser",

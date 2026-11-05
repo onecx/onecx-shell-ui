@@ -16,8 +16,9 @@ const onProxyRes = function (proxyRes, req, res) {
   }
 }
 
-const PROXY_CONFIG = {
-  '/onecx-shell/shell-bff': {
+const PROXY_CONFIG = [
+  {
+    context: ['/onecx-shell/shell-bff'],
     target: 'http://onecx-shell-bff',
     secure: false,
     pathRewrite: {
@@ -27,6 +28,6 @@ const PROXY_CONFIG = {
     logLevel: 'debug',
     onProxyRes: onProxyRes
   }
-}
+]
 
 module.exports = PROXY_CONFIG

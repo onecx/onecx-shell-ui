@@ -8,7 +8,7 @@ const path = require('path')
 
 const PACKAGE_NAME = /^(@[a-z0-9][\w.~-]*\/)?[a-z0-9][\w.~-]*$/
 const EXACT_VERSION = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/
-const BYPASS_FLAG = /--(dangerously-allow-all-scripts|allow-scripts)(?![\w-])/
+const BYPASS_FLAG = /--(dangerously-allow-all-scripts|allow-scripts|no-strict-allow-scripts|strict-allow-scripts=false)(?![\w-])/
 
 const errors = []
 const fail = (project, message) => errors.push(`${project}: ${message}`)
@@ -45,13 +45,13 @@ for (const project of projects) {
   const manifest = JSON.parse(fs.readFileSync(path.join(project, 'package.json'), 'utf-8'))
   for (const [name, command] of Object.entries(manifest.scripts ?? {})) {
     if (BYPASS_FLAG.test(command)) {
-      fail(project, `script "${name}" must not pass --allow-scripts or --dangerously-allow-all-scripts`)
+      fail(project, `script "${name}" must not pass a flag that bypasses the install-script policy`)
     }
   }
 
-  const allowScripts = manifest.allowScripts
-  if (allowScripts === null || typeof allowScripts !== 'object' || Array.isArray(allowScripts)) {
-    fail(project, 'package.json must contain an allowScripts object')
+  const allowScripts = manifest.allowScripts ?? {}
+  if (typeof allowScripts !== 'object' || Array.isArray(allowScripts)) {
+    fail(project, 'package.json allowScripts must be an object if present')
     continue
   }
   for (const [selector, allowed] of Object.entries(allowScripts)) {

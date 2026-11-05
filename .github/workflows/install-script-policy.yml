@@ -10,6 +10,7 @@ on:
       - 'package-lock.json'
       - '.npmrc'
       - 'pre_loaders/*/*'
+      - 'pre_loaders/*/.npmrc'
       - 'create-dummies.js'
       - 'build-preloaders.sh'
       - '.github/scripts/verify-install-script-policy.js'

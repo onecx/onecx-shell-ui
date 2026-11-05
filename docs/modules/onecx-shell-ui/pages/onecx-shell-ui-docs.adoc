@@ -114,8 +114,8 @@ npm distinguishes two kinds of scripts in this flow:
 
 * The root `postinstall` script is project code. It is reviewed like any other change
 and is not part of the dependency policy.
-* Install scripts (`preinstall`, `install`, `postinstall`) of dependency packages only run
-if the package is approved in the `allowScripts` field of the installing project's `package.json`.
+* Install scripts (`preinstall`, `install`, `postinstall`, and `prepare` for git or file dependencies)
+of dependency packages only run if the package is approved in the `allowScripts` field of the installing project's `package.json`.
 npm approves packages, not single scripts or commands.
 
 ===== Independent Policies
@@ -140,7 +140,7 @@ The `npm install-scripts` commands only work on installed packages, so install t
 [source,bash]
 ----
 cd pre_loaders/angular-20                 # the project that reported the package
-npm install --ignore-scripts              # install without running any script
+npm ci --ignore-scripts                   # install without running any script
 npm install-scripts ls                    # list packages with unreviewed install scripts
 npm install-scripts deny <package>        # default: the script is not needed
 npm install-scripts approve <package>     # only if the script is proven necessary
@@ -175,7 +175,7 @@ The reusable `Build Pull Request` workflow still builds and tests the applicatio
 ===== Compatibility and Validation Scope
 The project does not require a specific npm version. npm versions that do not support the policy
 ignore it and run dependency install scripts as before.
-Some of them print `npm warn Unknown project config "strict-allow-scripts"`; this warning does not mean that the installation failed.
+Some of them may print `npm warn Unknown project config "strict-allow-scripts"`; this warning does not mean that the installation failed.
 Verify policy changes with npm 12.
 
 The check runs on Linux only. Platform-specific optional dependencies for other operating systems,

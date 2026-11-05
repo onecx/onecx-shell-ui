@@ -106,6 +106,83 @@ This is optional.
 system that simplifies authentication, authorization, and single sign-on
 for web and mobile applications.
 
+[#dependency-install-script-policy]
+==== Dependency Install-Script Policy
+Running `npm ci` or `npm install` in the repository root also installs all pre-loaders:
+the root `postinstall` script runs `npm install --prefix pre_loaders/<pre-loader>` for each of them.
+npm distinguishes two kinds of scripts in this flow:
+
+* The root `postinstall` script is project code. It is reviewed like any other change
+and is not part of the dependency policy.
+* Install scripts (`preinstall`, `install`, `postinstall`, and `prepare` for git or file dependencies)
+of dependency packages only run if the package is approved in the `allowScripts` field of the installing project's `package.json`.
+npm approves packages, not single scripts or commands.
+
+===== Independent Policies
+The root project and every pre-loader in `pre_loaders/` (currently Angular 18 to 22 and React 19)
+are independent npm projects. Each one has its own policy, which applies whether the project
+is installed from the root or directly in its folder:
+
+* `.npmrc` sets `strict-allow-scripts=true`.
+* `package.json` contains the `allowScripts` field with the reviewed decisions:
+** `"<package>": false` denies the install scripts of a package (name-only).
+** `"<package>@<version>": true` approves the install scripts of exactly one version.
+
+In strict mode, an install fails with the error code `ESTRICTALLOWSCRIPTS` if a dependency
+has an install script that is neither approved nor denied. The error lists the packages and their scripts.
+Denied packages are installed without running their scripts.
+
+===== Reviewing Install Scripts
+When an install fails with `ESTRICTALLOWSCRIPTS`, review each listed package in the project that failed.
+Change the policy of every project that reports the package.
+The `npm install-scripts` commands only work on installed packages, so install the project without scripts first:
+
+[source,bash]
+----
+cd pre_loaders/angular-20                 # the project that reported the package
+npm ci --ignore-scripts                   # install without running any script
+npm install-scripts ls                    # list packages with unreviewed install scripts
+npm install-scripts deny <package>        # default: the script is not needed
+npm install-scripts approve <package>     # only if the script is proven necessary
+----
+
+Then run `npm ci` in the root again and build all pre-loaders with `npm run prebuild` to verify the policy.
+
+* Deny a package unless a clean installation and the pre-loader builds fail without its script.
+* `npm install-scripts approve` pins the approval to the installed version.
+After a version update, the install fails again until the new version is reviewed.
+* Never use `npm install-scripts approve --all`, `--no-allow-scripts-pin`, wildcard or name-only approvals,
+an `allow-scripts` setting in a user or global npm configuration, or `--dangerously-allow-all-scripts`.
+
+Record the reasons in the pull request, not in the documentation. For each changed entry,
+the pull request description lists the package version and its script, the decision and its reason,
+the npm versions used, and the evidence: a clean `npm ci` in the root and successful pre-loader builds,
+and for an approval, the failing installation or build without it.
+
+===== Pull Request Check
+The workflow `Install Script Policy` (`.github/workflows/install-script-policy.yml`) runs for pull requests
+that change a `package.json`, `package-lock.json` or `.npmrc` of the root project or a pre-loader,
+another pre-loader configuration file, the pre-loader build scripts, or the check itself.
+On Linux with the latest npm 12 patch release, it:
+
+. rejects missing strict mode and blanket, wildcard, name-only or global approvals,
+. runs `npm ci` in the root, which installs all pre-loaders through the root `postinstall` script,
+. builds all pre-loaders (`npm run prebuild`),
+. verifies that every project rejects a dependency with an unreviewed install script.
+
+The reusable `Build Pull Request` workflow still builds and tests the application.
+
+===== Compatibility and Validation Scope
+The project does not require a specific npm version. npm versions that do not support the policy
+ignore it and run dependency install scripts as before.
+Some of them may print `npm warn Unknown project config "strict-allow-scripts"`; this warning does not mean that the installation failed.
+Verify policy changes with npm 12.
+
+The check runs on Linux only. Platform-specific optional dependencies for other operating systems,
+for example macOS, are not installed there, so their install scripts are not reviewed.
+If an installation on another operating system fails with `ESTRICTALLOWSCRIPTS`,
+review the package in a pull request in the same way.
+
 ==== Slot Groups
 
 Slot Groups are a layout mechanism in OneCX Shell UI that organize multiple slots into structured regions. They enable flexible positioning and dynamic loading of remote components within defined areas of the shell interface's portal viewport.

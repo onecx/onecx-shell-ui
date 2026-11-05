@@ -8,7 +8,9 @@ const path = require('path')
 
 const PACKAGE_NAME = /^(@[a-z0-9][\w.~-]*\/)?[a-z0-9][\w.~-]*$/
 const EXACT_VERSION = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/
-const BYPASS_FLAG = /--(dangerously-allow-all-scripts|allow-scripts|no-strict-allow-scripts|strict-allow-scripts=false)(?![\w-])/
+// Command-line flags and npm_config_* environment variables that relax the policy.
+const BYPASS_FLAG =
+  /--(?:dangerously-allow-all-scripts|allow-scripts|no-strict-allow-scripts)(?![\w-])|--strict-allow-scripts(?:=|\s+)false\b|\bnpm_config_(?:dangerously_allow_all_scripts|allow_scripts|strict_allow_scripts)\s*=/i
 
 const errors = []
 const fail = (project, message) => errors.push(`${project}: ${message}`)
@@ -45,7 +47,7 @@ for (const project of projects) {
   const manifest = JSON.parse(fs.readFileSync(path.join(project, 'package.json'), 'utf-8'))
   for (const [name, command] of Object.entries(manifest.scripts ?? {})) {
     if (BYPASS_FLAG.test(command)) {
-      fail(project, `script "${name}" must not pass a flag that bypasses the install-script policy`)
+      fail(project, `script "${name}" must not pass a flag or npm_config_* variable that bypasses the install-script policy`)
     }
   }
 

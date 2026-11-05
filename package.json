@@ -115,6 +115,7 @@
     "@nx/workspace": "23.3.0",
     "@onecx/build-utils": "^9.0.0",
     "@openapitools/openapi-generator-cli": "^2.25.0",
+    "@rspack/dev-server": "^1.2.1",
     "@schematics/angular": "~22.2.0",
     "@swc/core": "^1.16.2",
     "@swc/helpers": "0.5.17",

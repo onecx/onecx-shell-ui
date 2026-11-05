@@ -1,3 +1,5 @@
+/// <reference path="./primereact.d.ts" />
+
 function f() {
   import('./dummy')
 }

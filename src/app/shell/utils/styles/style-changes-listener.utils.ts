@@ -10,7 +10,7 @@ import { updateRequiredWrappingStyles } from './update-required-wrapping-styles.
  *
  * The listener finds the scopeId data by looking for "_nghost" owner and looking for the closest styleId element.
  */
-export async function styleChangesListenerInitializer() {
+export function styleChangesListenerInitializer() {
   const observer = new MutationObserver((mutationList: MutationRecord[]) => updateStyles(mutationList))
   observer.observe(document.head, {
     childList: true

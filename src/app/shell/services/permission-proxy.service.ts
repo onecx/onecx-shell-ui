@@ -11,7 +11,7 @@ export class PermissionProxyService {
   private readonly permissionsService: PermissionBffService = inject(PermissionBffService)
   private readonly permissionsCacheService: PermissionsCacheService = inject(PermissionsCacheService)
 
-  async init(): Promise<void> {
+  init(): void {
     this.permissionsTopic$
       .pipe(
         filter((message) => message.permissions === undefined),

@@ -341,7 +341,7 @@ declare global {
   }
 }
 
-export async function shareMfContainer() {
+export function shareMfContainer() {
   // @deprecated Use __FEDERATION__ instead of globalThis.onecxWebpackContainer
   window.onecxWebpackContainer = __FEDERATION__ // NOSONAR
 }

@@ -350,6 +350,22 @@ describe('RoutesService', () => {
       ])
     })
 
+    it('logs app style errors without blocking app state update', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
+      const testRoute = createBffRoute({ technology: Technologies.Angular })
+      const styleError = new Error('style boom')
+      const updateStylesSpy = jest.spyOn(routerService as any, 'updateAppStyles').mockRejectedValue(styleError)
+      const updateAppStateSpy = jest.spyOn(routerService as any, 'updateAppState').mockResolvedValue(true)
+
+      const result = await (routerService as any).updateAppEnvironment(testRoute, '/admin/welcome/')
+
+      expect(result).toBe(true)
+      expect(updateStylesSpy).toHaveBeenCalledWith(testRoute)
+      expect(updateAppStateSpy).toHaveBeenCalledWith(testRoute, '/admin/welcome/')
+      expect(consoleErrorSpy).toHaveBeenCalledWith(styleError)
+      consoleErrorSpy.mockRestore()
+    })
+
     it('covers direct helper logic', async () => {
       const serviceAsAny = routerService as any
       routerService.showContent$.next(false)

@@ -135,7 +135,12 @@ jobs:
 
           expect_rejected() {
             local label=$1
-            if node "$GITHUB_WORKSPACE/scripts/dependency-script-policy.mjs" > /dev/null 2>&1; then
+            # The validator resolves the six project dirs relative to its cwd,
+            # so run it from the repository root (in a subshell, to keep this
+            # step's cwd at pre_loaders/react-19 for `restore` above); the only
+            # mutation is in pre_loaders/react-19, so a rejection now means the
+            # over-broad shape itself was detected, not a phantom "missing" error.
+            if (cd "$GITHUB_WORKSPACE" && node scripts/dependency-script-policy.mjs) > /dev/null 2>&1; then
               echo "FAIL: $label was accepted (expected rejection)"
               exit 1
             fi

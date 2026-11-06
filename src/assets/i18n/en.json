@@ -1,5 +1,12 @@
 {
   "SHELL": "",
+  "PAGE_TITLES": {
+    "ABOUT": "About Shell",
+    "ERROR": "Error",
+    "INITIALIZATION_ERROR": "Initialization error",
+    "NOT_FOUND": "Page not found",
+    "HOME": "Home"
+  },
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Parts of the application could not be loaded."
   },

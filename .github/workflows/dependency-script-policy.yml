@@ -1,0 +1,174 @@
+# Focused Linux pull-request check for the dependency install-script policy
+# (npm RFC 868, enforced by npm 11+/12).
+#
+# This check is deliberately separate from, and does not replace, the existing
+# reusable application build (.github/workflows/build-pr.yml). It exists to
+# continuously exercise the *complete* installation path: the shell root and all
+# six pre-loader npm projects are installed under each project's own
+# `strict-allow-scripts=true` policy, the five in-scope pre-loaders are built,
+# and regressions in the policy (an unreviewed scripted dependency, or an
+# over-broad approval) are rejected. It only runs for changes that can affect
+# the policy: manifests, lockfiles, npm configuration, pre-loader configuration,
+# and this check itself.
+name: Dependency Install-Script Policy
+
+on:
+  pull_request:
+    paths:
+      # Manifests and lockfiles at the shell root and in every pre-loader.
+      - 'package.json'
+      - 'package-lock.json'
+      - 'pre_loaders/**/package.json'
+      - 'pre_loaders/**/package-lock.json'
+      # npm configuration (the strict-allow-scripts setting lives here).
+      - '.npmrc'
+      - 'pre_loaders/**/.npmrc'
+      # Pre-loader build configuration.
+      - 'pre_loaders/**/nx.json'
+      - 'pre_loaders/**/project.json'
+      - 'pre_loaders/**/module-federation.config.ts'
+      - 'pre_loaders/**/webpack.config.ts'
+      - 'pre_loaders/**/tsconfig*.json'
+      # This check itself.
+      - '.github/workflows/dependency-script-policy.yml'
+      - 'scripts/dependency-script-policy.mjs'
+
+jobs:
+  dependency-script-policy:
+    name: npm 12 strict install-script policy (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Pin the latest npm 12 patch so the strict-allow-scripts behaviour
+      # exercised here is the one npm 12 ships on Linux.
+      - name: Install npm 12
+        run: npm install -g npm@12
+
+      # The real root installation path: `npm install` runs the root
+      # `postinstall`, which installs every pre-loader under its own
+      # `strict-allow-scripts=true` `.npmrc`. A policy regression in any of the
+      # six projects fails here.
+      - name: Install the shell and all pre-loaders
+        run: npm install
+
+      # The current policy must be compliant across all six contexts: strict
+      # mode on, no global `allow-scripts=true`, and every `allowScripts` entry
+      # an explicit denial or an exact-version approval.
+      - name: Validate the dependency-script policy
+        run: node scripts/dependency-script-policy.mjs
+
+      # Prove the validator rejects over-broad approvals (blanket, wildcard,
+      # name-only, global) and accepts an exact-version approval, against a
+      # throw-away tree so it never touches the working copy.
+      - name: Run the policy self-test
+        run: node scripts/dependency-script-policy.mjs --self-test
+
+      # Negative test: a newly introduced, unreviewed scripted dependency must
+      # make `npm install` fail under strict-allow-scripts (and its script must
+      # not run). A local `file:` dependency keeps this offline and
+      # deterministic.
+      - name: Reject an unreviewed scripted dependency
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE/pre_loaders/react-19"
+          restore() { rm -rf filedeps; git checkout -- package.json package-lock.json; }
+          trap restore EXIT
+
+          mkdir -p filedeps/filedep
+          printf '%s\n' '{ "name": "filedep", "version": "0.0.0", "scripts": { "preinstall": "node -e \"console.log(1)\"" } }' \
+            > filedeps/filedep/package.json
+          node -e '
+            const fs = require("fs")
+            const f = "package.json"
+            const m = JSON.parse(fs.readFileSync(f, "utf8"))
+            m.dependencies = m.dependencies || {}
+            m.dependencies.filedep = "file:./filedeps/filedep"
+            fs.writeFileSync(f, JSON.stringify(m, null, 2) + "\n")
+          '
+
+          set +e
+          npm install --no-audit --no-fund > unreviewed-dep.log 2>&1
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "FAIL: an unreviewed scripted dependency was installed (expected strict-allow-scripts to reject it)"
+            exit 1
+          fi
+          if ! grep -q ESTRICTALLOWSCRIPTS unreviewed-dep.log; then
+            echo "FAIL: the install failed for an unexpected reason, not strict-allow-scripts"
+            cat unreviewed-dep.log
+            exit 1
+          fi
+          echo "OK: an unreviewed scripted dependency was rejected by strict-allow-scripts"
+          restore
+          trap - EXIT
+          rm -f unreviewed-dep.log
+
+      # Negative test: each over-broad approval shape must be rejected. npm
+      # itself runs a blanket/wildcard/name-only approval rather than failing,
+      # so the check enforces the approval *shape* with the policy validator:
+      # rewrite one entry, expect the validator to reject it, then restore.
+      - name: Reject over-broad script approvals
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE/pre_loaders/react-19"
+          restore() { git checkout -- package.json .npmrc; }
+          trap restore EXIT
+
+          # Over-broad approvals are written as `true`; only the key varies
+          # (a bare name for blanket/name-only, `name@*` for a wildcard version).
+          set_allow() {
+            node -e '
+              const fs = require("fs")
+              const m = JSON.parse(fs.readFileSync("package.json", "utf8"))
+              m.allowScripts[process.argv[1]] = true
+              fs.writeFileSync("package.json", JSON.stringify(m, null, 2) + "\n")
+            ' "$1"
+          }
+
+          expect_rejected() {
+            local label=$1
+            # The validator resolves the six project dirs relative to its cwd,
+            # so run it from the repository root (in a subshell, to keep this
+            # step's cwd at pre_loaders/react-19 for `restore` above); the only
+            # mutation is in pre_loaders/react-19, so a rejection now means the
+            # over-broad shape itself was detected, not a phantom "missing" error.
+            if (cd "$GITHUB_WORKSPACE" && node scripts/dependency-script-policy.mjs) > /dev/null 2>&1; then
+              echo "FAIL: $label was accepted (expected rejection)"
+              exit 1
+            fi
+            echo "OK: $label was rejected"
+            restore
+          }
+
+          set_allow nx
+          expect_rejected "a blanket approval (nx: true)"
+
+          set_allow 'nx@*'
+          expect_rejected "a wildcard approval (nx@*: true)"
+
+          set_allow less
+          expect_rejected "a name-only approval that permits a script (less: true)"
+
+          printf 'allow-scripts=true\nstrict-allow-scripts=true\n' > .npmrc
+          expect_rejected "a global allow-scripts=true override in .npmrc"
+
+          restore
+          trap - EXIT
+
+      # Build the five in-scope pre-loaders (Angular 18/19/20/21 and React 19).
+      # Each `build:*` script builds its pre-loader and then the shell.
+      - name: Build the in-scope pre-loaders
+        run: |
+          npm run build:18
+          npm run build:19
+          npm run build:20
+          npm run build:21
+          npm run build:react-19

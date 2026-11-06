@@ -106,6 +106,158 @@ This is optional.
 system that simplifies authentication, authorization, and single sign-on
 for web and mobile applications.
 
+==== Dependency Install-Script Policy
+
+The repository controls which install-time scripts are allowed to run while
+`npm install` resolves dependencies. This is the security boundary that keeps
+a dependency from executing a `preinstall`, `install`, or `postinstall` script
+that has not been explicitly reviewed.
+
+===== The trusted root script versus dependency approvals
+
+Two different things are governed by this policy, and it is important not to
+confuse them:
+
+* **The repository's own `postinstall` script is trusted.** The shell root
+`package.json` defines a `postinstall` that installs the pre-loader projects.
+This is a script of this repository, not of a dependency, so npm always runs it
+and it is not controlled by `allowScripts`. The scripts of the repository itself
+are trusted because they are the code being reviewed.
+
+* **Dependency packages are governed by `allowScripts`.** Every third-party
+package is a dependency. If such a package ships an install-time lifecycle
+script, that script must be explicitly reviewed in the project's `package.json`
+`allowScripts` field before it may run. This is what `strict-allow-scripts=true`
+enforces, and it is the boundary `npm install-scripts` reviews against.
+
+===== The six independent policy contexts
+
+The policy is not a single global switch. Each of the six npm projects carries
+its own policy — a `.npmrc` and a `package.json` `allowScripts` field — and each
+is enforced independently during its own install:
+
+* the shell root (the repository `package.json`), and
+* the five in-scope pre-loaders: `pre_loaders/angular-18`, `pre_loaders/angular-19`,
+`pre_loaders/angular-20`, `pre_loaders/angular-21`, and `pre_loaders/react-19`.
+
+Every pre-loader, including `pre_loaders/angular-22`, ships the same strict
+policy; the focused pull-request check exercises the six contexts above and
+builds the five in-scope pre-loaders. Because the contexts are independent, a
+script that is reviewed for one project does not imply it is reviewed for
+another — each project's `allowScripts` must be considered on its own.
+
+===== Strict mode
+
+Every project's `.npmrc` sets:
+
+[source,ini]
+----
+strict-allow-scripts=true
+----
+
+Under npm 11 and later (the focused check pins npm 12 on Node 22, on Linux),
+this makes `npm install` fail — not merely warn — when a dependency has an
+install-time lifecycle script that is not covered by `allowScripts`. A newly
+introduced, unreviewed scripted dependency therefore breaks the install at the
+point it is added, rather than running its script silently; npm reports the
+failure with the `ESTRICTALLOWSCRIPTS` code.
+
+===== Reviewing a pending script
+
+When `npm install` reports an unreviewed script, review it before changing the
+policy. List the pending scripts with:
+
+[source,bash]
+----
+npm install-scripts ls
+----
+
+Then approve a *specific version* of the package so that a future release
+cannot silently run a script:
+
+[source,bash]
+----
+npm install-scripts approve <package> --allow-scripts-pin
+----
+
+This records a version-pinned approval in the project's `allowScripts`. To deny
+a reviewed-but-unnecessary script so that it never runs:
+
+[source,bash]
+----
+npm install-scripts deny <package>
+----
+
+===== Approval shapes
+
+Each `allowScripts` entry is one of exactly two compliant shapes:
+
+* **An explicit denial** — the package name mapped to `false`. The script does
+not run. This is the shape used for every scripted dependency in this repository
+today.
+
++
+[source,json]
+----
+{ "allowScripts": { "esbuild": false } }
+----
+
+* **An exact-version approval** — `"<package>@<version>"` mapped to `true`. The
+script runs only for that precise version.
+
++
+[source,json]
+----
+{ "allowScripts": { "esbuild@0.25.10": true } }
+----
+
+The approval is pinned to the version that was reviewed. If a later version of
+the package is installed, its script is unreviewed again and the strict install
+fails until it is reviewed afresh.
+
+===== Over-broad approvals are rejected
+
+The following are not compliant, and the focused pull-request check fails on
+each of them:
+
+* a **blanket** approval (`"esbuild": true`),
+* a **wildcard** or **version-range** approval (`"esbuild@*": true`,
+`"esbuild@^1.0.0": true`),
+* a **name-only** approval that permits a script without pinning a version
+(`"esbuild": true`), and
+* a **global** `allow-scripts=true` set in a project's `.npmrc`.
+
+These shapes would let an unreviewed — or a *future* unreviewed — release run
+its script, which defeats the point of the policy. Only the two approval shapes
+above are accepted.
+
+===== Changes to the policy
+
+When a pull request changes the policy — adding a dependency that ships a
+script, approving an exact version, or denying one — it must carry the evidence
+that the policy still holds:
+
+* the focused `Dependency Install-Script Policy` check passes, which installs
+all six contexts under strict mode and builds the five in-scope pre-loaders; and
+* its negative tests still fail, proving that an unreviewed scripted dependency
+and every over-broad approval shape are still rejected.
+
+The *reason* a specific package is approved or denied belongs in the pull
+request that introduces it, not in this guide. This guide documents the policy
+model, not the per-package justifications, so it does not accumulate a stale
+list of approvals.
+
+===== Compatibility and validation boundary
+
+* **npm version.** The strict behavior is defined by npm 11 and later; the
+focused check pins npm 12 on Node 22. Older npm versions (10 and earlier) do not
+enforce `strict-allow-scripts` and may run unreviewed scripts, so the policy is
+guaranteed only on npm 11+/12.
+* **Operating system.** The focused check runs on Linux. The strict-allow-scripts
+mechanism is an npm behavior, but the environment the repository continuously
+verifies the complete installation path in — the guaranteed validation boundary
+— is Linux.
+
 ==== Slot Groups
 
 Slot Groups are a layout mechanism in OneCX Shell UI that organize multiple slots into structured regions. They enable flexible positioning and dynamic loading of remote components within defined areas of the shell interface's portal viewport.

@@ -78,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE/pre_loaders/react-19"
-          restore() { rm -rf filedeps; git checkout -- package.json; }
+          restore() { rm -rf filedeps; git checkout -- package.json package-lock.json; }
           trap restore EXIT
 
           mkdir -p filedeps/filedep

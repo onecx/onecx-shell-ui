@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
@@ -8,10 +8,11 @@ import { RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [AsyncPipe, RouterModule, TranslateModule],
   template: `
-    <div class="p-4 flex flex-column gap-5">
+    <div class="p-6 flex flex-col gap-8">
       <div>
         <h1 class="md:text-xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
         <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>

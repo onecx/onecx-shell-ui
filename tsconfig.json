@@ -18,7 +18,9 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2022",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"]
   },
   "files": [],
   "include": [],

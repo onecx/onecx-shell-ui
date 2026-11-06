@@ -13,7 +13,6 @@ import { getStyleDataFromInjector, getStyleDataOrIntermediateStyleData } from '@
  * If style data is found, it is appended to the newly created element to prevent style isolation issues.
  */
 export function ensureCreateOnecxElement() {
-  // eslint-disable-next-line @typescript-eslint/no-extra-semi
   ;(document as any).createOnecxElement = function (context: any, tagName: any, options?: any): HTMLElement {
     const el = document.createElement(tagName, options)
     const calleeObject = context['this']
@@ -35,7 +34,6 @@ export function ensureCreateOnecxElement() {
  * The style data is retrieved from the application element specified by the `appElementName` parameter. If style data is found, it is appended to the newly created container element to prevent style isolation issues.
  */
 export function ensureCreateOnecxDynamicContainer() {
-  // eslint-disable-next-line @typescript-eslint/no-extra-semi
   ;(document as any).createOnecxDynamicContainer = function (
     containerTagName: string,
     appElementName: string

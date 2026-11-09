@@ -29,7 +29,6 @@ app:
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-shell
           tagName: ocx-shell-toast-component
-          deprecated: true
     # Microservice
     microservice:
       spec:

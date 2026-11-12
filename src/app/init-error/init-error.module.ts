@@ -12,7 +12,7 @@ import { InitializationErrorPageComponent } from './components/initialization-er
       {
         path: '',
         component: InitializationErrorPageComponent,
-        title: 'Initialization Error'
+        title: 'PAGE_TITLES.INITIALIZATION_ERROR'
       }
     ])
   ]

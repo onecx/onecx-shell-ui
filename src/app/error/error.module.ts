@@ -12,7 +12,7 @@ import { ErrorPageComponent } from './components/error-page/error-page.component
       {
         path: '',
         component: ErrorPageComponent,
-        title: 'Error'
+        title: 'PAGE_TITLES.ERROR'
       }
     ])
   ]

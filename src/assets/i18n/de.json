@@ -1,5 +1,12 @@
 {
   "SHELL": "",
+  "PAGE_TITLES": {
+    "ABOUT": "Über Shell",
+    "ERROR": "Fehler",
+    "INITIALIZATION_ERROR": "Initialisierungsfehler",
+    "NOT_FOUND": "Seite nicht gefunden",
+    "HOME": "Startseite"
+  },
   "ERROR_MESSAGES": {
     "ON_REMOTE_LOAD_ERROR": "Teile der Anwendung konnten nicht geladen werden."
   },

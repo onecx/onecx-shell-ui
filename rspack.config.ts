@@ -239,7 +239,7 @@ export default async (env: { production?: boolean; configuration?: string } = {}
   // Inference only needs output metadata; creating the full config here would
   // recursively request the project graph from buildSharedMap.
   if ((globalThis as typeof globalThis & { NX_GRAPH_CREATION?: boolean }).NX_GRAPH_CREATION) {
-    return { output: { path: join(__dirname, 'dist/onecx-shell-ui') }, devServer: { port: 4300 } }
+    return { output: { path: join(__dirname, 'dist/onecx-shell-ui') }, devServer: { port: 5000 } }
   }
   process.env['NG_BUILD_PARALLEL_TS'] ??= 'false'
 
@@ -345,7 +345,7 @@ export default async (env: { production?: boolean; configuration?: string } = {}
   // --- Source patches (Optimus UI + Angular SharedStylesHost) as a source loader ---
   // Re-implements the two former `ModifySourcePlugin` patches.
   browserConfig.module.rules.push({
-    test: /[\/\\]node_modules[\/\\](@openng[\/\\]optimus-ui|@angular[\/\\]platform-browser)[\/\\]/,
+    test: /[\/\\]node_modules[\/\\](@openng[\/\\]optimus-ui(-utils)?|@angular[\/\\]platform-browser)[\/\\]/,
     enforce: 'pre',
     loader: require.resolve('./source-patch.loader.js')
   })

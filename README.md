@@ -36,9 +36,15 @@ For direct Rspack CLI usage, select a configuration with
 `--env configuration=production` (or `development` / `local-env`).
 
 The default server uses `proxy.conf.js`; `local-env` uses
-`proxy.local-env.conf.js` and the `/onecx-shell/` base path. Override the listening
-port with `npm start -- --port=5000`. TypeScript configuration files are loaded
+`proxy.local-env.conf.js` and the `/onecx-shell/` base path. Both default to port
+5000; an explicit port can be passed with `npm start -- --port=5000`. TypeScript configuration files are loaded
 with SWC (`@swc-node/register` for Nx and ts-node's `swc` option for the CLI).
+
+The Shell and Angular 22 preloader patch both `@openng/optimus-ui` and
+`@openng/optimus-ui-utils` to route element creation through `createOnecxElement`.
+Both `Theme.setLoadedStyleName` and `Base.setLoadedStyleName` are disabled so
+their shared loaded-style guards do not prevent styles from loading for each
+scoped application.
 
 The Nx 23.3 / Angular 22 build defaults to in-process TypeScript compilation
 (`NG_BUILD_PARALLEL_TS=false`). The worker path fails because Nx passes a compiler

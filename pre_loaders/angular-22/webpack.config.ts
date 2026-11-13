@@ -8,7 +8,7 @@ const modifyOptimisUiPlugin = new ModifySourcePlugin({
     {
       test: (module) => {
         if (module.resource) {
-          return module.resource.includes('@openng/optimus-ui')
+          return /[/\\]node_modules[/\\]@openng[/\\]optimus-ui(-utils)?[/\\]/.test(module.resource)
         }
         return false
       },
@@ -18,7 +18,7 @@ const modifyOptimisUiPlugin = new ModifySourcePlugin({
           'document\\.createElement\\(',
           'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
         ),
-        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+        new ReplaceOperation('all', '\\b(Theme|Base)\\.setLoadedStyleName\\b', '(function(_){})')
       ]
     }
   ]

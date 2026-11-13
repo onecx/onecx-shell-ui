@@ -6,6 +6,9 @@ const config: ModuleFederationConfig = {
     './OneCXShellToastComponent': 'src/app/remotes/shell-toast/shell-toast.component.main.ts'
   },
   shared: (libraryName, sharedConfig) => {
+    if (libraryName === '@onecx/angular-testing') {
+      return false
+    }
     const config = getOneCXSharedRecommendations(libraryName, sharedConfig)
     // Add custom shared configurations to the config object if needed
     return config

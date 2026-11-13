@@ -70,6 +70,12 @@ ocx-shell-root + .splash {
           colors 5.6s ease-in-out infinite;
       }
     }
+    @media (prefers-reduced-motion: reduce) {
+      .splash-loader,
+      .splash-loader .splash-path {
+        animation: none;
+      }
+    }
   }
 }
 

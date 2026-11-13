@@ -157,9 +157,17 @@ describe('RoutesService', () => {
       expect(createdRoute?.canActivateChild).toBeDefined()
       expect(createdRoute?.pathMatch).toBe(PathMatch.prefix)
       expect(createdRoute?.data).toBeDefined()
-      expect((createdRoute?.data as any).breadcrumb).toBe('onecx-welcome')
+      expect((createdRoute?.data as any).breadcrumb).toBe('OneCX Welcome')
       expect((createdRoute?.data as any).module).toBe('./OneCXWelcomeModule')
       expect(createdRoute?.title).toBe('OneCX Welcome')
+    })
+
+    it('falls back to productName for the breadcrumb when displayName is empty', async () => {
+      const testRoute = createBffRoute({ displayName: '' })
+      await routerService.init([testRoute])
+
+      const createdRoute = router.config.find((r) => r.path === 'admin/welcome')
+      expect((createdRoute?.data as any).breadcrumb).toBe('onecx-welcome')
     })
 
     it('does not provide a fallback welcome route when there is already a welcome route', async () => {
@@ -226,7 +234,7 @@ describe('RoutesService', () => {
       expect(createdRoute?.loadChildren).toBeDefined()
       expect(createdRoute?.canActivateChild).toBeDefined()
       expect(createdRoute?.pathMatch).toBe(PathMatch.prefix)
-      expect((createdRoute?.data as any).breadcrumb).toBe('onecx-welcome')
+      expect((createdRoute?.data as any).breadcrumb).toBe('OneCX Welcome')
       expect((createdRoute?.data as any).module).toBe('./OneCXWelcomeModule')
       expect(createdRoute?.title).toBe('OneCX Welcome')
 

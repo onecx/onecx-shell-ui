@@ -1,13 +1,12 @@
-import { Component, Input, inject } from '@angular/core'
-import { ActivatedRoute, Router, RouterModule } from '@angular/router'
-import { CommonModule } from '@angular/common'
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-error',
   templateUrl: './global-error.component.html',
-  styleUrls: ['./global-error.component.scss'],
-  imports: [CommonModule, RouterModule]
+  styleUrl: './global-error.component.scss'
 })
 export class GlobalErrorComponent {
   private readonly router = inject(Router)

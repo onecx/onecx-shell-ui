@@ -1,8 +1,7 @@
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { inject, NgModule, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
-import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { Router, RouterModule } from '@angular/router'
+import { Router, RouterModule, TitleStrategy } from '@angular/router'
 import { provideMissingTranslationHandler, provideTranslateLoader, provideTranslateService } from '@ngx-translate/core'
 import { getLocation, getNormalizedBrowserLocales, normalizeLocales } from '@onecx/accelerator'
 import { provideTokenInterceptor } from '@onecx/angular-auth'
@@ -27,14 +26,13 @@ import {
   provideTranslationPathFromMeta,
   SKIP_STYLE_SCOPING
 } from '@onecx/angular-utils'
-import { provideThemeConfig } from '@onecx/angular-utils/theme/primeng'
+import { provideThemeConfig } from '@onecx/angular-utils/theme/optimus'
 
-import { CurrentLocationTopic, EventsTopic, Theme, UserProfile } from '@onecx/integration-interface'
+import { CurrentLocationTopic, EventsTopic, OverrideType, Theme, UserProfile } from '@onecx/integration-interface'
 
 import {
   BASE_PATH,
   LoadWorkspaceConfigResponse,
-  OverrideType,
   UserProfileBffService,
   WorkspaceConfigBffService
 } from 'src/app/shared/generated'
@@ -44,8 +42,7 @@ import { PermissionProxyService } from './shell/services/permission-proxy.servic
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
-import { CommonModule } from '@angular/common'
-import { providePrimeNG } from 'primeng/config'
+import { provideOptimus } from '@openng/optimus-ui/config'
 import { AppComponent } from './app.component'
 import { appRoutes, internalShellRoute } from './app.routes'
 import { AppLoadingSpinnerComponent } from './shell/components/app-loading-spinner/app-loading-spinner.component'
@@ -56,6 +53,7 @@ import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
 import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
+import { ShellTitleStrategy } from './shell/services/shell-title.strategy'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -352,9 +350,7 @@ export async function shareMfContainer() {
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    BrowserModule,
     BrowserAnimationsModule,
-    CommonModule,
     RouterModule.forRoot(appRoutes),
     PortalViewportComponent,
     GlobalErrorComponent,
@@ -379,10 +375,11 @@ export async function shareMfContainer() {
       loader: provideTranslateLoader(OnecxTranslateLoader),
       missingTranslationHandler: provideMissingTranslationHandler(MultiLanguageMissingTranslationHandler)
     }),
+    { provide: TitleStrategy, useExisting: ShellTitleStrategy },
     provideThemeConfig(),
     provideTokenInterceptor(),
     provideAuthService(),
-    providePrimeNG(),
+    provideOptimus(),
     {
       provide: SKIP_STYLE_SCOPING,
       useValue: true

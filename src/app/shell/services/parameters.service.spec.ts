@@ -1,4 +1,7 @@
 import { TestBed } from '@angular/core/testing'
+import { firstValueFrom, of } from 'rxjs'
+
+import { FakeTopic } from '@onecx/accelerator'
 import {
   AppStateServiceMock,
   provideAppStateServiceMock,
@@ -6,10 +9,9 @@ import {
   RemoteComponentsServiceMock
 } from '@onecx/angular-integration-interface/mocks'
 import { ParametersTopicPayload, RemoteComponent, RemoteComponentsInfo, Workspace } from '@onecx/integration-interface'
-import { firstValueFrom, of } from 'rxjs'
+
 import { GetParametersResponse, Parameter, ParameterBffService } from 'src/app/shared/generated'
 import { ParametersService } from './parameters.service'
-import { FakeTopic } from '@onecx/accelerator'
 
 describe('ParametersService', () => {
   let parametersService: ParametersService
@@ -145,7 +147,7 @@ describe('ParametersService', () => {
       }
     })
 
-    expect(publishedParameters.parameters.length).toEqual(6)
+    expect(publishedParameters.parameters).toHaveLength(6)
 
     // In cache and was up-to-date -> we have not asked for an update -> unchanged
     expect(publishedParameters.parameters[0].productName).toEqual(cache.parameters[0].productName)

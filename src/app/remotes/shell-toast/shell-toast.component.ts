@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common'
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, ChangeDetectorRef } from '@angular/core'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ReplaySubject } from 'rxjs'
 
@@ -11,35 +10,42 @@ import {
   ocxRemoteWebcomponent
 } from '@onecx/angular-remote-components'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
-import { MessageService } from 'primeng/api'
-import { PrimeNG } from 'primeng/config'
-import { ToastModule } from 'primeng/toast'
+import { MessageService } from '@openng/optimus-ui/api'
+import { Optimus } from '@openng/optimus-ui/config'
+import { ToastModule } from '@openng/optimus-ui/toast'
 
-// Should be moved out of shell to another repo later, so that primeNG dependency can be started to be removed from shell
+// Should be moved out of shell to another repo later, so that the Optimus UI dependency can be started to be removed from shell
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'ocx-shell-toast',
   templateUrl: './shell-toast.component.html',
   standalone: true,
-  imports: [AngularRemoteComponentsModule, CommonModule, AngularAcceleratorModule, ToastModule],
+  imports: [AngularRemoteComponentsModule, AngularAcceleratorModule, ToastModule],
   providers: [{ provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) }, MessageService]
 })
 @UntilDestroy()
 export class OneCXShellToastComponent implements ocxRemoteComponent, ocxRemoteWebcomponent, OnInit {
   private readonly rcConfig = inject<ReplaySubject<RemoteComponentConfig>>(REMOTE_COMPONENT_CONFIG)
-  private readonly primengConfig: PrimeNG = inject(PrimeNG)
+  private readonly optimusConfig: Optimus = inject(Optimus)
   private readonly messageService = inject(MessageService)
   private readonly portalMessageService = inject(PortalMessageService)
+  private readonly cdr = inject(ChangeDetectorRef)
 
   @Input() set ocxRemoteComponentConfig(rcConfig: RemoteComponentConfig) {
     this.ocxInitRemoteComponent(rcConfig)
   }
 
   constructor() {
-    this.portalMessageService.message$.subscribe((message: Message) => this.messageService.add(message))
+    this.portalMessageService.message$.subscribe((message: Message) => {
+      this.messageService.add(message)
+      // Primng fails to trigger change detection automatically and which cuses the messages to get stacked and pushed once the change detection triggers
+      // so we use setTimeout to manually trigger it
+      setTimeout(() => this.cdr.detectChanges())
+    })
   }
 
   ngOnInit() {
-    this.primengConfig.ripple.set(true)
+    this.optimusConfig.ripple.set(true)
   }
 
   public ocxInitRemoteComponent(rcConfig: RemoteComponentConfig) {

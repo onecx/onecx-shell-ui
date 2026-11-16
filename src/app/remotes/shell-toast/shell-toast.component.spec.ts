@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
@@ -9,8 +8,8 @@ import { ConfigurationService } from '@onecx/angular-integration-interface'
 import { PortalMessageServiceMock, providePortalMessageServiceMock } from '@onecx/angular-integration-interface/mocks'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
-import { MessageService } from 'primeng/api'
-import { ToastModule } from 'primeng/toast'
+import { MessageService } from '@openng/optimus-ui/api'
+import { ToastModule } from '@openng/optimus-ui/toast'
 import { OneCXShellToastComponent } from './shell-toast.component'
 import { provideTranslateTestingService } from '@onecx/angular-testing'
 
@@ -54,7 +53,7 @@ describe('OneCXShellExtensionsComponent', () => {
     })
       .overrideComponent(OneCXShellToastComponent, {
         set: {
-          imports: [CommonModule, ToastModule],
+          imports: [ToastModule],
           providers: [
             providePortalMessageServiceMock(),
             { provide: REMOTE_COMPONENT_CONFIG, useValue: new ReplaySubject<string>(1) },

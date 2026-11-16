@@ -1,22 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { AboutComponent } from './about.component'
 import { TranslateModule } from '@ngx-translate/core'
+
+import { AboutComponent } from './about.component'
 
 describe('AboutComponent', () => {
   let fixture: ComponentFixture<AboutComponent>
   let component: AboutComponent
-
-  function resetFederation() {
-    const global = globalThis as any
-    global.__FEDERATION__ = {
-      __INSTANCES__: [
-        {
-          name: 'onecx_shell_ui',
-          shareScopeMap: {}
-        }
-      ]
-    }
-  }
 
   function mockFederation(entries: Record<string, Record<string, any>>) {
     const global = globalThis as any
@@ -40,7 +29,15 @@ describe('AboutComponent', () => {
   })
 
   afterEach(() => {
-    resetFederation()
+    const global = globalThis as any
+    global.__FEDERATION__ = {
+      __INSTANCES__: [
+        {
+          name: 'onecx_shell_ui',
+          shareScopeMap: {}
+        }
+      ]
+    }
     jest.restoreAllMocks()
   })
 
@@ -163,5 +160,30 @@ describe('AboutComponent', () => {
       'onecx_shell_ui shareScopeMap not found. Supported Angular versions cannot be determined.'
     )
     expect(component.supportedAngularVersions).toHaveLength(0)
+  })
+
+  it('should update angular context when react loads before angular', () => {
+    mockFederation({
+      react: {
+        'react_19.0.0': { from: 'onecx-react-19-loader', eager: false }
+      },
+      default: {
+        '@angular/core': {
+          '18.2.12': { from: 'onecx-workspace-ui', eager: false },
+          '18.2.14': { from: 'onecx-angular-18-loader', eager: false, loaded: 1 },
+          '19.2.17': { from: 'onecx-angular-19-loader', eager: false },
+          '20.3.15': { from: 'onecx-angular-20-loader', eager: false },
+          '21.0.0': { from: 'onecx_shell_ui', eager: false, useIn: ['consumer1'] }
+        }
+      }
+    })
+
+    fixture.detectChanges()
+
+    expect(component.supportedAngularVersions).toHaveLength(4)
+    expect(component.supportedAngularVersions[0].version).toBe('18.2.14')
+    expect(component.supportedAngularVersions[1].version).toBe('19.2.17')
+    expect(component.supportedAngularVersions[2].version).toBe('20.3.15')
+    expect(component.supportedAngularVersions[3].version).toBe('21.0.0')
   })
 })

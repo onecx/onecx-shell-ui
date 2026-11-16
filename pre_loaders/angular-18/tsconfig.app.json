@@ -1,10 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "types": []
-  },
-  "files": ["src/main.ts", "webpack.config.ts"],
-  "include": ["src/**/*.d.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "compilerOptions": {},
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.harness.ts", "src/app/shared/mocks/**"]
 }

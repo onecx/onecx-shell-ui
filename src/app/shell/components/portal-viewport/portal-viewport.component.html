@@ -3,7 +3,7 @@
   @if (themeService.currentTheme$ | async) {
   <!-- Header slot group -->
   <header class="onecx-header" id="ocx_header">
-    <section [ngStyle]="{width: '100%'}" [attr.aria-label]="'Start'">
+    <section [style.width]="'100%'" [attr.aria-label]="'Start'">
       <ocx-shell-slot-group
         name="onecx-shell-header"
         direction="row"

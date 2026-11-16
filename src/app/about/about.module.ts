@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 import { AboutComponent } from './componenets/about.component'
@@ -8,11 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: AboutComponent,
-    title: 'About'
+    title: 'PAGE_TITLES.ABOUT'
   }
 ]
 
 @NgModule({
-  imports: [CommonModule, TranslateModule, AboutComponent, RouterModule.forChild(routes)]
+  imports: [TranslateModule, AboutComponent, RouterModule.forChild(routes)]
 })
 export class AboutModule {}

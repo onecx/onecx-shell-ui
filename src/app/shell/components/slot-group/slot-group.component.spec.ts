@@ -1,13 +1,16 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
-import { SlotGroupComponent } from './slot-group.component'
-import { ComponentRef, ElementRef, EventEmitter } from '@angular/core'
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
-import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
-import { SlotGroupHarness } from './slot-group.harness'
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { ComponentRef, ElementRef, EventEmitter } from '@angular/core'
 import { By } from '@angular/platform-browser'
+
 import { SLOT_SERVICE, SlotComponent, SlotService } from '@onecx/angular-remote-components'
+import { SlotServiceMock } from '@onecx/angular-remote-components/mocks'
+import { SlotHarness } from '@onecx/angular-remote-components/testing'
+
+import { SlotGroupComponent } from './slot-group.component'
+import { SlotGroupHarness } from './slot-group.harness'
 
 class ResizeObserverMock {
   constructor(private readonly callback: ResizeObserverCallback) {}
@@ -23,6 +26,9 @@ class ResizeObserverMock {
       devicePixelContentBoxSize: [] as any
     } as ResizeObserverEntry
     this.callback([entry], this as unknown as ResizeObserver)
+  }
+  triggerWithoutEntries() {
+    this.callback([], this as unknown as ResizeObserver)
   }
 }
 globalThis.ResizeObserver = ResizeObserverMock
@@ -111,6 +117,10 @@ describe('SlotGroupComponent', () => {
     expect(resizeObserverMock.observe).toHaveBeenCalledWith(elRef.nativeElement)
   })
 
+  it('ignores resize notifications without entries', () => {
+    expect(() => resizeObserverMock.triggerWithoutEntries()).not.toThrow()
+  })
+
   it('should debounce resize events and publish SLOT_GROUP_RESIZED once', fakeAsync(() => {
     const spy = jest.spyOn(resizedEventsTopic, 'publish')
     // Simulate multiple rapid size changes
@@ -157,6 +167,33 @@ describe('SlotGroupComponent', () => {
     })
   }))
 
+  it('ignores resize requests for other event types and slot groups', () => {
+    const publish = jest.spyOn(resizedEventsTopic, 'publish')
+    resizedEventsTopic.publish({
+      type: ResizedEventType.REQUESTED_EVENTS_CHANGED,
+      payload: {
+        type: ResizedEventType.SLOT_RESIZED,
+        name: 'test-slot'
+      }
+    })
+    resizedEventsTopic.publish({
+      type: ResizedEventType.REQUESTED_EVENTS_CHANGED,
+      payload: {
+        type: ResizedEventType.SLOT_GROUP_RESIZED,
+        name: 'other-slot'
+      }
+    })
+    resizedEventsTopic.publish({
+      type: ResizedEventType.SLOT_GROUP_RESIZED,
+      payload: {
+        slotGroupName: 'test-slot',
+        slotGroupDetails: { width: 200, height: 100 }
+      }
+    })
+
+    expect(publish).toHaveBeenCalledTimes(3)
+  })
+
   it('should disconnect ResizeObserver and complete subject on destroy', () => {
     const disconnectSpy = jest.spyOn(resizeObserverMock, 'disconnect')
 
@@ -166,7 +203,6 @@ describe('SlotGroupComponent', () => {
   })
 
   it('does not throw if resizeObserver is undefined on destroy (covers optional chain false branch)', () => {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(component as any).resizeObserver = undefined
     expect(() => fixture.destroy()).not.toThrow()
   })
@@ -179,6 +215,44 @@ describe('SlotGroupComponent', () => {
     const slots = await slotGroupHarness.getAllSlots()
 
     expect(slots).toHaveLength(3)
+  })
+
+  it('finds each slot by its position', async () => {
+    expect(await slotGroupHarness.getStartSlot()).not.toBeNull()
+    expect(await slotGroupHarness.getCenterSlot()).not.toBeNull()
+    expect(await slotGroupHarness.getEndSlot()).not.toBeNull()
+  })
+
+  it('returns null for missing and unnamed slots', async () => {
+    const unnamedSlot = { getName: jest.fn().mockResolvedValue(null) } as unknown as SlotHarness
+    jest.spyOn(slotGroupHarness, 'getAllSlots').mockResolvedValue([unnamedSlot])
+
+    expect(await slotGroupHarness.getStartSlot()).toBeNull()
+    expect(await slotGroupHarness.getCenterSlot()).toBeNull()
+    expect(await slotGroupHarness.getEndSlot()).toBeNull()
+  })
+
+  it('supports optional name filtering and reflected name fallback', async () => {
+    const unfiltered = SlotGroupHarness.with()
+    const matching = SlotGroupHarness.with({ name: 'test-slot' })
+    expect(await unfiltered.evaluate(slotGroupHarness)).toBe(true)
+    expect(await matching.evaluate(slotGroupHarness)).toBe(true)
+    expect(matching.getSelector()).toBe(SlotGroupHarness.hostSelector)
+
+    const host = fixture.nativeElement as HTMLElement
+    host.removeAttribute('name')
+    host.setAttribute('ng-reflect-name', 'reflected-slot')
+    expect(await slotGroupHarness.getName()).toBe('reflected-slot')
+    host.removeAttribute('ng-reflect-name')
+    expect(await slotGroupHarness.getName()).toBeNull()
+  })
+
+  it('returns no container classes when the host has no class attribute', async () => {
+    const log = jest.spyOn(console, 'log').mockImplementation()
+    ;(fixture.nativeElement as HTMLElement).removeAttribute('class')
+
+    expect(await slotGroupHarness.getContainerGroupClasses()).toEqual([])
+    log.mockRestore()
   })
 
   describe('Input Signals', () => {
@@ -329,14 +403,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type string to the slot-group host element', async () => {
         const slotGroupClassesString = 'test-group-class another-class'
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesString)
         fixture.detectChanges()
@@ -347,14 +414,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type string array to the slot-group host element', async () => {
         const slotGroupClassesArray = ['test-group-class', 'another-class']
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesArray)
         fixture.detectChanges()
@@ -365,14 +425,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type Set to the slot-group host element', async () => {
         const slotGroupClassesSet = new Set(['test-group-class', 'another-class'])
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'another-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'another-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesSet)
         fixture.detectChanges()
@@ -383,14 +436,7 @@ describe('SlotGroupComponent', () => {
 
       it('should apply slotGroupClasses of type object to the slot-group host element', async () => {
         const slotGroupClassesObject = { 'test-group-class': true, 'another-class': false, 'third-class': true }
-        const expectedClasses = [
-          'flex',
-          'justify-content-between',
-          'flex-row',
-          'w-full',
-          'test-group-class',
-          'third-class'
-        ]
+        const expectedClasses = ['flex', 'justify-between', 'flex-row', 'w-full', 'test-group-class', 'third-class']
 
         componentRef.setInput('slotGroupClasses', slotGroupClassesObject)
         fixture.detectChanges()
@@ -407,28 +453,16 @@ describe('SlotGroupComponent', () => {
         expect(computedSlotGroupClasses).toBe('flex-row w-full')
       })
 
-      it('should update classes when direction changes to column', () => {
-        componentRef.setInput('direction', 'column')
+      it.each([
+        ['column', 'flex-col h-full'],
+        ['row-reverse', 'flex-row-reverse w-full'],
+        ['column-reverse', 'flex-col-reverse h-full']
+      ])('should apply correct classes for %s direction', (direction, expectedClasses) => {
+        componentRef.setInput('direction', direction)
 
         const computedSlotGroupClasses = component.computedSlotGroupClasses()
 
-        expect(computedSlotGroupClasses).toBe('flex-column h-full')
-      })
-
-      it('should apply correct classes for row-reverse direction', () => {
-        componentRef.setInput('direction', 'row-reverse')
-
-        const computedSlotGroupClasses = component.computedSlotGroupClasses()
-
-        expect(computedSlotGroupClasses).toBe('flex-row-reverse w-full')
-      })
-
-      it('should apply correct classes for column-reverse direction', () => {
-        componentRef.setInput('direction', 'column-reverse')
-
-        const computedSlotGroupClasses = component.computedSlotGroupClasses()
-
-        expect(computedSlotGroupClasses).toBe('flex-column-reverse h-full')
+        expect(computedSlotGroupClasses).toBe(expectedClasses)
       })
 
       it('should merge custom slotGroupClasses with base classes', () => {
@@ -452,7 +486,7 @@ describe('SlotGroupComponent', () => {
 
         const slotClasses = component.computedSlotClasses()
 
-        expect(slotClasses).toBe('flex-column')
+        expect(slotClasses).toBe('flex-col')
       })
 
       it('should merge custom slotClasses with base classes', () => {

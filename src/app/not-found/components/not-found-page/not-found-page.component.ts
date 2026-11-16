@@ -1,17 +1,18 @@
-import { Component, inject } from '@angular/core'
+import { AsyncPipe } from '@angular/common'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 import { Workspace } from '@onecx/integration-interface'
-import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [AsyncPipe, RouterModule, TranslateModule],
   template: `
-    <div class="p-4 flex flex-column gap-5">
+    <div class="p-6 flex flex-col gap-8">
       <div>
         <h1 class="md:text-xl text-lg">{{ 'NOT_FOUND_PAGE.TITLE' | translate }}</h1>
         <p class="">{{ 'NOT_FOUND_PAGE.DETAILS' | translate }}</p>
@@ -20,7 +21,7 @@ import { TranslateModule } from '@ngx-translate/core'
         <button
           class="w-max"
           [routerLink]="[workspace.baseUrl]"
-          [ngStyle]="{ cursor: 'pointer' }"
+          [style.cursor]="'pointer'"
           [attr.aria-label]="'NOT_FOUND_PAGE.ACTION' | translate"
           [attr.title]="'NOT_FOUND_PAGE.ACTION.TOOLTIP' | translate"
         >

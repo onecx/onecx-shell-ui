@@ -1,15 +1,16 @@
-import { Component, inject } from '@angular/core'
-import { Location, CommonModule } from '@angular/common'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { Location } from '@angular/common'
 import { ActivatedRoute } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { getLocation } from '@onecx/accelerator'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [TranslateModule],
   template: `
-    <div class="p-4 flex flex-column gap-5">
+    <div class="p-6 flex flex-col gap-8">
       <div>
         <h1 class="md:text-xl text-lg">{{ 'ERROR_PAGE.TITLE' | translate }}</h1>
         <p class="mb-1">{{ 'ERROR_PAGE.DETAILS' | translate }}</p>
@@ -21,7 +22,7 @@ import { getLocation } from '@onecx/accelerator'
       <button
         class="w-max"
         (click)="onReloadPage()"
-        [ngStyle]="{ cursor: 'pointer' }"
+        [style.cursor]="'pointer'"
         routerLinkActive="router-link-active"
         [attr.aria-label]="'ERROR_PAGE.ACTION' | translate"
         [attr.title]="'ERROR_PAGE.ACTION.TOOLTIP' | translate"

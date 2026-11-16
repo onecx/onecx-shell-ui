@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
 import { Federation } from '@module-federation/runtime-core'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -15,8 +14,9 @@ interface AngularVersion {
 const magicChar = String.fromCodePoint(0x10ffff) // Magic character for preloaders
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [TranslateModule],
   selector: 'ocx-shell-about',
   templateUrl: './about.component.html'
 })
@@ -36,18 +36,21 @@ export class AboutComponent implements OnInit {
     }
 
     Object.entries(shellScopeMap).forEach(([scopeName, scopeData]: [string, any]) => {
-      Object.entries(scopeData['@angular/core']).forEach(([version, data]: [string, any]) => {
-        if (this.isAngularVersionBoundary(data)) {
-          this.supportedAngularVersions.push({
-            name: 'Angular ' + version.substring(0, version.indexOf('.')),
-            version: version,
-            from: data.from.replace(magicChar, ''),
-            eager: data['eager'],
-            loaded: data['loaded'] || 0,
-            shareScope: scopeName
-          })
-        }
-      })
+      const angularCoreData = scopeData['@angular/core']
+      if (angularCoreData) {
+        Object.entries(angularCoreData).forEach(([version, data]: [string, any]) => {
+          if (this.isAngularVersionBoundary(data)) {
+            this.supportedAngularVersions.push({
+              name: 'Angular ' + version.substring(0, version.indexOf('.')),
+              version: version,
+              from: data.from.replace(magicChar, ''),
+              eager: data['eager'],
+              loaded: data['loaded'] || 0,
+              shareScope: scopeName
+            })
+          }
+        })
+      }
     })
   }
 

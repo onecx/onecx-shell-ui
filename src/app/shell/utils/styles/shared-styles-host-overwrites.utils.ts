@@ -1,12 +1,12 @@
 import { DynamicAppId } from '@onecx/angular-webcomponents'
-import { getStyleDataOrIntermediateStyleData, markElement } from './style-data.utils'
+import { markElement } from './style-data.utils'
+import { getStyleDataOrIntermediateStyleData } from '@onecx/angular-utils/style'
 
 export const MARKED_FOR_WRAPPING = 'markedForWrapping'
 export const MARKED_AS_WRAPPED = 'markedAsWrapped'
 
 // When creating style elements via Renderer from Angular Core, make sure to include the style id data in the style elements so when appending to the head we don't lose context of the current App
 export function ensureAngularComponentStylesContainStyleId() {
-  // eslint-disable-next-line @typescript-eslint/no-extra-semi
   ;(document as any).createElementFromSharedStylesHost = function (
     context: any,
     tagName: any,
@@ -33,7 +33,7 @@ export function ensureAngularComponentStylesContainStyleId() {
       )
       return el
     }
-    const styleData = contextElement ? getStyleDataOrIntermediateStyleData(contextElement) : null
+    const styleData = getStyleDataOrIntermediateStyleData(contextElement)
     if (!styleData) {
       console.warn(
         `Expected to overwrite SharedStyleHost createElement method, but could not find style data for Angular component styles in context element: ${contextElementName}`

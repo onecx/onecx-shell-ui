@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 import { TestBed } from '@angular/core/testing'
-import { ensureProperty, FakeTopic } from '@onecx/accelerator'
 import { of, throwError } from 'rxjs'
-import { ShellIconLoaderService } from './icon-loader.service'
+
+import { ensureProperty, FakeTopic } from '@onecx/accelerator'
 import { IconService, ThemeService } from '@onecx/angular-integration-interface'
-import { IconBffService } from 'src/app/shared/generated'
 import { IconCache } from '@onecx/integration-interface'
+
+import { IconBffService } from 'src/app/shared/generated'
+import { ShellIconLoaderService } from './icon-loader.service'
 
 describe('ShellIconLoaderService', () => {
   let service: ShellIconLoaderService
@@ -203,7 +205,7 @@ describe('ShellIconLoaderService', () => {
     expect(s1).toBe(s2)
 
     const styles = document.querySelectorAll('#onecx-icons-css')
-    expect(styles.length).toBe(1)
+    expect(styles).toHaveLength(1)
   })
 
   it('should insert rules for svg, background, and background-before', () => {

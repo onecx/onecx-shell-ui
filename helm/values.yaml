@@ -19,17 +19,16 @@ app:
       enabled: true
       entrySuffix: "mf-manifest.json"
       spec:
-        shareScope: 'angular_21'
+        shareScope: 'angular_22'
       specs:
         shell-toast:
           exposedModule: "./OneCXShellToastComponent"
-          shareScope: 'angular_21'
+          shareScope: 'angular_22'
           description: "Display shell toast notifications"
           type: COMPONENT
           technology: WEBCOMPONENTMODULE
           remoteName: onecx-shell
           tagName: ocx-shell-toast-component
-          deprecated: true
     # Microservice
     microservice:
       spec:

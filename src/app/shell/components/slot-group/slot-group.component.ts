@@ -1,4 +1,14 @@
-import { Component, computed, ElementRef, EventEmitter, inject, input, OnDestroy, OnInit } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  EventEmitter,
+  inject,
+  input,
+  OnDestroy,
+  OnInit
+} from '@angular/core'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
 import {
   ResizedEventsTopic,
@@ -12,12 +22,13 @@ import { normalizeClassesToString } from '../../utils/normalize-classes.utils'
 export type NgClassInputType = string | string[] | Set<string> | { [key: string]: any }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'ocx-shell-slot-group[name]',
   templateUrl: './slot-group.component.html',
   imports: [AngularRemoteComponentsModule],
   host: {
     '[attr.name]': 'name()',
-    '[class]': '"flex justify-content-between " + computedSlotGroupClasses()',
+    '[class]': '"flex justify-between " + computedSlotGroupClasses()',
     '[style]': 'slotGroupStyles()'
   },
   standalone: true
@@ -44,8 +55,8 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
     const directionClasses = {
       row: 'flex-row w-full',
       'row-reverse': 'flex-row-reverse w-full',
-      column: 'flex-column h-full',
-      'column-reverse': 'flex-column-reverse h-full'
+      column: 'flex-col h-full',
+      'column-reverse': 'flex-col-reverse h-full'
     }
 
     const baseClasses = directionClasses[this.direction()]
@@ -59,8 +70,8 @@ export class SlotGroupComponent implements OnInit, OnDestroy {
     const directionClasses = {
       row: 'flex-row',
       'row-reverse': 'flex-row-reverse',
-      column: 'flex-column',
-      'column-reverse': 'flex-column-reverse'
+      column: 'flex-col',
+      'column-reverse': 'flex-col-reverse'
     }
 
     const baseClasses = directionClasses[this.direction()]

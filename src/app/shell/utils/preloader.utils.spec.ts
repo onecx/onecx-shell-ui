@@ -83,6 +83,21 @@ describe('Preloader Utils', () => {
   })
 
   describe('loadPreloaderModule', () => {
+    it('does not reload a preloader that is already marked ready', async () => {
+      window.onecxPreloaders['mock-key'] = true
+
+      await loadPreloaderModule({
+        name: 'mock-preloader',
+        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+        windowKey: 'mock-key',
+        exposedModule: 'MockModule',
+        shareScope: 'default'
+      })
+
+      expect(moduleFederation.registerRemotes).not.toHaveBeenCalled()
+      expect(moduleFederation.loadRemote).not.toHaveBeenCalled()
+    })
+
     it('should load a remote module using module federation with document base href', async () => {
       const dom = document
       jest.spyOn(dom, 'getElementsByTagName').mockReturnValue([{ href: 'http://localhost/base/' }] as any)

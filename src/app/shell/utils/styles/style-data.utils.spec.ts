@@ -17,6 +17,7 @@ import {
   markElement,
   observeStyleDataWrapper,
   removeStyleDataRecursive,
+  stopObservingStyleDataWrapper,
   wrapWithDiv
 } from './style-data.utils'
 
@@ -38,6 +39,10 @@ describe('style data utilities', () => {
     expect(dataWrapper.dataset[dataStyleIdKey]).toBe('app')
     expect(dataWrapper.dataset[dataNoPortalLayoutStylesKey]).toBe('')
     expect(dataWrapper.dataset[dataMfeElementKey]).toBe('')
+  })
+
+  it('does nothing when stopping observation for an unobserved wrapper', () => {
+    expect(() => stopObservingStyleDataWrapper(createWrapper())).not.toThrow()
   })
 
   it('wraps elements and finds the nearest style wrapper', () => {

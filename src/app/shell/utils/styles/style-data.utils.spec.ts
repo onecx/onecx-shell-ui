@@ -90,6 +90,7 @@ describe('style data utilities', () => {
   it('removes style data recursively and removes an empty observed wrapper', async () => {
     const wrapper = createWrapper({ styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
     document.body.appendChild(wrapper)
+    const disconnect = jest.spyOn(MutationObserver.prototype, 'disconnect')
     const child = document.createElement('span')
     appendIntermediateStyleData(child, { styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
     child.dataset[dataStyleIsolationKey] = ''
@@ -110,6 +111,7 @@ describe('style data utilities', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(wrapper.isConnected).toBe(false)
+    expect(disconnect).toHaveBeenCalledTimes(1)
   })
 
   it('skips data cleanup when given an element without a dataset', () => {

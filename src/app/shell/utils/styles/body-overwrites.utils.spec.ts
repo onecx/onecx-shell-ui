@@ -35,8 +35,16 @@ describe('body style data overwrites', () => {
     expect(wrapper.dataset[dataStyleIdKey]).toBe('shell|app')
     expect(wrapper.firstElementChild).toBe(child)
     expect(child.dataset[dataStyleIdKey]).toBeUndefined()
+    const originalDisconnect = MutationObserver.prototype.disconnect
+    const disconnect = jest.spyOn(MutationObserver.prototype, 'disconnect').mockImplementation(function (
+      this: MutationObserver
+    ) {
+      expect(wrapper.contains(child)).toBe(true)
+      originalDisconnect.call(this)
+    })
     document.body.removeChild(child)
     expect(document.body.firstElementChild).toBeNull()
+    expect(disconnect).toHaveBeenCalledTimes(1)
   })
 
   it('leaves text and blacklisted body children unwrapped', () => {

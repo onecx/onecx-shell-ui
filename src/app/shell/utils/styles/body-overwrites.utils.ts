@@ -6,6 +6,7 @@ import {
   findStyleDataWrapper,
   markElement,
   removeStyleDataRecursive,
+  stopObservingStyleDataWrapper,
   wrapWithDiv
 } from './style-data.utils'
 import { getOnecxTriggerElement } from './onecx-trigger-element.utils'
@@ -74,7 +75,11 @@ function overwriteRemoveChild(el: Node) {
   el.removeChild = function (child: Node): any {
     let childToRemove = child
     if (child.nodeType === Node.ELEMENT_NODE && child instanceof HTMLElement) {
-      childToRemove = findStyleDataWrapper(child) ?? child
+      const wrapper = findStyleDataWrapper(child)
+      if (wrapper) {
+        stopObservingStyleDataWrapper(wrapper)
+        childToRemove = wrapper
+      }
     }
     return originalRemoveChild.call(this, childToRemove)
   }

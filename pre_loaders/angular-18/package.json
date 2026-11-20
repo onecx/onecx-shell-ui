@@ -58,6 +58,7 @@
     "webpack": "~5.104.1"
   },
   "overrides": {
+    "axios@^1.0.0": "^1.21.1",
     "@module-federation/dts-plugin": {
       "koa": "^2.16.2"
     },

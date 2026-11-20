@@ -41,6 +41,7 @@ import { environment } from 'src/environments/environment'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
+import { initializeWorkspaceAfterPreloaders } from './shell/utils/preloader.utils'
 
 import { provideOptimus } from '@openng/optimus-ui/config'
 import { AppComponent } from './app.component'
@@ -130,28 +131,34 @@ export async function workspaceConfigInitializer(
   )
 
   if (loadWorkspaceConfigResponse) {
-    const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
-      string,
-      Record<string, string>
-    >
+    await initializeWorkspaceAfterPreloaders(
+      loadWorkspaceConfigResponse.routes,
+      loadWorkspaceConfigResponse.components,
+      async () => {
+        const parsedProperties = JSON.parse(loadWorkspaceConfigResponse.theme.properties) as Record<
+          string,
+          Record<string, string>
+        >
 
-    const themeWithParsedProperties = {
-      ...loadWorkspaceConfigResponse.theme,
-      properties: parsedProperties
-    }
+        const themeWithParsedProperties = {
+          ...loadWorkspaceConfigResponse.theme,
+          properties: parsedProperties
+        }
 
-    await Promise.all([
-      publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
-      routesService
-        .init(loadWorkspaceConfigResponse.routes)
-        .then(urlChangeListenerInitializer(router, appStateService)),
-      applyThemeVariables(themeService, themeWithParsedProperties),
-      remoteComponentsService.remoteComponents$.publish({
-        components: loadWorkspaceConfigResponse.components,
-        slots: mapSlots(loadWorkspaceConfigResponse.slots)
-      })
-    ])
-    parametersService.initialize()
+        await Promise.all([
+          publishCurrentWorkspace(appStateService, loadWorkspaceConfigResponse),
+          routesService
+            .init(loadWorkspaceConfigResponse.routes)
+            .then(urlChangeListenerInitializer(router, appStateService)),
+          applyThemeVariables(themeService, themeWithParsedProperties),
+          remoteComponentsService.remoteComponents$.publish({
+            components: loadWorkspaceConfigResponse.components,
+            slots: mapSlots(loadWorkspaceConfigResponse.slots)
+          })
+        ])
+        parametersService.initialize()
+      }
+    )
   }
 }
 

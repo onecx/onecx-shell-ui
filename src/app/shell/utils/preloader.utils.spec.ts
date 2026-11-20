@@ -1,10 +1,16 @@
 import * as moduleFederation from '@module-federation/enhanced/runtime'
 
 import {
+  allPreloaders,
   loadPreloaderModule,
-  ensurePreloaderModuleLoaded,
   angular21Preloader,
-  angular22Preloader
+  angular22Preloader,
+  angular18Preloader,
+  angular19Preloader,
+  angular20Preloader,
+  react19Preloader,
+  selectRequiredPreloaders,
+  initializeWorkspaceAfterPreloaders
 } from './preloader.utils'
 
 jest.mock('@module-federation/enhanced/runtime', () => ({
@@ -15,7 +21,47 @@ jest.mock('@module-federation/enhanced/runtime', () => ({
 describe('Preloader Utils', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')
+    window.onecxPreloaders = {}
+    jest.mocked(moduleFederation.loadRemote).mockImplementation(async () => {
+      window.onecxPreloaders['mock-key'] = true
+      return 'MockModule'
+    })
+  })
+
+  describe('selectRequiredPreloaders', () => {
+    it('selects all preloaders sharing the default scope', () => {
+      expect(selectRequiredPreloaders([{ shareScope: 'default' }], [])).toEqual([
+        angular18Preloader,
+        angular19Preloader,
+        angular20Preloader
+      ])
+    })
+
+    it('maps each explicit non-default scope to its preloader', () => {
+      expect(
+        selectRequiredPreloaders(
+          [{ shareScope: 'angular_21' }, { shareScope: 'angular_22' }],
+          [{ shareScope: 'react_19' }]
+        )
+      ).toEqual([angular21Preloader, angular22Preloader, react19Preloader])
+    })
+
+    it('deduplicates preloader selections across routes and components', () => {
+      expect(
+        selectRequiredPreloaders(
+          [{ shareScope: 'angular_21' }],
+          [{ shareScope: 'angular_21' }, { shareScope: 'angular_22' }]
+        )
+      ).toEqual([angular21Preloader, angular22Preloader])
+    })
+
+    it.each([undefined, 'unknown'])('falls back to all preloaders for scope %s', (shareScope) => {
+      expect(selectRequiredPreloaders([{ shareScope }], [])).toEqual(allPreloaders)
+    })
+
+    it('selects no preloaders when the workspace has no remotes', () => {
+      expect(selectRequiredPreloaders([], [])).toEqual([])
+    })
   })
 
   describe('preloader definitions', () => {
@@ -37,6 +83,21 @@ describe('Preloader Utils', () => {
   })
 
   describe('loadPreloaderModule', () => {
+    it('does not reload a preloader that is already marked ready', async () => {
+      window.onecxPreloaders['mock-key'] = true
+
+      await loadPreloaderModule({
+        name: 'mock-preloader',
+        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+        windowKey: 'mock-key',
+        exposedModule: 'MockModule',
+        shareScope: 'default'
+      })
+
+      expect(moduleFederation.registerRemotes).not.toHaveBeenCalled()
+      expect(moduleFederation.loadRemote).not.toHaveBeenCalled()
+    })
+
     it('should load a remote module using module federation with document base href', async () => {
       const dom = document
       jest.spyOn(dom, 'getElementsByTagName').mockReturnValue([{ href: 'http://localhost/base/' }] as any)
@@ -86,22 +147,24 @@ describe('Preloader Utils', () => {
       expect(moduleFederation.loadRemote).toHaveBeenCalledWith(`${mockPreloader.name}/${mockPreloader.exposedModule}`)
     })
 
-    it('marks a preloader as failed when its remote module rejects', async () => {
+    it('rejects when a preloader remote fails instead of marking it as loaded', async () => {
       const failure = new Error('preloader unavailable')
       const warning = jest.spyOn(console, 'warn').mockImplementation()
       const error = jest.spyOn(console, 'error').mockImplementation()
       window.onecxPreloaders = {}
       jest.mocked(moduleFederation.loadRemote).mockRejectedValue(failure)
 
-      await loadPreloaderModule({
-        name: 'mock-preloader',
-        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
-        windowKey: 'mock-key',
-        exposedModule: 'MockModule',
-        shareScope: 'default'
-      })
+      await expect(
+        loadPreloaderModule({
+          name: 'mock-preloader',
+          relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+          windowKey: 'mock-key',
+          exposedModule: 'MockModule',
+          shareScope: 'default'
+        })
+      ).rejects.toBe(failure)
 
-      expect(window.onecxPreloaders['mock-key']).toBe(true)
+      expect(window.onecxPreloaders['mock-key']).toBeUndefined()
       expect(warning).toHaveBeenCalledWith(
         'Could not load preloader: mock-key. Application might not work as expected.'
       )
@@ -109,12 +172,13 @@ describe('Preloader Utils', () => {
       warning.mockRestore()
       error.mockRestore()
     })
-  })
 
-  describe('ensurePreloaderModuleLoaded', () => {
-    it('should resolve immediately if the preloader module is already loaded', async () => {
-      window.onecxPreloaders = { 'mock-key': true }
-
+    it('shares an in-flight load and waits for remote loading to finish', async () => {
+      let resolveRemote!: (value: string) => void
+      const remoteLoad = new Promise<string>((resolve) => {
+        resolveRemote = resolve
+      })
+      jest.mocked(moduleFederation.loadRemote).mockReturnValue(remoteLoad)
       const mockPreloader = {
         name: 'mock-preloader',
         relativeRemoteEntryUrl: 'mock/remoteEntry.js',
@@ -123,27 +187,56 @@ describe('Preloader Utils', () => {
         shareScope: 'default'
       }
 
-      const result = await ensurePreloaderModuleLoaded(mockPreloader)
-      expect(result).toBe(true)
+      const firstLoad = loadPreloaderModule(mockPreloader)
+      const secondLoad = loadPreloaderModule(mockPreloader)
+      expect(secondLoad).toBe(firstLoad)
+      let resolved = false
+      void firstLoad.then(() => (resolved = true))
+
+      await Promise.resolve()
+      expect(resolved).toBe(false)
+      window.onecxPreloaders['mock-key'] = true
+      resolveRemote('MockModule')
+      await Promise.all([firstLoad, secondLoad])
+      expect(resolved).toBe(true)
     })
 
-    it('should wait until the preloader module is loaded', async () => {
-      window.onecxPreloaders = {}
+    it('rejects if a resolved preloader remote did not signal readiness', async () => {
+      const error = jest.spyOn(console, 'error').mockImplementation()
+      jest.mocked(moduleFederation.loadRemote).mockResolvedValue('MockModule')
 
-      const mockPreloader = {
-        name: 'mock-preloader',
-        relativeRemoteEntryUrl: 'mock/remoteEntry.js',
-        windowKey: 'mock-key',
-        exposedModule: 'MockModule',
-        shareScope: 'default'
-      }
+      await expect(
+        loadPreloaderModule({
+          name: 'mock-preloader',
+          relativeRemoteEntryUrl: 'mock/remoteEntry.js',
+          windowKey: 'not-ready-key',
+          exposedModule: 'MockModule',
+          shareScope: 'default'
+        })
+      ).rejects.toThrow('Preloader did not report readiness: not-ready-key')
+      expect(window.onecxPreloaders['not-ready-key']).toBeUndefined()
+      error.mockRestore()
+    })
 
-      setTimeout(() => {
-        window.onecxPreloaders['mock-key'] = true
-      }, 100)
+    it('does not initialize the workspace until its required preloader finishes loading', async () => {
+      let resolveRemote!: (value: string) => void
+      const remoteLoad = new Promise<string>((resolve) => {
+        resolveRemote = resolve
+      })
+      jest.mocked(moduleFederation.loadRemote).mockReturnValue(remoteLoad)
+      const initializeWorkspace = jest.fn().mockResolvedValue(undefined)
+      const initialization = initializeWorkspaceAfterPreloaders(
+        [{ shareScope: 'angular_21' }],
+        [{ shareScope: 'angular_21' }],
+        initializeWorkspace
+      )
 
-      const result = await ensurePreloaderModuleLoaded(mockPreloader)
-      expect(result).toBe(true)
+      await Promise.resolve()
+      expect(initializeWorkspace).not.toHaveBeenCalled()
+      window.onecxPreloaders['angular-21'] = true
+      resolveRemote('MockModule')
+      await initialization
+      expect(initializeWorkspace).toHaveBeenCalledTimes(1)
     })
   })
 })

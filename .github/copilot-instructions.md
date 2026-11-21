@@ -24,3 +24,14 @@ Rules:
 - **Never hide violations.** Do not add suppression comments (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `jscpd:ignore`) and do not edit the guardrail configuration or a baseline to make the check pass. Fix the design instead, as described in the tool output (extract functions, guard clauses, parameter objects, strategy maps, smaller modules).
 - Shell variables may not survive between commands: re-run the whole snippet above, not only its last line, until it prints `[ONECX-GUARDRAIL PASSED]`, then commit.
 - When adding a new preloader in `pre_loaders/`, share the common webpack/module-federation config instead of copying an existing preloader folder (copies fail the duplicate-code check).
+
+## Testing rules
+
+These rules apply to every new or changed `*.spec.ts` file. The Clean Code Guardrail rules above apply to tests as well (test functions up to 50 lines, files up to 250 lines: split by scenario, share setup through small factory functions).
+
+- **Test behavior, not implementation.** Assert only what a user or a collaborator can observe: return values, emitted values, rendered DOM, and calls to injected collaborators that belong to the unit's contract. Do not assert private state, internal call order or call counts of internal steps, or timer arithmetic of an internal debounce.
+- **Derive scenarios from intended behavior, not from the code.** Take them from the documentation, public types and JSDoc contracts, the OpenAPI contract, and how callers use the unit. Never write a test only to "cover" a line or branch, and never name a test after a line or branch (no "covers remaining branch-only paths"). If the intended behavior is unclear, ask instead of recording what the code happens to do. A test that exposes a bug must fail until the bug is fixed.
+- **Call only public API of the unit under test.** No `as any`, bracket access (`['member']`) or other access to private or protected members. If a line is only reachable through a private member, it is dead code (remove it) or the design needs a public entry point.
+- **Mock only other classes, never the unit itself.** Use `jest.spyOn` and mocks on injected collaborators and external modules only. Never spy on, stub or replace methods of the unit under test.
+- **Name tests as scenarios** (`given <state>, when <action>, then <outcome>`), keep one scenario per test, and structure each test as arrange, act, assert without logic (no loops or conditionals) in the test body.
+- **Coverage follows from behavior.** The target is 100% statement, branch, function and line coverage of non-generated code (`src/app/shared/generated` is excluded). Reach it by testing the scenarios above; remove unreachable code instead of testing it through private access.

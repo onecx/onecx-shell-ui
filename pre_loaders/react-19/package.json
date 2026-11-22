@@ -50,7 +50,7 @@
     "smol-toml@^1.0.0": "^1.7.0",
     "uuid": "^11.1.1",
     "qs@^6.0.0": "^6.16.0",
-    "axios@^1.0.0": "^1.18.0"
+    "axios@^1.0.0": "^1.21.1"
   },
   "allowScripts": {
     "@parcel/watcher": false,

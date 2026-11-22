@@ -1,11 +1,11 @@
-<div class="pages-body error-page flex flex-column">
-  <div class="align-self-center mt-auto mb-auto">
-    <div class="pages-panel card flex flex-column">
-      <div class="pages-header px-3 py-1">
+<div class="pages-body error-page flex flex-col">
+  <div class="self-center mt-auto mb-auto">
+    <div class="pages-panel card flex flex-col">
+      <div class="pages-header px-4 py-1">
         <h1 #heading tabindex="-1">{{ 'GLOBAL_ERROR.TITLE' | translate }}</h1>
       </div>
-      <p class="pages-description px-3 mt-3">{{ 'GLOBAL_ERROR.DESCRIPTION' | translate }}</p>
-      <p class="pages-detail px-3 pb-3">
+      <p class="pages-description px-4 mt-4">{{ 'GLOBAL_ERROR.DESCRIPTION' | translate }}</p>
+      <p class="pages-detail px-4 pb-6">
         <span>{{ 'GLOBAL_ERROR.ERROR_CODE' | translate }}</span> <code>{{ errCode }}</code>
       </p>
       <button type="button" class="p-button p-component p-button-text" (click)="reload()">

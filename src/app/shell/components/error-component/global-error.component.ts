@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild, inject } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [TranslateModule],
   selector: 'ocx-shell-error',

@@ -1,4 +1,4 @@
-import { ToastMessageOptions } from 'primeng/api'
+import { ToastMessageOptions } from '@openng/optimus-ui/api'
 
 import { applyToastPolicy, DEFAULT_TOAST_LIFE_MS } from './toast-policy'
 

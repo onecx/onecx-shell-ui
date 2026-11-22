@@ -8,8 +8,8 @@ import { ConfigurationService } from '@onecx/angular-integration-interface'
 import { PortalMessageServiceMock, providePortalMessageServiceMock } from '@onecx/angular-integration-interface/mocks'
 import { REMOTE_COMPONENT_CONFIG, RemoteComponentConfig } from '@onecx/angular-utils'
 
-import { MessageService } from 'primeng/api'
-import { ToastModule } from 'primeng/toast'
+import { MessageService } from '@openng/optimus-ui/api'
+import { ToastModule } from '@openng/optimus-ui/toast'
 import { OneCXShellToastComponent } from './shell-toast.component'
 import { provideTranslateTestingService } from '@onecx/angular-testing'
 

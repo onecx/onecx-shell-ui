@@ -1,4 +1,4 @@
-import { ToastMessageOptions } from 'primeng/api'
+import { ToastMessageOptions } from '@openng/optimus-ui/api'
 
 /** Minimum lifetime (ms) of info/success toasts that do not set an explicit life. WCAG 2.2.1 Timing Adjustable. */
 export const DEFAULT_TOAST_LIFE_MS = 10000

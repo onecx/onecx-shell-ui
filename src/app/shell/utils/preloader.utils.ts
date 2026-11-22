@@ -44,6 +44,14 @@ export const angular21Preloader: Preloader = {
   shareScope: 'angular_21'
 }
 
+export const angular22Preloader: Preloader = {
+  name: 'angular-22-preloader',
+  relativeRemoteEntryUrl: 'pre_loaders/onecx-angular-22-loader/mf-manifest.json',
+  windowKey: 'angular-22',
+  exposedModule: 'Angular22Loader',
+  shareScope: 'angular_22'
+}
+
 export const react19Preloader: Preloader = {
   name: 'react-19-preloader',
   relativeRemoteEntryUrl: 'pre_loaders/onecx-react-19-loader/mf-manifest.json',

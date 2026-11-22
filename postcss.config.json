@@ -1,0 +1,5 @@
+{
+  "plugins": {
+    "./scripts/tailwind-shell-postcss.js": {}
+  }
+}

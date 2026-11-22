@@ -17,7 +17,7 @@ const config: Config = {
   testEnvironment: 'jsdom',
   preset: './jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
-  testMatch: ['<rootDir>/src/app/**/*.spec.ts'],
+  testMatch: ['<rootDir>/src/app/**/*.spec.ts', '<rootDir>/source-patch.loader.spec.js'],
   testPathIgnorePatterns: ignoredPathPatterns,
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: '',
     component: AboutComponent,
-    title: 'About'
+    title: 'PAGE_TITLES.ABOUT'
   }
 ]
 

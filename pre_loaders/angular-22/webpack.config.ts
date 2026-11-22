@@ -1,14 +1,14 @@
 import { Configuration } from 'webpack'
 import config from './module-federation.config'
-import { withModuleFederation } from '@nx/angular/module-federation'
+import { withModuleFederation } from '@nx/module-federation/angular'
 import { ModifySourcePlugin, ReplaceOperation } from 'modify-source-webpack-plugin'
 
-const modifyPrimeNgPlugin = new ModifySourcePlugin({
+const modifyOptimisUiPlugin = new ModifySourcePlugin({
   rules: [
     {
       test: (module) => {
         if (module.resource) {
-          return module.resource.includes('primeng')
+          return /[/\\]node_modules[/\\]@openng[/\\]optimus-ui(-utils)?[/\\]/.test(module.resource)
         }
         return false
       },
@@ -16,9 +16,9 @@ const modifyPrimeNgPlugin = new ModifySourcePlugin({
         new ReplaceOperation(
           'all',
           'document\\.createElement\\(',
-          'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments)},'
+          'document.createOnecxElement({"this": this, "arguments": Array.from(arguments)},'
         ),
-        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+        new ReplaceOperation('all', '\\b(Theme|Base)\\.setLoadedStyleName\\b', '(function(_){})')
       ]
     }
   ]
@@ -47,14 +47,19 @@ const modifyAngularCorePlugin = new ModifySourcePlugin({
 
 export default async function (baseConfig: Configuration) {
   const withMf = await withModuleFederation(config, {
-    shareScope: 'angular_21'
+    shareScope: 'angular_22'
   })
   const webpackConfig = withMf(baseConfig)
 
   return {
     ...webpackConfig,
-    devtool: 'source-map',
-    plugins: [...(webpackConfig.plugins ?? []), modifyPrimeNgPlugin, modifyAngularCorePlugin],
+    plugins: [...(webpackConfig.plugins ?? []), modifyAngularCorePlugin, modifyOptimisUiPlugin],
+    output: {
+      ...webpackConfig.output,
+      uniqueName: 'zzz_onecx-angular-22-loader',
+      publicPath: 'auto',
+      devtoolNamespace: 'onecx-angular-22-loader'
+    },
     module: {
       ...webpackConfig.module,
       parser: {

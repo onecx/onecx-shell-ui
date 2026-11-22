@@ -1,20 +1,17 @@
 const { execFileSync } = require('node:child_process')
+const { stagedFiles } = require('./staged-files.js')
 
 async function checkStagedFiles() {
-  const stagedFiles = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'], {
-    encoding: 'utf8',
-  })
-    .split('\0')
-    .filter(Boolean)
+  const files = stagedFiles()
 
-  if (stagedFiles.length === 0) {
+  if (files.length === 0) {
     return
   }
 
   const prettier = require('prettier')
   let failed = false
 
-  for (const file of stagedFiles) {
+  for (const file of files) {
     const fileInfo = await prettier.getFileInfo(file, { ignorePath: '.prettierignore' })
     if (fileInfo.ignored || !fileInfo.inferredParser) {
       continue
@@ -22,7 +19,7 @@ async function checkStagedFiles() {
 
     const content = execFileSync('git', ['show', `:${file}`], {
       encoding: 'utf8',
-      maxBuffer: 10 * 1024 * 1024,
+      maxBuffer: 10 * 1024 * 1024
     })
     const config = await prettier.resolveConfig(file)
     if (!(await prettier.check(content, { ...config, filepath: file }))) {

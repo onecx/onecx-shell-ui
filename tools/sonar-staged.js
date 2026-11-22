@@ -1,16 +1,16 @@
-const { execFileSync, spawnSync } = require('node:child_process')
+const { spawnSync } = require('node:child_process')
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
+const { git, stagedFiles } = require('./staged-files.js')
 
-const SOURCE_FILE = /^src\/(?!.*\.spec\.[tj]s$).+\.(?:ts|js|html)$/
+const SOURCE_FILE = /^src\/.+\.(?:ts|js|html)$/
+// same as sonar.test.inclusions in sonar-project.properties: these files are analysed as tests
+const TEST_FILE = /^src\/app\/.+\.spec\.ts$/
+const API_TIMEOUT_MS = 30000
 const DEFAULT_HOST = 'https://sonarcloud.io'
 const ORGANIZATION = 'onecx'
 const DEFAULT_PROJECT_KEY = 'onecx_onecx-shell-ui'
-
-function git(args) {
-  return execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
-}
 
 /**
  * Parses the `git diff -U0` output of ONE file into the added/changed line ranges of its new side.
@@ -35,11 +35,6 @@ function parseHunkRanges(diff, file) {
   return ranges
 }
 
-/** Lists staged added/copied/modified/renamed/typed files (NUL separated, so any file name works). */
-function stagedFiles() {
-  return git(['diff', '--cached', '--name-only', '-z', '--diff-filter=ACMR']).split('\0').filter(Boolean)
-}
-
 /** Reads the staged added/changed ranges of every staged analysable source file. */
 function stagedSourceRanges() {
   const ranges = {}
@@ -55,7 +50,7 @@ function stagedSourceRanges() {
       '--dst-prefix=b/',
       '-U0',
       '--',
-      file,
+      file
     ])
     ranges[file] = parseHunkRanges(diff, file)
   }
@@ -80,7 +75,8 @@ function filterNewCodeIssues(issues, ranges, projectKey) {
 
 async function api(host, token, pathname) {
   const response = await fetch(`${host}${pathname}`, {
-    headers: { Authorization: `Basic ${Buffer.from(`${token}:`).toString('base64')}` },
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    headers: { Authorization: `Basic ${Buffer.from(`${token}:`).toString('base64')}` }
   })
   if (!response.ok) {
     throw new Error(`Sonar API ${pathname} failed: ${response.status} ${response.statusText}`)
@@ -116,7 +112,7 @@ async function fetchIssues(host, token, projectKey, pullRequest) {
       resolved: 'false',
       organization: ORGANIZATION,
       ps: '500',
-      p: String(page),
+      p: String(page)
     })
     const data = await api(host, token, `/api/issues/search?${query}`)
     issues.push(...data.issues)
@@ -129,13 +125,17 @@ function exportIndex(dir) {
   git(['checkout-index', '-a', `--prefix=${dir}${path.sep}`])
 }
 
+/** The pinned sonarqube-scanner (devDependency) is started with node directly, so no shell is involved on any platform. */
 function runScanner(args, cwd, env) {
-  return spawnSync('npx', ['--yes', 'sonarqube-scanner', ...args], {
-    cwd,
-    env,
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  })
+  const script = path.resolve(__dirname, '..', 'node_modules', 'sonarqube-scanner', 'bin', 'sonar-scanner.js')
+  if (!fs.existsSync(script)) {
+    throw new Error('sonarqube-scanner is not installed, run npm ci')
+  }
+  const scan = spawnSync(process.execPath, [script, ...args], { cwd, env, stdio: 'inherit' })
+  if (scan.error) {
+    throw new Error(`sonarqube-scanner could not be started: ${scan.error.message}`)
+  }
+  return scan
 }
 
 async function analyze(ranges, env) {
@@ -143,11 +143,19 @@ async function analyze(ranges, env) {
   const pullRequest = `precommit-${env.USER || env.USERNAME || 'local'}`
   const host = env.SONAR_HOST_URL || DEFAULT_HOST
   const inclusions = Object.keys(ranges).filter((file) => ranges[file].length > 0)
+  const testInclusions = inclusions.filter((file) => TEST_FILE.test(file))
   if (inclusions.length === 0) {
     console.log('sonar:staged: staged source files have no added or changed lines, nothing to analyze')
     return 0
   }
   const exportDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sonar-staged-'))
+  const cleanup = () => fs.rmSync(exportDir, { recursive: true, force: true })
+  const onSignal = (signal) => {
+    cleanup()
+    process.exit(128 + (os.constants.signals[signal] ?? 0))
+  }
+  process.once('SIGINT', onSignal)
+  process.once('SIGTERM', onSignal)
   try {
     exportIndex(exportDir)
     const workDir = path.join(exportDir, 'reports', '.scannerwork')
@@ -159,17 +167,18 @@ async function analyze(ranges, env) {
         `-Dsonar.host.url=${host}`,
         `-Dsonar.organization=${ORGANIZATION}`,
         `-Dsonar.inclusions=${inclusions.join(',')}`,
+        ...(testInclusions.length > 0 ? [`-Dsonar.test.inclusions=${testInclusions.join(',')}`] : []),
         '-Dsonar.scm.disabled=true',
         `-Dsonar.working.directory=${workDir}`,
         `-Dsonar.pullrequest.key=${pullRequest}`,
         `-Dsonar.pullrequest.branch=${pullRequest}`,
-        '-Dsonar.pullrequest.base=main',
+        '-Dsonar.pullrequest.base=main'
       ],
       exportDir,
       env
     )
     if (scan.status !== 0) {
-      throw new Error(`sonarqube-scanner failed (exit ${scan.status})`)
+      throw new Error(`sonarqube-scanner failed (exit ${scan.status}${scan.signal ? `, signal ${scan.signal}` : ''})`)
     }
     await waitForAnalysis(host, env.SONAR_TOKEN, path.join(workDir, 'report-task.txt'))
     const issues = filterNewCodeIssues(
@@ -182,16 +191,18 @@ async function analyze(ranges, env) {
     }
     return issues.length
   } finally {
-    fs.rmSync(exportDir, { recursive: true, force: true })
+    process.removeListener('SIGINT', onSignal)
+    process.removeListener('SIGTERM', onSignal)
+    cleanup()
   }
 }
 
 /** Entry point; returns the number of issues on new code. Throws when the gate cannot run. */
-async function main(env = process.env, readRanges = stagedSourceRanges) {
+async function main(env = process.env, readRanges = stagedSourceRanges, log = console.log) {
   const ranges = readRanges()
   const files = Object.keys(ranges)
   if (files.length === 0) {
-    console.log('sonar:staged: no staged source changes, nothing to analyze')
+    log('sonar:staged: no staged source changes, nothing to analyze')
     return 0
   }
   if (!env.SONAR_TOKEN) {
@@ -203,11 +214,18 @@ async function main(env = process.env, readRanges = stagedSourceRanges) {
   if (total > 0) {
     throw new Error(`sonar:staged found ${total} issue(s) on new or changed lines`)
   }
-  console.log('sonar:staged: no issues on new or changed lines')
+  log('sonar:staged: no issues on new or changed lines')
   return 0
 }
 
-module.exports = { parseHunkRanges, stagedSourceRanges, filterNewCodeIssues, main }
+module.exports = {
+  isSourceFile: (f) => SOURCE_FILE.test(f),
+  isTestFile: (f) => TEST_FILE.test(f),
+  parseHunkRanges,
+  stagedSourceRanges,
+  filterNewCodeIssues,
+  main
+}
 
 if (require.main === module) {
   main().catch((error) => {

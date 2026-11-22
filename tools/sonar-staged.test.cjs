@@ -12,18 +12,20 @@ test('parses added ranges and ignores pure deletions', () => {
   const diff = header('src/a.ts') + '@@ -3,2 +3,3 @@\n@@ -10 +11 @@\n@@ -20,2 +22,0 @@\n'
   assert.deepEqual(parseHunkRanges(diff, 'src/a.ts'), [
     [3, 5],
-    [11, 11],
+    [11, 11]
   ])
 })
 
 test('a new file (/dev/null source) yields its whole range', () => {
-  const diff = 'diff --git a/src/n.ts b/src/n.ts\nnew file mode 100644\n--- /dev/null\n+++ b/src/n.ts\n@@ -0,0 +1,4 @@\n'
+  const diff =
+    'diff --git a/src/n.ts b/src/n.ts\nnew file mode 100644\n--- /dev/null\n+++ b/src/n.ts\n@@ -0,0 +1,4 @@\n'
   assert.deepEqual(parseHunkRanges(diff, 'src/n.ts'), [[1, 4]])
 })
 
 test('headers with trailing tab, quotes or without prefixes do not matter', () => {
   const tab = 'diff --git a/src/a b.ts b/src/a b.ts\n--- a/src/a b.ts\t\n+++ b/src/a b.ts\t\n@@ -1 +1 @@\n'
-  const quoted = 'diff --git "a/src/\\303\\244.ts" "b/src/\\303\\244.ts"\n--- "a/src/\\303\\244.ts"\n+++ "b/src/\\303\\244.ts"\n@@ -2 +2,2 @@\n'
+  const quoted =
+    'diff --git "a/src/\\303\\244.ts" "b/src/\\303\\244.ts"\n--- "a/src/\\303\\244.ts"\n+++ "b/src/\\303\\244.ts"\n@@ -2 +2,2 @@\n'
   const noprefix = 'diff --git src/a.ts src/a.ts\n--- src/a.ts\n+++ src/a.ts\n@@ -5 +5 @@\n'
   assert.deepEqual(parseHunkRanges(tab, 'src/a b.ts'), [[1, 1]])
   assert.deepEqual(parseHunkRanges(quoted, 'src/ä.ts'), [[2, 3]])
@@ -31,7 +33,10 @@ test('headers with trailing tab, quotes or without prefixes do not matter', () =
 })
 
 test('a mode-only change has no added lines, an unparseable diff throws', () => {
-  assert.deepEqual(parseHunkRanges('diff --git a/src/a.ts b/src/a.ts\nold mode 100644\nnew mode 100755\n', 'src/a.ts'), [])
+  assert.deepEqual(
+    parseHunkRanges('diff --git a/src/a.ts b/src/a.ts\nold mode 100644\nnew mode 100755\n', 'src/a.ts'),
+    []
+  )
   assert.throws(() => parseHunkRanges('', 'src/a.ts'), /cannot parse/)
 })
 
@@ -41,14 +46,28 @@ test('only issues on added or changed lines of staged files are kept', () => {
     { component: 'k:src/a.ts', line: 4 },
     { component: 'k:src/a.ts', line: 9 },
     { component: 'k:src/b.ts', line: 4 },
-    { component: 'k:src/a.ts', textRange: { startLine: 1, endLine: 3 } },
+    { component: 'k:src/a.ts', textRange: { startLine: 1, endLine: 3 } }
   ]
   assert.deepEqual(filterNewCodeIssues(issues, ranges, 'k'), [issues[0], issues[3]])
 })
 
 test('staged source without SONAR_TOKEN fails, nothing staged passes', async () => {
-  await assert.rejects(main({}, () => ({ 'src/a.ts': [[1, 1]] })), /needs SONAR_TOKEN/)
-  assert.equal(await main({}, () => ({})), 0)
+  await assert.rejects(
+    main(
+      {},
+      () => ({ 'src/a.ts': [[1, 1]] }),
+      () => {}
+    ),
+    /needs SONAR_TOKEN/
+  )
+  assert.equal(
+    await main(
+      {},
+      () => ({}),
+      () => {}
+    ),
+    0
+  )
 })
 
 test('staged ranges are read from the index for odd file names', () => {
@@ -68,4 +87,12 @@ test('staged ranges are read from the index for odd file names', () => {
     process.chdir(cwd)
     fs.rmSync(repo, { recursive: true, force: true })
   }
+})
+
+test('staged specs under src/app are analysed as tests, other staged sources as sources', async () => {
+  const { isTestFile, isSourceFile } = require('./sonar-staged.js')
+  assert.equal(isSourceFile('src/app/a.spec.ts'), true)
+  assert.equal(isTestFile('src/app/a.spec.ts'), true)
+  assert.equal(isTestFile('src/app/a.ts'), false)
+  assert.equal(isSourceFile('README.md'), false)
 })

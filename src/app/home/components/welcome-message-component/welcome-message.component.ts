@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 
 import { AppStateService, UserService } from '@onecx/angular-integration-interface'
 import { CurrentWorkspaceTopic, UserProfileTopic } from '@onecx/integration-interface'
 import { TranslateModule } from '@ngx-translate/core'
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-welcome-message',
   imports: [TranslateModule],

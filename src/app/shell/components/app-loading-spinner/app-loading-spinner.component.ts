@@ -1,6 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y'
 import { AsyncPipe } from '@angular/common'
-import { Component, inject, OnDestroy, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import { catchError, firstValueFrom, Observable, of, shareReplay } from 'rxjs'
 
@@ -20,6 +20,7 @@ export const LOADING_ANNOUNCE_DELAY_MS = 1000
  * aria-hidden overlay so that it is not announced a second time.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-loading-spinner',
   imports: [AsyncPipe],

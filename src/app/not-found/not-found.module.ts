@@ -12,7 +12,7 @@ import { PageNotFoundComponent } from './components/not-found-page/not-found-pag
       {
         path: '',
         component: PageNotFoundComponent,
-        title: 'OneCX Error'
+        title: 'PAGE_TITLES.NOT_FOUND'
       }
     ])
   ]

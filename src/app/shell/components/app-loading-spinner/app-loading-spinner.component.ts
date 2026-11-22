@@ -1,5 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y'
-import { Component, inject, OnDestroy, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import { firstValueFrom } from 'rxjs'
 
@@ -15,6 +15,7 @@ export const LOADING_ANNOUNCE_DELAY_MS = 1000
  * also used for the page title announcement after the route change.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   selector: 'ocx-shell-loading-spinner',
   templateUrl: 'app-loading-spinner.component.html',

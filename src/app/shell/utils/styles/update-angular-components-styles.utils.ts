@@ -1,4 +1,4 @@
-import { dataNoPortalLayoutStylesKey, dataStyleIdKey, replacePrimengPrefix } from '@onecx/angular-utils'
+import { dataNoPortalLayoutStylesKey, dataStyleIdKey, replaceOptimusPrefix } from '@onecx/angular-utils'
 
 /**
  * Updates styles of Angular components added to the document head.
@@ -25,7 +25,7 @@ export function updateAngularComponentsStyles(mutationList: MutationRecord[]) {
       return
     }
 
-    node.textContent = replacePrimengPrefix(node.textContent, styleId)
+    node.textContent = replaceOptimusPrefix(node.textContent, styleId)
   })
 }
 

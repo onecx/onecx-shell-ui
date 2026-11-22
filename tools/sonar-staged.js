@@ -57,19 +57,26 @@ function stagedSourceRanges() {
   return ranges
 }
 
+/** Staged files that are newly added (git status A). */
+function stagedNewFiles() {
+  return new Set(git(['diff', '--cached', '--name-only', '-z', '--diff-filter=A']).split('\0').filter(Boolean))
+}
+
 function overlapsRanges(ranges, first, last) {
   return ranges.some(([from, to]) => first <= to && last >= from)
 }
 
-/** Keeps only issues located on added/changed lines of staged files. */
-function filterNewCodeIssues(issues, ranges, projectKey) {
+/** Keeps only issues located on added/changed lines of staged files, and file-level issues of newly added files. */
+function filterNewCodeIssues(issues, ranges, projectKey, newFiles = new Set()) {
   return issues.filter((issue) => {
     const file = String(issue.component).replace(`${projectKey}:`, '')
     const fileRanges = ranges[file]
     if (!fileRanges) return false
     const first = issue.textRange?.startLine ?? issue.line
     const last = issue.textRange?.endLine ?? issue.line
-    return first === undefined || overlapsRanges(fileRanges, first, last)
+    // a file-level issue (no line) is only new code when the whole file is new
+    if (first === undefined) return newFiles.has(file)
+    return overlapsRanges(fileRanges, first, last)
   })
 }
 
@@ -184,7 +191,8 @@ async function analyze(ranges, env) {
     const issues = filterNewCodeIssues(
       await fetchIssues(host, env.SONAR_TOKEN, projectKey, pullRequest),
       ranges,
-      projectKey
+      projectKey,
+      stagedNewFiles()
     )
     for (const issue of issues) {
       console.error(`${issue.component.split(':').pop()}:${issue.line ?? '?'} [${issue.rule}] ${issue.message}`)

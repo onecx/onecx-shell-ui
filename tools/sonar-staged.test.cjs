@@ -96,3 +96,10 @@ test('staged specs under src/app are analysed as tests, other staged sources as 
   assert.equal(isTestFile('src/app/a.ts'), false)
   assert.equal(isSourceFile('README.md'), false)
 })
+
+test('file-level issues count only for newly added files', () => {
+  const ranges = { 'src/old.ts': [[1, 1]], 'src/new.ts': [[1, 9]] }
+  const issues = [{ component: 'k:src/old.ts' }, { component: 'k:src/new.ts' }]
+  assert.deepEqual(filterNewCodeIssues(issues, ranges, 'k', new Set(['src/new.ts'])), [issues[1]])
+  assert.deepEqual(filterNewCodeIssues(issues, ranges, 'k'), [])
+})

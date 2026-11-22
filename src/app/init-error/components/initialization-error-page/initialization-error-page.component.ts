@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, inject, OnDestroy } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, map } from 'rxjs'
 import { TranslateModule } from '@ngx-translate/core'
@@ -16,6 +16,7 @@ interface InitializationError {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [AsyncPipe, TranslateModule],
   templateUrl: './initialization-error-page.component.html'

@@ -1,24 +1,44 @@
 {
   "name": "onecx-shell-ui",
   "$schema": "node_modules/nx/schemas/project-schema.json",
+  "includedScripts": [],
   "projectType": "application",
   "prefix": "ocx-shell",
   "sourceRoot": "./src",
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
+  },
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/angular:webpack-browser",
       "dependsOn": ["^build"],
-      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "configurations": {
+        "production": {},
+        "development": {},
+        "local-env": {}
+      }
+    },
+    "serve": {
+      "configurations": {
+        "production": {},
+        "development": {},
+        "local-env": {}
+      },
+      "defaultConfiguration": "development"
+    },
+    "build-i18n": {
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
-        "outputPath": "dist/onecx-shell-ui",
+        "outputPath": "dist/onecx-shell-ui-i18n",
         "index": "./src/index.html",
         "main": "./src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "./tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
-          "src/favicon.ico",
           "./src/assets",
           {
             "glob": "**/*",
@@ -87,86 +107,13 @@
             "inject": false
           }
         ],
-        "sourceMap": {
-          "scripts": true,
-          "styles": false,
-          "vendor": true,
-          "hidden": false
-        },
-        "scripts": [],
-        "customWebpackConfig": {
-          "path": "./webpack.config.ts"
-        }
-      },
-      "configurations": {
-        "production": {
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "1mb",
-              "maximumError": "5mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "2kb",
-              "maximumError": "4kb"
-            }
-          ],
-          "sourceMap": {
-            "scripts": true,
-            "styles": false,
-            "vendor": true,
-            "hidden": false
-          },
-          "outputHashing": "all",
-          "customWebpackConfig": {
-            "path": "./webpack.config.ts"
-          }
-        },
-        "development": {
-          "buildOptimizer": false,
-          "optimization": false,
-          "vendorChunk": true,
-          "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true
-        },
-        "local-env": {
-          "baseHref": "/onecx-shell/",
-          "outputHashing": "all"
-        }
-      },
-      "defaultConfiguration": "production"
-    },
-    "serve": {
-      "executor": "@nx/angular:dev-server",
-      "configurations": {
-        "production": {
-          "buildTarget": "onecx-shell-ui:build:production"
-        },
-        "development": {
-          "buildTarget": "onecx-shell-ui:build:development"
-        },
-        "local-env": {
-          "buildTarget": "onecx-shell-ui:build:local-env",
-          "host": "0.0.0.0",
-          "disableHostCheck": true,
-          "publicHost": "http://localhost:4300/onecx-shell/",
-          "port": 4300
-        }
-      },
-      "defaultConfiguration": "development",
-      "options": {
-        "hmr": false,
-        "port": 4300,
-        "proxyConfig": "proxy.conf.js"
+        "scripts": []
       }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "onecx-shell-ui:build",
-        "customWebpackConfig": "./webpack.config.ts"
+        "buildTarget": "onecx-shell-ui:build-i18n"
       }
     },
     "lint": {
@@ -182,11 +129,6 @@
         "jestConfig": "jest.config.ts",
         "codeCoverage": true
       }
-    }
-  },
-  "cli": {
-    "cache": {
-      "enabled": false
     }
   }
 }

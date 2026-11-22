@@ -36,7 +36,7 @@
     "sonar": "npm run sonar:staged",
     "sonar:staged": "node tools/sonar-staged.js",
     "sonar:all": "npx sonar-scanner",
-    "test:tools": "node --test tools/",
+    "test:tools": "node --test tools/*.test.cjs",
     "prettier": "npm run prettier:staged",
     "prettier:all": "prettier -c --cache .",
     "prettier:staged": "node tools/prettier-staged.js",

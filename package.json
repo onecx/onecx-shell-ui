@@ -45,11 +45,6 @@
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
     "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
-  },
   "nx": {
     "includedScripts": []
   },

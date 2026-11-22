@@ -2,13 +2,15 @@
   <div class="self-center mt-auto mb-auto">
     <div class="pages-panel card flex flex-col">
       <div class="pages-header px-4 py-1">
-        <h2>ERROR</h2>
+        <h1 #heading tabindex="-1">{{ 'GLOBAL_ERROR.TITLE' | translate }}</h1>
       </div>
-      <div class="card mt-4 px-12">
-        <img src="assets/images/error.png" alt="" />
-      </div>
-      <div class="pages-detail pb-12">{{errCode}}</div>
-      <button pButton pRipple type="button" label="Try Again" (click)="reload()" class="p-button-text"></button>
+      <p class="pages-description px-4 mt-4">{{ 'GLOBAL_ERROR.DESCRIPTION' | translate }}</p>
+      <p class="pages-detail px-4 pb-6">
+        <span>{{ 'GLOBAL_ERROR.ERROR_CODE' | translate }}</span> <code>{{ errCode }}</code>
+      </p>
+      <button type="button" class="p-button p-component p-button-text" (click)="reload()">
+        {{ 'GLOBAL_ERROR.ACTION' | translate }}
+      </button>
     </div>
   </div>
 </div>

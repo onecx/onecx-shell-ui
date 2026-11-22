@@ -1,8 +1,9 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { AsyncPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { TranslatePipe } from '@ngx-translate/core'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
 import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
@@ -22,7 +23,8 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
     GlobalErrorComponent,
     AppLoadingSpinnerComponent,
     RouterModule,
-    SlotGroupComponent
+    SlotGroupComponent,
+    TranslatePipe
   ],
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
@@ -46,7 +48,13 @@ export class PortalViewportComponent implements OnInit {
   routesService = inject(RoutesService)
   workspaceConfigBffService = inject(WorkspaceConfigBffService)
 
+  @ViewChild('mainRegion') mainRegion?: ElementRef<HTMLElement>
+
   menuButtonTitle = ''
+  // The document has <base href="/">, so a bare "#id" would resolve against the root URL.
+  get skipLinkHref(): string {
+    return `${globalThis.location.pathname}${globalThis.location.search}#ocx_main_content`
+  }
 
   colorScheme: 'auto' | 'light' | 'dark' = 'light'
   menuMode: 'horizontal' | 'static' | 'overlay' | 'slim' | 'slimplus' = 'static'
@@ -109,6 +117,11 @@ export class PortalViewportComponent implements OnInit {
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
     })
+  }
+
+  onSkipLinkClick(event: Event) {
+    event.preventDefault()
+    this.mainRegion?.nativeElement.focus()
   }
 
   private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {

@@ -32,10 +32,10 @@
     "start": "nx serve --configuration=development",
     "start:local-env": "nx serve --configuration=local-env",
     "test": "nx test",
-    "test:ci": "nx test --no-color --watch=false --browsers=ChromeHeadless --coverage",
+    "test:ci": "nx test --no-color --watch=false --browsers=ChromeHeadless --coverage && npm run test:tools",
     "sonar": "npm run sonar:staged",
     "sonar:staged": "node tools/sonar-staged.js",
-    "sonar:all": "npx sonar-scanner",
+    "sonar:all": "npx --yes sonarqube-scanner",
     "test:tools": "node --test tools/*.test.cjs",
     "prettier": "npm run prettier:staged",
     "prettier:all": "prettier -c --cache .",
@@ -44,6 +44,11 @@
     "apigen-format": "npx prettier $npm_package_config_openapiYaml --write && npx prettier $npm_package_config_openapiOutput/**/* --write",
     "apigen-generate": "openapi-generator-cli generate -i $npm_package_config_openapiYaml -g typescript-angular -c apigen.yaml -o $npm_package_config_openapiOutput --type-mappings=AnyType=object,set=Array",
     "apigen": "npm run apigen-cleanup && npm run apigen-generate && npm run apigen-format"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "nx": {
     "includedScripts": []

@@ -1,12 +1,13 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { AsyncPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { TranslatePipe } from '@ngx-translate/core'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { AppStateService, Theme, ThemeService, UserService } from '@onecx/angular-integration-interface'
-import { AngularRemoteComponentsModule } from '@onecx/angular-remote-components'
-import { filter, first, from, mergeMap, Observable, of } from 'rxjs'
+import { AngularRemoteComponentsModule, SLOT_SERVICE } from '@onecx/angular-remote-components'
+import { combineLatest, filter, first, from, map, mergeMap, Observable, of, shareReplay } from 'rxjs'
 import { WorkspaceConfigBffService } from 'src/app/shared/generated/api/workspaceConfig.service'
 import { RoutesService } from '../../services/routes.service'
 import { AppLoadingSpinnerComponent } from '../app-loading-spinner/app-loading-spinner.component'
@@ -22,7 +23,8 @@ import { SlotGroupComponent } from '../slot-group/slot-group.component'
     GlobalErrorComponent,
     AppLoadingSpinnerComponent,
     RouterModule,
-    SlotGroupComponent
+    SlotGroupComponent,
+    TranslatePipe
   ],
   selector: 'ocx-shell-portal-viewport',
   templateUrl: './portal-viewport.component.html',
@@ -45,8 +47,25 @@ export class PortalViewportComponent implements OnInit {
   private readonly httpClient = inject(HttpClient)
   routesService = inject(RoutesService)
   workspaceConfigBffService = inject(WorkspaceConfigBffService)
+  private readonly slotService = inject(SLOT_SERVICE)
+
+  // Landmarks are only exposed when their slot group has content
+  headerHasContent$ = this.slotGroupHasContent('onecx-shell-header')
+  menuHasContent$ = this.slotGroupHasContent('onecx-shell-body-start')
+  footerHasContent$ = this.slotGroupHasContent('onecx-shell-footer')
+  // Legacy footer slots are mapped to the body footer, it is the contentinfo unless the footer slot group is shown
+  bodyFooterIsContentInfo$ = combineLatest([
+    this.slotGroupHasContent('onecx-shell-body-footer'),
+    this.footerHasContent$
+  ]).pipe(map(([bodyFooterHasContent, footerHasContent]) => bodyFooterHasContent && !footerHasContent))
+
+  @ViewChild('mainRegion') mainRegion?: ElementRef<HTMLElement>
 
   menuButtonTitle = ''
+  // The document has <base href="/">, so a bare "#id" would resolve against the root URL.
+  get skipLinkHref(): string {
+    return `${globalThis.location.pathname}${globalThis.location.search}#ocx_main_content`
+  }
 
   colorScheme: 'auto' | 'light' | 'dark' = 'light'
   menuMode: 'horizontal' | 'static' | 'overlay' | 'slim' | 'slimplus' = 'static'
@@ -109,6 +128,22 @@ export class PortalViewportComponent implements OnInit {
     this.logoLoadingEmitter.subscribe((data: boolean) => {
       this.themeLogoLoadingFailed = data
     })
+  }
+
+  onSkipLinkClick(event: Event) {
+    event.preventDefault()
+    this.mainRegion?.nativeElement.focus()
+  }
+
+  private slotGroupHasContent(slotGroupName: string): Observable<boolean> {
+    return combineLatest(
+      ['start', 'center', 'end'].map((position) =>
+        this.slotService.isSomeComponentDefinedForSlot(`${slotGroupName}.${position}`)
+      )
+    ).pipe(
+      map((slotsHaveContent) => slotsHaveContent.some(Boolean)),
+      shareReplay({ bufferSize: 1, refCount: true })
+    )
   }
 
   private readBlobAsDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {

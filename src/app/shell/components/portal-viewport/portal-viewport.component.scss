@@ -1,3 +1,5 @@
+@use '../../../../breakpoints' as *;
+
 .onecx-viewport-wrapper {
   display: flex;
   flex-direction: column;
@@ -160,4 +162,85 @@ footer {
   width: 0 !important;
   height: 0 !important;
   overflow: hidden !important;
+}
+
+// Skip link: visually hidden until it receives keyboard focus
+.onecx-skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  padding: 0.75rem 1rem;
+  // Colours come from the active theme (surface background/text pair)
+  background-color: var(--content-bg-color, var(--p-content-background));
+  color: var(--text-color, var(--p-text-color));
+  border: 2px solid var(--primary-color, var(--p-primary-color));
+  border-radius: 4px;
+  text-decoration: underline;
+  transform: translateY(-200%);
+
+  &:focus,
+  &:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--primary-color, var(--p-primary-color));
+    outline-offset: 2px;
+  }
+
+  // Windows High Contrast / forced colours: use system colours so the link stays visible
+  @media (forced-colors: active) {
+    background-color: Canvas;
+    color: LinkText;
+    border-color: CanvasText;
+
+    &:focus,
+    &:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
+
+#ocx_main_content:focus {
+  outline: none;
+}
+
+// Reflow (WCAG 1.4.10 / 1.4.4): below $shell-reflow-breakpoint (see src/_breakpoints.scss), the frame must never be wider than the viewport.
+// The body has overflow: hidden, so anything wider would be clipped, not scrollable.
+// Desktop widths are outside this media query and keep their layout unchanged.
+@media (max-width: $shell-reflow-breakpoint) {
+  .onecx-header {
+    // Top bar actions wrap onto further rows instead of being pushed off-screen
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    // A top bar wrapped onto many rows scrolls itself instead of pushing the page content out of view
+    max-height: 50dvh;
+    overflow-y: auto;
+
+    > div {
+      min-width: 0;
+    }
+
+    // Remote components rendered into the top bar slots may shrink and wrap instead of
+    // forcing the slot (and the top bar) wider than the viewport
+    ::ng-deep ocx-slot > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  .onecx-body-wrapper {
+    // When a static side menu and the content do not fit next to each other (e.g. 320 px),
+    // the content wraps below the menu instead of collapsing to a few pixels beside it.
+    // The 20rem basis only decides when to wrap: on one line the content still grows to fill the row.
+    flex-wrap: wrap;
+
+    .onecx-body-start,
+    .onecx-body-end {
+      max-width: 100%;
+    }
+
+    .onecx-body-center {
+      flex-basis: 20rem;
+      min-width: 0;
+    }
+  }
 }

@@ -77,3 +77,21 @@ ocx-shell-root:empty + .splash {
   display: flex;
   opacity: 1;
 }
+
+// WCAG 2.3.3 / 2.2.2: with reduced motion the splash shows a static ring (three quarters of a circle)
+// in the splash text colour instead of the rotating, colour-cycling loader, and appears without fading.
+@media (prefers-reduced-motion: reduce) {
+  ocx-shell-root + .splash {
+    transition: none;
+
+    .splash-content .splash-loader {
+      animation: none;
+
+      .splash-path {
+        animation: none;
+        stroke: currentColor;
+        stroke-dashoffset: 46.75;
+      }
+    }
+  }
+}

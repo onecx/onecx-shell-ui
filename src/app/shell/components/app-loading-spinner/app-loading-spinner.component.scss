@@ -39,10 +39,31 @@ $loader-border-bottom-color: transparent;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  &.loader-small {
-    width: 20px;
-    height: 20px;
-    top: 20%;
-    left: 45%;
+}
+
+// Shown only with reduced motion (see below), as a text cue next to the static ring
+.loader-text {
+  display: none;
+  position: absolute;
+  top: calc(50% + 1.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--p-border-radius-sm, 4px);
+  white-space: nowrap;
+  // Colours come from the active theme (surface background/text pair), readable on top of the dimmed overlay
+  background-color: var(--content-bg-color, var(--p-content-background));
+  color: var(--text-color, var(--p-text-color));
+}
+
+// WCAG 2.3.3 / 2.2.2: no rotation with reduced motion; a static ring plus visible text stays as loading cue
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation: none;
+  }
+
+  .loader-text {
+    display: block;
   }
 }

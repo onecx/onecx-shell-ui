@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { TestBed, waitForAsync, fakeAsync } from '@angular/core/testing'
+import { TestBed, waitForAsync, fakeAsync, tick, flush, discardPeriodicTasks } from '@angular/core/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ReplaySubject, firstValueFrom } from 'rxjs'
 
@@ -100,6 +100,38 @@ describe('OneCXShellExtensionsComponent', () => {
           summaryKey: 'TEST_SUCCESS_MESSAGE_KEY'
         })
       )
+    }))
+  })
+
+  describe('with prefers-reduced-motion', () => {
+    let originalMatchMedia: typeof globalThis.matchMedia
+
+    beforeEach(() => {
+      originalMatchMedia = globalThis.matchMedia
+      globalThis.matchMedia = jest.fn((query: string) => ({
+        ...originalMatchMedia(query),
+        matches: query.includes('prefers-reduced-motion: reduce')
+      }))
+    })
+
+    afterEach(() => {
+      globalThis.matchMedia = originalMatchMedia
+    })
+
+    it('still renders the toast as an assertive live region', fakeAsync(() => {
+      const { fixture, portalMessageServiceMock } = setUp()
+
+      portalMessageServiceMock.error({ summaryKey: 'REDUCED_MOTION_TOAST' })
+      tick()
+      fixture.detectChanges()
+
+      const message: HTMLElement | null = fixture.nativeElement.querySelector('.p-toast-message')
+      expect(message).not.toBeNull()
+      expect(message?.getAttribute('role')).toBe('alert')
+      expect(message?.getAttribute('aria-live')).toBe('assertive')
+      expect(message?.className).toContain('p-toast-message-error')
+      discardPeriodicTasks()
+      flush()
     }))
   })
 })

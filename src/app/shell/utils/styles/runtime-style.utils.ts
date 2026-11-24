@@ -57,7 +57,7 @@ function replaceCssUrls(css: string, stylesheetUrl: URL): string {
 
 function rewriteCssUrl(match: string, rawValue: string, stylesheetUrl: URL): string {
   const parsedUrl = parseCssUrl(rawValue)
-  if (!parsedUrl || !parsedUrl.assetUrl || isAbsoluteCssUrl(parsedUrl.assetUrl)) {
+  if (!parsedUrl?.assetUrl || isAbsoluteCssUrl(parsedUrl.assetUrl)) {
     return match
   }
 

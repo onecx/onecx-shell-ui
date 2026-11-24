@@ -1,5 +1,4 @@
 import { HttpClient } from '@angular/common/http'
-import { firstValueFrom } from 'rxjs'
 import {
   dataNoPortalLayoutStylesAttribute,
   dataStyleIdAttribute,
@@ -10,9 +9,10 @@ import {
 } from '@onecx/angular-utils'
 import { addStyleToHead, replaceRootWithScope } from '@onecx/angular-utils/style'
 import { markElement } from './style-data.utils'
+import { fetchRuntimeStyle } from './runtime-style.utils'
 
 export async function fetchPortalLayoutStyles(http: HttpClient) {
-  return await firstValueFrom(http.request('get', `./portal-layout-styles.css`, { responseType: 'text' }))
+  return await fetchRuntimeStyle(http, 'portal-layout-styles')
 }
 
 export function loadPortalLayoutStyles(css: string) {

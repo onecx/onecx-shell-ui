@@ -1,4 +1,4 @@
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { inject, NgModule, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Router, RouterModule, TitleStrategy } from '@angular/router'
@@ -54,6 +54,7 @@ import { ImageRepositoryService } from './shell/services/image-repository.servic
 import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
 import { ShellTitleStrategy } from './shell/services/shell-title.strategy'
+import { StylesheetAssetUrlInterceptor } from './shell/utils/styles/stylesheet-asset-url.interceptor'
 
 async function styleInitializer(
   configService: ConfigurationService,
@@ -359,6 +360,7 @@ export async function shareMfContainer() {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: StylesheetAssetUrlInterceptor, multi: true },
     provideAppInitializer(() => {
       return workspaceConfigInitializer(
         inject(WorkspaceConfigBffService),

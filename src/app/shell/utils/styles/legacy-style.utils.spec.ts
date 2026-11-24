@@ -18,11 +18,17 @@ describe('legacy style utils', () => {
   })
 
   it('fetches portal layout stylesheet as text', async () => {
-    const request = jest.fn(() => of('body { color: red; }'))
+    const request = jest.fn((method: string, url: string) =>
+      of(
+        url === './style-manifest.json'
+          ? { 'portal-layout-styles': 'portal-layout-styles.456def.css' }
+          : 'body { color: red; }'
+      )
+    )
     const http = { request } as unknown as HttpClient
 
     await expect(fetchPortalLayoutStyles(http)).resolves.toContain('color: red')
-    expect(request).toHaveBeenCalledWith('get', './portal-layout-styles.css', { responseType: 'text' })
+    expect(request).toHaveBeenCalledWith('get', './portal-layout-styles.456def.css', { responseType: 'text' })
   })
 
   it('loads both portal layout stylesheets with and without native scope support', () => {

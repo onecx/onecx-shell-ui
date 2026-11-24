@@ -24,25 +24,74 @@ export async function fetchRuntimeStyle(http: HttpClient, bundleName: string): P
 }
 
 export function resolveRelativeCssUrls(css: string, stylesheetUrl: string): string {
-  const baseElement = document.querySelector('base')
-  const documentBase = baseElement?.href ?? globalThis.location?.href ?? '/'
+  const documentBase = document.querySelector('base')?.href ?? document.baseURI
   const resolvedStylesheetUrl = new URL(stylesheetUrl, documentBase)
 
-  return css.replace(/url\(\s*(['"]?)([^)'"]*?)\1\s*\)/g, (match, quote: string, rawAssetUrl: string) => {
-    const assetUrl = rawAssetUrl.trim()
-    if (!assetUrl) {
-      return match
+  return replaceCssUrls(css, resolvedStylesheetUrl)
+}
+
+function replaceCssUrls(css: string, stylesheetUrl: URL): string {
+  let result = ''
+  let cursor = 0
+
+  while (cursor < css.length) {
+    const openingIndex = css.indexOf('url(', cursor)
+    if (openingIndex < 0) {
+      return result + css.slice(cursor)
     }
 
-    if (
-      assetUrl.startsWith('/') ||
-      assetUrl.startsWith('#') ||
-      assetUrl.startsWith('data:') ||
-      /^[a-z][a-z\d+.-]*:/i.test(assetUrl)
-    ) {
-      return match
+    const closingIndex = css.indexOf(')', openingIndex + 4)
+    if (closingIndex < 0) {
+      return result + css.slice(cursor)
     }
 
-    return `url(${quote}${new URL(assetUrl, resolvedStylesheetUrl).href}${quote})`
-  })
+    result += css.slice(cursor, openingIndex)
+    const match = css.slice(openingIndex, closingIndex + 1)
+    const rawValue = css.slice(openingIndex + 4, closingIndex)
+    result += rewriteCssUrl(match, rawValue, stylesheetUrl)
+    cursor = closingIndex + 1
+  }
+
+  return result
+}
+
+function rewriteCssUrl(match: string, rawValue: string, stylesheetUrl: URL): string {
+  const parsedUrl = parseCssUrl(rawValue)
+  if (!parsedUrl || !parsedUrl.assetUrl || isAbsoluteCssUrl(parsedUrl.assetUrl)) {
+    return match
+  }
+
+  return `url(${parsedUrl.quote}${new URL(parsedUrl.assetUrl, stylesheetUrl).href}${parsedUrl.quote})`
+}
+
+function parseCssUrl(rawValue: string): { assetUrl: string; quote: string } | undefined {
+  const value = rawValue.trim()
+  if (!value) {
+    return undefined
+  }
+
+  const quote = value[0]
+  if (quote !== '"' && quote !== "'") {
+    return value.includes('"') || value.includes("'") ? undefined : { assetUrl: value, quote: '' }
+  }
+
+  if (!value.endsWith(quote)) {
+    return undefined
+  }
+
+  const assetUrl = value.slice(1, -1)
+  if (assetUrl.includes('"') || assetUrl.includes("'")) {
+    return undefined
+  }
+
+  return { assetUrl, quote }
+}
+
+function isAbsoluteCssUrl(assetUrl: string): boolean {
+  return (
+    assetUrl.startsWith('/') ||
+    assetUrl.startsWith('#') ||
+    assetUrl.startsWith('data:') ||
+    /^[a-z][a-z\d+.-]*:/i.test(assetUrl)
+  )
 }

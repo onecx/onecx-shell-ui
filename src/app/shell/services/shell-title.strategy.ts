@@ -3,8 +3,9 @@ import { Title } from '@angular/platform-browser'
 import { RouterStateSnapshot, TitleStrategy } from '@angular/router'
 import { TranslateService } from '@ngx-translate/core'
 import { AppStateService } from '@onecx/angular-integration-interface'
-import { DocumentTitle, DocumentTitleTopic } from '@onecx/integration-interface'
-import { combineLatest, map, Observable, of, startWith, Subscription } from 'rxjs'
+import { DocumentTitleTopic } from '@onecx/integration-interface'
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subscription } from 'rxjs'
+import { DocumentTitleRegistry } from '../utils/document-title-registry.utils'
 import { isMfeRoute } from '../utils/mfe-route.utils'
 
 /** Route titles starting with this prefix are shell translation keys. */
@@ -16,8 +17,9 @@ export const TITLE_SEPARATOR = ' - '
  * - the deepest route title wins (Angular's buildTitle); MFE routes fall back to the app displayName set by the shell
  * - shell titles are translation keys and are re-translated on language change
  * - raw translation keys are never written to the document title
- * - on MFE routes, a title published by the MFE on the DocumentTitleTopic for the current location replaces the
- *   route title (also when it arrives after the navigation); titles published for other paths are ignored
+ * - on MFE routes, the title published on the DocumentTitleTopic for the best matching path (exact path or wildcard
+ *   pattern, see DocumentTitleRegistry) replaces the route title, also when it is published before or after the
+ *   navigation; titles published for non-matching paths are ignored
  */
 @Injectable({ providedIn: 'root' })
 export class ShellTitleStrategy extends TitleStrategy implements OnDestroy {
@@ -25,6 +27,13 @@ export class ShellTitleStrategy extends TitleStrategy implements OnDestroy {
   private readonly translate = inject(TranslateService)
   private readonly appStateService = inject(AppStateService)
   private readonly documentTitleTopic = new DocumentTitleTopic()
+  private readonly documentTitles = new DocumentTitleRegistry()
+  private readonly documentTitlesChanged$ = new BehaviorSubject<void>(undefined)
+  // registered for the whole lifetime: the topic replays only its latest message, earlier patterns would be lost
+  private readonly documentTitleSubscription = this.documentTitleTopic.subscribe((documentTitle) => {
+    this.documentTitles.apply(documentTitle)
+    this.documentTitlesChanged$.next()
+  })
   private subscription?: Subscription
 
   override updateTitle(snapshot: RouterStateSnapshot): void {
@@ -39,13 +48,14 @@ export class ShellTitleStrategy extends TitleStrategy implements OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe()
+    this.documentTitleSubscription.unsubscribe()
+    this.documentTitlesChanged$.complete()
     this.documentTitleTopic.destroy()
   }
 
   private mfeTitle(routeTitle: Observable<string | undefined>): Observable<string | undefined> {
-    const publishedTitle = this.documentTitleTopic.pipe(
-      map((documentTitle) => titleForCurrentLocation(documentTitle)),
-      startWith<string | undefined, [undefined]>(undefined)
+    const publishedTitle = this.documentTitlesChanged$.pipe(
+      map(() => this.documentTitles.resolve(document.location.pathname))
     )
     return combineLatest([publishedTitle, routeTitle]).pipe(map(([published, fallback]) => published ?? fallback))
   }
@@ -63,8 +73,4 @@ export class ShellTitleStrategy extends TitleStrategy implements OnDestroy {
       startWith<string | undefined, [undefined]>(undefined)
     )
   }
-}
-
-function titleForCurrentLocation(documentTitle: DocumentTitle): string | undefined {
-  return documentTitle.path === document.location.pathname ? documentTitle.title || undefined : undefined
 }

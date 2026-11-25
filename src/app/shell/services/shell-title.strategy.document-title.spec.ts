@@ -90,6 +90,41 @@ describe('ShellTitleStrategy on microfrontend routes', () => {
   })
 })
 
+describe('ShellTitleStrategy with wildcard paths on microfrontend routes', () => {
+  let s: Setup
+  beforeEach(() => (s = setup('Theme App')))
+  afterEach(() => s.strategy.ngOnDestroy())
+
+  it('given a section pattern published before the navigation, when navigating into the section, then it is used', async () => {
+    await publish({ title: 'Themes', path: '/admin/theme/**' })
+    await publish({ title: 'Other', path: '/admin/other' })
+    s.strategy.updateTitle(mfeRouteAt(MFE_PATH))
+    expect(s.setTitle).toHaveBeenLastCalledWith('Themes - WS')
+  })
+
+  it('given a section pattern, when an exact title is published for the location, then the exact title is used', async () => {
+    await publish({ title: 'Theme Search', path: MFE_PATH })
+    await publish({ title: 'Themes', path: '/admin/theme/**' })
+    s.strategy.updateTitle(mfeRouteAt(MFE_PATH))
+    expect(s.setTitle).toHaveBeenLastCalledWith('Theme Search - WS')
+  })
+
+  it('given an exact title and a pattern, when the exact title is removed, then the pattern title is used', async () => {
+    await publish({ title: 'Themes', path: '/admin/theme/**' })
+    await publish({ title: 'Theme Search', path: MFE_PATH })
+    s.strategy.updateTitle(mfeRouteAt(MFE_PATH))
+    await publish({ path: MFE_PATH })
+    expect(s.setTitle).toHaveBeenLastCalledWith('Themes - WS')
+  })
+
+  it('given a pattern title, when the pattern is removed, then the route title is used', async () => {
+    await publish({ title: 'Themes', path: '/admin/theme/**' })
+    s.strategy.updateTitle(mfeRouteAt(MFE_PATH))
+    await publish({ title: '', path: '/admin/theme/**' })
+    expect(s.setTitle).toHaveBeenLastCalledWith('Theme App - WS')
+  })
+})
+
 describe('ShellTitleStrategy on shell pages', () => {
   it('given a title published for the current path, when on a shell page, then the shell title is used', async () => {
     const { strategy, setTitle } = setup('PAGE_TITLES.ABOUT')

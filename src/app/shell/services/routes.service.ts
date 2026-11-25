@@ -23,6 +23,11 @@ import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-l
 import { updateStylesForMfeChange } from '@onecx/angular-utils'
 import { HttpClient } from '@angular/common/http'
 
+/**
+ * Route data key that marks a shell route as a workspace microfrontend route.
+ */
+export const MFE_ROUTE_DATA_KEY = 'isMfeRoute'
+
 export const DEFAULT_CATCH_ALL_ROUTE: Route = {
   path: '**',
   component: PageNotFoundComponent,
@@ -77,7 +82,8 @@ export class RoutesService implements ShowContentProvider {
       path: await this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
-        breadcrumb: r.productName
+        breadcrumb: r.productName,
+        [MFE_ROUTE_DATA_KEY]: true
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),

@@ -2,7 +2,7 @@ import { inject, NgModule, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { Router, RouterModule } from '@angular/router'
+import { Router, RouterModule, TitleStrategy } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { catchError, firstValueFrom, retry } from 'rxjs'
 
@@ -49,30 +49,21 @@ import { InitializationErrorPageComponent } from './shell/components/initializat
 import { PageNotFoundComponent } from './shell/components/not-found-page.component'
 import { PermissionProxyService } from './shell/services/permission-proxy.service'
 import { RoutesService } from './shell/services/routes.service'
+import { ShellTitleStrategy } from './shell/services/shell-title.strategy'
 import { initializationErrorHandler } from './shell/utils/initialization-error-handler.utils'
 
 import { AppComponent } from './app.component'
 import { appRoutes } from './app.routes'
 import { ErrorPageComponent } from './shell/components/error-page.component'
-import { fetchPortalLayoutStyles, loadPortalLayoutStyles } from './shell/utils/styles/legacy-style.utils'
+import {
+  portalLayoutStylesInitializer,
+  shellStylesInitializer
+} from './shell/utils/styles/layout-styles-initializer.utils'
 import { dynamicContentInitializer } from './shell/utils/styles/dynamic-content-initializer.utils'
-import { fetchShellStyles, loadShellStyles } from './shell/utils/styles/shell-styles.utils'
 import { styleChangesListenerInitializer } from './shell/utils/styles/style-changes-listener.utils'
 import { WelcomeMessageComponent } from './shell/components/welcome-message-component/welcome-message.component'
 import { ParametersService } from './shell/services/parameters.service'
 import { applyPerformancePolyfill, applyPrecisionPolyfill } from 'src/scope-polyfill/polyfill'
-
-async function shellStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const css = await fetchShellStyles(http)
-  loadShellStyles(css)
-}
-
-async function portalLayoutStylesInitializer(appStateService: AppStateService, http: HttpClient) {
-  await appStateService.isAuthenticated$.isInitialized
-  const css = await fetchPortalLayoutStyles(http)
-  loadPortalLayoutStyles(css)
-}
 
 async function scopePolyfillInitializer(configService: ConfigurationService) {
   const mode = await configService.getProperty(CONFIG_KEY.POLYFILL_SCOPE_MODE)
@@ -415,7 +406,8 @@ export async function shareMfContainer() {
     { provide: SLOT_SERVICE, useExisting: SlotService },
     { provide: BASE_PATH, useValue: './shell-bff' },
     { provide: SHOW_CONTENT_PROVIDER, useExisting: RoutesService },
-    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService }
+    { provide: WORKSPACE_CONFIG_BFF_SERVICE_PROVIDER, useExisting: WorkspaceConfigBffService },
+    { provide: TitleStrategy, useExisting: ShellTitleStrategy }
   ],
   bootstrap: [AppComponent]
 })

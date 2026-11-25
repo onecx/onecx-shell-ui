@@ -3,7 +3,7 @@
 
 // Selectors of links that are not inline links in running text and keep their plain look.
 // PrimeNG 21 puts role="menuitem"/"treeitem" on the li, so the contained links are matched via `[role] a`.
-$plainLinkContexts: '.ocx-link-plain, .ocx-link-plain a, nav a, [role="menu"] a, [role="menubar"] a, [role="menuitem"] a, [role="treeitem"] a, .p-breadcrumb a, [aria-label="breadcrumb"] a, .p-dock a, .p-dock-link, .p-button, [role="button"]';
+$plainLinkContexts: '.ocx-link-plain, .ocx-link-plain a, nav a, [role="menu"] a, [role="menubar"] a, [role="menuitem"] a, [role="treeitem"] a, .p-breadcrumb a, .p-panelmenu a, [aria-label="breadcrumb"] a, .p-dock a, .p-dock-link, .p-button, [role="button"]';
 
 @mixin ocx-link-styles {
   // Inline links, e.g. in running text of any MFE, are underlined and use the regular text colour

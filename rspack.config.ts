@@ -228,6 +228,44 @@ class SuppressJsForCssOnlyEntryPlugin {
   }
 }
 
+/**
+ * Maps runtime-fetched global-style bundle names to their emitted file names.
+ * This keeps the requests independent of outputHashing: 'all' while preserving
+ * hashed assets in production builds.
+ */
+class EmitStyleManifestPlugin {
+  constructor(private readonly styleEntries: readonly string[]) {}
+
+  apply(compiler: Compiler) {
+    compiler.hooks.thisCompilation.tap('EmitStyleManifestPlugin', (compilation: Compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'EmitStyleManifestPlugin',
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE
+        },
+        () => {
+          const assetNames = Object.keys(compilation.assets)
+          const manifest: Record<string, string> = {}
+
+          for (const bundle of this.styleEntries) {
+            const match = assetNames.find((name) => new RegExp(`^${bundle}(?:\\.[0-9a-f]+)?\\.css$`).test(name))
+            if (match) {
+              manifest[bundle] = match
+            }
+          }
+
+          if (Object.keys(manifest).length > 0) {
+            compilation.emitAsset(
+              'style-manifest.json',
+              new compiler.webpack.sources.RawSource(JSON.stringify(manifest))
+            )
+          }
+        }
+      )
+    })
+  }
+}
+
 export default async (env: { production?: boolean; configuration?: string } = {}) => {
   const configuration =
     env.configuration ??
@@ -287,6 +325,7 @@ export default async (env: { production?: boolean; configuration?: string } = {}
       .map(([name]) => name)
   )
   browserConfig.plugins.push(new SuppressJsForCssOnlyEntryPlugin(styleEntries))
+  browserConfig.plugins.push(new EmitStyleManifestPlugin(['shell-styles', 'portal-layout-styles']))
   // Angular's application builder normally shuts down this shared pool.
   browserConfig.plugins.push({
     apply(compiler) {

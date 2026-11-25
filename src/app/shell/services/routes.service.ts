@@ -13,7 +13,7 @@ import {
 } from '@onecx/angular-integration-interface'
 import { PermissionsTopic } from '@onecx/integration-interface'
 
-import { appRoutes } from 'src/app/app.routes'
+import { appRoutes, MFE_ROUTE_DATA_KEY } from 'src/app/app.routes'
 import { Route as BffGeneratedRoute, PathMatch, PermissionBffService, Technologies } from 'src/app/shared/generated'
 
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
@@ -75,7 +75,8 @@ export class RoutesService {
       path: await this.toRouteUrl(r.baseUrl),
       data: {
         module: r.exposedModule,
-        breadcrumb: r.productName
+        breadcrumb: r.productName,
+        [MFE_ROUTE_DATA_KEY]: true
       },
       pathMatch: r.pathMatch ?? (r.baseUrl.endsWith('$') ? 'full' : 'prefix'),
       loadChildren: async () => await this.loadChildren(r, r.baseUrl),

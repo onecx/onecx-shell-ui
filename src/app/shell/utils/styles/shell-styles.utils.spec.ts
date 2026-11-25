@@ -17,11 +17,13 @@ describe('shell styles utils', () => {
   })
 
   it('fetches shell stylesheet as text', async () => {
-    const request = jest.fn(() => of('body { color: red; }'))
+    const request = jest.fn((method: string, url: string) =>
+      of(url === './style-manifest.json' ? { 'shell-styles': 'shell-styles.123abc.css' } : 'body { color: red; }')
+    )
     const http = { request } as unknown as HttpClient
 
     await expect(fetchShellStyles(http)).resolves.toContain('color: red')
-    expect(request).toHaveBeenCalledWith('get', './shell-styles.css', { responseType: 'text' })
+    expect(request).toHaveBeenCalledWith('get', './shell-styles.123abc.css', { responseType: 'text' })
   })
 
   it('loads shell styles with native scope support or a supports fallback', () => {

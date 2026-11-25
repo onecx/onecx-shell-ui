@@ -1,5 +1,4 @@
 import { HttpClient } from '@angular/common/http'
-import { firstValueFrom } from 'rxjs'
 import {
   dataStyleIdAttribute,
   dataStyleIsolationAttribute,
@@ -8,9 +7,10 @@ import {
 } from '@onecx/angular-utils'
 import { addStyleToHead, replaceRootWithScope } from '@onecx/angular-utils/style'
 import { markElement } from './style-data.utils'
+import { fetchRuntimeStyle } from './runtime-style.utils'
 
 export async function fetchShellStyles(http: HttpClient) {
-  return await firstValueFrom(http.request('get', `./shell-styles.css`, { responseType: 'text' }))
+  return await fetchRuntimeStyle(http, 'shell-styles')
 }
 
 export function loadShellStyles(css: string) {

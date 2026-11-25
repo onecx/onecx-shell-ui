@@ -21,16 +21,20 @@ describe('InitializationErrorPageComponent', () => {
     params: '[key1: value1]'
   }
 
-  beforeEach(() => {
-    route = {
-      fragment: of(new URLSearchParams(fragmentParams).toString())
-    } as any
+  function configureTestingModule(fragment: string): ActivatedRoute {
+    const activatedRoute = { fragment: of(fragment) } as any
 
     TestBed.configureTestingModule({
       declarations: [],
       imports: [InitializationErrorPageComponent, TooltipModule],
-      providers: [{ provide: ActivatedRoute, useValue: route }, provideTranslateTestingService({})]
+      providers: [{ provide: ActivatedRoute, useValue: activatedRoute }, provideTranslateTestingService({})]
     }).compileComponents()
+
+    return activatedRoute
+  }
+
+  beforeEach(() => {
+    route = configureTestingModule(new URLSearchParams(fragmentParams).toString())
 
     fixture = TestBed.createComponent(InitializationErrorPageComponent)
     component = fixture.componentInstance
@@ -64,6 +68,34 @@ describe('InitializationErrorPageComponent', () => {
         '[param1: Invalid]'
       )
       expect(compiled.querySelector('#onecxInitializationErrorParams')?.textContent).toContain('[key1: value1]')
+    })
+  })
+
+  describe('reflow', () => {
+    const longUrl = 'https://example.com/' + 'a'.repeat(280)
+
+    beforeEach(() => {
+      // Use a fresh testing module with its own route instead of mutating the shared one after creation
+      TestBed.resetTestingModule()
+      configureTestingModule(new URLSearchParams({ ...fragmentParams, requestedUrl: longUrl }).toString())
+      fixture = TestBed.createComponent(InitializationErrorPageComponent)
+      fixture.detectChanges()
+    })
+
+    it('renders a 300-character URL completely in a wrapping value element', () => {
+      const compiled = fixture.nativeElement as HTMLElement
+      const value = compiled.querySelector('#onecxInitializationErrorRequestedUrl .onecx-init-error-value')
+
+      expect(longUrl).toHaveLength(300)
+      expect(value?.textContent).toBe(longUrl)
+      expect(compiled.querySelectorAll('.onecx-init-error-value')).toHaveLength(Object.keys(fragmentParams).length)
+    })
+
+    it('renders the "Log out" button with its label inside the error section', () => {
+      const compiled = fixture.nativeElement as HTMLElement
+      const button = compiled.querySelector('section.onecx-init-error button.onecx-init-error-logout')
+
+      expect(button?.textContent?.trim()).toBe('LOGOUT')
     })
   })
 

@@ -1,0 +1,16 @@
+// Reflow (WCAG 1.4.10): long, unbroken values such as a requested URL must wrap
+// instead of forcing horizontal scrolling at 320 CSS px / 400% zoom.
+.onecx-init-error {
+  overflow-wrap: anywhere;
+}
+
+.onecx-init-error-value {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+// Keep the "Log out" action within the viewport when its label is longer than the available width
+.onecx-init-error-logout {
+  max-width: 100%;
+  white-space: normal;
+}

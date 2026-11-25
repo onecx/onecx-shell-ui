@@ -19,7 +19,8 @@ interface InitializationError {
   changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [AsyncPipe, TranslateModule],
-  templateUrl: './initialization-error-page.component.html'
+  templateUrl: './initialization-error-page.component.html',
+  styleUrl: './initialization-error-page.component.scss'
 })
 export class InitializationErrorPageComponent implements OnDestroy {
   error$: Observable<InitializationError>

@@ -53,6 +53,7 @@ import { mapSlots } from './shell/utils/slot-names-mapper'
 import { ImageRepositoryService } from './shell/services/image-repository.service'
 import { MARKED_AS_WRAPPED } from './shell/utils/styles/shared-styles-host-overwrites.utils'
 import { ShellIconLoaderService } from './shell/services/icon-loader.service'
+import { NavigationFocusService } from './shell/services/navigation-focus.service'
 import { ShellTitleStrategy } from './shell/services/shell-title.strategy'
 import { StylesheetAssetUrlInterceptor } from './shell/utils/styles/stylesheet-asset-url.interceptor'
 
@@ -431,6 +432,9 @@ export async function shareMfContainer() {
     { provide: BASE_PATH, useValue: './shell-bff' },
     provideAppInitializer(() => {
       return shellIconLoaderServiceInitializer(inject(ShellIconLoaderService))
+    }),
+    provideAppInitializer(() => {
+      inject(NavigationFocusService).init()
     })
   ],
   bootstrap: [AppComponent]

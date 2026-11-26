@@ -9,6 +9,8 @@
 // Import theme_defaults so default theme variables are available on the page
 @import 'node_modules/@onecx/portal-layout-styles/src/styles/shell/theme_defaults.scss';
 
+@import 'focus-ring';
+
 $mobileBreakpoint: 991px !default;
 :root {
   --mobile-break-point: #{$mobileBreakpoint};

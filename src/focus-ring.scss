@@ -1,0 +1,23 @@
+/*
+  Platform focus-ring baseline. No colour is hardcoded: OneCX themes change the palette per workspace,
+  so the ring follows the theme tokens published by the libs preset (onecx/internal-tasks#1070):
+
+    --p-onecx-focus-ring-color          contrast-checked ring colour (falls back to --primary-color)
+    --p-onecx-focus-ring-inverse-color  halo colour (falls back to --content-bg-color)
+    --p-focus-ring-width / --p-focus-ring-offset
+
+  :where() keeps the selector at the specificity of a single pseudo-class, so any focus style of a remote or component wins.
+*/
+:where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: var(--p-focus-ring-width, 2px) solid var(--p-onecx-focus-ring-color, var(--primary-color));
+  outline-offset: var(--p-focus-ring-offset, 2px);
+  // halo fills the offset gap so the ring is visible on light and dark backgrounds
+  box-shadow: 0 0 0 var(--p-focus-ring-offset, 2px) var(--p-onecx-focus-ring-inverse-color, var(--content-bg-color));
+}
+
+@media (forced-colors: active) {
+  :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+    outline-color: Highlight;
+    box-shadow: none;
+  }
+}

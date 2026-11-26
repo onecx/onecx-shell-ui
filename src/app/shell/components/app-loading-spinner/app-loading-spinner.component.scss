@@ -39,6 +39,11 @@ $loader-border-bottom-color: transparent;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
   &.loader-small {
     width: 20px;
     height: 20px;

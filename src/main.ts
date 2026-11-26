@@ -22,6 +22,6 @@ const preloaders = [
   react19Preloader
 ]
 
-Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)]).then(() => {
-  return import('./bootstrap').catch((err) => console.error(err))
-})
+Promise.all([...preloaders.map(loadPreloaderModule), ...preloaders.map(ensurePreloaderModuleLoaded)])
+  .then(() => import('./bootstrap'))
+  .catch((err) => console.error(err))

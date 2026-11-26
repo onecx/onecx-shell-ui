@@ -11,10 +11,10 @@ export class ImageRepositoryService {
 
   /**
    * Triggers image loading and publishing asynchronously.
-   * Returns a resolved Promise<void> immediately (non-blocking).
+   * Returns immediately (non-blocking).
    */
 
-  public async init(): Promise<void> {
+  public init(): void {
     this.getAvailableImages()
   }
 

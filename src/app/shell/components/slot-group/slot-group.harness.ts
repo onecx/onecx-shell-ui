@@ -48,12 +48,18 @@ export class SlotGroupHarness extends ContentContainerComponentHarness {
    */
   async getContainerStyles(properties: string[]): Promise<Record<string, string>> {
     const host = await this.host()
-    const result: Record<string, string> = {}
 
-    for (const property of properties) {
-      result[property] = await host.getCssValue(property)
-    }
-    return result
+    const values = await Promise.all(
+      properties.map(async (property) => ({
+        property,
+        value: await host.getCssValue(property)
+      }))
+    )
+
+    return values.reduce<Record<string, string>>((result, { property, value }) => {
+      result[property] = value
+      return result
+    }, {})
   }
 
   /**

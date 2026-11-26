@@ -77,7 +77,7 @@ export class ParametersService implements OnDestroy {
     )
 
     const expirationDate = new Date()
-    expirationDate.setSeconds(expirationDate.getSeconds() + this.cacheExpirationTimeMs)
+    expirationDate.setTime(expirationDate.getTime() + this.cacheExpirationTimeMs)
 
     const existingParameter = cache.parameters.find((item) => item.productName === productName && item.appId === appId)
     if (existingParameter) {

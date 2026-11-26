@@ -14,7 +14,7 @@ import { DEFAULT_CATCH_ALL_ROUTE, RoutesService } from './routes.service'
 import { ConfigurationService, PortalMessageService } from '@onecx/angular-integration-interface'
 import { AppStateServiceMock, provideAppStateServiceMock } from '@onecx/angular-integration-interface/mocks'
 
-import { appRoutes } from 'src/app/app.routes'
+import { appRoutes, MFE_ROUTE_DATA_KEY } from 'src/app/app.routes'
 import { PathMatch, PermissionBffService, Route, Technologies } from 'src/app/shared/generated'
 import { PermissionsCacheService } from './permissions-cache.service'
 import { WebcomponentLoaderModule } from '../web-component-loader/webcomponent-loader.module'
@@ -156,7 +156,7 @@ describe('RoutesService', () => {
       expect(createdRoute?.loadChildren).toBeDefined()
       expect(createdRoute?.canActivateChild).toBeDefined()
       expect(createdRoute?.pathMatch).toBe(PathMatch.prefix)
-      expect(createdRoute?.data).toBeDefined()
+      expect(createdRoute?.data?.[MFE_ROUTE_DATA_KEY]).toBe(true)
       expect((createdRoute?.data as any).breadcrumb).toBe('onecx-welcome')
       expect((createdRoute?.data as any).module).toBe('./OneCXWelcomeModule')
       expect(createdRoute?.title).toBe('OneCX Welcome')

@@ -3,6 +3,9 @@ import { Route } from '@angular/router'
 // Initialization error page is lazy-loaded via InitErrorModule
 export const internalShellRoute = 'onecx-shell'
 
+/** Route data key marking a shell route generated for a workspace microfrontend. */
+export const MFE_ROUTE_DATA_KEY = 'isMfeRoute'
+
 export const appRoutes: Route[] = [
   {
     path: 'portal-initialization-error-page',

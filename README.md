@@ -8,6 +8,8 @@ Useful Links:
 
 . [OneCX Local Environment](https://onecx.github.io/docs/documentation/current/onecx-local-env/index.html)
 
+. [Contributing (commit hooks)](CONTRIBUTING.md)
+
 ## Styling
 
 The Shell's own content (v9 / Angular 22 surface: slot groups, loading/error/About layouts, initial splash) is styled with **Tailwind CSS v4**, built with the Optimus **styled mode** theme from `@openng/optimus-ui-tailwindcss`.

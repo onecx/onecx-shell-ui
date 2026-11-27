@@ -19,8 +19,10 @@
     "strict": true,
     "target": "es2022",
     "useDefineForClassFields": false,
-    "noUncheckedSideEffectImports": false,
-    "types": ["*"]
+    "noUncheckedSideEffectImports": false
+  },
+  "ts-node": {
+    "swc": true
   },
   "files": [],
   "include": [],

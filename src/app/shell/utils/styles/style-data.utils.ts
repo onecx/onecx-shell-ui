@@ -13,6 +13,8 @@ import {
 export const dataWrapperElementAttribute = 'data-dynamic-wrapper-element'
 export const dataWrapperElementKey = 'dynamicWrapperElement'
 
+const styleDataWrapperObservers = new WeakMap<HTMLElement, MutationObserver>()
+
 /**
  * Marks an element with a specific value for tracking purposes.
  * @param element - The element to be marked.
@@ -62,13 +64,22 @@ export function observeStyleDataWrapper(wrapper: HTMLElement) {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList' && wrapper.childNodes.length === 0) {
+        stopObservingStyleDataWrapper(wrapper)
         wrapper.remove()
-        observer.disconnect()
       }
     })
   })
 
+  styleDataWrapperObservers.set(wrapper, observer)
   observer.observe(wrapper, { childList: true })
+}
+
+export function stopObservingStyleDataWrapper(wrapper: HTMLElement) {
+  const observer = styleDataWrapperObservers.get(wrapper)
+  if (observer) {
+    observer.disconnect()
+    styleDataWrapperObservers.delete(wrapper)
+  }
 }
 
 /**

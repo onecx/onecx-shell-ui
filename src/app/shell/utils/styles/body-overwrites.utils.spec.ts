@@ -10,6 +10,12 @@ jest.mock('@onecx/angular-utils', () => {
   return { ...actual, isCssScopeRuleSupported: jest.fn() }
 })
 
+function setStyleTrigger(styleId: string, tagName: string): void {
+  const trigger = document.createElement(tagName)
+  trigger.dataset[dataStyleIdKey] = styleId
+  globalThis.onecxTriggerElement = trigger
+}
+
 describe('body style data overwrites', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
@@ -23,9 +29,8 @@ describe('body style data overwrites', () => {
   })
 
   it('wraps body children with inherited style data and removes their wrapper', () => {
-    const trigger = document.createElement('div')
-    trigger.dataset[dataStyleIdKey] = 'shell|app'
-    globalThis.onecxTriggerElement = trigger
+    const disconnect = jest.spyOn(MutationObserver.prototype, 'disconnect')
+    setStyleTrigger('shell|app', 'div')
     ensureBodyChangesIncludeStyleData(undefined)
     const child = document.createElement('main')
 
@@ -37,6 +42,8 @@ describe('body style data overwrites', () => {
     expect(child.dataset[dataStyleIdKey]).toBeUndefined()
     document.body.removeChild(child)
     expect(document.body.firstElementChild).toBeNull()
+    expect(wrapper.firstElementChild).toBe(child)
+    expect(disconnect).toHaveBeenCalled()
   })
 
   it('leaves text and blacklisted body children unwrapped', () => {
@@ -88,9 +95,7 @@ describe('body style data overwrites', () => {
     expect(child.dataset[dataStyleIdKey]).toBeUndefined()
     overlay.removeChild(child)
 
-    const trigger = document.createElement('button')
-    trigger.dataset[dataStyleIdKey] = 'trigger|app'
-    globalThis.onecxTriggerElement = trigger
+    setStyleTrigger('trigger|app', 'button')
     const unstyledChild = document.createElement('button')
     overlay.appendChild(unstyledChild)
     expect(overlay.dataset[dataStyleIdKey]).toBe('trigger|app')

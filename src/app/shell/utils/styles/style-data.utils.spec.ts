@@ -20,6 +20,19 @@ import {
   wrapWithDiv
 } from './style-data.utils'
 
+function createWrapperWithStyleChild() {
+  const wrapper = createWrapper({ styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
+  document.body.appendChild(wrapper)
+  const child = document.createElement('span')
+  appendIntermediateStyleData(child, { styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
+  child.dataset[dataStyleIsolationKey] = ''
+  child.dataset[dataStyleIdKey] = 'app'
+  child.dataset[dataNoPortalLayoutStylesKey] = ''
+  child.dataset[dataMfeElementKey] = ''
+  wrapper.append(child, document.createTextNode('text'))
+  return { wrapper, child }
+}
+
 describe('style data utilities', () => {
   it('marks elements and reuses existing marker collections', () => {
     const element: { onecx?: { markers?: string[] } } = {}
@@ -88,20 +101,13 @@ describe('style data utilities', () => {
   })
 
   it('removes style data recursively and removes an empty observed wrapper', async () => {
-    const wrapper = createWrapper({ styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
-    document.body.appendChild(wrapper)
-    const child = document.createElement('span')
-    appendIntermediateStyleData(child, { styleId: 'app', noPortalLayoutStyles: '', mfeElement: '' })
-    child.dataset[dataStyleIsolationKey] = ''
-    child.dataset[dataStyleIdKey] = 'app'
-    child.dataset[dataNoPortalLayoutStylesKey] = ''
-    child.dataset[dataMfeElementKey] = ''
-    wrapper.append(child, document.createTextNode('text'))
+    const { wrapper, child } = createWrapperWithStyleChild()
 
     removeStyleDataRecursive(wrapper)
     expect(child.dataset[dataStyleIsolationKey]).toBeUndefined()
     expect(child.dataset[dataIntermediateStyleIdKey]).toBeUndefined()
 
+    const disconnect = jest.spyOn(MutationObserver.prototype, 'disconnect')
     observeStyleDataWrapper(wrapper)
     wrapper.removeChild(child)
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -110,6 +116,8 @@ describe('style data utilities', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(wrapper.isConnected).toBe(false)
+    expect(disconnect).toHaveBeenCalled()
+    disconnect.mockRestore()
   })
 
   it('skips data cleanup when given an element without a dataset', () => {

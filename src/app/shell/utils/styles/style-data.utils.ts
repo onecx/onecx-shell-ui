@@ -13,6 +13,8 @@ import {
 export const dataWrapperElementAttribute = 'data-dynamic-wrapper-element'
 export const dataWrapperElementKey = 'dynamicWrapperElement'
 
+const wrapperObservers = new WeakMap<HTMLElement, MutationObserver>()
+
 /**
  * Marks an element with a specific value for tracking purposes.
  * @param element - The element to be marked.
@@ -63,12 +65,24 @@ export function observeStyleDataWrapper(wrapper: HTMLElement) {
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList' && wrapper.childNodes.length === 0) {
         wrapper.remove()
-        observer.disconnect()
+        stopObservingStyleDataWrapper(wrapper)
       }
     })
   })
 
+  wrapperObservers.set(wrapper, observer)
   observer.observe(wrapper, { childList: true })
+}
+
+/**
+ * Disconnects the style data observer of a wrapper if one is observing it.
+ * Safe to call for a wrapper without a stored observer or after it already
+ * stopped observing, e.g. when a still-populated wrapper is removed wholesale.
+ * @param wrapper HTMLElement whose observer should be disconnected
+ */
+export function stopObservingStyleDataWrapper(wrapper: HTMLElement) {
+  wrapperObservers.get(wrapper)?.disconnect()
+  wrapperObservers.delete(wrapper)
 }
 
 /**
